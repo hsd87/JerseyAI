@@ -286,6 +286,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  app.get("/api/subscription/status", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const user = req.user;
+      
+      // Default response for users without Stripe subscription
+      let subscriptionData = {
+        isSubscribed: user.subscriptionTier === 'pro',
+        subscriptionTier: user.subscriptionTier,
+        subscriptionExpiry: null,
+        subscriptionStatus: user.subscriptionTier === 'pro' ? 'active' : 'inactive',
+        remainingDesigns: user.remainingDesigns
+      };
+      
+      // If Stripe is configured and user has a subscription, get details from Stripe
+      if (process.env.STRIPE_SECRET_KEY && user.stripeSubscriptionId) {
+        try {
+          const { checkSubscriptionStatus } = await import('./stripe');
+          const stripeStatus = await checkSubscriptionStatus(user.stripeSubscriptionId);
+          
+          subscriptionData = {
+            isSubscribed: stripeStatus.status === 'active',
+            subscriptionTier: stripeStatus.status === 'active' ? 'pro' : 'free',
+            subscriptionExpiry: new Date(stripeStatus.current_period_end * 1000).toISOString(),
+            subscriptionStatus: stripeStatus.status,
+            remainingDesigns: user.remainingDesigns
+          };
+          
+          // Update user record if there's a mismatch
+          if ((subscriptionData.isSubscribed && user.subscriptionTier !== 'pro') ||
+              (!subscriptionData.isSubscribed && user.subscriptionTier === 'pro')) {
+            await storage.updateUserSubscription(
+              user.id, 
+              subscriptionData.isSubscribed ? 'pro' : 'free'
+            );
+          }
+        } catch (err: any) {
+          console.error('Error checking Stripe subscription:', err);
+          // If there's an error with Stripe, fall back to the database record
+        }
+      }
+      
+      res.json(subscriptionData);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
   // Checkout endpoint for orders
   app.post("/api/create-payment-intent", async (req, res, next) => {
     try {

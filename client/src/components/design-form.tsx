@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/use-auth";
 import { useReplicate } from "@/hooks/use-replicate";
 import { useDesignStore } from "@/hooks/use-design-store";
+import { useSubscription } from "@/hooks/use-subscription-store";
 import { Link } from "wouter";
 import {
   DesignFormValues,
@@ -35,6 +36,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   const { user } = useAuth();
   const { formData, updateFormData } = useDesignStore();
   const { generateDesign, isGenerating } = useReplicate();
+  const subscription = useSubscription();
 
   // Initialize the form with values from the store
   const form = useForm<DesignFormValues>({
@@ -263,7 +265,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             <Button
               type="submit"
               className="w-full bg-black text-white py-3 px-4 rounded-md font-medium hover:bg-gray-800 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14]"
-              disabled={isGenerating || !user}
+              disabled={isGenerating || !user || (!subscription.isSubscribed && subscription.remainingDesigns <= 0)}
             >
               {isGenerating ? (
                 <>
@@ -279,19 +281,19 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             
             {user ? (
               <p className="text-xs text-gray-500 mt-2 text-center">
-                Using {user.subscriptionTier === 'pro' ? 'unlimited' : `1 of ${remainingDesigns}`} {user.subscriptionTier === 'pro' ? '' : 'free'} generations this month
+                Using {subscription.isSubscribed ? 'unlimited' : `1 of ${subscription.remainingDesigns}`} {subscription.isSubscribed ? '' : 'free'} generations this month
               </p>
             ) : (
               <p className="text-xs text-gray-500 mt-2 text-center">
-                <Link href="/auth">
-                  <a className="text-black hover:text-[#39FF14]">Sign in</a>
+                <Link href="/auth" className="text-black hover:text-[#39FF14]">
+                  Sign in
                 </Link> to use the design generator
               </p>
             )}
           </div>
           
           {/* Subscription Upsell */}
-          {user?.subscriptionTier !== 'pro' && (
+          {user && !subscription.isSubscribed && (
             <div className="bg-gray-50 border border-gray-200 rounded-md p-4 mt-6">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
@@ -303,9 +305,9 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                     <p>Get unlimited designs, 15% off orders, and priority rendering</p>
                   </div>
                   <div className="mt-2">
-                    <a href="#" className="text-sm font-medium text-black hover:text-[#39FF14]">
+                    <Link href="/subscribe" className="text-sm font-medium text-black hover:text-[#39FF14]">
                       $9/month - Subscribe <i className="fas fa-arrow-right ml-1"></i>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

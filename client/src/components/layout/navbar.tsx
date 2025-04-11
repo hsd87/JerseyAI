@@ -1,11 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useSubscription } from "@/hooks/use-subscription-store";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { CrownIcon } from "lucide-react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logoutMutation } = useAuth();
+  const subscription = useSubscription();
   const [location] = useLocation();
 
   const toggleMenu = () => {
@@ -30,32 +34,39 @@ export default function Navbar() {
           
           <div className="hidden md:block">
             <div className="ml-4 flex items-center space-x-4">
-              <Link href="/">
-                <a className={`px-3 py-2 rounded-md text-sm font-medium ${location === '/' ? 'bg-gray-100' : 'hover:bg-gray-100'} transition-colors`}>
-                  Home
-                </a>
+              <Link href="/" className={`px-3 py-2 rounded-md text-sm font-medium ${location === '/' ? 'bg-gray-100' : 'hover:bg-gray-100'} transition-colors`}>
+                Home
               </Link>
-              <a href="#" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors">
+              <button className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors">
                 Gallery
-              </a>
-              <a href="#" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors">
+              </button>
+              <button className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors">
                 Pricing
-              </a>
-              <a href="#" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors">
+              </button>
+              <button className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors">
                 How It Works
-              </a>
+              </button>
               
               {user ? (
-                <Link href="/dashboard">
-                  <a className={`bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors`}>
+                <>
+                  {subscription.isSubscribed ? (
+                    <Badge variant="outline" className="bg-[#39FF14]/10 text-black border-[#39FF14] flex items-center gap-1">
+                      <CrownIcon className="h-3 w-3" />
+                      <span>Pro</span>
+                    </Badge>
+                  ) : (
+                    <Link href="/subscribe" className="text-black border border-[#39FF14] bg-[#39FF14]/10 px-3 py-1.5 rounded-md text-sm font-medium hover:bg-[#39FF14]/20 transition-colors flex items-center gap-1">
+                      <CrownIcon className="h-3 w-3" />
+                      <span>Upgrade</span>
+                    </Link>
+                  )}
+                  <Link href="/dashboard" className="bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors">
                     Dashboard
-                  </a>
-                </Link>
+                  </Link>
+                </>
               ) : (
-                <Link href="/auth">
-                  <a className="bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors">
-                    Sign In
-                  </a>
+                <Link href="/auth" className="bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors">
+                  Sign In
                 </Link>
               )}
             </div>
@@ -99,27 +110,34 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/">
-              <a className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/' ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}>
-                Home
-              </a>
+            <Link href="/" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/' ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}>
+              Home
             </Link>
-            <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+            <button className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
               Gallery
-            </a>
-            <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+            </button>
+            <button className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
               Pricing
-            </a>
-            <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+            </button>
+            <button className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
               How It Works
-            </a>
+            </button>
             
             {user ? (
               <>
-                <Link href="/dashboard">
-                  <a className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                    Dashboard
-                  </a>
+                {subscription.isSubscribed && (
+                  <div className="px-3 py-2">
+                    <Badge variant="outline" className="bg-[#39FF14]/10 text-black border-[#39FF14] flex items-center gap-1">
+                      <CrownIcon className="h-3 w-3" />
+                      <span>Pro</span>
+                    </Badge>
+                  </div>
+                )}
+                <Link href="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+                  Dashboard
+                </Link>
+                <Link href="/subscribe" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+                  {subscription.isSubscribed ? 'Manage Subscription' : 'Upgrade to Pro'}
                 </Link>
                 <button 
                   onClick={handleLogout}
@@ -129,10 +147,8 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <Link href="/auth">
-                <a className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-                  Sign In
-                </a>
+              <Link href="/auth" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+                Sign In
               </Link>
             )}
           </div>
