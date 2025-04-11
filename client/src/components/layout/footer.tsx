@@ -6,10 +6,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <Link href="/">
-              <a className="flex items-center">
-                <span className="font-sora font-bold text-2xl">Pro<span className="text-[#39FF14]">Jersey</span></span>
-              </a>
+            <Link href="/" className="flex items-center">
+              <span className="font-sora font-bold text-2xl">Pro<span className="text-[#39FF14]">Jersey</span></span>
             </Link>
             <p className="mt-4 text-sm text-gray-600 max-w-md">
               Design your dream sports kit with AI-powered precision. From concept to delivery, we make custom sportswear simple, high-quality, and accessible.

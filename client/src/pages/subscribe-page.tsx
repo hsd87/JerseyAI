@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
+import { useSubscription } from '@/hooks/use-subscription-store';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { loadStripe } from '@stripe/stripe-js';
@@ -23,6 +24,7 @@ function SubscriptionForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
   const [, navigate] = useLocation();
+  const subscription = useSubscription();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +37,9 @@ function SubscriptionForm() {
     setErrorMessage(null);
 
     try {
-      const { error } = await stripe.confirmPayment({
+      const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
+        redirect: "if_required",
         confirmParams: {
           return_url: `${window.location.origin}/dashboard`,
         },
@@ -49,6 +52,14 @@ function SubscriptionForm() {
           description: error.message,
           variant: 'destructive',
         });
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        // Payment succeeded, fetch updated subscription status
+        await subscription.fetchSubscription();
+        toast({
+          title: 'Subscription Active',
+          description: 'Your Pro subscription is now active!',
+        });
+        navigate('/dashboard');
       }
     } catch (error: any) {
       setErrorMessage(error.message || 'An unexpected error occurred');
@@ -90,6 +101,7 @@ function SubscriptionForm() {
 
 export default function SubscribePage() {
   const { user } = useAuth();
+  const subscription = useSubscription();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -106,7 +118,7 @@ export default function SubscribePage() {
     if (!user) return;
 
     // If already on pro tier, redirect to dashboard
-    if (user.subscriptionTier === 'pro') {
+    if (subscription.isSubscribed) {
       toast({
         title: 'Already subscribed',
         description: 'You are already on the Pro plan.',
@@ -130,10 +142,10 @@ export default function SubscribePage() {
     };
 
     createSubscription();
-  }, [user, navigate, toast]);
+  }, [user, navigate, toast, subscription]);
 
   // Options for the Stripe Elements
-  const options = {
+  const options = clientSecret ? {
     clientSecret,
     appearance: {
       theme: 'stripe',
@@ -143,7 +155,7 @@ export default function SubscribePage() {
         colorText: '#000000',
       },
     },
-  };
+  } : {};
 
   if (!user) {
     return (
