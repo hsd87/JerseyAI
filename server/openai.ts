@@ -1,4 +1,7 @@
 import OpenAI from "openai";
+import fs from 'fs';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -64,28 +67,126 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
 }
 
 export async function generateKitImageWithReplicate(prompt: string): Promise<string> {
-  // In a real implementation, we would call the Replicate API here with the prompt
-  // For now, return a mock image URL
-  console.log("Generated prompt for Replicate:", prompt);
+  console.log("Generating image with Replicate API using prompt:", prompt);
   
-  // This would be replaced with actual Replicate API call
-  // Example:
-  // const response = await fetch("https://api.replicate.com/v1/predictions", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "Authorization": `Token ${process.env.REPLICATE_API_KEY}`
-  //   },
-  //   body: JSON.stringify({
-  //     version: "replicate-model-version",
-  //     input: { prompt: prompt }
-  //   })
-  // });
+  if (!process.env.REPLICATE_API_TOKEN) {
+    throw new Error("REPLICATE_API_TOKEN is not set");
+  }
   
-  // For demo purposes, return placeholder sports jersey image
-  if (prompt.includes("front")) {
-    return "https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=2000&auto=format&fit=crop";
-  } else {
-    return "https://images.unsplash.com/photo-1580087433295-ab2600c1030e?q=80&w=2000&auto=format&fit=crop";
+  // Step 1: Create the prediction with Replicate API
+  try {
+    const modelUrl = "https://api.replicate.com/v1/predictions";
+    const response = await fetch(modelUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.REPLICATE_API_TOKEN}`
+      },
+      body: JSON.stringify({
+        version: "hsd87/flux-jersey-pro", // Model identifier
+        input: {
+          prompt: prompt,
+          width: 768,
+          height: 768,
+          num_outputs: 1
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Replicate API error:", errorData);
+      throw new Error(`Replicate API error: ${response.status} ${response.statusText}`);
+    }
+
+    const prediction = await response.json();
+    console.log("Prediction created:", prediction.id);
+    
+    // Step 2: Poll for the prediction result
+    const maxAttempts = 30;  // 5 minutes (30 attempts x 10 seconds)
+    let attempts = 0;
+    let result;
+    
+    // Create a timeout promise
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    
+    while (attempts < maxAttempts) {
+      attempts++;
+      
+      const getResponse = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
+        headers: {
+          "Authorization": `Bearer ${process.env.REPLICATE_API_TOKEN}`
+        }
+      });
+      
+      if (!getResponse.ok) {
+        console.error(`Error checking prediction status: ${getResponse.status} ${getResponse.statusText}`);
+        await sleep(10000);  // Wait 10 seconds before trying again
+        continue;
+      }
+      
+      result = await getResponse.json();
+      
+      if (result.status === "succeeded") {
+        break;
+      } else if (result.status === "failed") {
+        throw new Error(`Image generation failed: ${result.error || "Unknown error"}`);
+      }
+      
+      // Wait 10 seconds before checking again
+      await sleep(10000);
+    }
+    
+    if (!result || result.status !== "succeeded") {
+      throw new Error("Image generation timed out or failed");
+    }
+    
+    // Step 3: Download the generated image
+    const imageUrl = result.output[0]; // First image in output array
+    
+    if (!imageUrl) {
+      throw new Error("No image was generated");
+    }
+    
+    const imageResponse = await fetch(imageUrl);
+    
+    if (!imageResponse.ok) {
+      throw new Error(`Failed to download generated image: ${imageResponse.status} ${imageResponse.statusText}`);
+    }
+    
+    // Create a unique filename
+    const imageId = uuidv4();
+    const isBackView = !prompt.includes("front");
+    const filename = isBackView ? `back_${imageId}.png` : `front_${imageId}.png`;
+    const outputPath = path.join(process.cwd(), 'output', filename);
+    
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(path.join(process.cwd(), 'output'))) {
+      fs.mkdirSync(path.join(process.cwd(), 'output'), { recursive: true });
+    }
+    
+    // Save the image
+    const arrayBuffer = await imageResponse.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    fs.writeFileSync(outputPath, buffer);
+    
+    // Return the local URL
+    return `/output/${filename}`;
+  } catch (error) {
+    console.error("Error generating image with Replicate:", error);
+    
+    // Return fallback image if generation fails
+    const fallbackImage = prompt.includes("front") 
+      ? "/output/fallback_front.png"
+      : "/output/fallback_back.png";
+      
+    // Return the fallback image or throw the error
+    if (fs.existsSync(path.join(process.cwd(), fallbackImage.substring(1)))) {
+      console.log("Using fallback image:", fallbackImage);
+      return fallbackImage;
+    }
+    
+    // If no fallback, rethrow the error
+    throw error;
   }
 }
