@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
+import { useSubscription } from '@/hooks/use-subscription-store';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -25,6 +26,8 @@ function CheckoutForm({ items, isSubscription = false }: { items: any[], isSubsc
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
   const [, navigate] = useLocation();
+  const { user } = useAuth();
+  const { fetchSubscription } = useSubscription();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,40 +41,39 @@ function CheckoutForm({ items, isSubscription = false }: { items: any[], isSubsc
     setErrorMessage(null);
 
     try {
-      // For subscriptions, use confirmPayment
-      if (isSubscription) {
-        const { error } = await stripe.confirmPayment({
-          elements,
-          confirmParams: {
-            return_url: `${window.location.origin}/dashboard`,
-          },
-        });
+      // For all payments, use confirmPayment with proper redirect handling
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        redirect: "if_required",
+        confirmParams: {
+          return_url: `${window.location.origin}/dashboard`,
+        },
+      });
 
-        if (error) {
-          setErrorMessage(error.message || 'An error occurred with your payment');
+      if (error) {
+        setErrorMessage(error.message || 'An error occurred with your payment');
+        toast({
+          title: 'Payment Failed',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        // Payment succeeded
+        if (isSubscription) {
+          // If it's a subscription, update subscription status
+          await fetchSubscription();
           toast({
-            title: 'Payment Failed',
-            description: error.message,
-            variant: 'destructive',
+            title: 'Subscription Active',
+            description: 'Your Pro subscription is now active!',
+          });
+        } else {
+          // If it's a regular payment
+          toast({
+            title: 'Payment Successful',
+            description: 'Your order has been placed successfully!',
           });
         }
-      } else {
-        // For one-time payments
-        const { error } = await stripe.confirmPayment({
-          elements,
-          confirmParams: {
-            return_url: `${window.location.origin}/dashboard`,
-          },
-        });
-
-        if (error) {
-          setErrorMessage(error.message || 'An error occurred with your payment');
-          toast({
-            title: 'Payment Failed',
-            description: error.message,
-            variant: 'destructive',
-          });
-        }
+        navigate('/dashboard');
       }
     } catch (error: any) {
       setErrorMessage(error.message || 'An unexpected error occurred');
@@ -114,6 +116,7 @@ function CheckoutForm({ items, isSubscription = false }: { items: any[], isSubsc
 // Main checkout page component
 export default function CheckoutPage() {
   const { user } = useAuth();
+  const { isSubscribed, fetchSubscription } = useSubscription();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isSubscription, setIsSubscription] = useState(false);
   const [items, setItems] = useState<any[]>([]);
@@ -175,7 +178,7 @@ export default function CheckoutPage() {
   }, [items, user, isSubscription, toast]);
 
   // Options for the Stripe Elements
-  const options = {
+  const options = clientSecret ? {
     clientSecret,
     appearance: {
       theme: 'stripe',
@@ -185,7 +188,7 @@ export default function CheckoutPage() {
         colorText: '#000000',
       },
     },
-  };
+  } : {};
 
   // Calculate order summary
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
