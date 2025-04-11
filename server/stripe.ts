@@ -9,7 +9,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 // Initialize Stripe with API key if available
 const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })
+  ? new Stripe(process.env.STRIPE_SECRET_KEY)
   : null;
 
 // Price IDs should be configured in a real system

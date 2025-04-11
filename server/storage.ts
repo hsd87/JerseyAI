@@ -29,6 +29,7 @@ export interface IStorage {
   // Subscription Methods
   updateUserSubscription(userId: number, tier: string): Promise<User>;
   updateUserStripeInfo(userId: number, info: { stripeCustomerId: string, stripeSubscriptionId: string }): Promise<User>;
+  findUsersByStripeCustomerId(stripeCustomerId: string): Promise<User[]>;
   
   // Generation Credits
   decrementDesignCredits(userId: number): Promise<User>;
@@ -204,6 +205,12 @@ export class MemStorage implements IStorage {
     };
     this.users.set(userId, updatedUser);
     return updatedUser;
+  }
+  
+  async findUsersByStripeCustomerId(stripeCustomerId: string): Promise<User[]> {
+    return Array.from(this.users.values()).filter(
+      (user) => user.stripeCustomerId === stripeCustomerId
+    );
   }
 
   // Generation Credits

@@ -264,9 +264,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      // Update user's subscription tier
-      const user = await storage.updateUserSubscription(req.user.id, "pro");
-      res.json(user);
+      if (process.env.STRIPE_SECRET_KEY) {
+        try {
+          const { createSubscription } = await import('./stripe');
+          const subscription = await createSubscription(req.user.id);
+          res.json({
+            clientSecret: subscription.clientSecret,
+            subscriptionId: subscription.subscriptionId
+          });
+        } catch (err: any) {
+          console.error('Stripe subscription error:', err);
+          res.status(500).json({ message: err.message });
+        }
+      } else {
+        // For testing without Stripe
+        const user = await storage.updateUserSubscription(req.user.id, "pro");
+        res.json(user);
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Checkout endpoint for orders
+  app.post("/api/create-payment-intent", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      if (!process.env.STRIPE_SECRET_KEY) {
+        return res.status(500).json({ message: "Stripe is not configured" });
+      }
+
+      const { items } = req.body;
+      
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: "No items provided" });
+      }
+
+      try {
+        const { calculateOrderAmount, createPaymentIntent } = await import('./stripe');
+        
+        // Calculate amount based on items
+        const amount = await calculateOrderAmount(items);
+        
+        // Get or create customer ID
+        const user = req.user;
+        if (!user.stripeCustomerId) {
+          const { createCustomer } = await import('./stripe');
+          await createCustomer(user);
+        }
+        
+        // Create payment intent
+        const clientSecret = await createPaymentIntent(amount, user.stripeCustomerId!);
+        
+        res.json({ clientSecret });
+      } catch (err: any) {
+        console.error('Stripe payment error:', err);
+        res.status(500).json({ message: err.message });
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Stripe webhook handler
+  app.post("/api/webhook", async (req, res, next) => {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(400).json({ message: "Stripe is not configured" });
+    }
+    
+    try {
+      const { buffer } = await import('buffer');
+      const stripe = await import('stripe').then(pkg => new pkg.default(process.env.STRIPE_SECRET_KEY!));
+      const { handleSubscriptionEvent } = await import('./stripe');
+      
+      // Get the signature from headers
+      const signature = req.headers['stripe-signature'];
+      
+      if (!signature) {
+        return res.status(400).json({ message: "Missing stripe-signature header" });
+      }
+      
+      try {
+        const event = stripe.webhooks.constructEvent(
+          buffer.from(JSON.stringify(req.body)),
+          signature,
+          process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test'
+        );
+        
+        // Handle subscription-related events
+        if (
+          event.type === 'customer.subscription.created' ||
+          event.type === 'customer.subscription.updated' ||
+          event.type === 'customer.subscription.deleted'
+        ) {
+          await handleSubscriptionEvent(event);
+        }
+        
+        res.json({ received: true });
+      } catch (err: any) {
+        console.error('Webhook error:', err.message);
+        return res.status(400).json({ message: `Webhook Error: ${err.message}` });
+      }
     } catch (error) {
       next(error);
     }
