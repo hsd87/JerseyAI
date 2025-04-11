@@ -270,7 +270,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
               {isGenerating ? (
                 <>
                   <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                  Generating...
+                  AI Generating Design...
                 </>
               ) : (
                 <>
@@ -281,7 +281,11 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             
             {user ? (
               <p className="text-xs text-gray-500 mt-2 text-center">
-                Using {subscription.isSubscribed ? 'unlimited' : `1 of ${subscription.remainingDesigns}`} {subscription.isSubscribed ? '' : 'free'} generations this month
+                {isGenerating ? (
+                  <span>AI generation takes 30-60 seconds. Please wait while we create your design...</span>
+                ) : (
+                  <span>Using {subscription.isSubscribed ? 'unlimited' : `1 of ${subscription.remainingDesigns}`} {subscription.isSubscribed ? '' : 'free'} generations this month</span>
+                )}
               </p>
             ) : (
               <p className="text-xs text-gray-500 mt-2 text-center">

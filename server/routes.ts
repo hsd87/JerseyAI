@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { designFormSchema, insertOrderSchema } from "@shared/schema";
 import path from "path";
+import fs from "fs";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -388,7 +389,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const { buffer } = await import('buffer');
+      // Import Buffer from node:buffer to avoid compatibility issues
+      const buffer = Buffer.from(JSON.stringify(req.body));
       const stripe = await import('stripe').then(pkg => new pkg.default(process.env.STRIPE_SECRET_KEY!));
       const { handleSubscriptionEvent } = await import('./stripe');
       
@@ -401,7 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       try {
         const event = stripe.webhooks.constructEvent(
-          buffer.from(JSON.stringify(req.body)),
+          buffer,
           signature,
           process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test'
         );
@@ -421,6 +423,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: `Webhook Error: ${err.message}` });
       }
     } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Serve images from the output directory
+  app.get('/output/:filename', (req, res, next) => {
+    try {
+      const filename = req.params.filename;
+      if (!filename || filename.includes('..')) {
+        return res.status(400).send('Invalid filename');
+      }
+      
+      const imagePath = path.join(process.cwd(), 'output', filename);
+      
+      // Check if file exists
+      if (!fs.existsSync(imagePath)) {
+        console.error(`File not found: ${imagePath}`);
+        return res.status(404).send('Image not found');
+      }
+      
+      // Determine content type based on extension
+      let contentType = 'image/png';
+      if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) {
+        contentType = 'image/jpeg';
+      }
+      
+      res.setHeader('Content-Type', contentType);
+      return res.sendFile(imagePath);
+    } catch (error) {
+      console.error('Error serving image:', error);
       next(error);
     }
   });

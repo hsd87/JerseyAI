@@ -29,6 +29,11 @@ export function useReplicate() {
         designRecord = { id: designId } as Design;
       }
 
+      toast({
+        title: "Generating design...",
+        description: "This may take up to 30-60 seconds while we create your jersey design.",
+      });
+
       // Then, generate images for it
       const generateRes = await apiRequest(
         "POST", 
