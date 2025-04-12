@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import JerseyEditor from '@/components/jersey-editor';
-import { useEditorStoreBase } from '@/components/jersey-editor/editor-store';
+import { EditorProvider, useEditorStoreBase } from '@/components/jersey-editor/editor-store';
 
-export default function JerseyEditorPage() {
+// Wrapper component that uses the base store
+function JerseyEditorWrapper() {
   // Get the setter from the store
   const setImages = useEditorStoreBase((state) => state.setImages);
   
@@ -15,6 +16,10 @@ export default function JerseyEditorPage() {
     setImages(frontImageUrl, backImageUrl);
   }, [setImages]);
 
+  return <JerseyEditor />;
+}
+
+export default function JerseyEditorPage() {
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8 text-center">
@@ -24,7 +29,9 @@ export default function JerseyEditorPage() {
         </p>
       </div>
       
-      <JerseyEditor />
+      <EditorProvider>
+        <JerseyEditorWrapper />
+      </EditorProvider>
     </div>
   );
 }
