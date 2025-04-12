@@ -61,12 +61,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
 
-      // Use OpenAI to generate a detailed prompt for the kit design
+      // Use OpenAI to generate a detailed prompt for the kit design using the template
       try {
         const { generateKitPrompt, generateKitImageWithReplicate } = await import("./openai");
         
-        // Generate the prompts using OpenAI
-        const promptsJson = await generateKitPrompt({
+        // Generate a combined prompt using the template through OpenAI
+        const enhancedPrompt = await generateKitPrompt({
           sport: design.sport,
           kitType: design.kitType,
           primaryColor: design.primaryColor,
@@ -76,18 +76,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           patternStyle: design.patternStyle,
           designNotes: design.designNotes
         });
-        
-        // Parse the prompts
-        const prompts = JSON.parse(promptsJson);
-        
-        // Generate the images using Replicate (or mock for now)
-        const frontImage = await generateKitImageWithReplicate(prompts.frontPrompt);
-        const backImage = await generateKitImageWithReplicate(prompts.backPrompt);
 
-        // Update the design with the generated images
+        console.log("Enhanced template prompt generated:", enhancedPrompt);
+        
+        // Generate a single combined image showing both front and back views
+        const jerseyImage = await generateKitImageWithReplicate(enhancedPrompt);
+        
+        // For backward compatibility, set both front and back image URLs to the same combined image
         const updatedDesign = await storage.updateDesign(designId, {
-          frontImageUrl: frontImage,
-          backImageUrl: backImage
+          frontImageUrl: jerseyImage,
+          backImageUrl: jerseyImage // Same image contains both views
         });
 
         res.json(updatedDesign);
