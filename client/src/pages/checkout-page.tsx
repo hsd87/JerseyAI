@@ -23,7 +23,7 @@ export default function CheckoutPage() {
   
   useEffect(() => {
     if (designData) {
-      setDesign(designData);
+      setDesign(designData as Design);
     }
   }, [designData]);
 
@@ -55,7 +55,7 @@ export default function CheckoutPage() {
           The design you're looking for could not be found or you don't have permission to access it.
         </p>
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => setLocation('/dashboard')}
           className="px-4 py-2 bg-primary text-white rounded-md"
         >
           Return to Dashboard
@@ -118,7 +118,7 @@ export default function CheckoutPage() {
             
             <div className="mt-4 pt-4 border-t">
               <button
-                onClick={() => navigate('/dashboard')}
+                onClick={() => setLocation('/dashboard')}
                 className="w-full py-2 border border-gray-300 rounded-md text-center"
               >
                 Return to Dashboard
