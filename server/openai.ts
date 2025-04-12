@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import Replicate from "replicate";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -161,87 +162,44 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
     throw new Error("REPLICATE_API_TOKEN is not set");
   }
   
-  // Step 1: Create the prediction with Replicate API
+  // Step 1: Create the prediction with Replicate API using the client library
   try {
-    const modelUrl = "https://api.replicate.com/v1/predictions";
-    const response = await fetch(modelUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Token ${process.env.REPLICATE_API_TOKEN}`
-      },
-      body: JSON.stringify({
-        version: "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3", // Using the provided jersey model
-        input: {
-          prompt: prompt,
-          aspect_ratio: "1:1",
-          prompt_strength: 0.8,
-          model: "dev",
-          num_outputs: 1,
-          num_inference_steps: 28,
-          guidance_scale: 3,
-          output_format: "png",
-          disable_safety_checker: false
-        }
-      })
+    // Initialize the Replicate client
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN,
     });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error("Replicate API error:", errorData);
-      throw new Error(`Replicate API error: ${response.status} ${response.statusText}`);
-    }
-
-    const prediction = await response.json();
-    console.log("Prediction created:", prediction.id);
     
-    // Step 2: Poll for the prediction result
-    const maxAttempts = 30;  // 5 minutes (30 attempts x 10 seconds)
-    let attempts = 0;
-    let result;
+    // Define the model ID and input
+    const modelVersion = "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3";
+    const input = {
+      prompt: prompt,
+      aspect_ratio: "1:1",
+      prompt_strength: 0.8,
+      model: "dev",
+      num_outputs: 1,
+      num_inference_steps: 28,
+      guidance_scale: 3,
+      output_format: "png",
+      disable_safety_checker: false
+    };
     
-    // Create a timeout promise
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    console.log("Running prediction with model:", modelVersion);
+    console.log("Input parameters:", JSON.stringify(input, null, 2));
     
-    while (attempts < maxAttempts) {
-      attempts++;
-      
-      const getResponse = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
-        headers: {
-          "Authorization": `Token ${process.env.REPLICATE_API_TOKEN}`
-        }
-      });
-      
-      if (!getResponse.ok) {
-        console.error(`Error checking prediction status: ${getResponse.status} ${getResponse.statusText}`);
-        await sleep(10000);  // Wait 10 seconds before trying again
-        continue;
-      }
-      
-      result = await getResponse.json();
-      
-      if (result.status === "succeeded") {
-        break;
-      } else if (result.status === "failed") {
-        throw new Error(`Image generation failed: ${result.error || "Unknown error"}`);
-      }
-      
-      // Wait 10 seconds before checking again
-      await sleep(10000);
-    }
+    // Run the model prediction
+    const output = await replicate.run(modelVersion, { input });
     
-    if (!result || result.status !== "succeeded") {
-      throw new Error("Image generation timed out or failed");
-    }
+    console.log("Prediction result:", output);
     
-    // Step 3: Download the generated image
-    const imageUrl = result.output[0]; // First image in output array
+    // Get the image URL from the output (output is usually an array of URLs)
+    const imageUrl = Array.isArray(output) ? output[0] : output;
     
     if (!imageUrl) {
       throw new Error("No image was generated");
     }
     
-    const imageResponse = await fetch(imageUrl);
+    // Download the generated image
+    const imageResponse = await fetch(imageUrl.toString());
     
     if (!imageResponse.ok) {
       throw new Error(`Failed to download generated image: ${imageResponse.status} ${imageResponse.statusText}`);
