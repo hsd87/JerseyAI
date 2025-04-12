@@ -168,7 +168,7 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.REPLICATE_API_TOKEN}`
+        "Authorization": `Token ${process.env.REPLICATE_API_TOKEN}`
       },
       body: JSON.stringify({
         version: "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3", // Using the provided jersey model
@@ -208,7 +208,7 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
       
       const getResponse = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
         headers: {
-          "Authorization": `Bearer ${process.env.REPLICATE_API_TOKEN}`
+          "Authorization": `Token ${process.env.REPLICATE_API_TOKEN}`
         }
       });
       

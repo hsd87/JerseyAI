@@ -1,0 +1,96 @@
+Absolutely, let’s fix this together.
+
+If your Replicate model is not receiving API calls, here’s a structured checklist to debug and resolve it quickly:
+
+⸻
+
+✅ Step-by-Step Debug Flow
+
+1. ✅ Confirm the Replicate Endpoint and API Key
+
+Make sure:
+	•	Your Replicate model URL is correct. It should look like:
+
+https://api.replicate.com/v1/predictions
+
+
+	•	You’re using the correct Replicate model version ID (found in your dashboard).
+	•	Your Replicate API key is valid and set in the .env file like:
+
+REPLICATE_API_TOKEN=your_api_key
+
+
+
+⸻
+
+2. ✅ Verify API Call in Backend
+
+Go to the file where your Replicate API is called (e.g., replicate_api.ts, flux_api.py, or server/image-generator.ts) and make sure the headers and body match this structure:
+
+const response = await fetch('https://api.replicate.com/v1/predictions', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Token ${process.env.REPLICATE_API_TOKEN}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    version: "your-model-version-id",
+    input: {
+      prompt: "your prompt here",
+      // other params (width, height, etc.)
+    }
+  })
+});
+
+
+
+⸻
+
+3. ✅ Check If the Request Is Being Sent
+
+Add a console.log or logger before the API call to confirm it’s being triggered:
+
+console.log("Sending request to Replicate...");
+
+
+
+⸻
+
+4. ✅ Enable CORS (if frontend is making the call directly)
+
+If the request is made from the frontend (not recommended), ensure your backend is not blocking it due to CORS.
+
+⸻
+
+5. ✅ View Logs on Replicate
+
+Go to https://replicate.com → Your model → API → View if any request is received or failed.
+
+⸻
+
+6. ✅ Test Manually
+
+You can test your model via cURL or Postman:
+
+curl https://api.replicate.com/v1/predictions \
+  -H "Authorization: Token YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "version": "your-model-version-id",
+    "input": {
+      "prompt": "a sleek football jersey"
+    }
+  }'
+
+If this works, but the app doesn’t — it’s a problem with your code integration.
+
+⸻
+
+🚨 If Still Not Working
+
+Tell me:
+	•	What error message are you getting (if any)?
+	•	Is it a timeout, 403, 400, or something else?
+	•	Can you share the code block that sends the API request?
+
+Once you paste that, I’ll rewrite or fix it for you right away.
