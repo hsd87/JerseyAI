@@ -1,10 +1,16 @@
-import { useState, useRef } from 'react';
-import { useEditorStore } from './editor-store';
+import { useState, ChangeEvent } from 'react';
+import { 
+  Type, 
+  Image as ImageIcon, 
+  RotateCw, 
+  Download
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
+import { useEditorStore } from './editor-store';
 
 interface EditorSidebarProps {
   onExport: () => void;
@@ -13,139 +19,144 @@ interface EditorSidebarProps {
 }
 
 const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarProps) => {
-  const { addTextItem, addImageItem } = useEditorStore();
   const [textInput, setTextInput] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Add text to the canvas
-  const handleAddText = () => {
-    if (!textInput.trim()) return;
-    
-    // Add to a reasonable position in the center of the canvas
-    const x = 240;
-    const y = 240;
-    
-    // If we're on the back view, include "BACK" in the text ID to help with filtering
-    const textWithPrefix = currentView === 'back' ? `BACK ${textInput}` : textInput;
-    
-    addTextItem(textInput, x, y, {
-      text: textWithPrefix,
-      // Set text in the center
-      x: x - (textInput.length * 5),  // Rough estimate of half the text width
-      y: y
-    });
-    
-    setTextInput(''); // Clear the input
+  const [imageUrl, setImageUrl] = useState('');
+  const [fontSize, setFontSize] = useState(24);
+  const { addTextItem, addImageItem } = useEditorStore();
+  
+  const handleTextSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (textInput.trim()) {
+      // Add text at the center of the canvas
+      addTextItem(textInput, 240, 200, { fontSize });
+      setTextInput('');
+    }
   };
 
-  // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // Create a data URL for the image
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        const imageUrl = event.target.result.toString();
-        
-        // Add the image to the canvas
-        addImageItem(imageUrl, 240, 240, {
-          // Set in the center
-          x: 200,
-          y: 200
-        });
-      }
-    };
-    reader.readAsDataURL(file);
-    
-    // Clear the input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  const handleImageSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (imageUrl.trim()) {
+      // Add image at the center of the canvas
+      addImageItem(imageUrl, 240, 200);
+      setImageUrl('');
+    }
+  };
+
+  const handleFontSizeChange = (value: number[]) => {
+    setFontSize(value[0]);
+  };
+
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        if (dataUrl) {
+          addImageItem(dataUrl, 240, 200);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Jersey Editor Tools</CardTitle>
-        <CardDescription>Add and edit elements on your jersey</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="add" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="add">Add Elements</TabsTrigger>
-            <TabsTrigger value="export">Export</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="add" className="space-y-4">
-            {/* Text Input */}
+    <div className="bg-white rounded-lg shadow-md p-4 w-80">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-medium">Editor Tools</h3>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onToggleView} 
+          className="flex items-center gap-1"
+        >
+          <RotateCw className="h-4 w-4" />
+          {currentView === 'front' ? 'View Back' : 'View Front'}
+        </Button>
+      </div>
+      
+      <Tabs defaultValue="text">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="text" className="flex items-center gap-1">
+            <Type className="h-4 w-4" />
+            Text
+          </TabsTrigger>
+          <TabsTrigger value="image" className="flex items-center gap-1">
+            <ImageIcon className="h-4 w-4" />
+            Images
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="text">
+          <form onSubmit={handleTextSubmit} className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="text-input">Add Text</Label>
-              <div className="flex space-x-2">
-                <Input
-                  id="text-input"
-                  placeholder="Enter text..."
-                  value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddText();
-                  }}
-                />
-                <Button onClick={handleAddText}>Add</Button>
-              </div>
-              <p className="text-xs text-gray-500">
-                {currentView === 'front' ? 'Adding to front' : 'Adding to back'}
-              </p>
+              <Label htmlFor="text-input">Text</Label>
+              <Input
+                id="text-input"
+                placeholder="Enter text to add..."
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+              />
             </div>
             
-            {/* Image Upload */}
             <div className="space-y-2">
-              <Label htmlFor="image-upload">Upload Logo or Image</Label>
-              <div className="flex space-x-2">
-                <Input
-                  id="image-upload"
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleImageUpload}
-                  className="flex-1"
-                />
-              </div>
-              <p className="text-xs text-gray-500">
-                Supports PNG, JPG, SVG (max 2MB)
-              </p>
+              <Label htmlFor="font-size">Font Size: {fontSize}px</Label>
+              <Slider
+                id="font-size"
+                defaultValue={[fontSize]}
+                max={72}
+                min={10}
+                step={1}
+                onValueChange={handleFontSizeChange}
+              />
             </div>
             
-            {/* View Toggle */}
-            <div className="pt-4">
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={onToggleView}
-              >
-                Switch to {currentView === 'front' ? 'Back' : 'Front'} View
-              </Button>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="export" className="space-y-4">
+            <Button type="submit" className="w-full">Add Text</Button>
+          </form>
+        </TabsContent>
+        
+        <TabsContent value="image">
+          <div className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label>Export Options</Label>
-              <Button 
-                onClick={onExport}
-                className="w-full"
-              >
-                Export as PNG
-              </Button>
-              <p className="text-xs text-gray-500 pt-2">
-                Exports the current {currentView} view as a PNG image.
-              </p>
+              <Label htmlFor="image-input">Upload Image</Label>
+              <Input
+                id="image-input"
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="cursor-pointer"
+              />
             </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+            
+            <div className="text-center text-sm text-gray-500">
+              - or -
+            </div>
+            
+            <form onSubmit={handleImageSubmit} className="space-y-2">
+              <Label htmlFor="image-url">Image URL</Label>
+              <Input
+                id="image-url"
+                placeholder="Enter image URL..."
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+              />
+              <Button type="submit" className="w-full">Add Image</Button>
+            </form>
+          </div>
+        </TabsContent>
+      </Tabs>
+      
+      <div className="border-t border-gray-200 mt-4 pt-4">
+        <Button 
+          onClick={onExport} 
+          variant="secondary" 
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <Download className="h-4 w-4" />
+          Export Design
+        </Button>
+      </div>
+    </div>
   );
 };
 

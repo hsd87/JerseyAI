@@ -1,12 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
-import { Stage, Layer, Group, Image, Text, Transformer } from 'react-konva';
+import { useRef, useState, useEffect } from 'react';
+import { Stage, Layer, Image, Group, Text, Transformer } from 'react-konva';
 import useImage from 'use-image';
+import { useEditorStore } from './editor-store';
 import EditorSidebar from './editor-sidebar';
 import EditorControls from './editor-controls';
-import { Button } from '@/components/ui/button';
-import { EditorProvider, useEditorStore } from './editor-store';
 
-// Types for selectable items
+// Types
 export type ItemConfig = {
   id: string;
   type: 'text' | 'image';
@@ -26,7 +25,6 @@ export type ItemConfig = {
   scaleY?: number;
 };
 
-// Predefined zones for the jersey
 export type JerseyZone = {
   id: string;
   name: string;
@@ -35,15 +33,143 @@ export type JerseyZone = {
   side: 'front' | 'back';
 };
 
-const JerseyEditor = () => {
+// Helper Components
+const TextItem = ({ item, isSelected, onSelect }: { 
+  item: ItemConfig, 
+  isSelected: boolean, 
+  onSelect: () => void 
+}) => {
+  const textRef = useRef<any>(null);
+  const trRef = useRef<any>(null);
+  
+  useEffect(() => {
+    if (isSelected && trRef.current && textRef.current) {
+      trRef.current.nodes([textRef.current]);
+      trRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+  
   return (
-    <EditorProvider>
-      <JerseyEditorContent />
-    </EditorProvider>
+    <>
+      <Text
+        ref={textRef}
+        text={item.text || ''}
+        x={item.x}
+        y={item.y}
+        fontSize={item.fontSize}
+        fontFamily={item.fontFamily}
+        fill={item.fill}
+        rotation={item.rotation}
+        draggable
+        onClick={onSelect}
+        onTap={onSelect}
+        onDragEnd={(e) => {
+          const node = e.target;
+          const { x, y } = node.position();
+          onDragMove(item.id, x, y);
+        }}
+        onTransformEnd={(e) => {
+          const node = e.target;
+          const scaleX = node.scaleX();
+          const scaleY = node.scaleY();
+          
+          // Scale back to 1 to avoid accumulating scaling
+          node.scaleX(1);
+          node.scaleY(1);
+          
+          const fontSize = Math.max(10, (item.fontSize || 24) * scaleX);
+          const rotation = node.rotation();
+          
+          // Update item in store
+          onTransform(item.id, fontSize, rotation);
+        }}
+      />
+      {isSelected && (
+        <Transformer
+          ref={trRef}
+          boundBoxFunc={(oldBox, newBox) => {
+            // Limit size
+            if (newBox.width < 10 || newBox.height < 10) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
+    </>
   );
 };
 
-const JerseyEditorContent = () => {
+const ImageItem = ({ item, isSelected, onSelect }: { 
+  item: ItemConfig, 
+  isSelected: boolean, 
+  onSelect: () => void 
+}) => {
+  const imageRef = useRef<any>(null);
+  const trRef = useRef<any>(null);
+  const [image] = useImage(item.src || '');
+  
+  useEffect(() => {
+    if (isSelected && trRef.current && imageRef.current) {
+      trRef.current.nodes([imageRef.current]);
+      trRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+  
+  if (!image) {
+    return null;
+  }
+  
+  return (
+    <>
+      <Image
+        ref={imageRef}
+        image={image}
+        x={item.x}
+        y={item.y}
+        width={item.width}
+        height={item.height}
+        scaleX={item.scaleX || 1}
+        scaleY={item.scaleY || 1}
+        rotation={item.rotation}
+        draggable
+        onClick={onSelect}
+        onTap={onSelect}
+        onDragEnd={(e) => {
+          const node = e.target;
+          const { x, y } = node.position();
+          onDragMove(item.id, x, y);
+        }}
+        onTransformEnd={(e) => {
+          const node = e.target;
+          
+          // Get new scale values
+          const scaleX = node.scaleX();
+          const scaleY = node.scaleY();
+          const rotation = node.rotation();
+          
+          // Update item in store
+          onImageTransform(item.id, scaleX, scaleY, rotation);
+        }}
+      />
+      {isSelected && (
+        <Transformer
+          ref={trRef}
+          boundBoxFunc={(oldBox, newBox) => {
+            // Limit size
+            if (newBox.width < 10 || newBox.height < 10) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
+    </>
+  );
+};
+
+// The main editor component
+const JerseyEditor = () => {
   const {
     items,
     selectedItemId,
@@ -52,249 +178,172 @@ const JerseyEditorContent = () => {
     selectItem,
     updateItem,
     frontImage,
-    backImage
+    backImage,
+    jerseyZones
   } = useEditorStore();
   
-  const stageRef = useRef<any>(null);
-  const transformerRef = useRef<any>(null);
-  
-  // Size settings
-  const canvasWidth = 480;
-  const canvasHeight = 480;
-
-  // Load front and back jersey images
+  const [stageWidth, setStageWidth] = useState(480);
+  const [stageHeight, setStageHeight] = useState(480);
   const [frontImageObj] = useImage(frontImage || '');
   const [backImageObj] = useImage(backImage || '');
   
-  // Predefined zones on the jersey
-  const jerseyZones: JerseyZone[] = [
-    { id: 'chest-left', name: 'Left Chest', x: canvasWidth * 0.3, y: canvasHeight * 0.3, side: 'front' },
-    { id: 'chest-right', name: 'Right Chest', x: canvasWidth * 0.7, y: canvasHeight * 0.3, side: 'front' },
-    { id: 'center-front', name: 'Center Front', x: canvasWidth * 0.5, y: canvasHeight * 0.4, side: 'front' },
-    { id: 'back-name', name: 'Back Name', x: canvasWidth * 0.5, y: canvasHeight * 0.25, side: 'back' },
-    { id: 'back-number', name: 'Back Number', x: canvasWidth * 0.5, y: canvasHeight * 0.5, side: 'back' },
-  ];
+  const stageRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
-  // When clicking on the canvas, deselect if clicking empty space
-  const handleCanvasClick = (e: any) => {
-    if (e.target === e.currentTarget) {
+  // Handle responsive canvas sizing
+  useEffect(() => {
+    const checkSize = () => {
+      if (containerRef.current) {
+        const width = Math.min(480, containerRef.current.offsetWidth);
+        setStageWidth(width);
+        setStageHeight(width);
+      }
+    };
+    
+    checkSize();
+    window.addEventListener('resize', checkSize);
+    return () => window.removeEventListener('resize', checkSize);
+  }, []);
+  
+  // Handle click on empty canvas
+  const handleStageClick = (e: any) => {
+    const clickedOnEmpty = e.target === e.target.getStage();
+    if (clickedOnEmpty) {
       selectItem(null);
     }
   };
   
-  // Update the transformer when selection changes
-  useEffect(() => {
-    if (!selectedItemId || !transformerRef.current) return;
-    
-    const selectedNode = stageRef.current?.findOne('#' + selectedItemId);
-    if (selectedNode) {
-      transformerRef.current.nodes([selectedNode]);
-      transformerRef.current.getLayer().batchDraw();
-    } else {
-      transformerRef.current.nodes([]);
-      transformerRef.current.getLayer().batchDraw();
-    }
-  }, [selectedItemId]);
-
-  // Toggle between front and back views
-  const toggleView = () => {
+  // Handle item movement
+  const handleDragMove = (id: string, x: number, y: number) => {
+    updateItem(id, { x, y });
+  };
+  
+  // Handle text transformation
+  const handleTextTransform = (id: string, fontSize: number, rotation: number) => {
+    updateItem(id, { fontSize, rotation });
+  };
+  
+  // Handle image transformation
+  const handleImageTransform = (id: string, scaleX: number, scaleY: number, rotation: number) => {
+    updateItem(id, { scaleX, scaleY, rotation });
+  };
+  
+  // Toggle between front and back view
+  const handleToggleView = () => {
     setCurrentView(currentView === 'front' ? 'back' : 'front');
   };
   
-  // Export canvas as an image
-  const exportImage = () => {
+  // Export canvas as image
+  const handleExport = () => {
     if (stageRef.current) {
-      const dataURL = stageRef.current.toDataURL({ 
-        pixelRatio: 2, // Higher quality
-      });
-      
-      // Create a download link
+      const dataURL = stageRef.current.toDataURL({ pixelRatio: 3 });
       const link = document.createElement('a');
-      link.download = `jersey-${currentView}.png`;
+      link.download = `jersey-${currentView}-${new Date().getTime()}.png`;
       link.href = dataURL;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
   };
-
+  
+  // Get current items for the active view
+  const currentZones = jerseyZones.filter(zone => zone.side === currentView);
+  
   return (
-    <div className="flex flex-col md:flex-row w-full gap-4 p-4">
-      {/* Left sidebar with controls */}
-      <div className="w-full md:w-1/4">
-        <EditorSidebar 
-          onExport={exportImage} 
-          currentView={currentView}
-          onToggleView={toggleView}
-        />
-      </div>
+    <div className="flex flex-col md:flex-row gap-6">
+      <EditorSidebar 
+        onExport={handleExport} 
+        currentView={currentView} 
+        onToggleView={handleToggleView} 
+      />
       
-      {/* Main canvas */}
-      <div className="w-full md:w-2/4 flex justify-center">
-        <div className="border border-gray-300 rounded-lg shadow-sm bg-white">
-          <div className="p-2 bg-gray-50 rounded-t-lg border-b border-gray-200 flex justify-between items-center">
-            <h3 className="text-sm font-medium">Jersey Editor - {currentView === 'front' ? 'Front View' : 'Back View'}</h3>
-            <Button 
-              variant="outline"
-              size="sm"
-              onClick={toggleView}
-            >
-              Switch to {currentView === 'front' ? 'Back' : 'Front'}
-            </Button>
-          </div>
-          
-          <div className="p-4">
-            <Stage 
-              width={canvasWidth} 
-              height={canvasHeight} 
-              ref={stageRef}
-              onClick={handleCanvasClick}
-              onTap={handleCanvasClick}
-            >
-              <Layer>
-                {/* Background jersey image */}
+      <div className="flex-1 flex flex-col items-center">
+        <div 
+          ref={containerRef} 
+          className="border-2 border-gray-200 rounded-lg mb-4 overflow-hidden"
+        >
+          <Stage
+            ref={stageRef}
+            width={stageWidth}
+            height={stageHeight}
+            onClick={handleStageClick}
+            onTap={handleStageClick}
+          >
+            <Layer>
+              {/* Background Jersey Image */}
+              {currentView === 'front' && frontImageObj && (
                 <Image 
-                  image={currentView === 'front' ? frontImageObj : backImageObj} 
-                  width={canvasWidth}
-                  height={canvasHeight}
-                  x={0}
-                  y={0}
+                  image={frontImageObj} 
+                  width={stageWidth} 
+                  height={stageHeight} 
                 />
-                
-                {/* Render all items (text and images) */}
-                {items
-                  .filter(item => 
-                    (item.type === 'text' && ((currentView === 'front' && !item.text?.includes('BACK')) || 
-                                             (currentView === 'back' && item.text?.includes('BACK')))) ||
-                    item.type === 'image'
-                  )
-                  .map(item => (
-                    <SelectableItem 
-                      key={item.id} 
-                      item={item} 
+              )}
+              
+              {currentView === 'back' && backImageObj && (
+                <Image 
+                  image={backImageObj} 
+                  width={stageWidth} 
+                  height={stageHeight} 
+                />
+              )}
+              
+              {/* Items (text and images) */}
+              {items.map((item) => (
+                <Group key={item.id}>
+                  {item.type === 'text' ? (
+                    <TextItem
+                      item={item}
                       isSelected={item.id === selectedItemId}
-                      onChange={(newAttrs: any) => {
-                        updateItem(item.id, newAttrs);
-                      }}
                       onSelect={() => selectItem(item.id)}
                     />
-                  ))
-                }
-                
-                {/* Transformer for selected items */}
-                <Transformer 
-                  ref={transformerRef}
-                  boundBoxFunc={(oldBox, newBox) => {
-                    // Limit resize to stage dimensions
-                    if (newBox.width < 5 || newBox.height < 5) {
-                      return oldBox;
-                    }
-                    return newBox;
-                  }}
-                />
-              </Layer>
-            </Stage>
-          </div>
+                  ) : (
+                    <ImageItem
+                      item={item}
+                      isSelected={item.id === selectedItemId}
+                      onSelect={() => selectItem(item.id)}
+                    />
+                  )}
+                </Group>
+              ))}
+            </Layer>
+          </Stage>
         </div>
-      </div>
-      
-      {/* Right sidebar with item properties */}
-      <div className="w-full md:w-1/4">
+        
         <EditorControls 
-          selectedItemId={selectedItemId}
-          jerseyZones={jerseyZones.filter(zone => zone.side === currentView)}
+          selectedItemId={selectedItemId} 
+          jerseyZones={currentZones} 
         />
       </div>
     </div>
   );
 };
 
-// Component for selectable and editable items (text or images)
-const SelectableItem = ({ item, isSelected, onChange, onSelect }: { 
-  item: ItemConfig, 
-  isSelected: boolean,
-  onChange: (newAttrs: any) => void,
-  onSelect: () => void
-}) => {
-  // If it's a text item
-  if (item.type === 'text') {
-    return (
-      <Text
-        id={item.id}
-        x={item.x}
-        y={item.y}
-        text={item.text || ''}
-        fontSize={item.fontSize || 20}
-        fontFamily={item.fontFamily || 'Arial'}
-        fill={item.fill || '#000000'}
-        draggable
-        rotation={item.rotation || 0}
-        onClick={onSelect}
-        onTap={onSelect}
-        onDragEnd={(e) => {
-          onChange({
-            x: e.target.x(),
-            y: e.target.y(),
-          });
-        }}
-        onTransformEnd={(e) => {
-          const node = e.target;
-          onChange({
-            x: node.x(),
-            y: node.y(),
-            rotation: node.rotation(),
-            // Update font size proportionally
-            fontSize: item.fontSize * node.scaleX(),
-          });
-        }}
-      />
-    );
-  }
+// Make drag handlers globally accessible
+let onDragMove: (id: string, x: number, y: number) => void;
+let onTransform: (id: string, fontSize: number, rotation: number) => void;
+let onImageTransform: (id: string, scaleX: number, scaleY: number, rotation: number) => void;
+
+// Update global handler references
+const JerseyEditorWrapper = () => {
+  const editor = <JerseyEditor />;
   
-  // If it's an image item
-  if (item.type === 'image') {
-    const [image] = useImage(item.src || '');
-    return (
-      <Group
-        id={item.id}
-        x={item.x}
-        y={item.y}
-        draggable
-        rotation={item.rotation || 0}
-        onClick={onSelect}
-        onTap={onSelect}
-        onDragEnd={(e) => {
-          onChange({
-            x: e.target.x(),
-            y: e.target.y(),
-          });
-        }}
-        onTransformEnd={(e) => {
-          const node = e.target;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-          
-          onChange({
-            x: node.x(),
-            y: node.y(),
-            rotation: node.rotation(),
-            scaleX,
-            scaleY,
-          });
-        }}
-      >
-        <Image
-          image={image}
-          width={item.width || 100}
-          height={item.height || 100}
-          scaleX={item.scaleX || 1}
-          scaleY={item.scaleY || 1}
-        />
-      </Group>
-    );
-  }
+  // Set up the global handlers using the store's actual instance
+  onDragMove = (id, x, y) => {
+    const store = useEditorStoreBase.getState();
+    store.updateItem(id, { x, y });
+  };
   
-  return null;
+  onTransform = (id, fontSize, rotation) => {
+    const store = useEditorStoreBase.getState();
+    store.updateItem(id, { fontSize, rotation });
+  };
+  
+  onImageTransform = (id, scaleX, scaleY, rotation) => {
+    const store = useEditorStoreBase.getState();
+    store.updateItem(id, { scaleX, scaleY, rotation });
+  };
+  
+  return editor;
 };
 
-export default JerseyEditor;
+export default JerseyEditorWrapper;
