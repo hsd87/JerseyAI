@@ -128,11 +128,11 @@ ${designNotes || `The Circuit kit is bold, distinctive, and meticulously enginee
       messages: [
         { 
           role: "system", 
-          content: `You are an expert sports kit designer. Take the following jersey design template and enhance it into a compelling prompt for an AI image generator. Keep the overall structure and format similar but add unique details and descriptions that will result in a high-quality, realistic jersey image.` 
+          content: `You are an expert sports kit designer. Take the following jersey design template and enhance it into a compelling prompt for an AI image generator. Keep the overall structure and format similar but add unique details and descriptions that will result in a high-quality, realistic jersey image. Return your response as a JSON object with a "prompt" field that contains the enhanced prompt.` 
         },
         { 
           role: "user", 
-          content: promptTemplate 
+          content: `Please convert this template into an enhanced AI prompt and return as json: ${promptTemplate}` 
         }
       ],
       response_format: { type: "json_object" },

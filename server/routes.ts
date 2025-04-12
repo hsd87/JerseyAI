@@ -71,10 +71,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           kitType: design.kitType,
           primaryColor: design.primaryColor,
           secondaryColor: design.secondaryColor,
-          sleeveStyle: design.sleeveStyle,
-          collarType: design.collarType,
-          patternStyle: design.patternStyle,
-          designNotes: design.designNotes
+          sleeveStyle: design.sleeveStyle || undefined,
+          collarType: design.collarType || undefined,
+          patternStyle: design.patternStyle || undefined,
+          designNotes: design.designNotes || undefined
         });
 
         console.log("Enhanced template prompt generated:", enhancedPrompt);
@@ -89,9 +89,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         res.json(updatedDesign);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error generating design:", error);
-        res.status(500).json({ message: "Failed to generate design", error: error.message });
+        res.status(500).json({ 
+          message: "Failed to generate design", 
+          error: error.message || "Unknown error" 
+        });
       }
     } catch (error) {
       next(error);
@@ -246,10 +249,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const { checkSubscriptionStatus } = await import('./stripe');
           const stripeStatus = await checkSubscriptionStatus(user.stripeSubscriptionId);
           
+          const expiryDate = stripeStatus.current_period_end 
+            ? new Date(stripeStatus.current_period_end * 1000).toISOString()
+            : null;
+            
           subscriptionData = {
             isSubscribed: stripeStatus.status === 'active',
             subscriptionTier: stripeStatus.status === 'active' ? 'pro' : 'free',
-            subscriptionExpiry: new Date(stripeStatus.current_period_end * 1000).toISOString(),
+            subscriptionExpiry: expiryDate,
             subscriptionStatus: stripeStatus.status,
             remainingDesigns: user.remainingDesigns
           };
