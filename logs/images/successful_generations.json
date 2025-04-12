@@ -105,5 +105,137 @@
       "extra_lora_scale": 0.69,
       "extra_lora": ""
     }
+  },
+  {
+    "timestamp": "2025-04-12T18:59:02.777Z",
+    "imageId": "928068e5-aeb0-4cdc-96d8-db71135b61ef",
+    "filename": "jersey_928068e5-aeb0-4cdc-96d8-db71135b61ef.png",
+    "generationTimeMs": 8335,
+    "promptLength": 2771,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a short basketball design. It features a crew, angular shoulder seams, and a form-fitting streamlined cut through the torso. sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: medium blue\n        • Secondary Color: medium red-green\n        • Accent: Ice white trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe front of the jersey features an elegant yet modern solid pattern, radiating outward from the chest center in medium red-green, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in medium red-green with subtle dotted patterns near the hem.\n\nThe back of the jersey includes a medium red-green vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large medium red-green numerals outlined in white. A deep medium blue halo gradient behind the number adds tonal contrast.\n\n⸻\n\n\n\n🧩 Panel & Trim Breakdown\n        • Collar: crew in medium blue with medium red-green edge taping\n        • Sleeves: Matte medium blue with dotted medium red-green cuff details\n        • Front Body: solid-centered medium red-green burst, angled white slash\n        • Back Body: Vertical medium red-green tech spine with clean typography block\n\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n\n⸻\n\n🌐 Design Mood & Cohesion\n\ncrazy\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-12T18:59:59.005Z",
+    "imageId": "4fb6d9b6-fd68-4750-a0a8-71d1c7417899",
+    "filename": "jersey_4fb6d9b6-fd68-4750-a0a8-71d1c7417899.png",
+    "generationTimeMs": 8302,
+    "promptLength": 2771,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a short basketball design. It features a crew, angular shoulder seams, and a form-fitting streamlined cut through the torso. sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: medium blue\n        • Secondary Color: medium red-green\n        • Accent: Ice white trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe front of the jersey features an elegant yet modern solid pattern, radiating outward from the chest center in medium red-green, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in medium red-green with subtle dotted patterns near the hem.\n\nThe back of the jersey includes a medium red-green vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large medium red-green numerals outlined in white. A deep medium blue halo gradient behind the number adds tonal contrast.\n\n⸻\n\n\n\n🧩 Panel & Trim Breakdown\n        • Collar: crew in medium blue with medium red-green edge taping\n        • Sleeves: Matte medium blue with dotted medium red-green cuff details\n        • Front Body: solid-centered medium red-green burst, angled white slash\n        • Back Body: Vertical medium red-green tech spine with clean typography block\n\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n\n⸻\n\n🌐 Design Mood & Cohesion\n\ncrazy\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-12T19:00:48.279Z",
+    "imageId": "89c6b282-d823-49a6-b1cc-069b67170e78",
+    "filename": "jersey_89c6b282-d823-49a6-b1cc-069b67170e78.png",
+    "generationTimeMs": 8820,
+    "promptLength": 2771,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a short basketball design. It features a crew, angular shoulder seams, and a form-fitting streamlined cut through the torso. sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: medium blue\n        • Secondary Color: medium red-green\n        • Accent: Ice white trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe front of the jersey features an elegant yet modern solid pattern, radiating outward from the chest center in medium red-green, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in medium red-green with subtle dotted patterns near the hem.\n\nThe back of the jersey includes a medium red-green vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large medium red-green numerals outlined in white. A deep medium blue halo gradient behind the number adds tonal contrast.\n\n⸻\n\n\n\n🧩 Panel & Trim Breakdown\n        • Collar: crew in medium blue with medium red-green edge taping\n        • Sleeves: Matte medium blue with dotted medium red-green cuff details\n        • Front Body: solid-centered medium red-green burst, angled white slash\n        • Back Body: Vertical medium red-green tech spine with clean typography block\n\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n\n⸻\n\n🌐 Design Mood & Cohesion\n\ncrazy\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-12T19:01:31.545Z",
+    "imageId": "00c79ef5-0214-448d-86ff-f3d4aa1a108d",
+    "filename": "jersey_00c79ef5-0214-448d-86ff-f3d4aa1a108d.png",
+    "generationTimeMs": 14465,
+    "promptLength": 2771,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a short basketball design. It features a crew, angular shoulder seams, and a form-fitting streamlined cut through the torso. sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: medium blue\n        • Secondary Color: medium red-green\n        • Accent: Ice white trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe front of the jersey features an elegant yet modern solid pattern, radiating outward from the chest center in medium red-green, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in medium red-green with subtle dotted patterns near the hem.\n\nThe back of the jersey includes a medium red-green vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large medium red-green numerals outlined in white. A deep medium blue halo gradient behind the number adds tonal contrast.\n\n⸻\n\n\n\n🧩 Panel & Trim Breakdown\n        • Collar: crew in medium blue with medium red-green edge taping\n        • Sleeves: Matte medium blue with dotted medium red-green cuff details\n        • Front Body: solid-centered medium red-green burst, angled white slash\n        • Back Body: Vertical medium red-green tech spine with clean typography block\n\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n\n⸻\n\n🌐 Design Mood & Cohesion\n\ncrazy\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-12T19:02:10.303Z",
+    "imageId": "27f4cefa-eb45-4101-8aa7-49ff1793ed24",
+    "filename": "jersey_27f4cefa-eb45-4101-8aa7-49ff1793ed24.png",
+    "generationTimeMs": 8118,
+    "promptLength": 2771,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a short basketball design. It features a crew, angular shoulder seams, and a form-fitting streamlined cut through the torso. sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: medium blue\n        • Secondary Color: medium red-green\n        • Accent: Ice white trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe front of the jersey features an elegant yet modern solid pattern, radiating outward from the chest center in medium red-green, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in medium red-green with subtle dotted patterns near the hem.\n\nThe back of the jersey includes a medium red-green vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large medium red-green numerals outlined in white. A deep medium blue halo gradient behind the number adds tonal contrast.\n\n⸻\n\n\n\n🧩 Panel & Trim Breakdown\n        • Collar: crew in medium blue with medium red-green edge taping\n        • Sleeves: Matte medium blue with dotted medium red-green cuff details\n        • Front Body: solid-centered medium red-green burst, angled white slash\n        • Back Body: Vertical medium red-green tech spine with clean typography block\n\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n\n⸻\n\n🌐 Design Mood & Cohesion\n\ncrazy\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-12T19:05:02.716Z",
+    "imageId": "7d1aa586-993a-4db8-866a-3a622e8fdd12",
+    "filename": "jersey_7d1aa586-993a-4db8-866a-3a622e8fdd12.png",
+    "generationTimeMs": 8458,
+    "promptLength": 2771,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a short basketball design. It features a crew, angular shoulder seams, and a form-fitting streamlined cut through the torso. sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: medium blue\n        • Secondary Color: medium red-green\n        • Accent: Ice white trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe front of the jersey features an elegant yet modern solid pattern, radiating outward from the chest center in medium red-green, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in medium red-green with subtle dotted patterns near the hem.\n\nThe back of the jersey includes a medium red-green vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large medium red-green numerals outlined in white. A deep medium blue halo gradient behind the number adds tonal contrast.\n\n⸻\n\n\n\n🧩 Panel & Trim Breakdown\n        • Collar: crew in medium blue with medium red-green edge taping\n        • Sleeves: Matte medium blue with dotted medium red-green cuff details\n        • Front Body: solid-centered medium red-green burst, angled white slash\n        • Back Body: Vertical medium red-green tech spine with clean typography block\n\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n\n⸻\n\n🌐 Design Mood & Cohesion\n\ncrazy\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
   }
 ]

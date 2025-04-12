@@ -4,154 +4,11 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import Replicate from "replicate";
 
-// Smart prompt override rules per sport
-export const sportPromptOverrides = {
-  soccer: {
-    sleeveStyle: "short-sleeved",
-    collarType: "hybrid mandarin V-collar",
-    patternStyle: "circuit crest",
-    structureNote: "streamlined fit for performance, short sleeves, angular seams for agility",
-  },
-  basketball: {
-    sleeveStyle: "sleeveless",
-    collarType: "classic round neck",
-    patternStyle: "vertical wave stripes",
-    structureNote: "sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion",
-  },
-  rugby: {
-    sleeveStyle: "short-sleeved reinforced",
-    collarType: "traditional button placket",
-    patternStyle: "bold chest bands",
-    structureNote: "rugged construction with short reinforced sleeves and secure button collar",
-  },
-  cricket: {
-    sleeveStyle: "half or long-sleeved",
-    collarType: "polo collar with piping",
-    patternStyle: "minimal pinstripe or shoulder gradient",
-    structureNote: "lightweight long-wear design with cooling mesh underarm zones",
-  },
-  esports: {
-    sleeveStyle: "short-sleeved or long-sleeved",
-    collarType: "crew neck",
-    patternStyle: "cyberpunk hexgrid",
-    structureNote: "stylized digital-wear with futuristic trim, ideal for media and team branding",
-  },
-  baseball: {
-    sleeveStyle: "3/4 length raglan",
-    collarType: "buttoned crew neck",
-    patternStyle: "team panel blocks",
-    structureNote: "structured cut for arm rotation with emphasized back yoke",
-  },
-};
+// Import the smart prompt builder
+import { generateSmartPrompt } from './lib/promptBuilder';
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-/**
- * Color mapping to convert hex codes or basic color names to descriptive sports terminology
- * This improves prompt quality for the AI image generation
- */
-const colorMapping: Record<string, string> = {
-  // Basic colors
-  "red": "vibrant scarlet red",
-  "blue": "deep royal blue",
-  "green": "emerald green",
-  "yellow": "brilliant gold",
-  "orange": "rich sunset orange",
-  "purple": "majestic purple",
-  "black": "deep jet black",
-  "white": "pristine white",
-  "grey": "sleek silver grey",
-  "gray": "sleek silver grey",
-  "pink": "striking pink",
-  "brown": "rustic brown",
-  "navy": "traditional navy blue",
-  "maroon": "classic maroon",
-  "teal": "ocean teal",
-  "olive": "traditional olive green",
-  "cyan": "bright cyan blue",
-  
-  // Soccer team colors
-  "barcelona blue": "Barcelona blue and garnet",
-  "madrid white": "Real Madrid pristine white",
-  "liverpool red": "Liverpool cardinal red",
-  "chelsea blue": "Chelsea royal blue",
-  "arsenal red": "Arsenal crimson red",
-  
-  // Basketball team colors
-  "lakers purple": "Lakers royal purple and gold",
-  "celtics green": "Celtics traditional green",
-  "bulls red": "Chicago Bulls fiery red",
-  "heat black": "Miami Heat sleek black and red",
-  
-  // Common hex codes
-  "#ff0000": "vibrant scarlet red",
-  "#00ff00": "bright lime green",
-  "#0000ff": "deep royal blue",
-  "#ffff00": "brilliant gold",
-  "#ff8000": "rich sunset orange",
-  "#800080": "majestic purple",
-  "#000000": "deep jet black",
-  "#ffffff": "pristine white",
-  "#808080": "sleek silver grey",
-  "#ffc0cb": "soft pink",
-  "#800000": "classic maroon",
-  "#008080": "ocean teal",
-  "#808000": "traditional olive green",
-};
-
-/**
- * Convert color input (name or hex) to descriptive sports terminology
- * @param colorInput The color name or hex code
- * @returns Descriptive sports color terminology
- */
-function convertToDescriptiveColor(colorInput: string): string {
-  if (!colorInput) return "";
-  
-  // If it's already in our mapping, return the mapped value
-  if (colorInput.toLowerCase() in colorMapping) {
-    return colorMapping[colorInput.toLowerCase()];
-  }
-  
-  // Handle hex codes that aren't in our predefined mapping
-  if (colorInput.startsWith('#')) {
-    try {
-      // Convert hex to RGB
-      const r = parseInt(colorInput.slice(1, 3), 16);
-      const g = parseInt(colorInput.slice(3, 5), 16);
-      const b = parseInt(colorInput.slice(5, 7), 16);
-      
-      // For simplicity, we'll add a description based on RGB values
-      const colors = [];
-      if (r > 200) colors.push("red");
-      if (g > 200) colors.push("green");
-      if (b > 200) colors.push("blue");
-      
-      if (colors.length === 0) {
-        if (r > g && r > b) colors.push("reddish");
-        else if (g > r && g > b) colors.push("greenish");
-        else if (b > r && b > g) colors.push("bluish");
-        else colors.push("neutral");
-      }
-      
-      if (r < 50 && g < 50 && b < 50) return "deep dark";
-      if (r > 200 && g > 200 && b > 200) return "bright white";
-      
-      const brightness = (r + g + b) / 3;
-      const brightnessDesc = brightness > 200 ? "bright" : brightness < 100 ? "dark" : "medium";
-      
-      return `${brightnessDesc} ${colors.join("-")}`;
-    } catch (e) {
-      console.warn(`Failed to parse hex color: ${colorInput}`, e);
-      return colorInput; // Return original if parsing fails
-    }
-  }
-  
-  // If it's not a recognized color or hex code, use as is with a "tone" suffix
-  return `${colorInput} tone`; // Add "tone" to make it sound more descriptive
-}
-
-interface GenerateKitPromptOptions {
+// Export the prompt generation options interface for external use
+export interface GenerateKitPromptOptions {
   sport: string;
   kitType: string;
   primaryColor: string;
@@ -163,98 +20,64 @@ interface GenerateKitPromptOptions {
 }
 
 export async function generateKitPrompt(options: GenerateKitPromptOptions): Promise<string> {
+  // Use the new smart prompt generator for enhanced sport-specific prompts
+  try {
+    console.log("Using smart prompt builder for enhanced sport-specific prompt generation");
+    return await generateSmartPrompt(options);
+  } catch (error) {
+    console.error("Error using smart prompt builder:", error);
+    console.warn("Using legacy prompt generation as fallback");
+    // Fall back to more basic prompt if smart prompt generation fails
+    return generateBasicPrompt(options);
+  }
+}
+
+// Legacy prompt generation function as fallback
+async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<string> {
   const { 
     sport, 
     kitType, 
     primaryColor, 
-    secondaryColor, 
-    sleeveStyle: userSleeveStyle, 
-    collarType: userCollarType, 
-    patternStyle: userPatternStyle, 
-    designNotes 
+    secondaryColor 
   } = options;
-
-  // Apply sport-specific overrides if available
-  const sportLower = sport.toLowerCase();
-  const sportOverrides = sportPromptOverrides[sportLower as keyof typeof sportPromptOverrides] || {};
   
-  // Prioritize user input over sport defaults
-  const sleeveStyle = userSleeveStyle || sportOverrides.sleeveStyle || 'short-sleeved';
-  const collarType = userCollarType || sportOverrides.collarType || 'hybrid mandarin V-collar';
-  const patternStyle = userPatternStyle || sportOverrides.patternStyle || 'circuit crest';
-  const structureNote = sportOverrides.structureNote || '';
-  
-  console.log(`Applied sport override for ${sport}: ${JSON.stringify({ sleeveStyle, collarType, patternStyle, structureNote })}`);
-
-  // Use the enhanced color conversion function
-  const primaryColorName = convertToDescriptiveColor(primaryColor);
-  const secondaryColorName = convertToDescriptiveColor(secondaryColor);
-  
-  console.log(`Color conversion: Primary "${primaryColor}" → "${primaryColorName}", Secondary "${secondaryColor}" → "${secondaryColorName}"`);
-
-  // Create a template that uses "jersey and shorts" instead of "kit"
-  // And only includes shorts description if it's not a jersey-only design
-  let isJerseyOnly = kitType === "jersey only" || 
-                     !kitType.toLowerCase().includes("shorts");
-                     
-  // Smart Structure Enforcement based on sport
-  if (sportLower === 'basketball') {
-    // Always enforce sleeveless for basketball
-    isJerseyOnly = true; // Basketball usually focuses on the jersey
-  }
-                       
-  // Construct the prompt template with conditionals for jersey-only vs full uniform
-  const promptTemplate = `⸻
+  // Create a simple prompt format that doesn't rely on any logic or external calls
+  return `⸻
 
 Prompt:
 
-A pfsportskit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. ${isJerseyOnly ? 
-  `The ${sport} jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals.` : 
-  `The ${sport} jersey and shorts are presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals.`} Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the ${isJerseyOnly ? 'jersey' : 'uniform'}, front and back.
+A pfsportskit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The ${sport} jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.
 
 ⸻
 
 🧍‍♂️ Garment Structure
 
-${isJerseyOnly ? 
-  `The jersey is a ${sleeveStyle || 'short-sleeved'} ${sport} design. It features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso. ${structureNote ? structureNote : ''}${sportLower === 'basketball' ? ' The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.' : ''}${sportLower === 'rugby' ? ' The rugby jersey is constructed with reinforced seams and durable stitching to withstand physical contact and frequent tackles.' : ''}${sportLower === 'esports' ? ' The esports jersey features tech-inspired styling with cyberpunk aesthetics, ideal for both gaming competition and content creation.' : ''}` : 
-  `The uniform consists of a ${sleeveStyle || 'short-sleeved'} ${sport} jersey and tapered mid-thigh athletic shorts. The jersey features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso. ${structureNote ? structureNote : ''}${sportLower === 'basketball' ? ' The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.' : ''}${sportLower === 'rugby' ? ' The rugby jersey is constructed with reinforced seams and durable stitching to withstand physical contact and frequent tackles.' : ''}${sportLower === 'esports' ? ' The esports jersey features tech-inspired styling with cyberpunk aesthetics, ideal for both gaming competition and content creation.' : ''} The shorts include sculpted side panels, a reinforced waistband, and slit hems for dynamic movement.`}
+The jersey is a ${sport}-specific design with appropriate structure and fit for the sport.
 
 ⸻
 
 🧵 Fabric & Texture
 
-Constructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.
+Constructed from a high-performance poly-elastane blend with appropriate ventilation and structure for ${sport}.
 
 ⸻
 
 🎨 Color Scheme
-        • Primary Color: ${primaryColorName}
-        • Secondary Color: ${secondaryColorName}
-        • Accent: Ice white trim and dark contours
+        • Primary Color: ${primaryColor}
+        • Secondary Color: ${secondaryColor}
+        • Accent: White trim and dark contours
 
 ⸻
 
 🎨 Design Language
 
-The front of the jersey features an elegant yet modern ${patternStyle || 'circuit crest'} pattern, radiating outward from the chest center in ${secondaryColorName}, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in ${secondaryColorName} with subtle dotted patterns near the hem.
-
-The back of the jersey includes a ${secondaryColorName} vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large ${secondaryColorName} numerals outlined in white. A deep ${primaryColorName} halo gradient behind the number adds tonal contrast.
+The jersey features a modern, sport-authentic design with the primary and secondary colors appropriately placed for ${sport} traditions.
 
 ⸻
 
-${isJerseyOnly ? '' : `🩳 Shorts Design
-
-Shorts are ${primaryColorName} with angular ${secondaryColorName} side panels, shaped like descending wedges that taper toward the knee. A thin white trim outlines the bottom hem and side slits. Rear panel shaping follows the glute contour with internal stitching and a slight back yoke drop. The left thigh displays a ${secondaryColorName} team crest; the right thigh features an optional player number or minimal icon.
-
-⸻`}
-
 🧩 Panel & Trim Breakdown
-        • Collar: ${collarType || 'Mandarin-style V-notch'} in ${primaryColorName} with ${secondaryColorName} edge taping
-        • Sleeves: Matte ${primaryColorName} with dotted ${secondaryColorName} cuff details
-        • Front Body: ${patternStyle || 'Crest'}-centered ${secondaryColorName} burst, angled white slash
-        • Back Body: Vertical ${secondaryColorName} tech spine with clean typography block
-${isJerseyOnly ? '' : '        • Shorts: Sculpted fit with angular ' + secondaryColorName + ' inserts and hem detailing'}
+        • Front Body: Sport-appropriate design in primary and secondary colors
+        • Back Body: Clean player name and number placement
 
 ⸻
 
@@ -263,125 +86,13 @@ ${isJerseyOnly ? '' : '        • Shorts: Sculpted fit with angular ' + seconda
         • Jersey front right chest: Sponsor logo
         • Upper back (below collar): Player name
         • Back center: Large number
-${isJerseyOnly ? '' : '        • Shorts left thigh: Team crest\n        • Shorts right thigh: Player number or secondary crest'}
 
 ⸻
 
 🌐 Design Mood & Cohesion
 
-${designNotes || `The design is bold, distinctive, and meticulously engineered — merging the power of tradition with the precision of modern performancewear. The ${secondaryColorName}-on-${primaryColorName} palette evokes prestige, while the ${patternStyle || 'circuit'} patterning adds a tech-forward identity. This ${isJerseyOnly ? 'jersey' : 'uniform'} is ideal for trophy-season campaigns, limited-edition drops, or teams with a legacy-driven brand story.`}
+A professional, competition-ready ${sport} jersey design with modern styling.
 `;
-
-  // Create a log file path for saving successful prompts
-  const promptLogsDir = path.join(process.cwd(), 'logs');
-  const promptLogFile = path.join(promptLogsDir, 'successful_prompts.json');
-  
-  // For fallback in case OpenAI fails
-  const createDirectPrompt = () => {
-    // Create a direct prompt without OpenAI enhancement
-    return promptTemplate;
-  };
-  
-  try {
-    // Ensure logs directory exists
-    if (!fs.existsSync(promptLogsDir)) {
-      fs.mkdirSync(promptLogsDir, { recursive: true });
-    }
-    
-    console.log(`Generating enhanced prompt for ${sport} jersey with ${primaryColorName} and ${secondaryColorName} colors...`);
-    
-    // Set up OpenAI to generate an enhanced prompt
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { 
-          role: "system", 
-          content: `You are an expert sports jersey designer creating prompts for an AI jersey generation system. 
-
-SPORT-SPECIFIC CONTEXT:
-This is a ${sport} jersey design with the following characteristics:
-- Sleeve Style: ${sleeveStyle}
-- Collar Type: ${collarType}
-- Pattern Style: ${patternStyle}
-${structureNote ? `- Structure Note: ${structureNote}` : ''}
-${sportLower === 'basketball' ? '- Basketball jerseys should emphasize wide armholes, loose fit, and remove cuff/hem logic' : ''}
-${sportLower === 'rugby' ? '- Rugby jerseys should emphasize reinforced seam structures and durability' : ''}
-${sportLower === 'esports' ? '- Esports jerseys should include visual neon motifs and stylized mesh trims' : ''}
-
-You MUST:
-1. Follow the EXACT same format as the template with all sections provided in the exact same order.
-2. KEEP all dividers (⸻) and emoji section markers (🧍‍♂️, 🧵, 🎨, 🩳, 🧩, 🏷️, 🌐) in the exact same positions.
-3. Keep all bullet points in the same sections but enhance their descriptions.
-4. Maintain the same jersey views arrangement - front view (left) and back view (right).
-5. Always include the exact term "pfsportskit" in the first paragraph - this is REQUIRED and must not be changed.
-6. Include all colors exactly as mentioned - primary, secondary, and accent.
-7. Maintain all specifications about collar type, sleeve style, and pattern style.
-8. Never use the word "kit" except in the required "pfsportskit" token. Use "jersey" or "jersey and shorts" or "uniform" instead.
-9. If the template doesn't include shorts sections, DO NOT add them. Only describe shorts if the template includes shorts sections.
-10. Incorporate any design inspiration (if provided) as visual elements in the jersey design itself, not just in the mood section.
-
-ENHANCE the template with:
-1. More vivid and specific material descriptions appropriate for ${sport}.
-2. Richer color descriptors (while keeping the actual colors).
-3. More technical sportswear terminology specific to ${sport}.
-4. Better physical structure descriptions aligned with ${sport} performance needs.
-5. Additional design elements that would make the jersey more distinctive and authentic for ${sport}.
-
-Return your response as a JSON object with a single "prompt" field containing the enhanced prompt.` 
-        },
-        { 
-          role: "user", 
-          content: `Please convert this template into an enhanced AI prompt and return as json: ${promptTemplate}` 
-        }
-      ],
-      response_format: { type: "json_object" },
-    });
-
-    const content = response.choices[0].message.content;
-    if (!content) {
-      console.warn("OpenAI returned empty content. Falling back to direct prompt.");
-      return createDirectPrompt();
-    }
-
-    try {
-      // Parse the content to get the prompt
-      const jsonContent = JSON.parse(content);
-      const enhancedPrompt = jsonContent.prompt || content;
-      
-      // Log successful prompt for future analysis
-      try {
-        let existingLogs: any[] = [];
-        if (fs.existsSync(promptLogFile)) {
-          const logsContent = fs.readFileSync(promptLogFile, 'utf8');
-          existingLogs = JSON.parse(logsContent);
-        }
-        
-        // Save the prompt with metadata
-        existingLogs.push({
-          timestamp: new Date().toISOString(),
-          sport,
-          primaryColor: primaryColorName,
-          secondaryColor: secondaryColorName,
-          template: promptTemplate,
-          enhanced: enhancedPrompt
-        });
-        
-        fs.writeFileSync(promptLogFile, JSON.stringify(existingLogs, null, 2), 'utf8');
-      } catch (logError) {
-        console.warn("Failed to log prompt:", logError);
-      }
-      
-      return enhancedPrompt;
-    } catch (parseError) {
-      console.error("Failed to parse OpenAI response as JSON:", parseError);
-      console.warn("Falling back to direct prompt.");
-      return createDirectPrompt();
-    }
-  } catch (error) {
-    console.error("Error generating jersey design prompt:", error);
-    console.warn("Falling back to direct prompt template due to OpenAI error.");
-    return createDirectPrompt();
-  }
 }
 
 export async function generateJerseyImageWithReplicate(prompt: string, kitType?: string): Promise<string> {

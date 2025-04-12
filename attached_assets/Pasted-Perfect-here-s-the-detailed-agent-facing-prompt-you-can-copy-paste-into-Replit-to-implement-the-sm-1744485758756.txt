@@ -1,0 +1,83 @@
+Perfect — here’s the detailed agent-facing prompt you can copy/paste into Replit to implement the smart prompt builder and override-aware formatting system into your app:
+
+⸻
+
+🧠 REPLIT AGENT TASK PROMPT
+
+Objective:
+Integrate the newly designed generateSmartPrompt() module into the ProJersey OpenAI prompt pipeline. This system ensures accurate and intelligent prompt construction per sport type, always includes branding and formatting standards, and adapts garment structure dynamically.
+
+⸻
+
+✅ REQUIRED TASKS:
+
+1. 🔁 Replace the existing generateKitPrompt() logic with the new smart override system:
+	•	Create a file: lib/sportsPromptOverrides.ts
+	•	Populate it with override definitions (collar style, sleeve logic, garment rules) per sport (e.g., basketball → sleeveless jersey).
+	•	You can use this template for the override map:
+
+export const sportPromptOverrides: Record<string, Partial<PromptOverrides>> = {
+  basketball: {
+    sleeveStyle: "sleeveless",
+    collarType: "round crew neck",
+    shortsRequired: false,
+    designMood: "The jersey is built for agility and on-court visibility — sleek, minimal, and optimized for fast breaks.",
+  },
+  soccer: {
+    sleeveStyle: "short-sleeved",
+    collarType: "hybrid mandarin V-collar",
+    shortsRequired: true,
+  },
+  rugby: {
+    sleeveStyle: "short-sleeved with reinforced shoulders",
+    collarType: "rugged reinforced V-neck",
+    shortsRequired: true,
+  },
+  esports: {
+    sleeveStyle: "long-sleeved",
+    collarType: "crew collar",
+    shortsRequired: false,
+    designMood: "Futuristic and bold — this esports jersey brings digital edge to competitive identity.",
+  },
+  cricket: {
+    sleeveStyle: "long-sleeved",
+    collarType: "button mandarin",
+    shortsRequired: false,
+  },
+};
+
+2. 🧠 Create a new module: lib/promptBuilder.ts
+
+This should export a function:
+
+generateSmartPrompt(options: PromptInput): string
+
+This must:
+	•	Dynamically adapt garment structure, panel/trim, design tone, and color phrasing.
+	•	Always include the branding token pfsportskit in the opening line.
+	•	Use emoji section markers and dividers consistently (🧍‍♂️, 🧵, 🎨, 🩳, 🧩, 🏷️, 🌐, and ⸻).
+	•	Include optional garment sections like shorts only when needed (shortsRequired in overrides).
+	•	Pass final prompt through OpenAI (GPT-4o) for enhancement, maintaining JSON return format.
+
+⸻
+
+3. 🧪 Validate:
+	•	Add unit tests for key sports prompt variants (soccer, basketball, esports).
+	•	Log both base and enhanced prompts to /logs/smart_prompts.json.
+
+⸻
+
+4. 🧩 Integration:
+	•	Replace the call in your existing generateKitPrompt() with generateSmartPrompt().
+	•	Ensure that prompt is passed to Replicate just as before.
+	•	Confirm the system gracefully handles missing overrides (fallback to generic structure).
+
+⸻
+
+💡 Optional Enhancements:
+	•	Future: Add language localization toggle (e.g. EN, FR).
+	•	Track “prompt-to-order conversion” for prompt tuning.
+
+⸻
+
+Let me know once this is in place, and we’ll continue with testing image consistency, user-side editing, or model fine-tuning.
