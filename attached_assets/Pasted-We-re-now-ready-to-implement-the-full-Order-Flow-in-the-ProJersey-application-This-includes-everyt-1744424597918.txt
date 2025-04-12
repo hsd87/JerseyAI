@@ -1,0 +1,97 @@
+We're now ready to implement the full Order Flow in the ProJersey application.
+
+This includes everything from the moment a user finalizes their jersey design to checkout, payment, and post-order handling. Please implement the following components and logic step-by-step with precision:
+
+---
+
+### ✅ 1. Order Form Module
+
+Create a dynamic order form component on the frontend (`client/src/components/order-form.tsx`) with the following requirements:
+
+- Allow both **single orders** and **team orders**
+- Show a **sport selection dropdown** (Esports, Soccer, Basketball, Rugby, Cricket)
+- Based on selected sport, load allowed jersey package options:
+  - Jersey only
+  - Jersey + Shorts
+  - Jersey + Shorts + Socks
+  - Full kit (Jersey + Shorts + Socks + Headwear)
+- Form dynamically shows options as **checkbox-style add-ons** with reference thumbnails
+- Show **size chart** component depending on gender selection (Male / Female / Youth)
+
+---
+
+### ✅ 2. Order Pricing Logic
+
+Update the backend API (`server/routes.ts` or `server/orders.ts`) to calculate pricing:
+
+- Base price per sport and base set (maintain config in a JSON or database model)
+- Each add-on item adds cost (e.g., socks = $3, headwear = $4)
+- For team orders, use quantity x (base + add-ons)
+- Apply **15% discount** if the user is a subscriber (can be accessed via subscription store)
+
+---
+
+### ✅ 3. PDF Order Summary Generator
+
+Implement a utility (`server/utils/pdf-generator.ts`) that:
+
+- Generates a branded PDF with:
+  - User name + email
+  - Prompt and design preview (front & back)
+  - Selected configuration (sport, sizes, add-ons)
+  - Price breakdown
+  - Delivery timeline
+- Save the PDF locally under `/orders/pdfs/order_<uuid>.pdf`
+- Attach this PDF to the order response and email (see section 5)
+
+---
+
+### ✅ 4. Database Schema (PostgreSQL)
+
+Create or update database models:
+
+- `orders` table:
+  - `id`, `user_id`, `uuid`, `prompt`, `design_urls`, `sport`, `items`, `price`, `pdf_url`, `created_at`, `status` (pending, in production, shipped)
+- `order_items` table:
+  - `order_id`, `product_type`, `size`, `qty`
+
+Use Prisma or SQLAlchemy based on your backend. Ensure indexes on `user_id`, `created_at`.
+
+---
+
+### ✅ 5. Email Integration
+
+Trigger an email to the user with:
+
+- Subject: “🎽 Your ProJersey Order Has Been Confirmed!”
+- Attach: Order summary PDF
+- Body: Thank you message, preview of design, and order summary inline
+
+Use any NodeMailer (Node.js) or FastAPI SMTP extension.
+
+---
+
+### ✅ 6. User Dashboard Integration
+
+In `client/src/pages/dashboard.tsx`:
+
+- Add “My Orders” section
+- Show cards with:
+  - Design preview
+  - Summary of items ordered
+  - Order status (pending, in production, shipped)
+  - Link to download the order PDF
+
+Make a backend route to return orders by `user_id` and attach to frontend store.
+
+---
+
+### 🛠️ Additional Notes
+
+- Add validation to ensure users can only place an order once per generated image (avoid abuse)
+- Keep the system modular for future B2B CSV bulk uploads
+- Reuse the design UUID from image generation as the order reference
+
+---
+
+Let me know once this Order Flow system is implemented so we can test the full design-to-order pipeline.

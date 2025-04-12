@@ -73,10 +73,15 @@ export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   designId: integer("design_id").notNull(),
+  uuid: text("uuid").notNull().unique(),
+  prompt: text("prompt"),
+  designUrls: json("design_urls").$type<{front: string, back: string}>(),
+  sport: text("sport").notNull(),
   totalAmount: integer("total_amount").notNull(),
   status: text("status").default("pending").notNull(),
   orderDetails: json("order_details").$type<OrderDetails>(),
   shippingAddress: json("shipping_address").$type<ShippingAddress>(),
+  pdfUrl: text("pdf_url"),
   trackingId: text("tracking_id"),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
@@ -85,7 +90,8 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   id: true,
   createdAt: true,
   status: true,
-  trackingId: true
+  trackingId: true,
+  pdfUrl: true
 });
 
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
@@ -127,18 +133,22 @@ export type CustomizationData = {
 
 export type OrderDetails = {
   items: {
+    type: string; // jersey, shorts, etc.
     size: string;
     quantity: number;
-    gender: string;
+    gender: string; // Male, Female, Youth
     price: number;
   }[];
   addOns?: {
-    name: string;
+    name: string; // e.g., "socks", "headwear"
     price: number;
     quantity: number;
   }[];
+  packageType: string; // "Jersey only", "Jersey + Shorts", etc.
   discount?: number;
   isTeamOrder: boolean;
+  teamName?: string;
+  deliveryTimeline?: string;
 };
 
 export type ShippingAddress = {
