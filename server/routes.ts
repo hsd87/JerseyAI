@@ -423,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Enhanced prompt for direct image generation:", enhancedPrompt.substring(0, 200) + "...");
         
         // Step 2: Generate image with Replicate
-        const imageUrl = await generateKitImageWithReplicate(enhancedPrompt, kitType);
+        const imageUrl = await generateJerseyImageWithReplicate(enhancedPrompt, kitType);
         
         // Return the image URL directly
         res.json({ imageUrl });
