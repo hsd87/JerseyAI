@@ -6,7 +6,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { useSubscription } from "@/hooks/use-subscription-store";
 
-import HomePage from "@/pages/home-page";
+import LandingPage from "@/pages/landing-page";
+import DesignerPage from "@/pages/designer-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import NotFound from "@/pages/not-found";
@@ -45,7 +46,8 @@ function AppContent() {
     <>
       <React.Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
         <Switch>
-          <Route path="/" component={HomePage} />
+          <Route path="/" component={LandingPage} />
+          <Route path="/designer" component={DesignerPage} />
           <Route path="/auth" component={AuthPage} />
           <ProtectedRoute path="/dashboard" component={DashboardPage} />
           <ProtectedRoute path="/checkout" component={CheckoutPage} />
