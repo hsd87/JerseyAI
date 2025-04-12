@@ -2,8 +2,7 @@ import { useState } from "react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import DesignForm from "@/components/design-form";
-import DesignResults from "@/components/design-results";
-import KitEditor from "@/components/kit-editor";
+import DesignEditor from "@/components/design-editor";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function DesignerPage() {
@@ -18,7 +17,7 @@ export default function DesignerPage() {
         {/* Design Process Steps */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
-            <h1 className="font-sora font-bold text-3xl mb-4 sm:mb-0">Create Your Custom Kit</h1>
+            <h1 className="font-sora font-bold text-3xl mb-4 sm:mb-0">AI Jersey Designer</h1>
             {user && (
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Designs left this month:</span>
@@ -65,21 +64,20 @@ export default function DesignerPage() {
           </div>
         </div>
 
-        {/* Design Form and Preview Grid */}
+        {/* Integrated Design Form and Editor */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Design Form */}
           <div className="lg:col-span-1">
             <DesignForm remainingDesigns={user?.remainingDesigns} />
           </div>
 
-          {/* Right Column - Design Previews */}
+          {/* Right Column - Combined Design Editor */}
           <div className="lg:col-span-2">
-            <DesignResults />
+            <DesignEditor />
           </div>
         </div>
       </main>
       
-      <KitEditor />
       <Footer />
     </div>
   );
