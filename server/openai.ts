@@ -359,7 +359,7 @@ export async function generateKitImageWithReplicate(prompt: string, kitType?: st
       output_format: "jpg", // Changed from png to jpg as requested
       disable_safety_checker: false,
       lora_scale: 1.05,     // Added lora_scale as requested
-      extra_lora: 0.69      // Added extra_lora with value 0.69 as requested
+      extra_lora: "0.69"    // Added extra_lora with value 0.69 as requested (as string)
     };
     
     console.log("Running prediction with model:", modelVersion);

@@ -1,0 +1,7 @@
+[
+  {
+    "timestamp": "2025-04-12T18:13:18.789Z",
+    "error": "Request to https://api.replicate.com/v1/predictions failed with status 422 Unprocessable Entity: {\"detail\":\"- input.extra_lora: Invalid type. Expected: string, given: number\\n\",\"status\":422,\"title\":\"Input validation failed\",\"invalid_fields\":[{\"type\":\"invalid_type\",\"field\":\"input.extra_lora\",\"description\":\"Invalid type. Expected: string, given: number\"}]}\n.",
+    "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for soccer, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. This presentation showcases the soccer ..."
+  }
+]
