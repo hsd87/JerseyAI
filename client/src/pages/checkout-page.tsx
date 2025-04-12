@@ -1,315 +1,132 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
-import { useSubscription } from '@/hooks/use-subscription-store';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiRequest, queryClient } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import Navbar from '@/components/layout/navbar';
-import Footer from '@/components/layout/footer';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import OrderForm from '@/components/order-form';
+import { Design } from '@shared/schema';
+import { getQueryFn } from '@/lib/queryClient';
 
-// Make sure to call loadStripe outside of a component's render to avoid recreating it on every render
-const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY 
-  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY) 
-  : null;
-
-// CheckoutForm component for handling the payment form
-function CheckoutForm({ items, isSubscription = false }: { items: any[], isSubscription?: boolean }) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { toast } = useToast();
-  const [, navigate] = useLocation();
-  const { user } = useAuth();
-  const { fetchSubscription } = useSubscription();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements) {
-      // Stripe.js hasn't yet loaded
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    try {
-      // For all payments, use confirmPayment with proper redirect handling
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        redirect: "if_required",
-        confirmParams: {
-          return_url: `${window.location.origin}/dashboard`,
-        },
-      });
-
-      if (error) {
-        setErrorMessage(error.message || 'An error occurred with your payment');
-        toast({
-          title: 'Payment Failed',
-          description: error.message,
-          variant: 'destructive',
-        });
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Payment succeeded
-        if (isSubscription) {
-          // If it's a subscription, update subscription status
-          await fetchSubscription();
-          toast({
-            title: 'Subscription Active',
-            description: 'Your Pro subscription is now active!',
-          });
-        } else {
-          // If it's a regular payment
-          toast({
-            title: 'Payment Successful',
-            description: 'Your order has been placed successfully!',
-          });
-        }
-        navigate('/dashboard');
-      }
-    } catch (error: any) {
-      setErrorMessage(error.message || 'An unexpected error occurred');
-      toast({
-        title: 'Payment Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
-      
-      {errorMessage && (
-        <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
-      )}
-      
-      <Button
-        type="submit"
-        disabled={!stripe || isLoading}
-        className="w-full bg-black hover:bg-gray-800"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : (
-          `Pay ${isSubscription ? '$9/month' : 'now'}`
-        )}
-      </Button>
-    </form>
-  );
-}
-
-// Main checkout page component
 export default function CheckoutPage() {
   const { user } = useAuth();
-  const { isSubscribed, fetchSubscription } = useSubscription();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isSubscription, setIsSubscription] = useState(false);
-  const [items, setItems] = useState<any[]>([]);
-  const [, navigate] = useLocation();
-  const { toast } = useToast();
+  const [location, setLocation] = useLocation();
+  const match = location.match(/\/checkout\/(\d+)/);
+  const designId = match ? parseInt(match[1]) : null;
+  const [design, setDesign] = useState<Design | null>(null);
   
-  // Redirect if not logged in
+  // Fetch the design
+  const { data: designData, isLoading, error } = useQuery({
+    queryKey: ['/api/designs', designId],
+    queryFn: getQueryFn({ on401: 'throw' }),
+    enabled: !!designId && !!user,
+  });
+  
   useEffect(() => {
-    if (user === null) {
-      navigate('/auth');
+    if (designData) {
+      setDesign(designData);
     }
-  }, [user, navigate]);
+  }, [designData]);
 
-  // Check query parameters for checkout type
+  // If no design ID, redirect to dashboard
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const type = params.get('type');
-    setIsSubscription(type === 'subscription');
-    
-    // For demo purposes, create a sample item
-    if (type === 'subscription') {
-      setItems([{ id: 'pro-subscription', name: 'Pro Subscription', price: 900, quantity: 1 }]);
-    } else {
-      const designId = params.get('designId');
-      const quantity = parseInt(params.get('quantity') || '1', 10);
-      const size = params.get('size') || 'M';
-      
-      if (designId) {
-        setItems([
-          { id: 'jersey-order', name: 'Custom Jersey', price: 5999, quantity, size, designId }
-        ]);
-      } else {
-        // Default item if nothing specified
-        setItems([{ id: 'jersey-order', name: 'Custom Jersey', price: 5999, quantity: 1, size: 'M' }]);
-      }
+    if (!designId) {
+      setLocation('/dashboard');
     }
-  }, []);
-
-  // Create payment intent when items are set
-  useEffect(() => {
-    if (!items.length || !user) return;
-
-    const createIntent = async () => {
-      try {
-        const endpoint = isSubscription ? '/api/subscribe' : '/api/create-payment-intent';
-        const response = await apiRequest('POST', endpoint, { items });
-        const data = await response.json();
-        setClientSecret(data.clientSecret);
-      } catch (error: any) {
-        toast({
-          title: 'Error',
-          description: `Could not initialize payment: ${error.message}`,
-          variant: 'destructive',
-        });
-      }
-    };
-
-    createIntent();
-  }, [items, user, isSubscription, toast]);
-
-  // Options for the Stripe Elements
-  const options = clientSecret ? {
-    clientSecret,
-    appearance: {
-      theme: 'stripe',
-      variables: {
-        colorPrimary: '#39FF14',
-        colorBackground: '#ffffff',
-        colorText: '#000000',
-      },
-    },
-  } : {};
-
-  // Calculate order summary
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const discount = isSubscription ? 0 : (user?.subscriptionTier === 'pro' ? Math.round(subtotal * 0.15) : 0);
-  const shipping = 1000; // $10 flat shipping
-  const tax = Math.round((subtotal - discount) * 0.075); // 7.5% tax
-  const total = subtotal - discount + shipping + tax;
-
-  if (!user) {
+  }, [designId, setLocation]);
+  
+  // Handle successful order completion
+  const handleOrderSuccess = () => {
+    setLocation('/dashboard');
+  };
+  
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
-
+  
+  if (error || !design) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 className="text-2xl font-bold mb-4">Design Not Found</h1>
+        <p className="text-gray-600 mb-6">
+          The design you're looking for could not be found or you don't have permission to access it.
+        </p>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="px-4 py-2 bg-primary text-white rounded-md"
+        >
+          Return to Dashboard
+        </button>
+      </div>
+    );
+  }
+  
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <div className="container mx-auto py-8 px-4">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Complete Your Order</h1>
+        <p className="text-gray-600">
+          Configure your order options and provide shipping details to complete your purchase.
+        </p>
+      </div>
       
-      <main className="flex-grow py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold font-sora mb-8">
-            {isSubscription ? 'Upgrade to Pro Subscription' : 'Checkout'}
-          </h1>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Payment Form */}
-            <div className="md:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payment Details</CardTitle>
-                  <CardDescription>
-                    Complete your {isSubscription ? 'subscription' : 'purchase'} using a credit or debit card.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {clientSecret && stripePromise ? (
-                    <Elements stripe={stripePromise} options={options}>
-                      <CheckoutForm items={items} isSubscription={isSubscription} />
-                    </Elements>
-                  ) : (
-                    <div className="flex justify-center py-8">
-                      <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="lg:col-span-3">
+          <OrderForm design={design} onSuccess={handleOrderSuccess} />
+        </div>
+        
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h2 className="text-xl font-bold mb-4">Your Design</h2>
+            
+            {design.frontImageUrl && (
+              <div className="mb-4">
+                <h3 className="font-medium mb-2">Front View</h3>
+                <img 
+                  src={design.frontImageUrl} 
+                  alt="Front design" 
+                  className="w-full h-auto rounded-md border border-gray-200"
+                />
+              </div>
+            )}
+            
+            {design.backImageUrl && (
+              <div className="mb-4">
+                <h3 className="font-medium mb-2">Back View</h3>
+                <img 
+                  src={design.backImageUrl} 
+                  alt="Back design" 
+                  className="w-full h-auto rounded-md border border-gray-200"
+                />
+              </div>
+            )}
+            
+            <div className="mt-4 pt-4 border-t">
+              <h3 className="font-medium mb-2">Design Details</h3>
+              <ul className="text-sm space-y-1">
+                <li><span className="font-medium">Sport:</span> {design.sport}</li>
+                <li><span className="font-medium">Type:</span> {design.kitType}</li>
+                <li><span className="font-medium">Colors:</span> {design.primaryColor}, {design.secondaryColor}</li>
+                {design.sleeveStyle && <li><span className="font-medium">Sleeves:</span> {design.sleeveStyle}</li>}
+                {design.collarType && <li><span className="font-medium">Collar:</span> {design.collarType}</li>}
+                {design.patternStyle && <li><span className="font-medium">Pattern:</span> {design.patternStyle}</li>}
+              </ul>
             </div>
             
-            {/* Order Summary */}
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {items.map((item, index) => (
-                    <div key={index} className="flex justify-between">
-                      <span>
-                        {item.name} {item.size ? `(${item.size})` : ''} × {item.quantity}
-                      </span>
-                      <span>${(item.price / 100).toFixed(2)}</span>
-                    </div>
-                  ))}
-                  
-                  <div className="border-t pt-4 mt-4">
-                    <div className="flex justify-between">
-                      <span>Subtotal</span>
-                      <span>${(subtotal / 100).toFixed(2)}</span>
-                    </div>
-                    
-                    {discount > 0 && (
-                      <div className="flex justify-between text-green-600">
-                        <span>Pro discount (15%)</span>
-                        <span>-${(discount / 100).toFixed(2)}</span>
-                      </div>
-                    )}
-                    
-                    {!isSubscription && (
-                      <>
-                        <div className="flex justify-between">
-                          <span>Shipping</span>
-                          <span>${(shipping / 100).toFixed(2)}</span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span>Tax</span>
-                          <span>${(tax / 100).toFixed(2)}</span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between font-bold">
-                  <span>Total</span>
-                  <span>
-                    {isSubscription 
-                      ? `$${(subtotal / 100).toFixed(2)}/month` 
-                      : `$${(total / 100).toFixed(2)}`}
-                  </span>
-                </CardFooter>
-              </Card>
-              
-              {isSubscription && (
-                <div className="mt-4 p-4 bg-gray-100 rounded-lg text-sm">
-                  <p className="font-medium mb-2">Pro Subscription Benefits:</p>
-                  <ul className="list-disc pl-4 space-y-1">
-                    <li>Unlimited design generations</li>
-                    <li>15% discount on all orders</li>
-                    <li>Priority customer support</li>
-                    <li>Cancel anytime</li>
-                  </ul>
-                </div>
-              )}
+            <div className="mt-4 pt-4 border-t">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="w-full py-2 border border-gray-300 rounded-md text-center"
+              >
+                Return to Dashboard
+              </button>
             </div>
           </div>
         </div>
-      </main>
-      
-      <Footer />
+      </div>
     </div>
   );
 }
