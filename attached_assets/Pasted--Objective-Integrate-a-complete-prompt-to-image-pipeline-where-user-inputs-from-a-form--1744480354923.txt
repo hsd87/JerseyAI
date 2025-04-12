@@ -1,0 +1,74 @@
+### 🧠 Objective:
+
+Integrate a complete prompt-to-image pipeline where **user inputs from a form** (e.g., sport, sleeve style, collar type, color palette) are transformed into a **structured prompt** using OpenAI (GPT-4o), and that prompt is used to generate an image through Replicate (Flux-based model).
+
+### 🧩 Additions & Constraints:
+- Every generated prompt must contain the token **"pfsportskit"** (replacing the specific sport placeholder).
+- The **structure** and **section formatting** of the prompt must strictly follow the **reference prompt** (Monarch Circuit Kit).
+- The OpenAI agent must intelligently adapt the entire prompt **based on user inputs** — not just change colors or names. The design descriptions must align with the chosen sport (e.g., basketball jerseys will have different fit and paneling than soccer kits).
+
+---
+
+### ✅ Prompt for Replit Agent (Refined)
+
+```markdown
+#### 🔧 Task:
+Create a new POST endpoint:
+
+**POST `/api/generate-image`**
+
+##### Request Body:
+```ts
+{
+  sport: "soccer" | "basketball" | "rugby" | etc,
+  kitType: "jersey+shorts" | "jersey only" | "full set",
+  primaryColor: "#800080",
+  secondaryColor: "#FFD700",
+  sleeveStyle?: "short-sleeved" | "sleeveless" | etc,
+  collarType?: "crewneck" | "mandarin V-collar" | etc,
+  patternStyle?: "circuit crest" | "zigzag" | etc,
+  designNotes?: string
+}
+```
+
+##### Response:
+```ts
+{
+  imageUrl: string
+}
+```
+
+#### 🔁 Flow:
+1. Call `generateKitPrompt()` with request data.
+   - This function uses the **Monarch Circuit reference template**.
+   - Sends the template + user inputs to OpenAI with a system prompt that instructs:
+     - Maintain exact structure & section formatting (⸻, emojis, bullet points)
+     - Modify ALL design descriptions to suit the selected **sport type**
+     - Enhance the detail using sports-specific vocabulary
+     - Replace internal placeholder like `pfsoccerkit` with `pfsportskit`
+     - Preserve product styling realism (studio background, two views, no mannequins)
+
+2. Receive `enhancedPrompt` back from OpenAI.
+
+3. Call `generateKitImageWithReplicate(prompt)`:
+   - Uses Flux model deployed on Replicate
+   - Parameters: aspect ratio, guidance scale, steps, format, etc.
+   - Downloads image and saves to `/output/`
+
+4. Return relative `imageUrl` to frontend.
+
+---
+
+### ✅ File Changes:
+- Add this logic in `/server/routes.ts`
+- Connect it with frontend `/components/design-form.tsx`
+- Display image in real-time preview component
+- Add error fallback (return placeholder image if OpenAI or Replicate fails)
+
+---
+
+### 💡 Optional:
+- Save successful prompts with metadata to `logs/successful_prompts.json`
+- Later use this as training data for v2 finetuned OpenAI model
+
+Let me know when you're done and I'll send the **next prompt** to build the editable preview with logo overlays and order flow integration.

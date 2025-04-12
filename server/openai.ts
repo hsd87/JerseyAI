@@ -77,12 +77,12 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
   const primaryColorName = getColorName(primaryColor);
   const secondaryColorName = getColorName(secondaryColor);
 
-  // Using the provided template structure
+  // Using the provided template structure with standardized "pfsportskit" token
   const promptTemplate = `⸻
 
 Prompt:
 
-A pf${sport}kit, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The ${sport} jersey and shorts are presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the uniform, front and back.
+A pfsportskit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The ${sport} jersey and shorts are presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the uniform, front and back.
 
 ⸻
 
@@ -174,7 +174,7 @@ You MUST:
 2. KEEP all dividers (⸻) and emoji section markers (🧍‍♂️, 🧵, 🎨, 🩳, 🧩, 🏷️, 🌐) in the exact same positions.
 3. Keep all bullet points in the same sections but enhance their descriptions.
 4. Maintain the same jersey views arrangement - front view (left) and back view (right).
-5. Keep the jersey type (pf${sport}kit) in the first line unchanged.
+5. Always include the exact term "pfsportskit" in the first paragraph - this is REQUIRED and must not be changed.
 6. Include all colors exactly as mentioned - primary, secondary, and accent.
 7. Maintain all specifications about collar type, sleeve style, and pattern style.
 8. Keep all structural elements of both the jersey and shorts as described.
@@ -361,7 +361,8 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
     
     // Return the local URL
     return `/output/${filename}`;
-  } catch (error) {
+  } catch (unknownError: unknown) {
+    const error = unknownError instanceof Error ? unknownError : new Error(String(unknownError));
     console.error("Error generating image with Replicate:", error);
     
     // Log failed attempts

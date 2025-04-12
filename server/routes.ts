@@ -373,6 +373,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Direct image generation endpoint without saving to design (for form previews)
+  app.post("/api/generate-image", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { 
+        sport, 
+        kitType, 
+        primaryColor, 
+        secondaryColor, 
+        sleeveStyle, 
+        collarType, 
+        patternStyle, 
+        designNotes 
+      } = req.body;
+      
+      // Validate required fields
+      if (!sport || !kitType || !primaryColor || !secondaryColor) {
+        return res.status(400).json({ 
+          message: "Missing required fields: sport, kitType, primaryColor, and secondaryColor are required."
+        });
+      }
+      
+      try {
+        console.log("Generating direct image with parameters:", req.body);
+        
+        // Step 1: Generate enhanced prompt using OpenAI
+        const { generateKitPrompt, generateKitImageWithReplicate } = await import('./openai');
+        const enhancedPrompt = await generateKitPrompt({
+          sport,
+          kitType,
+          primaryColor,
+          secondaryColor,
+          sleeveStyle,
+          collarType,
+          patternStyle,
+          designNotes
+        });
+        
+        console.log("Enhanced prompt for direct image generation:", enhancedPrompt.substring(0, 200) + "...");
+        
+        // Step 2: Generate image with Replicate
+        const imageUrl = await generateKitImageWithReplicate(enhancedPrompt);
+        
+        // Return the image URL directly
+        res.json({ imageUrl });
+      } catch (error: any) {
+        console.error("Error generating image:", error);
+        res.status(500).json({ 
+          message: "Failed to generate image", 
+          error: error.message || "Unknown error" 
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+  
   // Serve images from the output directory
   app.get('/output/:filename', (req, res, next) => {
     try {
