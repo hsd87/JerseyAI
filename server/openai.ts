@@ -81,10 +81,6 @@ function convertToDescriptiveColor(colorInput: string): string {
       const g = parseInt(colorInput.slice(3, 5), 16);
       const b = parseInt(colorInput.slice(5, 7), 16);
       
-      // Find the closest named color from our mapping
-      // This is a very simplified approach - a more sophisticated color distance calculation could be used
-      const colorNames = Object.keys(colorMapping).filter(c => !c.startsWith('#'));
-      
       // For simplicity, we'll add a description based on RGB values
       const colors = [];
       if (r > 200) colors.push("red");
@@ -348,6 +344,8 @@ export async function generateKitImageWithReplicate(prompt: string, kitType?: st
     
     // Define the model ID and input with updated settings
     const modelVersion = "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3";
+    
+    // Create the input configuration object with all requested parameters
     const input = {
       prompt: prompt,
       aspect_ratio: aspectRatio,
@@ -359,8 +357,10 @@ export async function generateKitImageWithReplicate(prompt: string, kitType?: st
       output_format: "jpg", // Changed from png to jpg as requested
       disable_safety_checker: false,
       lora_scale: 1.05,     // Added lora_scale as requested
-      extra_lora: "0.69"    // Added extra_lora with value 0.69 as requested (as string)
     };
+    
+    // Add extra_lora as a numeric parameter (explicitly adding it here to the typed object)
+    (input as any).extra_lora = 0.69;  // Using casting to add the property
     
     console.log("Running prediction with model:", modelVersion);
     console.log("Input parameters:", JSON.stringify(input, null, 2));
