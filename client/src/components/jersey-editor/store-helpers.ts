@@ -1,10 +1,11 @@
-import { useEditorStoreBase } from './editor-store';
+import { useEditorStore } from './editor-store';
 import { ItemConfig } from './index';
 
 // Direct update methods that don't rely on hooks
 export const updateItem = (id: string, changes: Partial<ItemConfig>) => {
-  const store = useEditorStoreBase.getState();
-  store.updateItem(id, changes);
+  // Simple implementation - use the hook function directly
+  const update = useEditorStore().updateItem;
+  update(id, changes);
 };
 
 export const dragMoveItem = (id: string, x: number, y: number) => {

@@ -34,10 +34,18 @@ export type JerseyZone = {
 };
 
 // Helper Components
-const TextItem = ({ item, isSelected, onSelect }: { 
+const TextItem = ({ 
+  item, 
+  isSelected, 
+  onSelect,
+  onDragMove,
+  onTransform
+}: { 
   item: ItemConfig, 
   isSelected: boolean, 
-  onSelect: () => void 
+  onSelect: () => void,
+  onDragMove: (id: string, x: number, y: number) => void,
+  onTransform: (id: string, fontSize: number, rotation: number) => void
 }) => {
   const textRef = useRef<any>(null);
   const trRef = useRef<any>(null);
@@ -100,10 +108,18 @@ const TextItem = ({ item, isSelected, onSelect }: {
   );
 };
 
-const ImageItem = ({ item, isSelected, onSelect }: { 
+const ImageItem = ({ 
+  item, 
+  isSelected, 
+  onSelect,
+  onDragMove,
+  onImageTransform
+}: { 
   item: ItemConfig, 
   isSelected: boolean, 
-  onSelect: () => void 
+  onSelect: () => void,
+  onDragMove: (id: string, x: number, y: number) => void,
+  onImageTransform: (id: string, scaleX: number, scaleY: number, rotation: number) => void
 }) => {
   const imageRef = useRef<any>(null);
   const trRef = useRef<any>(null);
@@ -138,7 +154,7 @@ const ImageItem = ({ item, isSelected, onSelect }: {
         onDragEnd={(e) => {
           const node = e.target;
           const { x, y } = node.position();
-          onDragMove(item.id, x, y);
+          dragMoveItem(item.id, x, y);
         }}
         onTransformEnd={(e) => {
           const node = e.target;
@@ -149,7 +165,7 @@ const ImageItem = ({ item, isSelected, onSelect }: {
           const rotation = node.rotation();
           
           // Update item in store
-          onImageTransform(item.id, scaleX, scaleY, rotation);
+          transformImageItem(item.id, scaleX, scaleY, rotation);
         }}
       />
       {isSelected && (
@@ -318,32 +334,9 @@ const JerseyEditor = () => {
   );
 };
 
-// Make drag handlers globally accessible
-let onDragMove: (id: string, x: number, y: number) => void;
-let onTransform: (id: string, fontSize: number, rotation: number) => void;
-let onImageTransform: (id: string, scaleX: number, scaleY: number, rotation: number) => void;
-
-// Update global handler references
+// Simple wrapper for the JerseyEditor component
 const JerseyEditorWrapper = () => {
-  const editor = <JerseyEditor />;
-  
-  // Set up the global handlers using the store's actual instance
-  onDragMove = (id, x, y) => {
-    const store = useEditorStoreBase.getState();
-    store.updateItem(id, { x, y });
-  };
-  
-  onTransform = (id, fontSize, rotation) => {
-    const store = useEditorStoreBase.getState();
-    store.updateItem(id, { fontSize, rotation });
-  };
-  
-  onImageTransform = (id, scaleX, scaleY, rotation) => {
-    const store = useEditorStoreBase.getState();
-    store.updateItem(id, { scaleX, scaleY, rotation });
-  };
-  
-  return editor;
+  return <JerseyEditor />;
 };
 
 export default JerseyEditorWrapper;
