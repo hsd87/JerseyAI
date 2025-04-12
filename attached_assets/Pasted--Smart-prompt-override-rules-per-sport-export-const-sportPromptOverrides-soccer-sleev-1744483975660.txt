@@ -1,0 +1,64 @@
+// Smart prompt override rules per sport
+export const sportPromptOverrides = {
+  soccer: {
+    sleeveStyle: "short-sleeved",
+    collarType: "hybrid mandarin V-collar",
+    patternStyle: "circuit crest",
+    structureNote: "streamlined fit for performance, short sleeves, angular seams for agility",
+  },
+  basketball: {
+    sleeveStyle: "sleeveless",
+    collarType: "classic round neck",
+    patternStyle: "vertical wave stripes",
+    structureNote: "sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion",
+  },
+  rugby: {
+    sleeveStyle: "short-sleeved reinforced",
+    collarType: "traditional button placket",
+    patternStyle: "bold chest bands",
+    structureNote: "rugged construction with short reinforced sleeves and secure button collar",
+  },
+  cricket: {
+    sleeveStyle: "half or long-sleeved",
+    collarType: "polo collar with piping",
+    patternStyle: "minimal pinstripe or shoulder gradient",
+    structureNote: "lightweight long-wear design with cooling mesh underarm zones",
+  },
+  esports: {
+    sleeveStyle: "short-sleeved or long-sleeved",
+    collarType: "crew neck",
+    patternStyle: "cyberpunk hexgrid",
+    structureNote: "stylized digital-wear with futuristic trim, ideal for media and team branding",
+  },
+  baseball: {
+    sleeveStyle: "3/4 length raglan",
+    collarType: "buttoned crew neck",
+    patternStyle: "team panel blocks",
+    structureNote: "structured cut for arm rotation with emphasized back yoke",
+  },
+};
+
+// Prompt to send to Replit agent
+export const smartPromptInstruction = `
+Update the OpenAI prompt generation logic to include adaptive garment logic for each sport.
+
+✅ Add this override object to the prompt builder system:
+
+\`\`\`ts
+${JSON.stringify(sportPromptOverrides, null, 2)}
+\`\`\`
+
+✅ For every kit generation request:
+- Check if user has passed sleeve/collar/pattern — use them
+- Otherwise fallback to the above defaults based on selected sport
+
+✅ Inject the selected values (sleeve, collar, pattern, structureNote) into the system prompt as context for OpenAI.
+
+✅ Token \"pfsportskit\" must always be present in the first sentence of the prompt.
+
+✅ Smart Structure Enforcement:
+- If sport is basketball, auto-enforce sleeveless and remove cuff/hem logic
+- If sport is rugby, emphasize reinforced seam structure
+- If sport is esports, inject visual neon motifs and stylized mesh trims
+
+Once updated, test with a basketball, rugby, and esports prompt and verify the logic is applied.`;

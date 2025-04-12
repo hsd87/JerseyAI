@@ -4,6 +4,46 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import Replicate from "replicate";
 
+// Smart prompt override rules per sport
+export const sportPromptOverrides = {
+  soccer: {
+    sleeveStyle: "short-sleeved",
+    collarType: "hybrid mandarin V-collar",
+    patternStyle: "circuit crest",
+    structureNote: "streamlined fit for performance, short sleeves, angular seams for agility",
+  },
+  basketball: {
+    sleeveStyle: "sleeveless",
+    collarType: "classic round neck",
+    patternStyle: "vertical wave stripes",
+    structureNote: "sleeveless loose-fit jersey with wide armholes, enhanced for vertical motion",
+  },
+  rugby: {
+    sleeveStyle: "short-sleeved reinforced",
+    collarType: "traditional button placket",
+    patternStyle: "bold chest bands",
+    structureNote: "rugged construction with short reinforced sleeves and secure button collar",
+  },
+  cricket: {
+    sleeveStyle: "half or long-sleeved",
+    collarType: "polo collar with piping",
+    patternStyle: "minimal pinstripe or shoulder gradient",
+    structureNote: "lightweight long-wear design with cooling mesh underarm zones",
+  },
+  esports: {
+    sleeveStyle: "short-sleeved or long-sleeved",
+    collarType: "crew neck",
+    patternStyle: "cyberpunk hexgrid",
+    structureNote: "stylized digital-wear with futuristic trim, ideal for media and team branding",
+  },
+  baseball: {
+    sleeveStyle: "3/4 length raglan",
+    collarType: "buttoned crew neck",
+    patternStyle: "team panel blocks",
+    structureNote: "structured cut for arm rotation with emphasized back yoke",
+  },
+};
+
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -128,11 +168,23 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
     kitType, 
     primaryColor, 
     secondaryColor, 
-    sleeveStyle, 
-    collarType, 
-    patternStyle, 
+    sleeveStyle: userSleeveStyle, 
+    collarType: userCollarType, 
+    patternStyle: userPatternStyle, 
     designNotes 
   } = options;
+
+  // Apply sport-specific overrides if available
+  const sportLower = sport.toLowerCase();
+  const sportOverrides = sportPromptOverrides[sportLower as keyof typeof sportPromptOverrides] || {};
+  
+  // Prioritize user input over sport defaults
+  const sleeveStyle = userSleeveStyle || sportOverrides.sleeveStyle || 'short-sleeved';
+  const collarType = userCollarType || sportOverrides.collarType || 'hybrid mandarin V-collar';
+  const patternStyle = userPatternStyle || sportOverrides.patternStyle || 'circuit crest';
+  const structureNote = sportOverrides.structureNote || '';
+  
+  console.log(`Applied sport override for ${sport}: ${JSON.stringify({ sleeveStyle, collarType, patternStyle, structureNote })}`);
 
   // Use the enhanced color conversion function
   const primaryColorName = convertToDescriptiveColor(primaryColor);
@@ -142,8 +194,14 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
 
   // Create a template that uses "jersey and shorts" instead of "kit"
   // And only includes shorts description if it's not a jersey-only design
-  const isJerseyOnly = kitType === "jersey only" || 
-                       !kitType.toLowerCase().includes("shorts");
+  let isJerseyOnly = kitType === "jersey only" || 
+                     !kitType.toLowerCase().includes("shorts");
+                     
+  // Smart Structure Enforcement based on sport
+  if (sportLower === 'basketball') {
+    // Always enforce sleeveless for basketball
+    isJerseyOnly = true; // Basketball usually focuses on the jersey
+  }
                        
   // Construct the prompt template with conditionals for jersey-only vs full uniform
   const promptTemplate = `⸻
@@ -159,8 +217,8 @@ A pfsportskit for ${sport}, displayed in two cleanly aligned angles: front view 
 🧍‍♂️ Garment Structure
 
 ${isJerseyOnly ? 
-  `The jersey is a ${sleeveStyle || 'short-sleeved'} ${sport} design. It features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso.` : 
-  `The uniform consists of a ${sleeveStyle || 'short-sleeved'} ${sport} jersey and tapered mid-thigh athletic shorts. The jersey features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso. The shorts include sculpted side panels, a reinforced waistband, and slit hems for dynamic movement.`}
+  `The jersey is a ${sleeveStyle || 'short-sleeved'} ${sport} design. It features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso. ${structureNote ? structureNote : ''}${sportLower === 'basketball' ? ' The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.' : ''}${sportLower === 'rugby' ? ' The rugby jersey is constructed with reinforced seams and durable stitching to withstand physical contact and frequent tackles.' : ''}${sportLower === 'esports' ? ' The esports jersey features tech-inspired styling with cyberpunk aesthetics, ideal for both gaming competition and content creation.' : ''}` : 
+  `The uniform consists of a ${sleeveStyle || 'short-sleeved'} ${sport} jersey and tapered mid-thigh athletic shorts. The jersey features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso. ${structureNote ? structureNote : ''}${sportLower === 'basketball' ? ' The basketball jersey is optimized for broad range of motion with wider armholes and a looser fit around the shoulders.' : ''}${sportLower === 'rugby' ? ' The rugby jersey is constructed with reinforced seams and durable stitching to withstand physical contact and frequent tackles.' : ''}${sportLower === 'esports' ? ' The esports jersey features tech-inspired styling with cyberpunk aesthetics, ideal for both gaming competition and content creation.' : ''} The shorts include sculpted side panels, a reinforced waistband, and slit hems for dynamic movement.`}
 
 ⸻
 
@@ -240,6 +298,16 @@ ${designNotes || `The design is bold, distinctive, and meticulously engineered �
           role: "system", 
           content: `You are an expert sports jersey designer creating prompts for an AI jersey generation system. 
 
+SPORT-SPECIFIC CONTEXT:
+This is a ${sport} jersey design with the following characteristics:
+- Sleeve Style: ${sleeveStyle}
+- Collar Type: ${collarType}
+- Pattern Style: ${patternStyle}
+${structureNote ? `- Structure Note: ${structureNote}` : ''}
+${sportLower === 'basketball' ? '- Basketball jerseys should emphasize wide armholes, loose fit, and remove cuff/hem logic' : ''}
+${sportLower === 'rugby' ? '- Rugby jerseys should emphasize reinforced seam structures and durability' : ''}
+${sportLower === 'esports' ? '- Esports jerseys should include visual neon motifs and stylized mesh trims' : ''}
+
 You MUST:
 1. Follow the EXACT same format as the template with all sections provided in the exact same order.
 2. KEEP all dividers (⸻) and emoji section markers (🧍‍♂️, 🧵, 🎨, 🩳, 🧩, 🏷️, 🌐) in the exact same positions.
@@ -253,11 +321,11 @@ You MUST:
 10. Incorporate any design inspiration (if provided) as visual elements in the jersey design itself, not just in the mood section.
 
 ENHANCE the template with:
-1. More vivid and specific material descriptions.
+1. More vivid and specific material descriptions appropriate for ${sport}.
 2. Richer color descriptors (while keeping the actual colors).
-3. More technical sportswear terminology.
-4. Better physical structure descriptions.
-5. Additional design elements that would make the jersey more distinctive.
+3. More technical sportswear terminology specific to ${sport}.
+4. Better physical structure descriptions aligned with ${sport} performance needs.
+5. Additional design elements that would make the jersey more distinctive and authentic for ${sport}.
 
 Return your response as a JSON object with a single "prompt" field containing the enhanced prompt.` 
         },

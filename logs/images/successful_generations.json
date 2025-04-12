@@ -39,5 +39,71 @@
       "extra_lora_scale": 0.69,
       "extra_lora": ""
     }
+  },
+  {
+    "timestamp": "2025-04-12T18:43:36.245Z",
+    "imageId": "515734d3-dc11-4d34-ada4-230595ac7769",
+    "filename": "jersey_515734d3-dc11-4d34-ada4-230595ac7769.png",
+    "generationTimeMs": 20700,
+    "promptLength": 3752,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a precise short basketball design. It boasts a sculpted crew neck with angular shoulder seams that provide both aerodynamic efficiency and an audacious silhouette. The form-fitting cut through the torso enhances the athlete's physique while ensuring optimal movement and breathability.\n\n⸻\n\n🧵 Fabric & Texture\n\nCrafted from an advanced dual-zone poly-elastane blend, the jersey incorporates an intricate diamond-knit mesh on the torso, offering superior airflow and moisture management. The sleeves flaunt a sleek matte spandex finish, engineered for comfort and a subtle sheen. Vented hex-weave textures line the side panels, ensuring ventilation even during the most rigorous plays. The material's low-luster sheen is strategically designed to accentuate colors under stadium lighting, and bonded flatlock seams with precision piping trace the contours of each panel, amplifying durability and aesthetic finesse.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: Exquisite medium blue\n        • Secondary Color: Vibrant medium red-green\n        • Accent: Crisp ice white trim and deep dark contours\n\n⸻\n\n🎨 Design Language\n\nThe front of the jersey exudes an elegant yet ultra-modern presence. A solid radiant pattern emanates from the chest center in medium red-green, evoking a digital emblem with contemporary flair. Tech-geometry inspired thin contour lines gracefully curve along the ribs and upper chest. An incisive ice white slash element dramatically intersects the midsection diagonally, creating a bold visual axis that harmonizes with the main motif. Sleeve cuffs are encased in medium red-green adorned with intricate dotted patterns near the hem.\n\nThe back of the jersey features a distinctive medium red-green vertical spine pattern, crafted from interlocking geometric bands. The player's name graces the area just below the collar in refined uppercase text, while the number takes center stage mid-back, rendered in large medium red-green numerals, expertly outlined in white. A rich medium blue halo gradient enhances the depth and contrast around the number, making it visually compelling.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n        • Collar: Modern crew with medium blue foundation accented by medium red-green edge taping\n        • Sleeves: Smooth matte medium blue with distinguished dotted medium red-green cuff details\n        • Front Body: Centralized medium red-green burst with a dynamic angular white slash\n        • Back Body: Seamless medium red-green tech spine paired with crisp, clear typographic block\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest for brand identity\n        • Jersey front right chest: Prestigious sponsor logo\n        • Upper back (below collar): Player's name in superior print\n        • Back center: Prominent large number\n\n⸻\n\n🌐 Design Mood & Cohesion\n\nThe design embodies boldness and distinctiveness, meticulously engineered to blend the prestige of tradition with the avant-garde precision of contemporary performancewear. The medium red-green against the medium blue backdrop evokes a sense of prestige and legacy. The solid patterning introduces a tech-advanced aesthetic, perfect for championship campaigns, exclusive editions, or teams whose brand story echoes a rich heritage.",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-12T18:44:43.902Z",
+    "imageId": "39ef95fa-e735-49d7-ae82-8c9f7d272205",
+    "filename": "jersey_39ef95fa-e735-49d7-ae82-8c9f7d272205.png",
+    "generationTimeMs": 8485,
+    "promptLength": 4023,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a short-sleeved basketball uniform influenced by athletic futurism. It features a crew neck with reinforced stitching, angular shoulder seams, and a form-fitting streamlined cut that elegantly contours the athlete's physique, providing an aerodynamic silhouette.\n\n⸻\n\n🧵 Fabric & Texture\n\nEngineered from a dual-zone poly-elastane blend, the jersey showcases advanced material technology. The torso is crafted from diamond-knit mesh for optimal breathability, promoting airflow and reducing moisture build-up during intense play. The sleeves are enveloped in smooth, matte spandex, facilitating full-range motion. Integrated side panels boast a sophisticated vented hex-weave texture for superior ventilation. The jersey's surface bears a low-luster finish, expertly designed to reflect studio lighting while preserving the vibrancy of colors. Seams are seamlessly bonded and precision flatlocked, with intricate piping detail enhancing the panel lines.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: A vibrant, medium blue with a rich, oceanic depth.\n        • Secondary Color: A harmonious medium red-green, reminiscent of digital camouflage.\n        • Accent: Crisp ice white trim paired with dark, defining contours.\n\n⸻\n\n🎨 Design Language\n\nThe front of the jersey showcases an elegant, tech-inspired motif emerging from the center chest in medium red-green, framing the athlete’s core with a dynamic digital emblem feel. Thin contour lines artfully wrap along the ribs and upper chest, creating a geomatic tech grid layout. A sleek ice white diagonal slash traverses the midsection, introducing a striking angle that dissects the primary design, offering a bold visual contrast. Sleeve cuffs are detailed with a red-green trim and accented by subtle dotted patterns near the hem, enhancing the modern aesthetic.\n\nThe back of the jersey features a medium red-green vertical spine pattern, formed from interlocking geometric bands, evoking movement and energy. The player's name adorns the area just beneath the collar in immaculate uppercase typography, while the player number sits proudly at the center back, displayed in large red-green numerals outlined in ice white. A profound blue halo gradient accentuates the number, creating a visual highlight and tonal depth.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n        • Collar: Crew neck lined in polished medium blue with medium red-green edge taping for a contrast finish.\n        • Sleeves: Crafted in matte medium blue, each adorned with dotted red-green cuff details for added flair.\n        • Front Body: Features a bold-centered red-green burst complemented by a sleek angled white slash.\n        • Back Body: Decorated with a vertical medium red-green tech spine, providing a dynamic tech-inspired look.\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Debossed team crest\n        • Jersey front right chest: Sublimated sponsor logo for a seamless integration\n        • Upper back (below collar): Player name, in bold, standardized font\n        • Back center: Oversized, media-friendly player number\n\n⸻\n\n🌐 Design Mood & Cohesion\n\nThe design is strikingly bold and precisely engineered, blending the enduring power of athletic heritage with modern performancewear precision. The medium red-green-on-medium blue palette signifies prestige and advanced capability, while the solid patterning imbues a futuristic, tech-forward identity. This jersey is ideal for championship-season showcases, limited-edition releases, or teams aiming to communicate a legacy-driven narrative.",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-12T18:45:27.727Z",
+    "imageId": "fc17b957-404e-4b57-a12b-e500b37ea7e3",
+    "filename": "jersey_fc17b957-404e-4b57-a12b-e500b37ea7e3.png",
+    "generationTimeMs": 8129,
+    "promptLength": 3576,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a contemporary basketball design with short sleeves. It showcases a crew neckline with angular shoulder seams that are precision-cut to ensure a snug, performance-oriented fit. The jersey is tailored through the torso to provide a streamlined silhouette that enhances aerodynamics and movement during play.\n\n⸻\n\n🧵 Fabric & Texture\n\nMeticulously crafted from a sophisticated dual-zone poly-elastane blend, the jersey incorporates an advanced diamond-knit mesh on the torso, ensuring maximum breathability, coupled with smooth matte spandex sleeves that offer a silky touch and sleek appearance. Innovative side panels are integrated with vented hex-weave textures designed to optimize airflow. The material exudes a low-luster finish, adept at managing lighting to amplify the rich color palette. Seams are intricately bonded and flatlocked, accented by detail piping that elegantly traces the contour of each panel.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: Rich medium blue\n        • Secondary Color: Dynamic medium red-green\n        • Accent: Crisp ice white trim and deep dark contours\n\n⸻\n\n🎨 Design Language\n\nThe jersey's front displays a sophisticated yet cutting-edge pattern, originating from the chest center in medium red-green and emanating like a digital emblem. Delicate contour lines embrace the ribs and upper chest with a tech-savvy geometric finesse. A sharp white slash dynamically traverses the midsection, creating a striking angle that intersects with the central motif. Sleeve cuffs are enhanced with medium red-green trim, featuring subtle dotted textures that add depth near the hems.\n\nOn the back, the jersey sports a medium red-green vertical spine design, composed of seamlessly interlocking bands that add to the modern aesthetic. The player's name, presented just beneath the collar in sleek uppercase text, complements the central placement of large medium red-green numerals outlined with pristine white to optimize visibility. A deep medium blue halo gradient underlies the number, providing a vivid contrast.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n        • Collar: Crew style in medium blue with medium red-green edge taping\n        • Sleeves: Matte medium blue featuring dotted medium red-green cuff detailing\n        • Front Body: Solid-centered medium red-green burst with an angled white slash\n        • Back Body: Vertical medium red-green tech spine accentuated by precise typography\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n⸻\n\n🌐 Design Mood & Cohesion\n\nThe design is robust, distinctive, and expertly crafted—harmonizing traditional prowess with the fidelity of modern sportswear technology. The medium red-green on medium blue palette encapsulates heritage and sophistication, while the solid pattern introduces a technologically advanced flair. This jersey is the epitome of ideal wear for championship campaigns, exclusive releases, or teams embodying a storied brand legacy.",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
   }
 ]
