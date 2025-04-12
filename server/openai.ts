@@ -83,7 +83,7 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
         "Authorization": `Bearer ${process.env.REPLICATE_API_TOKEN}`
       },
       body: JSON.stringify({
-        version: "hsd87/flux-jersey-pro", // Model identifier
+        version: "stability-ai/sdxl:c221b2b8ef527988fb59bf24a8b97c4561f1c671f73bd389f866bfb27c061316", // Using Stable Diffusion XL
         input: {
           prompt: prompt,
           width: 768,
