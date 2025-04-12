@@ -1,11 +1,10 @@
 import { users, designs, orders, type User, type InsertUser, type Design, type InsertDesign, type Order, type InsertOrder } from "@shared/schema";
-import createMemoryStore from "memorystore";
 import session from "express-session";
+import { eq, and } from 'drizzle-orm';
+import connectPg from "connect-pg-simple";
+import { db, pool } from './db';
 
-const MemoryStore = createMemoryStore(session);
-
-// modify the interface with any CRUD methods
-// you might need
+// Storage interface
 export interface IStorage {
   // Auth Methods
   getUser(id: number): Promise<User | undefined>;
@@ -36,186 +35,191 @@ export interface IStorage {
   resetMonthlyDesignCredits(): Promise<void>;
   
   // Session Store
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private designs: Map<number, Design>;
-  private orders: Map<number, Order>;
-  sessionStore: session.SessionStore;
-  currentUserId: number;
-  currentDesignId: number;
-  currentOrderId: number;
+// Database storage implementation
+export class DatabaseStorage implements IStorage {
+  sessionStore: any;
 
   constructor() {
-    this.users = new Map();
-    this.designs = new Map();
-    this.orders = new Map();
-    this.currentUserId = 1;
-    this.currentDesignId = 1;
-    this.currentOrderId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000 // prune expired entries every 24h
+    // Use PostgreSQL for session storage
+    const PostgresSessionStore = connectPg(session);
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
     });
   }
 
   // User Methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { 
-      ...insertUser, 
-      id, 
-      remainingDesigns: 6,
-      subscriptionTier: "free",
-      createdAt: new Date() 
-    };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...insertUser,
+        remainingDesigns: 6,
+        subscriptionTier: "free",
+        createdAt: new Date()
+      })
+      .returning();
     return user;
   }
 
   async updateUser(id: number, data: Partial<User>): Promise<User> {
-    const user = await this.getUser(id);
-    if (!user) {
+    const [updatedUser] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (!updatedUser) {
       throw new Error(`User with id ${id} not found`);
     }
     
-    const updatedUser = { ...user, ...data };
-    this.users.set(id, updatedUser);
     return updatedUser;
   }
 
   // Design Methods
   async createDesign(design: InsertDesign): Promise<Design> {
-    const id = this.currentDesignId++;
-    const newDesign: Design = {
-      ...design,
-      id,
-      customizations: {},
-      isFavorite: false,
-      createdAt: new Date(),
-      frontImageUrl: undefined,
-      backImageUrl: undefined
-    };
-    this.designs.set(id, newDesign);
+    const [newDesign] = await db
+      .insert(designs)
+      .values({
+        ...design,
+        customizations: {},
+        isFavorite: false,
+        createdAt: new Date()
+      })
+      .returning();
     return newDesign;
   }
 
   async getDesignById(id: number): Promise<Design | undefined> {
-    return this.designs.get(id);
+    const [design] = await db.select().from(designs).where(eq(designs.id, id));
+    return design;
   }
 
   async getUserDesigns(userId: number): Promise<Design[]> {
-    return Array.from(this.designs.values()).filter(
-      (design) => design.userId === userId
-    );
+    return db.select().from(designs).where(eq(designs.userId, userId));
   }
 
   async updateDesign(id: number, data: Partial<Design>): Promise<Design> {
-    const design = await this.getDesignById(id);
-    if (!design) {
+    const [updatedDesign] = await db
+      .update(designs)
+      .set(data)
+      .where(eq(designs.id, id))
+      .returning();
+    
+    if (!updatedDesign) {
       throw new Error(`Design with id ${id} not found`);
     }
     
-    const updatedDesign = { ...design, ...data };
-    this.designs.set(id, updatedDesign);
     return updatedDesign;
   }
 
   async deleteDesign(id: number): Promise<void> {
-    this.designs.delete(id);
+    await db.delete(designs).where(eq(designs.id, id));
   }
 
   // Order Methods
   async createOrder(order: InsertOrder): Promise<Order> {
-    const id = this.currentOrderId++;
-    const newOrder: Order = {
-      ...order,
-      id,
-      status: "pending",
-      createdAt: new Date(),
-      trackingId: undefined
-    };
-    this.orders.set(id, newOrder);
+    const [newOrder] = await db
+      .insert(orders)
+      .values({
+        ...order,
+        status: "pending",
+        createdAt: new Date()
+      })
+      .returning();
     return newOrder;
   }
 
   async getOrderById(id: number): Promise<Order | undefined> {
-    return this.orders.get(id);
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order;
   }
 
   async getUserOrders(userId: number): Promise<Order[]> {
-    return Array.from(this.orders.values()).filter(
-      (order) => order.userId === userId
-    );
+    return db.select().from(orders).where(eq(orders.userId, userId));
   }
 
   async updateOrderStatus(id: number, status: string, trackingId?: string): Promise<Order> {
-    const order = await this.getOrderById(id);
-    if (!order) {
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({
+        status,
+        ...(trackingId ? { trackingId } : {})
+      })
+      .where(eq(orders.id, id))
+      .returning();
+    
+    if (!updatedOrder) {
       throw new Error(`Order with id ${id} not found`);
     }
     
-    const updatedOrder = { 
-      ...order, 
-      status, 
-      ...(trackingId ? { trackingId } : {}) 
-    };
-    this.orders.set(id, updatedOrder);
     return updatedOrder;
   }
 
   // Subscription Methods
   async updateUserSubscription(userId: number, tier: string): Promise<User> {
-    const user = await this.getUser(userId);
-    if (!user) {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ 
+        subscriptionTier: tier,
+        // Reset remaining designs if upgrading to pro
+        ...(tier === "pro" ? { remainingDesigns: -1 } : {}) // -1 for unlimited
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!updatedUser) {
       throw new Error(`User with id ${userId} not found`);
     }
     
-    const updatedUser = { 
-      ...user, 
-      subscriptionTier: tier,
-      // Reset remaining designs if upgrading to pro
-      ...(tier === "pro" ? { remainingDesigns: Infinity } : {})
-    };
-    this.users.set(userId, updatedUser);
     return updatedUser;
   }
 
   async updateUserStripeInfo(userId: number, info: { stripeCustomerId: string; stripeSubscriptionId: string; }): Promise<User> {
-    const user = await this.getUser(userId);
-    if (!user) {
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        stripeCustomerId: info.stripeCustomerId,
+        stripeSubscriptionId: info.stripeSubscriptionId
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!updatedUser) {
       throw new Error(`User with id ${userId} not found`);
     }
     
-    const updatedUser = { 
-      ...user,
-      stripeCustomerId: info.stripeCustomerId,
-      stripeSubscriptionId: info.stripeSubscriptionId
-    };
-    this.users.set(userId, updatedUser);
     return updatedUser;
   }
   
   async findUsersByStripeCustomerId(stripeCustomerId: string): Promise<User[]> {
-    return Array.from(this.users.values()).filter(
-      (user) => user.stripeCustomerId === stripeCustomerId
-    );
+    return db
+      .select()
+      .from(users)
+      .where(eq(users.stripeCustomerId, stripeCustomerId));
   }
 
   // Generation Credits
   async decrementDesignCredits(userId: number): Promise<User> {
-    const user = await this.getUser(userId);
+    // First get the user
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId));
+    
     if (!user) {
       throw new Error(`User with id ${userId} not found`);
     }
@@ -229,24 +233,26 @@ export class MemStorage implements IStorage {
       throw new Error("No design credits remaining");
     }
     
-    const updatedUser = { 
-      ...user, 
-      remainingDesigns: user.remainingDesigns - 1 
-    };
-    this.users.set(userId, updatedUser);
+    // Decrement the credits
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        remainingDesigns: user.remainingDesigns - 1
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
     return updatedUser;
   }
 
   async resetMonthlyDesignCredits(): Promise<void> {
-    // This would normally run on a schedule
     // Reset credits for all free tier users
-    for (const [id, user] of this.users.entries()) {
-      if (user.subscriptionTier === "free") {
-        const updatedUser = { ...user, remainingDesigns: 6 };
-        this.users.set(id, updatedUser);
-      }
-    }
+    await db
+      .update(users)
+      .set({ remainingDesigns: 6 })
+      .where(eq(users.subscriptionTier, "free"));
   }
 }
 
-export const storage = new MemStorage();
+// Export database storage instead of memory storage
+export const storage = new DatabaseStorage();
