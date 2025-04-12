@@ -24,6 +24,7 @@ export interface IStorage {
   getOrderById(id: number): Promise<Order | undefined>;
   getUserOrders(userId: number): Promise<Order[]>;
   updateOrderStatus(id: number, status: string, trackingId?: string): Promise<Order>;
+  updateOrderPdfUrl(id: number, pdfUrl: string): Promise<Order>;
   
   // Subscription Methods
   updateUserSubscription(userId: number, tier: string): Promise<User>;
@@ -159,6 +160,20 @@ export class DatabaseStorage implements IStorage {
         status,
         ...(trackingId ? { trackingId } : {})
       })
+      .where(eq(orders.id, id))
+      .returning();
+    
+    if (!updatedOrder) {
+      throw new Error(`Order with id ${id} not found`);
+    }
+    
+    return updatedOrder;
+  }
+  
+  async updateOrderPdfUrl(id: number, pdfUrl: string): Promise<Order> {
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({ pdfUrl })
       .where(eq(orders.id, id))
       .returning();
     

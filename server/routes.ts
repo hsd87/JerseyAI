@@ -188,76 +188,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create order
-  app.post("/api/orders", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const result = insertOrderSchema.safeParse(req.body);
-      if (!result.success) {
-        return res.status(400).json({ message: "Invalid order data", errors: result.error.format() });
-      }
-
-      // Ensure the design exists and belongs to the user
-      const design = await storage.getDesignById(req.body.designId);
-      if (!design) {
-        return res.status(404).json({ message: "Design not found" });
-      }
-
-      if (design.userId !== req.user.id) {
-        return res.status(403).json({ message: "Forbidden" });
-      }
-
-      const order = await storage.createOrder({
-        ...req.body,
-        userId: req.user.id
-      });
-
-      res.status(201).json(order);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Get user orders
-  app.get("/api/orders", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const orders = await storage.getUserOrders(req.user.id);
-      res.json(orders);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Get order by id
-  app.get("/api/orders/:id", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const orderId = parseInt(req.params.id);
-      const order = await storage.getOrderById(orderId);
-
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-
-      if (order.userId !== req.user.id) {
-        return res.status(403).json({ message: "Forbidden" });
-      }
-
-      res.json(order);
-    } catch (error) {
-      next(error);
-    }
-  });
+  // Order routes - importing from orders.ts for advanced functionality
+  try {
+    const { registerOrderRoutes } = await import('./orders');
+    registerOrderRoutes(app);
+  } catch (error) {
+    console.error('Error registering order routes:', error);
+  }
 
   // Subscription endpoints
   app.post("/api/subscribe", async (req, res, next) => {

@@ -1,21 +1,7 @@
+import PDFDocument from 'pdfkit';
 import fs from 'fs-extra';
 import path from 'path';
-import PDFDocument from 'pdfkit';
-import { Order, User } from '@shared/schema';
-import { db } from '../db';
-import { eq } from 'drizzle-orm';
-import { users } from '@shared/schema';
-
-// Ensure the orders directory exists
-const ensureOrderDirectories = async () => {
-  const ordersDir = path.resolve(process.cwd(), 'orders');
-  const pdfsDir = path.resolve(ordersDir, 'pdfs');
-  
-  await fs.ensureDir(ordersDir);
-  await fs.ensureDir(pdfsDir);
-  
-  return { ordersDir, pdfsDir };
-};
+import { Order } from '@shared/schema';
 
 /**
  * Generates a branded PDF for an order
@@ -23,95 +9,119 @@ const ensureOrderDirectories = async () => {
  * @returns The path to the generated PDF
  */
 export async function generateOrderPDF(order: Order): Promise<string> {
-  // Get user information
-  const userResult = await db.select().from(users).where(eq(users.id, order.userId));
-  const user = userResult[0];
+  // Create the orders/pdfs directory if it doesn't exist
+  const pdfDir = path.join(process.cwd(), 'orders', 'pdfs');
+  await fs.ensureDir(pdfDir);
   
-  if (!user) {
-    throw new Error(`User not found for order ${order.id}`);
-  }
+  // Create a unique filename based on the order UUID
+  const pdfFilePath = path.join(pdfDir, `order_${order.uuid}.pdf`);
   
-  // Create directories
-  const { pdfsDir } = await ensureOrderDirectories();
-  
-  // Create PDF file path
-  const pdfFileName = `order_${order.uuid}.pdf`;
-  const pdfFilePath = path.join(pdfsDir, pdfFileName);
+  // Create a write stream for the PDF file
+  const stream = fs.createWriteStream(pdfFilePath);
   
   // Create a new PDF document
-  const doc = new PDFDocument({ margin: 50 });
+  const doc = new PDFDocument({
+    margins: { top: 50, bottom: 50, left: 50, right: 50 },
+    size: 'A4',
+  });
   
-  // Pipe the PDF output to a file
-  const stream = fs.createWriteStream(pdfFilePath);
+  // Pipe the PDF to the file
   doc.pipe(stream);
   
-  // Add header with logo
-  doc.fontSize(25).text('ProJersey', { align: 'center' });
-  doc.moveDown();
-  doc.fontSize(14).text('Custom Jersey Order Summary', { align: 'center' });
+  // Add ProJersey logo header
+  doc.fontSize(24).text('ProJersey', { align: 'center' });
+  doc.fontSize(12).text('Custom Jersey Design & Manufacturing', { align: 'center' });
   doc.moveDown(2);
   
-  // Add order information
-  doc.fontSize(12).text(`Order ID: ${order.uuid}`);
-  doc.fontSize(12).text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`);
+  // Order details header
+  doc.fontSize(18).text('Order Confirmation', { align: 'center' });
+  doc.moveDown();
+  
+  // Order details
+  doc.fontSize(12).text(`Order #: ${order.uuid}`);
+  doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`);
+  doc.text(`Status: ${order.status}`);
   doc.moveDown();
   
   // Customer information
   doc.fontSize(16).text('Customer Information', { underline: true });
-  doc.fontSize(12).text(`Name: ${user.username}`);
-  doc.fontSize(12).text(`Email: ${user.email || 'Not provided'}`);
-  doc.moveDown();
-  
-  // Shipping address
-  doc.fontSize(16).text('Shipping Address', { underline: true });
+  doc.fontSize(12).text(`User ID: ${order.userId}`);
   if (order.shippingAddress) {
-    doc.fontSize(12).text(`${order.shippingAddress.name}`);
-    doc.fontSize(12).text(`${order.shippingAddress.street}`);
-    doc.fontSize(12).text(`${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zip}`);
-    doc.fontSize(12).text(`${order.shippingAddress.country}`);
-    doc.fontSize(12).text(`Phone: ${order.shippingAddress.phone}`);
-  } else {
-    doc.fontSize(12).text('No shipping address provided');
+    doc.text('Shipping Address:');
+    const address = order.shippingAddress;
+    doc.text(`${address.name}`);
+    doc.text(`${address.street}`);
+    doc.text(`${address.city}, ${address.state} ${address.zip}`);
+    doc.text(`${address.country}`);
+    doc.text(`Phone: ${address.phone}`);
   }
   doc.moveDown();
   
-  // Order details
-  doc.fontSize(16).text('Order Details', { underline: true });
+  // Sport and design information
+  doc.fontSize(16).text('Design Information', { underline: true });
   doc.fontSize(12).text(`Sport: ${order.sport}`);
+  doc.text(`Kit Type: ${order.kitType}`);
+  if (order.customTeamName) {
+    doc.text(`Team Name: ${order.customTeamName}`);
+  }
+  doc.moveDown();
   
-  if (order.orderDetails) {
-    doc.fontSize(12).text(`Package: ${order.orderDetails.packageType}`);
+  // Order items
+  if (order.orderDetails && order.orderDetails.items && order.orderDetails.items.length > 0) {
+    doc.fontSize(16).text('Order Items', { underline: true });
     
-    if (order.orderDetails.isTeamOrder && order.orderDetails.teamName) {
-      doc.fontSize(12).text(`Team Name: ${order.orderDetails.teamName}`);
-    }
-    
+    // Create a table header
+    doc.fontSize(12).text('Type', 50, doc.y, { width: 100 });
+    doc.text('Size', 150, doc.y - 12, { width: 80 });
+    doc.text('Gender', 230, doc.y - 12, { width: 80 });
+    doc.text('Quantity', 310, doc.y - 12, { width: 80 });
+    doc.text('Price', 390, doc.y - 12, { width: 100 });
     doc.moveDown();
     
-    // Items
-    doc.fontSize(14).text('Items:', { underline: true });
-    if (order.orderDetails.items && order.orderDetails.items.length > 0) {
-      order.orderDetails.items.forEach((item, index) => {
-        doc.fontSize(12).text(`${index + 1}. ${item.gender} ${item.type} - Size: ${item.size}, Quantity: ${item.quantity}, Price: $${item.price.toFixed(2)}`);
-      });
-    }
+    // Add a line
+    doc.moveTo(50, doc.y - 5).lineTo(500, doc.y - 5).stroke();
+    doc.moveDown(0.5);
     
-    doc.moveDown();
-    
-    // Add-ons
-    if (order.orderDetails.addOns && order.orderDetails.addOns.length > 0) {
-      doc.fontSize(14).text('Add-ons:', { underline: true });
-      order.orderDetails.addOns.forEach((addon, index) => {
-        doc.fontSize(12).text(`${index + 1}. ${addon.name} - Quantity: ${addon.quantity}, Price: $${addon.price.toFixed(2)}`);
-      });
+    // List items
+    for (const item of order.orderDetails.items) {
+      doc.fontSize(10).text(item.type, 50, doc.y, { width: 100 });
+      doc.text(item.size, 150, doc.y - 10, { width: 80 });
+      doc.text(item.gender, 230, doc.y - 10, { width: 80 });
+      doc.text(item.quantity.toString(), 310, doc.y - 10, { width: 80 });
+      doc.text(`$${item.price.toFixed(2)}`, 390, doc.y - 10, { width: 100 });
       doc.moveDown();
     }
     
-    // Delivery timeline
-    if (order.orderDetails.deliveryTimeline) {
-      doc.fontSize(12).text(`Estimated Delivery: ${order.orderDetails.deliveryTimeline}`);
+    // Add a line
+    doc.moveTo(50, doc.y - 5).lineTo(500, doc.y - 5).stroke();
+    doc.moveDown();
+  }
+  
+  // Add-ons
+  if (order.orderDetails && order.orderDetails.addOns && order.orderDetails.addOns.length > 0) {
+    doc.fontSize(16).text('Add-ons', { underline: true });
+    
+    // Create a table header
+    doc.fontSize(12).text('Item', 50, doc.y, { width: 200 });
+    doc.text('Quantity', 250, doc.y - 12, { width: 100 });
+    doc.text('Price', 350, doc.y - 12, { width: 100 });
+    doc.moveDown();
+    
+    // Add a line
+    doc.moveTo(50, doc.y - 5).lineTo(500, doc.y - 5).stroke();
+    doc.moveDown(0.5);
+    
+    // List add-ons
+    for (const addon of order.orderDetails.addOns) {
+      doc.fontSize(10).text(addon.name, 50, doc.y, { width: 200 });
+      doc.text(addon.quantity.toString(), 250, doc.y - 10, { width: 100 });
+      doc.text(`$${addon.price.toFixed(2)}`, 350, doc.y - 10, { width: 100 });
       doc.moveDown();
     }
+    
+    // Add a line
+    doc.moveTo(50, doc.y - 5).lineTo(500, doc.y - 5).stroke();
+    doc.moveDown();
   }
   
   // Price summary
@@ -122,7 +132,7 @@ export async function generateOrderPDF(order: Order): Promise<string> {
     doc.fontSize(12).text(`Discount: -$${order.orderDetails.discount.toFixed(2)}`);
   }
   
-  doc.fontSize(14).text(`Total: $${(order.totalAmount / 100).toFixed(2)}`, { bold: true });
+  doc.fontSize(14).text(`Total: $${(order.totalAmount / 100).toFixed(2)}`);
   doc.moveDown(2);
   
   // Add design images if they exist
@@ -132,11 +142,11 @@ export async function generateOrderPDF(order: Order): Promise<string> {
     
     // Note: In a production app, we would fetch and embed the actual images here
     // For this example, we'll just include the URLs as text
-    doc.fontSize(12).text('Front Design URL:', { bold: true });
+    doc.fontSize(12).text('Front Design URL:');
     doc.fontSize(10).text(order.designUrls.front || 'N/A');
     doc.moveDown();
     
-    doc.fontSize(12).text('Back Design URL:', { bold: true });
+    doc.fontSize(12).text('Back Design URL:');
     doc.fontSize(10).text(order.designUrls.back || 'N/A');
     doc.moveDown();
   }

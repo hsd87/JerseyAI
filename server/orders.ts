@@ -3,7 +3,7 @@ import { db } from './db';
 import { storage } from './storage';
 import { eq } from 'drizzle-orm';
 import { users, orders } from '@shared/schema';
-import { InsertOrder } from '@shared/schema';
+import { InsertOrder, OrderDetails } from '@shared/schema';
 import { generateOrderPDF } from './utils/pdf-generator';
 import { sendOrderConfirmationEmail } from './utils/email-sender';
 
@@ -17,26 +17,28 @@ export function calculateOrderPrice(orderData: InsertOrder): number {
       throw new Error('Order details are missing');
     }
     
+    const orderDetails = orderData.orderDetails as OrderDetails;
+    
     // Calculate base price from items
     let baseTotal = 0;
-    if (orderData.orderDetails.items && orderData.orderDetails.items.length > 0) {
-      baseTotal = orderData.orderDetails.items.reduce((total, item) => {
+    if (orderDetails.items && orderDetails.items.length > 0) {
+      baseTotal = orderDetails.items.reduce((total, item) => {
         return total + (item.price * item.quantity);
       }, 0);
     }
     
     // Add addon prices
     let addonsTotal = 0;
-    if (orderData.orderDetails.addOns && orderData.orderDetails.addOns.length > 0) {
-      addonsTotal = orderData.orderDetails.addOns.reduce((total, addon) => {
+    if (orderDetails.addOns && orderDetails.addOns.length > 0) {
+      addonsTotal = orderDetails.addOns.reduce((total, addon) => {
         return total + (addon.price * addon.quantity);
       }, 0);
     }
     
     // Apply discount if applicable
     let discount = 0;
-    if (orderData.orderDetails.discount) {
-      discount = orderData.orderDetails.discount;
+    if (orderDetails.discount) {
+      discount = orderDetails.discount;
     }
     
     // Calculate final total
