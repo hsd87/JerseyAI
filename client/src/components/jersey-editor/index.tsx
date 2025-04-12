@@ -154,7 +154,7 @@ const ImageItem = ({
         onDragEnd={(e) => {
           const node = e.target;
           const { x, y } = node.position();
-          dragMoveItem(item.id, x, y);
+          onDragMove(item.id, x, y);
         }}
         onTransformEnd={(e) => {
           const node = e.target;
@@ -165,7 +165,7 @@ const ImageItem = ({
           const rotation = node.rotation();
           
           // Update item in store
-          transformImageItem(item.id, scaleX, scaleY, rotation);
+          onImageTransform(item.id, scaleX, scaleY, rotation);
         }}
       />
       {isSelected && (
@@ -311,12 +311,16 @@ const JerseyEditor = () => {
                       item={item}
                       isSelected={item.id === selectedItemId}
                       onSelect={() => selectItem(item.id)}
+                      onDragMove={handleDragMove}
+                      onTransform={handleTextTransform}
                     />
                   ) : (
                     <ImageItem
                       item={item}
                       isSelected={item.id === selectedItemId}
                       onSelect={() => selectItem(item.id)}
+                      onDragMove={handleDragMove}
+                      onImageTransform={handleImageTransform}
                     />
                   )}
                 </Group>
