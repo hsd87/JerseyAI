@@ -13,5 +13,10 @@
     "timestamp": "2025-04-12T18:21:55.129Z",
     "error": "Request to https://api.replicate.com/v1/predictions failed with status 422 Unprocessable Entity: {\"detail\":\"- input.extra_lora: Invalid type. Expected: string, given: number\\n\",\"status\":422,\"title\":\"Input validation failed\",\"invalid_fields\":[{\"type\":\"invalid_type\",\"field\":\"input.extra_lora\",\"description\":\"Invalid type. Expected: string, given: number\"}]}\n.",
     "prompt": "⸻\n\n**Prompt:**\n\nA pfsportskit for esports, displayed in two cleanly aligned angles: front view (left) and back view (right), against an immaculately pristine white studio background. The esports jerse..."
+  },
+  {
+    "timestamp": "2025-04-12T18:25:12.318Z",
+    "error": "Request to https://api.replicate.com/v1/predictions failed with status 422 Unprocessable Entity: {\"detail\":\"- input.extra_lora_scale: Invalid type. Expected: number, given: string\\n\",\"status\":422,\"title\":\"Input validation failed\",\"invalid_fields\":[{\"type\":\"invalid_type\",\"field\":\"input.extra_lora_scale\",\"description\":\"Invalid type. Expected: number, given: string\"}]}\n.",
+    "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for basketball, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The basketball jersey and shorts ar..."
   }
 ]
