@@ -79,6 +79,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         console.log("Enhanced template prompt generated:", enhancedPrompt);
         
+        // For debug purposes - Print the full prompt to ensure it's properly formatted
+        console.log("FULL PROMPT DETAILS:");
+        console.log(JSON.stringify(enhancedPrompt, null, 2));
+        
         // Generate a single combined image showing both front and back views
         const jerseyImage = await generateKitImageWithReplicate(enhancedPrompt);
         
