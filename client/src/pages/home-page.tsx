@@ -23,15 +23,15 @@ export default function HomePage() {
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Designs left this month:</span>
                 <div className="flex items-center space-x-1">
-                  {[...Array(user.remainingDesigns !== undefined && user.remainingDesigns <= 6 ? user.remainingDesigns : 6)].map((_, i) => (
+                  {Array.from({ length: Math.min(user.remainingDesigns || 0, 6) }).map((_, i) => (
                     <div key={i} className="w-3 h-6 bg-[#39FF14] rounded"></div>
                   ))}
-                  {[...Array(Math.max(0, 6 - (user.remainingDesigns !== undefined && user.remainingDesigns <= 6 ? user.remainingDesigns : 6)))].map((_, i) => (
+                  {Array.from({ length: Math.max(0, 6 - (user.remainingDesigns || 0)) }).map((_, i) => (
                     <div key={i} className="w-3 h-6 bg-gray-200 rounded"></div>
                   ))}
                 </div>
                 <span className="text-sm font-medium">
-                  {user.subscriptionTier === 'pro' ? 'Unlimited' : `${user.remainingDesigns !== undefined ? user.remainingDesigns : 0}/6`}
+                  {user.subscriptionTier === 'pro' ? 'Unlimited' : `${user.remainingDesigns || 0}/6`}
                 </span>
               </div>
             )}
