@@ -63,24 +63,16 @@ function AppContent() {
           
           {/* Protected routes */}
           <Route path="/dashboard">
-            {({ params }) => (
-              <ProtectedRoute path="/dashboard" component={DashboardPage} />
-            )}
+            <ProtectedRoute path="/dashboard" component={DashboardPage} />
           </Route>
           <Route path="/checkout">
-            {({ params }) => (
-              <ProtectedRoute path="/checkout" component={CheckoutPage} />
-            )}
+            <ProtectedRoute path="/checkout" component={CheckoutPage} />
           </Route>
           <Route path="/subscribe">
-            {({ params }) => (
-              <ProtectedRoute path="/subscribe" component={SubscribePage} />
-            )}
+            <ProtectedRoute path="/subscribe" component={SubscribePage} />
           </Route>
           <Route path="/test">
-            {({ params }) => (
-              <ProtectedRoute path="/test" component={TestPage} />
-            )}
+            <ProtectedRoute path="/test" component={TestPage} />
           </Route>
           
           {/* 404 route */}

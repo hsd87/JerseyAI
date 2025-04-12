@@ -243,7 +243,7 @@ Return your response as a JSON object with a single "prompt" field containing th
   }
 }
 
-export async function generateKitImageWithReplicate(prompt: string): Promise<string> {
+export async function generateKitImageWithReplicate(prompt: string, kitType?: string): Promise<string> {
   console.log("Generating image with Replicate API using prompt:", prompt);
   
   // Create a logs directory for saving successful prompts
@@ -270,18 +270,29 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
       auth: process.env.REPLICATE_API_TOKEN,
     });
     
-    // Define the model ID and input
+    // Determine if it's jersey-only based on kitType or prompt content
+    const isJerseyOnly = kitType === "jersey only" || 
+                         prompt.toLowerCase().includes("jersey only") || 
+                         !prompt.toLowerCase().includes("shorts");
+    
+    // Set aspect ratio based on jersey-only status
+    const aspectRatio = isJerseyOnly ? "3:2" : "1:1";
+    console.log(`Using aspect ratio ${aspectRatio} (jersey-only: ${isJerseyOnly})`);
+    
+    // Define the model ID and input with updated settings
     const modelVersion = "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3";
     const input = {
       prompt: prompt,
-      aspect_ratio: "1:1",
+      aspect_ratio: aspectRatio,
       prompt_strength: 0.8,
       model: "dev",
       num_outputs: 1,
       num_inference_steps: 28,
-      guidance_scale: 3,
-      output_format: "png",
-      disable_safety_checker: false
+      guidance_scale: 2.9,  // Changed from 3 to 2.9 as requested
+      output_format: "jpg", // Changed from png to jpg as requested
+      disable_safety_checker: false,
+      lora_scale: 1.05,     // Added lora_scale as requested
+      extra_lora: 0.69      // Added extra_lora with value 0.69 as requested
     };
     
     console.log("Running prediction with model:", modelVersion);

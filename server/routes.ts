@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(JSON.stringify(enhancedPrompt, null, 2));
         
         // Generate a single combined image showing both front and back views
-        const jerseyImage = await generateKitImageWithReplicate(enhancedPrompt);
+        const jerseyImage = await generateKitImageWithReplicate(enhancedPrompt, design.kitType);
         
         // For backward compatibility, set both front and back image URLs to the same combined image
         const updatedDesign = await storage.updateDesign(designId, {
@@ -239,7 +239,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       
       // Default response for users without Stripe subscription
-      let subscriptionData = {
+      let subscriptionData: {
+        isSubscribed: boolean;
+        subscriptionTier: string;
+        subscriptionExpiry: string | null;
+        subscriptionStatus: string;
+        remainingDesigns: number;
+      } = {
         isSubscribed: user.subscriptionTier === 'pro',
         subscriptionTier: user.subscriptionTier,
         subscriptionExpiry: null,
@@ -260,7 +266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           subscriptionData = {
             isSubscribed: stripeStatus.status === 'active',
             subscriptionTier: stripeStatus.status === 'active' ? 'pro' : 'free',
-            subscriptionExpiry: expiryDate,
+            subscriptionExpiry: expiryDate, // Now correctly typed as string | null
             subscriptionStatus: stripeStatus.status,
             remainingDesigns: user.remainingDesigns
           };
@@ -417,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Enhanced prompt for direct image generation:", enhancedPrompt.substring(0, 200) + "...");
         
         // Step 2: Generate image with Replicate
-        const imageUrl = await generateKitImageWithReplicate(enhancedPrompt);
+        const imageUrl = await generateKitImageWithReplicate(enhancedPrompt, kitType);
         
         // Return the image URL directly
         res.json({ imageUrl });
