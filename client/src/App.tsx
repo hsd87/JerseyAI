@@ -17,6 +17,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
 const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
 const JerseyEditorPage = React.lazy(() => import('./pages/jersey-editor-page'));
+const TestPage = React.lazy(() => import('./pages/test-page'));
 
 // Main application component that handles routing and subscription updates
 function AppContent() {
@@ -46,14 +47,46 @@ function AppContent() {
     <>
       <React.Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
         <Switch>
-          <Route path="/" component={LandingPage} />
-          <Route path="/designer" component={DesignerPage} />
-          <Route path="/auth" component={AuthPage} />
-          <ProtectedRoute path="/dashboard" component={DashboardPage} />
-          <ProtectedRoute path="/checkout" component={CheckoutPage} />
-          <ProtectedRoute path="/subscribe" component={SubscribePage} />
-          <Route path="/jersey-editor" component={JerseyEditorPage} />
-          <Route component={NotFound} />
+          {/* Regular routes */}
+          <Route path="/">
+            <LandingPage />
+          </Route>
+          <Route path="/designer">
+            <DesignerPage />
+          </Route>
+          <Route path="/auth">
+            <AuthPage />
+          </Route>
+          <Route path="/jersey-editor">
+            <JerseyEditorPage />
+          </Route>
+          
+          {/* Protected routes */}
+          <Route path="/dashboard">
+            {({ params }) => (
+              <ProtectedRoute path="/dashboard" component={DashboardPage} />
+            )}
+          </Route>
+          <Route path="/checkout">
+            {({ params }) => (
+              <ProtectedRoute path="/checkout" component={CheckoutPage} />
+            )}
+          </Route>
+          <Route path="/subscribe">
+            {({ params }) => (
+              <ProtectedRoute path="/subscribe" component={SubscribePage} />
+            )}
+          </Route>
+          <Route path="/test">
+            {({ params }) => (
+              <ProtectedRoute path="/test" component={TestPage} />
+            )}
+          </Route>
+          
+          {/* 404 route */}
+          <Route>
+            <NotFound />
+          </Route>
         </Switch>
       </React.Suspense>
       <Toaster />
