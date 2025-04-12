@@ -215,14 +215,6 @@ export default function DesignEditor() {
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
-            size="sm"
-            onClick={handleGenerateNew}
-            className="text-xs"
-          >
-            <Undo className="h-3 w-3 mr-1" /> Generate New
-          </Button>
-          <Button 
-            variant="outline" 
             size="sm" 
             onClick={handleSaveDesign}
             className="text-xs"
@@ -234,111 +226,9 @@ export default function DesignEditor() {
       </div>
       
       {/* Editor Body */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-0">
-        {/* Tools Panel */}
-        <div className="lg:order-1 p-4 border-r border-gray-200">
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-medium text-sm text-gray-700 mb-2">Add Elements</h3>
-              <div className="flex flex-wrap gap-2">
-                <Button 
-                  size="sm"
-                  variant="outline"
-                  className="text-xs flex items-center"
-                >
-                  <Type className="h-3 w-3 mr-1" /> Text
-                </Button>
-                <Button 
-                  size="sm"
-                  variant="outline"
-                  className="text-xs flex items-center"
-                >
-                  <Hash className="h-3 w-3 mr-1" /> Number
-                </Button>
-                <Button 
-                  size="sm"
-                  variant="outline"
-                  className="text-xs flex items-center"
-                >
-                  <Image className="h-3 w-3 mr-1" /> Logo
-                </Button>
-              </div>
-            </div>
-            
-            {/* Text Tool Settings */}
-            <div className="border-t border-gray-200 pt-3">
-              <h3 className="font-medium text-sm text-gray-700 mb-2">Text Settings</h3>
-              <div className="space-y-2">
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Text Content</label>
-                  <Input 
-                    type="text" 
-                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md" 
-                    placeholder="Enter text" 
-                    value={currentText}
-                    onChange={(e) => setCurrentText(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Font</label>
-                  <Select value={currentFont} onValueChange={setCurrentFont}>
-                    <SelectTrigger className="w-full text-xs h-8">
-                      <SelectValue placeholder="Select font" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Arial">Arial</SelectItem>
-                      <SelectItem value="Impact">Impact</SelectItem>
-                      <SelectItem value="Helvetica">Helvetica</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Color</label>
-                    <Input 
-                      type="color" 
-                      className="w-full h-8 px-1 border border-gray-300 rounded-md" 
-                      value={currentColor}
-                      onChange={(e) => setCurrentColor(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Size</label>
-                    <Select value={currentSize} onValueChange={setCurrentSize}>
-                      <SelectTrigger className="w-full text-xs h-8">
-                        <SelectValue placeholder="Size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="small">Small</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="large">Large</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <Button 
-                  size="sm"
-                  className="w-full bg-black text-white px-2 py-1 rounded-md text-xs h-8"
-                  onClick={handleAddText}
-                >
-                  Add Text to Jersey
-                </Button>
-              </div>
-            </div>
-            
-            <div className="border-t border-gray-200 pt-3">
-              <h3 className="font-medium text-sm text-gray-700 mb-2">Help</h3>
-              <ul className="text-xs text-gray-600 space-y-1 list-disc pl-4">
-                <li>Click and drag elements to position them</li>
-                <li>Use the tools panel to add text, numbers, or logos</li>
-                <li>Save your design before proceeding to order</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        
+      <div className="flex flex-col gap-6">
         {/* Canvas Area - Combined View */}
-        <div className="lg:col-span-3 lg:order-2 p-4 flex items-center justify-center bg-gray-50">
+        <div className="p-4 flex items-center justify-center bg-gray-50">
           <div className="w-full max-w-2xl">
             <div 
               ref={canvasRef}
@@ -405,6 +295,107 @@ export default function DesignEditor() {
                   <Download className="h-3 w-3 mr-1" /> Export
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Tools Panel - Now below the image as requested */}
+        <div className="p-4 border-t border-gray-200">
+          <div className="max-w-2xl mx-auto">
+            {/* Add Elements Section */}
+            <div className="mb-6">
+              <h3 className="font-medium text-sm text-gray-700 mb-2">Add Elements</h3>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  className="text-xs flex items-center"
+                >
+                  <Type className="h-3 w-3 mr-1" /> Text
+                </Button>
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  className="text-xs flex items-center"
+                >
+                  <Hash className="h-3 w-3 mr-1" /> Number
+                </Button>
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  className="text-xs flex items-center"
+                >
+                  <Image className="h-3 w-3 mr-1" /> Logo
+                </Button>
+              </div>
+            </div>
+            
+            {/* Text Tool Settings */}
+            <div className="mb-6">
+              <h3 className="font-medium text-sm text-gray-700 mb-2">Text Settings</h3>
+              <div className="space-y-2">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Text Content</label>
+                  <Input 
+                    type="text" 
+                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md" 
+                    placeholder="Enter text" 
+                    value={currentText}
+                    onChange={(e) => setCurrentText(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Font</label>
+                  <Select value={currentFont} onValueChange={setCurrentFont}>
+                    <SelectTrigger className="w-full text-xs h-8">
+                      <SelectValue placeholder="Select font" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Arial">Arial</SelectItem>
+                      <SelectItem value="Impact">Impact</SelectItem>
+                      <SelectItem value="Helvetica">Helvetica</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">Color</label>
+                    <Input 
+                      type="color" 
+                      className="w-full h-8 px-1 border border-gray-300 rounded-md" 
+                      value={currentColor}
+                      onChange={(e) => setCurrentColor(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">Size</label>
+                    <Select value={currentSize} onValueChange={setCurrentSize}>
+                      <SelectTrigger className="w-full text-xs h-8">
+                        <SelectValue placeholder="Size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="small">Small</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="large">Large</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button 
+                  size="sm"
+                  className="w-full bg-black text-white px-2 py-1 rounded-md text-xs h-8"
+                  onClick={handleAddText}
+                >
+                  Add Text to Jersey
+                </Button>
+              </div>
+            </div>
+            
+            {/* Help Section */}
+            <div className="text-center">
+              <p className="text-xs text-gray-600">
+                Click and drag elements to position them • Save your design before proceeding to order
+              </p>
             </div>
           </div>
         </div>
