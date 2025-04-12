@@ -83,7 +83,7 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
           </TabsTrigger>
           <TabsTrigger value="image" className="flex items-center gap-1">
             <ImageIcon className="h-4 w-4" />
-            Images
+            Logos
           </TabsTrigger>
         </TabsList>
         
@@ -118,7 +118,7 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
         <TabsContent value="image">
           <div className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="image-input">Upload Image</Label>
+              <Label htmlFor="image-input">Upload Logo</Label>
               <Input
                 id="image-input"
                 type="file"

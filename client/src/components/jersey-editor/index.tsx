@@ -17,6 +17,9 @@ export type ItemConfig = {
   fontSize?: number;
   fontFamily?: string;
   fill?: string;
+  // Text outline properties
+  stroke?: string;        // outline color
+  strokeWidth?: number;   // outline thickness
   // Image properties
   src?: string;
   width?: number;
@@ -67,6 +70,8 @@ const TextItem = ({
         fontSize={item.fontSize}
         fontFamily={item.fontFamily}
         fill={item.fill}
+        stroke={item.stroke}
+        strokeWidth={item.strokeWidth}
         rotation={item.rotation}
         draggable
         onClick={onSelect}
