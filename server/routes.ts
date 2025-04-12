@@ -63,7 +63,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Use OpenAI to generate a detailed prompt for the kit design using the template
       try {
-        const { generateKitPrompt, generateKitImageWithReplicate } = await import("./openai");
+        const { generateKitPrompt, generateJerseyImageWithReplicate } = await import("./openai");
         
         // Generate a combined prompt using the template through OpenAI
         const enhancedPrompt = await generateKitPrompt({
@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(JSON.stringify(enhancedPrompt, null, 2));
         
         // Generate a single combined image showing both front and back views
-        const jerseyImage = await generateKitImageWithReplicate(enhancedPrompt, design.kitType);
+        const jerseyImage = await generateJerseyImageWithReplicate(enhancedPrompt, design.kitType);
         
         // For backward compatibility, set both front and back image URLs to the same combined image
         const updatedDesign = await storage.updateDesign(designId, {
@@ -408,7 +408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Generating direct image with parameters:", req.body);
         
         // Step 1: Generate enhanced prompt using OpenAI
-        const { generateKitPrompt, generateKitImageWithReplicate } = await import('./openai');
+        const { generateKitPrompt, generateJerseyImageWithReplicate } = await import('./openai');
         const enhancedPrompt = await generateKitPrompt({
           sport,
           kitType,

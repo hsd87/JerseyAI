@@ -17,5 +17,27 @@
       "output_format": "png",
       "disable_safety_checker": false
     }
+  },
+  {
+    "timestamp": "2025-04-12T18:34:59.196Z",
+    "imageId": "c284856b-a018-486f-9dfb-3d27120315bd",
+    "filename": "jersey_c284856b-a018-486f-9dfb-3d27120315bd.png",
+    "generationTimeMs": 8404,
+    "promptLength": 4360,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for esports, displayed in two cleanly aligned angles: front view (left) and back view (right), set against a vivid, crisp white studio background. The esports jersey and shorts are presented in a captivating, floating arrangement without mannequins, perfect for high-end product catalog visuals. Both views are precisely centered, uniformly spaced, and prominently visible—focused entirely on the uniform's design details, with no cleats, socks, or human models, just the complete uniform, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe kit consists of a sleek esports jersey paired with tapered mid-thigh athletic shorts. The jersey exhibits a crew neckline, angular shoulder seams, and a sculpted form-fitting silhouette tapering through the torso for enhanced aerodynamics. The shorts feature sculpted side panels for ergonomic movement, a reinforced and elasticized waistband, and strategically placed slit hems enhancing agility and movement dynamics.\n\n⸻\n\n🧵 Fabric & Texture\n\nCrafted from an advanced dual-zone poly-elastane blend, the jersey integrates a diamond-knit mesh across the torso for breathability and seamless, smooth matte spandex for the sleeves, providing flexibility and comfort. These design elements are accentuated by side panels embedded with ventilated hex-weave textures, offering superior moisture control. The fabric is treated with a low-luster finish, engineered to exhibit consistent color brilliance under varying lighting conditions. Seams are fortified with bonded techniques and flatlocked for durability, featuring contour piping that aligns precisely with panel boundaries.\n\n⸻\n\n🎨 Color Scheme\n\n        • Primary Color: medium bluish\n        • Secondary Color: vibrant scarlet red\n        • Accent: ice white trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe jersey's front design features a contemporary, yet sophisticated solid pattern that emanates from the chest center in striking vibrant scarlet red, taking on the appearance of a digital emblem. Sleek, thin contour lines expertly accentuate the ribs and upper chest areas with a tech-geometric flair. A sharp white slash element slashes diagonally across the midsection, forming a dynamic angle that intersects the primary motif. Sleeve cuffs are daringly trimmed in vibrant scarlet red and adorned with subtle dotted patterns near the hem to ensure a stylish finish.\n\nThe jersey's back design includes a prominent vibrant scarlet red vertical spine pattern, composed of sophisticated interlocking bands. The player's name is displayed just below the collar in crisp uppercase text, while their number dominates the mid-back area in large, vibrant scarlet red numerals, accentuated with a white outline. A dynamic medium bluish halo gradient behind the number enhances tonal depth and creates visual interest.\n\n⸻\n\n🩳 Shorts Design\n\nThe shorts are rendered in a medium bluish with eye-catching angular vibrant scarlet red side panels, designed as descending wedges tapering gracefully toward the knee. A fine white trim elegantly outlines the bottom hem and the side slits. The rear panel's architecture aligns delicately with the natural contour of the glutes, incorporating a slight back yoke drop showcased through internal stitching. The left thigh proudly displays a vibrant scarlet red team crest, while the right thigh offers the option for a player number or an understated minimal icon for personalized detail.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n\n        • Collar: Crew in medium bluish with a vibrant scarlet red edge taping\n        • Sleeves: Matte medium bluish with intricate dotted vibrant scarlet red cuff details\n        • Front Body: Solid-centered vibrant scarlet red burst with a precision angled white slash\n        • Back Body: Vertical vibrant scarlet red tech spine combined with a clean typography block\n        • Shorts: Precision-shaped fit with angular vibrant scarlet red inserts and detailed hem aesthetics\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n        • Shorts left thigh: Team crest\n        • Shorts right thigh: Player number or secondary crest\n\n⸻\n\n🌐 Design Mood & Cohesion\n\ngaming inspire \"tekken\" \n\n",
+      "aspect_ratio": "1:1",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
   }
 ]

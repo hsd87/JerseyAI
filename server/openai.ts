@@ -140,18 +140,27 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
   
   console.log(`Color conversion: Primary "${primaryColor}" → "${primaryColorName}", Secondary "${secondaryColor}" → "${secondaryColorName}"`);
 
-  // Using the provided template structure with standardized "pfsportskit" token
+  // Create a template that uses "jersey and shorts" instead of "kit"
+  // And only includes shorts description if it's not a jersey-only design
+  const isJerseyOnly = kitType === "jersey only" || 
+                       !kitType.toLowerCase().includes("shorts");
+                       
+  // Construct the prompt template with conditionals for jersey-only vs full uniform
   const promptTemplate = `⸻
 
 Prompt:
 
-A pfsportskit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The ${sport} jersey and shorts are presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the uniform, front and back.
+A pfsportskit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. ${isJerseyOnly ? 
+  `The ${sport} jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals.` : 
+  `The ${sport} jersey and shorts are presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals.`} Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the ${isJerseyOnly ? 'jersey' : 'uniform'}, front and back.
 
 ⸻
 
 🧍‍♂️ Garment Structure
 
-The kit consists of a ${sleeveStyle || 'short-sleeved'} ${sport} jersey and tapered mid-thigh athletic shorts. The jersey features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso. The shorts include sculpted side panels, a reinforced waistband, and slit hems for dynamic movement.
+${isJerseyOnly ? 
+  `The jersey is a ${sleeveStyle || 'short-sleeved'} ${sport} design. It features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso.` : 
+  `The uniform consists of a ${sleeveStyle || 'short-sleeved'} ${sport} jersey and tapered mid-thigh athletic shorts. The jersey features a ${collarType || 'hybrid mandarin V-collar'}, angular shoulder seams, and a form-fitting streamlined cut through the torso. The shorts include sculpted side panels, a reinforced waistband, and slit hems for dynamic movement.`}
 
 ⸻
 
@@ -176,18 +185,18 @@ The back of the jersey includes a ${secondaryColorName} vertical spine pattern, 
 
 ⸻
 
-🩳 Shorts Design
+${isJerseyOnly ? '' : `🩳 Shorts Design
 
 Shorts are ${primaryColorName} with angular ${secondaryColorName} side panels, shaped like descending wedges that taper toward the knee. A thin white trim outlines the bottom hem and side slits. Rear panel shaping follows the glute contour with internal stitching and a slight back yoke drop. The left thigh displays a ${secondaryColorName} team crest; the right thigh features an optional player number or minimal icon.
 
-⸻
+⸻`}
 
 🧩 Panel & Trim Breakdown
         • Collar: ${collarType || 'Mandarin-style V-notch'} in ${primaryColorName} with ${secondaryColorName} edge taping
         • Sleeves: Matte ${primaryColorName} with dotted ${secondaryColorName} cuff details
         • Front Body: ${patternStyle || 'Crest'}-centered ${secondaryColorName} burst, angled white slash
         • Back Body: Vertical ${secondaryColorName} tech spine with clean typography block
-        • Shorts: Sculpted fit with angular ${secondaryColorName} inserts and hem detailing
+${isJerseyOnly ? '' : '        • Shorts: Sculpted fit with angular ' + secondaryColorName + ' inserts and hem detailing'}
 
 ⸻
 
@@ -196,14 +205,13 @@ Shorts are ${primaryColorName} with angular ${secondaryColorName} side panels, s
         • Jersey front right chest: Sponsor logo
         • Upper back (below collar): Player name
         • Back center: Large number
-        • Shorts left thigh: Team crest
-        • Shorts right thigh: Player number or secondary crest
+${isJerseyOnly ? '' : '        • Shorts left thigh: Team crest\n        • Shorts right thigh: Player number or secondary crest'}
 
 ⸻
 
 🌐 Design Mood & Cohesion
 
-${designNotes || `The Circuit kit is bold, distinctive, and meticulously engineered — merging the power of tradition with the precision of modern performancewear. The ${secondaryColorName}-on-${primaryColorName} palette evokes prestige, while the ${patternStyle || 'circuit'} patterning adds a tech-forward identity. This kit is ideal for trophy-season campaigns, limited-edition drops, or teams with a legacy-driven brand story.`}
+${designNotes || `The design is bold, distinctive, and meticulously engineered — merging the power of tradition with the precision of modern performancewear. The ${secondaryColorName}-on-${primaryColorName} palette evokes prestige, while the ${patternStyle || 'circuit'} patterning adds a tech-forward identity. This ${isJerseyOnly ? 'jersey' : 'uniform'} is ideal for trophy-season campaigns, limited-edition drops, or teams with a legacy-driven brand story.`}
 `;
 
   // Create a log file path for saving successful prompts
@@ -222,7 +230,7 @@ ${designNotes || `The Circuit kit is bold, distinctive, and meticulously enginee
       fs.mkdirSync(promptLogsDir, { recursive: true });
     }
     
-    console.log(`Generating enhanced prompt for ${sport} kit with ${primaryColorName} and ${secondaryColorName} colors...`);
+    console.log(`Generating enhanced prompt for ${sport} jersey with ${primaryColorName} and ${secondaryColorName} colors...`);
     
     // Set up OpenAI to generate an enhanced prompt
     const response = await openai.chat.completions.create({
@@ -230,17 +238,19 @@ ${designNotes || `The Circuit kit is bold, distinctive, and meticulously enginee
       messages: [
         { 
           role: "system", 
-          content: `You are an expert sports kit designer creating prompts for a jersey design AI. 
+          content: `You are an expert sports jersey designer creating prompts for an AI jersey generation system. 
 
 You MUST:
-1. Follow the EXACT same format as the template with sections: Prompt, Garment Structure, Fabric & Texture, Color Scheme, Design Language, Shorts Design, Panel & Trim Breakdown, Logo & Branding Placement, and Design Mood & Cohesion.
+1. Follow the EXACT same format as the template with all sections provided in the exact same order.
 2. KEEP all dividers (⸻) and emoji section markers (🧍‍♂️, 🧵, 🎨, 🩳, 🧩, 🏷️, 🌐) in the exact same positions.
 3. Keep all bullet points in the same sections but enhance their descriptions.
 4. Maintain the same jersey views arrangement - front view (left) and back view (right).
 5. Always include the exact term "pfsportskit" in the first paragraph - this is REQUIRED and must not be changed.
 6. Include all colors exactly as mentioned - primary, secondary, and accent.
 7. Maintain all specifications about collar type, sleeve style, and pattern style.
-8. Keep all structural elements of both the jersey and shorts as described.
+8. Never use the word "kit" except in the required "pfsportskit" token. Use "jersey" or "jersey and shorts" or "uniform" instead.
+9. If the template doesn't include shorts sections, DO NOT add them. Only describe shorts if the template includes shorts sections.
+10. Incorporate any design inspiration (if provided) as visual elements in the jersey design itself, not just in the mood section.
 
 ENHANCE the template with:
 1. More vivid and specific material descriptions.
@@ -300,13 +310,13 @@ Return your response as a JSON object with a single "prompt" field containing th
       return createDirectPrompt();
     }
   } catch (error) {
-    console.error("Error generating kit design prompt:", error);
+    console.error("Error generating jersey design prompt:", error);
     console.warn("Falling back to direct prompt template due to OpenAI error.");
     return createDirectPrompt();
   }
 }
 
-export async function generateKitImageWithReplicate(prompt: string, kitType?: string): Promise<string> {
+export async function generateJerseyImageWithReplicate(prompt: string, kitType?: string): Promise<string> {
   console.log("Generating image with Replicate API using prompt:", prompt);
   
   // Create a logs directory for saving successful prompts
@@ -338,9 +348,9 @@ export async function generateKitImageWithReplicate(prompt: string, kitType?: st
                          prompt.toLowerCase().includes("jersey only") || 
                          !prompt.toLowerCase().includes("shorts");
     
-    // Set aspect ratio based on jersey-only status
-    const aspectRatio = isJerseyOnly ? "3:2" : "1:1";
-    console.log(`Using aspect ratio ${aspectRatio} (jersey-only: ${isJerseyOnly})`);
+    // Set aspect ratio to 3:2 for all jerseys as requested
+    const aspectRatio = "3:2";
+    console.log(`Using consistent aspect ratio ${aspectRatio} for all jersey designs`);
     
     // Define the model ID and input with updated settings
     const modelVersion = "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3";
