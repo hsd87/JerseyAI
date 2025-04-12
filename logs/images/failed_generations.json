@@ -8,5 +8,10 @@
     "timestamp": "2025-04-12T18:14:54.820Z",
     "error": "Prediction failed: Failed to parse URL. Expected either:\n* Replicate model in the format <owner>/<username> or <owner>/<username>/<version>\n* HuggingFace URL in the format huggingface.co/<owner>/<model-name>\n* CivitAI URL in the format civitai.com/models/<id>[/<model-name>]\n* Arbitrary .safetensors URLs from the Internet",
     "prompt": "⸻\n\nPrompt:\n\nA pfsportskit for soccer, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio backdrop that accentuates every detail of the desig..."
+  },
+  {
+    "timestamp": "2025-04-12T18:21:55.129Z",
+    "error": "Request to https://api.replicate.com/v1/predictions failed with status 422 Unprocessable Entity: {\"detail\":\"- input.extra_lora: Invalid type. Expected: string, given: number\\n\",\"status\":422,\"title\":\"Input validation failed\",\"invalid_fields\":[{\"type\":\"invalid_type\",\"field\":\"input.extra_lora\",\"description\":\"Invalid type. Expected: string, given: number\"}]}\n.",
+    "prompt": "⸻\n\n**Prompt:**\n\nA pfsportskit for esports, displayed in two cleanly aligned angles: front view (left) and back view (right), against an immaculately pristine white studio background. The esports jerse..."
   }
 ]

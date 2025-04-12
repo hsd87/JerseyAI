@@ -359,8 +359,9 @@ export async function generateKitImageWithReplicate(prompt: string, kitType?: st
       lora_scale: 1.05,     // Added lora_scale as requested
     };
     
-    // Add extra_lora as a numeric parameter (explicitly adding it here to the typed object)
-    (input as any).extra_lora = 0.69;  // Using casting to add the property
+    // Add extra_lora_scale as a string parameter (explicitly adding it here to the typed object)
+    (input as any).extra_lora_scale = "0.69";  // Using casting to add the property as a string
+    (input as any).extra_lora = "";  // Set extra_lora to empty string as requested
     
     console.log("Running prediction with model:", modelVersion);
     console.log("Input parameters:", JSON.stringify(input, null, 2));
