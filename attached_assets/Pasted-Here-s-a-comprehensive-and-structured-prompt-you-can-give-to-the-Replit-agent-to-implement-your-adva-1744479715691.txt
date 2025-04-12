@@ -1,0 +1,107 @@
+Here’s a comprehensive and structured prompt you can give to the Replit agent to implement your advanced prompt-to-image pipeline for the ProJersey application:
+
+⸻
+
+🧠 Prompt for Replit Agent
+
+We are building an AI-powered D2C product design platform called ProJersey. The user fills out a detailed design form, and our system generates a professional jersey mockup using a fine-tuned Flux 1.1 Pro Ultra model hosted on Replicate.
+
+⸻
+
+🎯 Objective
+
+Create a structured pipeline with the following flow:
+	1.	User completes the form.
+	2.	Form values are sent to our OpenAI prompt generator endpoint, which transforms the inputs into a detailed descriptive prompt (based on a sample format).
+	3.	The rewritten prompt is then sent to our Replicate-hosted model via API.
+	4.	The response image is returned and shown to the user.
+
+We are already using:
+	•	React + Zustand on the frontend
+	•	FastAPI backend
+	•	Replicate for image generation
+	•	OpenAI for prompt rewriting
+
+⸻
+
+🛠️ What You Need to Implement
+
+1. 📦 Create Backend Prompt Generator Module
+	•	Endpoint: POST /api/prompt/generate
+	•	Input: User form fields (as JSON)
+	•	Use OpenAI’s API (gpt-4 or gpt-3.5) to rewrite the prompt into our structured format using the provided prompt template below
+	•	Output: Final descriptive prompt as a string
+	•	Save successful prompts into a log for later analysis (R&D/fine-tuning)
+
+⸻
+
+2. 🧠 Sample Prompt Template (Use as OpenAI Guidance)
+
+Prompt:
+A pfsoccerkit, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background...
+
+(← Refer to full structured prompt provided earlier)
+
+Instructions:
+- Map form inputs like primaryColor, secondaryColor, collarType, sleeveStyle, fabricTexture, patternStyle, etc. into this descriptive template.
+- The output should preserve the structure and language quality shown in the sample.
+- Ensure the formatting includes sections like 🧍‍♂️ Garment Structure, 🧵 Fabric, 🎨 Colors, etc.
+
+
+
+⸻
+
+3. 🔁 Connect Prompt to Image Generation
+
+After the prompt is generated:
+	•	Use this format to call Replicate:
+
+POST https://api.replicate.com/v1/predictions
+Authorization: Token <REPLICATE_API_KEY>
+{
+  "version": "<flux-model-version-id>",
+  "input": {
+    "prompt": "<generated_prompt>",
+    "num_outputs": 1,
+    "image_dimensions": "1024x1024"
+  }
+}
+
+	•	Save both prompt and resulting image URL for record
+	•	Return the image back to the frontend
+
+⸻
+
+4. 🖥️ Frontend Integration
+	•	Modify design-form.tsx to:
+	•	Submit form to /api/prompt/generate
+	•	Send the returned prompt to the Replicate API via /api/generate-image
+	•	Display the final image in design-results.tsx
+	•	Save state via Zustand or local storage
+
+⸻
+
+⚠️ Edge Cases
+	•	If OpenAI prompt generation fails: fallback to raw prompt composed from user form
+	•	If image generation fails: show a default test image + error message
+	•	Add loading states for both prompt + image steps
+
+⸻
+
+✅ Completion Checklist
+	•	POST /api/prompt/generate implemented with OpenAI
+	•	Prompt template integrated
+	•	Image generation endpoint updated to accept the new structured prompt
+	•	Frontend wired to new backend endpoints
+	•	Prompt and image stored in user’s session or DB
+	•	Error handling and fallback logic added
+	•	Loading indicators for UX during async actions
+
+⸻
+
+Please execute this in your next steps. After this is done, we will proceed with:
+	•	Editable design overlays (logo/name/number)
+	•	Order summary generation
+	•	Checkout flow and PDF logs
+
+Let me know once the prompt-to-image loop is complete and working end-to-end.

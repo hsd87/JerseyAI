@@ -30,27 +30,48 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
     designNotes 
   } = options;
 
-  // Create a color descriptive name
+  // More extensive color naming function
   const getColorName = (hexColor: string) => {
-    // This is a simple implementation - in production you might want a more robust color naming library
+    // Expanded color map with more sports-appropriate descriptive names
     const colorMap: Record<string, string> = {
-      "#FF0000": "red",
-      "#00FF00": "green",
-      "#0000FF": "blue",
-      "#FFFF00": "yellow",
-      "#FF00FF": "magenta",
-      "#00FFFF": "cyan",
-      "#000000": "black",
-      "#FFFFFF": "white",
-      "#FFA500": "orange",
-      "#800080": "purple",
-      "#A52A2A": "brown",
-      "#808080": "gray",
-      "#C0C0C0": "silver",
-      "#FFD700": "gold",
+      // Basic colors
+      "#FF0000": "crimson red",
+      "#00FF00": "electric green",
+      "#0000FF": "royal blue",
+      "#FFFF00": "vibrant yellow", 
+      "#FF00FF": "vivid magenta",
+      "#00FFFF": "azure blue",
+      "#000000": "deep black",
+      "#FFFFFF": "pristine white",
+      
+      // Common sports colors with more descriptive names
+      "#FFA500": "vibrant orange",
+      "#800080": "regal purple",
+      "#A52A2A": "rich brown",
+      "#808080": "steel gray",
+      "#C0C0C0": "metallic silver",
+      "#FFD700": "metallic gold",
+      "#8B0000": "dark crimson",
+      "#006400": "forest green",
+      "#00008B": "deep navy",
+      "#4B0082": "imperial purple",
+      "#800000": "maroon",
+      "#008080": "teal",
+      "#2E8B57": "sea green",
+      "#4682B4": "steel blue",
+      "#B22222": "firebrick red",
+      "#D2691E": "chocolate brown",
+      "#CD853F": "peru tan",
+      "#DAA520": "goldenrod",
+      "#FF4500": "orange red",
+      "#32CD32": "lime green",
+      "#1E90FF": "dodger blue",
+      "#FF1493": "deep pink"
     };
     
-    return colorMap[hexColor.toUpperCase()] || hexColor;
+    // If the color is found in our map, return the descriptive name
+    // Otherwise, return a generic description with the hex code
+    return colorMap[hexColor.toUpperCase()] || `custom ${hexColor} shade`;
   };
 
   const primaryColorName = getColorName(primaryColor);
@@ -122,14 +143,50 @@ Shorts are ${primaryColorName} with angular ${secondaryColorName} side panels, s
 ${designNotes || `The Circuit kit is bold, distinctive, and meticulously engineered — merging the power of tradition with the precision of modern performancewear. The ${secondaryColorName}-on-${primaryColorName} palette evokes prestige, while the ${patternStyle || 'circuit'} patterning adds a tech-forward identity. This kit is ideal for trophy-season campaigns, limited-edition drops, or teams with a legacy-driven brand story.`}
 `;
 
+  // Create a log file path for saving successful prompts
+  const promptLogsDir = path.join(process.cwd(), 'logs');
+  const promptLogFile = path.join(promptLogsDir, 'successful_prompts.json');
+  
+  // For fallback in case OpenAI fails
+  const createDirectPrompt = () => {
+    // Create a direct prompt without OpenAI enhancement
+    return promptTemplate;
+  };
+  
   try {
+    // Ensure logs directory exists
+    if (!fs.existsSync(promptLogsDir)) {
+      fs.mkdirSync(promptLogsDir, { recursive: true });
+    }
+    
+    console.log(`Generating enhanced prompt for ${sport} kit with ${primaryColorName} and ${secondaryColorName} colors...`);
+    
     // Set up OpenAI to generate an enhanced prompt
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         { 
           role: "system", 
-          content: `You are an expert sports kit designer. Take the following jersey design template and enhance it into a compelling prompt for an AI image generator. Keep the overall structure and format similar but add unique details and descriptions that will result in a high-quality, realistic jersey image. Return your response as a JSON object with a "prompt" field that contains the enhanced prompt.` 
+          content: `You are an expert sports kit designer creating prompts for a jersey design AI. 
+
+You MUST:
+1. Follow the EXACT same format as the template with sections: Prompt, Garment Structure, Fabric & Texture, Color Scheme, Design Language, Shorts Design, Panel & Trim Breakdown, Logo & Branding Placement, and Design Mood & Cohesion.
+2. KEEP all dividers (⸻) and emoji section markers (🧍‍♂️, 🧵, 🎨, 🩳, 🧩, 🏷️, 🌐) in the exact same positions.
+3. Keep all bullet points in the same sections but enhance their descriptions.
+4. Maintain the same jersey views arrangement - front view (left) and back view (right).
+5. Keep the jersey type (pf${sport}kit) in the first line unchanged.
+6. Include all colors exactly as mentioned - primary, secondary, and accent.
+7. Maintain all specifications about collar type, sleeve style, and pattern style.
+8. Keep all structural elements of both the jersey and shorts as described.
+
+ENHANCE the template with:
+1. More vivid and specific material descriptions.
+2. Richer color descriptors (while keeping the actual colors).
+3. More technical sportswear terminology.
+4. Better physical structure descriptions.
+5. Additional design elements that would make the jersey more distinctive.
+
+Return your response as a JSON object with a single "prompt" field containing the enhanced prompt.` 
         },
         { 
           role: "user", 
@@ -141,28 +198,72 @@ ${designNotes || `The Circuit kit is bold, distinctive, and meticulously enginee
 
     const content = response.choices[0].message.content;
     if (!content) {
-      throw new Error("Failed to generate kit design prompt");
+      console.warn("OpenAI returned empty content. Falling back to direct prompt.");
+      return createDirectPrompt();
     }
 
-    // Parse the content to get the prompt
-    const jsonContent = JSON.parse(content);
-    const enhancedPrompt = jsonContent.prompt || content;
-    
-    return enhancedPrompt;
+    try {
+      // Parse the content to get the prompt
+      const jsonContent = JSON.parse(content);
+      const enhancedPrompt = jsonContent.prompt || content;
+      
+      // Log successful prompt for future analysis
+      try {
+        let existingLogs: any[] = [];
+        if (fs.existsSync(promptLogFile)) {
+          const logsContent = fs.readFileSync(promptLogFile, 'utf8');
+          existingLogs = JSON.parse(logsContent);
+        }
+        
+        // Save the prompt with metadata
+        existingLogs.push({
+          timestamp: new Date().toISOString(),
+          sport,
+          primaryColor: primaryColorName,
+          secondaryColor: secondaryColorName,
+          template: promptTemplate,
+          enhanced: enhancedPrompt
+        });
+        
+        fs.writeFileSync(promptLogFile, JSON.stringify(existingLogs, null, 2), 'utf8');
+      } catch (logError) {
+        console.warn("Failed to log prompt:", logError);
+      }
+      
+      return enhancedPrompt;
+    } catch (parseError) {
+      console.error("Failed to parse OpenAI response as JSON:", parseError);
+      console.warn("Falling back to direct prompt.");
+      return createDirectPrompt();
+    }
   } catch (error) {
     console.error("Error generating kit design prompt:", error);
-    throw error;
+    console.warn("Falling back to direct prompt template due to OpenAI error.");
+    return createDirectPrompt();
   }
 }
 
 export async function generateKitImageWithReplicate(prompt: string): Promise<string> {
   console.log("Generating image with Replicate API using prompt:", prompt);
   
+  // Create a logs directory for saving successful prompts
+  const imageLogsDir = path.join(process.cwd(), 'logs', 'images');
+  
+  // Check for API token
   if (!process.env.REPLICATE_API_TOKEN) {
-    throw new Error("REPLICATE_API_TOKEN is not set");
+    console.error("Error: REPLICATE_API_TOKEN is not set in environment variables");
+    throw new Error("REPLICATE_API_TOKEN is not set. Please add this secret to continue.");
   }
   
-  // Step 1: Create the prediction with Replicate API using the client library
+  // Ensure logs directory exists
+  try {
+    if (!fs.existsSync(imageLogsDir)) {
+      fs.mkdirSync(imageLogsDir, { recursive: true });
+    }
+  } catch (dirError) {
+    console.warn("Failed to create image logs directory:", dirError);
+  }
+  
   try {
     // Initialize the Replicate client
     const replicate = new Replicate({
@@ -186,19 +287,30 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
     console.log("Running prediction with model:", modelVersion);
     console.log("Input parameters:", JSON.stringify(input, null, 2));
     
+    // Start tracking time for performance logging
+    const startTime = Date.now();
+    
     // Run the model prediction
     const output = await replicate.run(modelVersion, { input });
     
+    // Calculate generation time
+    const generationTime = Date.now() - startTime;
+    console.log(`Image generated in ${generationTime}ms`);
+    
+    // Log output result
     console.log("Prediction result:", output);
     
     // Get the image URL from the output (output is usually an array of URLs)
     const imageUrl = Array.isArray(output) ? output[0] : output;
     
     if (!imageUrl) {
-      throw new Error("No image was generated");
+      throw new Error("No image was generated by Replicate");
     }
     
+    console.log("Image URL received:", imageUrl);
+    
     // Download the generated image
+    console.log("Downloading generated image...");
     const imageResponse = await fetch(imageUrl.toString());
     
     if (!imageResponse.ok) {
@@ -207,29 +319,74 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
     
     // Create a unique filename
     const imageId = uuidv4();
-    const isBackView = !prompt.includes("front");
-    const filename = isBackView ? `back_${imageId}.png` : `front_${imageId}.png`;
+    const isBackView = !prompt.includes("front view") && prompt.includes("back view");
+    const filename = `jersey_${imageId}.png`;
     const outputPath = path.join(process.cwd(), 'output', filename);
     
-    // Create directory if it doesn't exist
+    // Create output directory if it doesn't exist
     if (!fs.existsSync(path.join(process.cwd(), 'output'))) {
       fs.mkdirSync(path.join(process.cwd(), 'output'), { recursive: true });
     }
     
     // Save the image
+    console.log(`Saving image to ${outputPath}...`);
     const arrayBuffer = await imageResponse.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     fs.writeFileSync(outputPath, buffer);
+    
+    // Log success information
+    try {
+      const logFilePath = path.join(imageLogsDir, 'successful_generations.json');
+      let logs = [];
+      
+      if (fs.existsSync(logFilePath)) {
+        const logsContent = fs.readFileSync(logFilePath, 'utf8');
+        logs = JSON.parse(logsContent);
+      }
+      
+      logs.push({
+        timestamp: new Date().toISOString(),
+        imageId,
+        filename,
+        generationTimeMs: generationTime,
+        promptLength: prompt.length,
+        modelVersion,
+        parameters: input
+      });
+      
+      fs.writeFileSync(logFilePath, JSON.stringify(logs, null, 2), 'utf8');
+    } catch (logError) {
+      console.warn("Failed to log image generation:", logError);
+    }
     
     // Return the local URL
     return `/output/${filename}`;
   } catch (error) {
     console.error("Error generating image with Replicate:", error);
     
-    // Return fallback image if generation fails
-    const fallbackImage = prompt.includes("front") 
-      ? "/output/fallback_front.png"
-      : "/output/fallback_back.png";
+    // Log failed attempts
+    try {
+      const errorLogPath = path.join(imageLogsDir, 'failed_generations.json');
+      let errorLogs = [];
+      
+      if (fs.existsSync(errorLogPath)) {
+        const logsContent = fs.readFileSync(errorLogPath, 'utf8');
+        errorLogs = JSON.parse(logsContent);
+      }
+      
+      errorLogs.push({
+        timestamp: new Date().toISOString(),
+        error: error.message,
+        prompt: prompt.substring(0, 200) + "..." // Log just the beginning to avoid massive logs
+      });
+      
+      fs.writeFileSync(errorLogPath, JSON.stringify(errorLogs, null, 2), 'utf8');
+    } catch (logError) {
+      console.warn("Failed to log image generation error:", logError);
+    }
+    
+    // Look for fallback image - if the front view or combined image fails
+    const fallbackImage = "/output/fallback_jersey.png";
       
     // Return the fallback image or throw the error
     if (fs.existsSync(path.join(process.cwd(), fallbackImage.substring(1)))) {
@@ -237,7 +394,7 @@ export async function generateKitImageWithReplicate(prompt: string): Promise<str
       return fallbackImage;
     }
     
-    // If no fallback, rethrow the error
-    throw error;
+    // If no fallback exists, throw an error with a detailed message
+    throw new Error(`Failed to generate jersey image: ${error.message}. Please try again with different design parameters.`);
   }
 }
