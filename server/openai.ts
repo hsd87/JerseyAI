@@ -4,8 +4,12 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import Replicate from "replicate";
 
-// Import the smart prompt builder
+// Import the smart prompt builder and color utilities
 import { generateSmartPrompt } from './lib/promptBuilder';
+import { convertToDescriptiveColor } from './utils/colorUtils';
+
+// Initialize OpenAI client
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Export the prompt generation options interface for external use
 export interface GenerateKitPromptOptions {
@@ -41,7 +45,11 @@ async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<s
     secondaryColor 
   } = options;
   
-  // Create a simple prompt format that doesn't rely on any logic or external calls
+  // Convert colors to more descriptive terms
+  const primaryColorDesc = convertToDescriptiveColor(primaryColor);
+  const secondaryColorDesc = convertToDescriptiveColor(secondaryColor);
+  
+  // Create a simple prompt format that doesn't rely on any complex logic
   return `⸻
 
 Prompt:
@@ -63,21 +71,21 @@ Constructed from a high-performance poly-elastane blend with appropriate ventila
 ⸻
 
 🎨 Color Scheme
-        • Primary Color: ${primaryColor}
-        • Secondary Color: ${secondaryColor}
+        • Primary Color: ${primaryColorDesc}
+        • Secondary Color: ${secondaryColorDesc}
         • Accent: White trim and dark contours
 
 ⸻
 
 🎨 Design Language
 
-The jersey features a modern, sport-authentic design with the primary and secondary colors appropriately placed for ${sport} traditions.
+The jersey features a modern, sport-authentic design with the ${primaryColorDesc} as the base and ${secondaryColorDesc} accents placed according to ${sport} traditions.
 
 ⸻
 
 🧩 Panel & Trim Breakdown
-        • Front Body: Sport-appropriate design in primary and secondary colors
-        • Back Body: Clean player name and number placement
+        • Front Body: Sport-appropriate design in ${primaryColorDesc} with ${secondaryColorDesc} detailing
+        • Back Body: Clean player name and number placement with ${secondaryColorDesc} numerals
 
 ⸻
 
@@ -91,7 +99,7 @@ The jersey features a modern, sport-authentic design with the primary and second
 
 🌐 Design Mood & Cohesion
 
-A professional, competition-ready ${sport} jersey design with modern styling.
+A professional, competition-ready ${sport} jersey design with modern styling, optimized for display and visualization.
 `;
 }
 
