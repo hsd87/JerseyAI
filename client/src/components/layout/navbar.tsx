@@ -37,6 +37,9 @@ export default function Navbar() {
               <Link href="/" className={`px-3 py-2 rounded-md text-sm font-medium ${location === '/' ? 'bg-gray-100' : 'hover:bg-gray-100'} transition-colors`}>
                 Home
               </Link>
+              <Link href="/jersey-editor" className={`px-3 py-2 rounded-md text-sm font-medium ${location === '/jersey-editor' ? 'bg-gray-100' : 'hover:bg-gray-100'} transition-colors`}>
+                Jersey Editor
+              </Link>
               <button className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors">
                 Gallery
               </button>
@@ -112,6 +115,9 @@ export default function Navbar() {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link href="/" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/' ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}>
               Home
+            </Link>
+            <Link href="/jersey-editor" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/jersey-editor' ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}>
+              Jersey Editor
             </Link>
             <button className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">
               Gallery

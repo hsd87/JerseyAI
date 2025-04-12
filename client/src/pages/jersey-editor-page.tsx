@@ -8,9 +8,9 @@ export default function JerseyEditorPage() {
   
   // Set some example images when the component mounts
   useEffect(() => {
-    // Example jersey images - replace with your actual front/back images
-    const frontImageUrl = '/placeholder-front.jpg';
-    const backImageUrl = '/placeholder-back.jpg';
+    // Use our SVG jersey templates
+    const frontImageUrl = '/placeholder-front.svg';
+    const backImageUrl = '/placeholder-back.svg';
     
     setImages(frontImageUrl, backImageUrl);
   }, [setImages]);

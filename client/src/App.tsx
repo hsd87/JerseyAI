@@ -15,6 +15,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 // Lazy-loaded components
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
 const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
+const JerseyEditorPage = React.lazy(() => import('./pages/jersey-editor-page'));
 
 // Main application component that handles routing and subscription updates
 function AppContent() {
@@ -49,6 +50,7 @@ function AppContent() {
           <ProtectedRoute path="/dashboard" component={DashboardPage} />
           <ProtectedRoute path="/checkout" component={CheckoutPage} />
           <ProtectedRoute path="/subscribe" component={SubscribePage} />
+          <Route path="/jersey-editor" component={JerseyEditorPage} />
           <Route component={NotFound} />
         </Switch>
       </React.Suspense>
