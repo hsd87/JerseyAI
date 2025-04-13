@@ -325,5 +325,115 @@
       "extra_lora_scale": 0.69,
       "extra_lora": ""
     }
+  },
+  {
+    "timestamp": "2025-04-13T01:40:26.556Z",
+    "imageId": "0f3459ee-870d-44bd-91cf-2a9c81839d85",
+    "filename": "jersey_0f3459ee-870d-44bd-91cf-2a9c81839d85.png",
+    "generationTimeMs": 8771,
+    "promptLength": 1553,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsoccerkit for esports, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The esports jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a esports-specific design with appropriate structure and fit for the sport.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a high-performance poly-elastane blend with appropriate ventilation and structure for esports.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: #0062ff\n        • Secondary Color: #222020\n        • Accent: White trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe jersey features a modern, sport-authentic design with the #0062ff as the base and #222020 accents placed according to esports traditions.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n        • Front Body: Sport-appropriate design in #0062ff with #222020 detailing\n        • Back Body: Clean player name and number placement with #222020 numerals\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n⸻\n\n🌐 Design Mood & Cohesion\n\nA professional, competition-ready esports jersey design with modern styling, optimized for display and visualization.\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-13T01:40:57.547Z",
+    "imageId": "93e86e16-d7ff-466c-9599-ecc865ab3a85",
+    "filename": "jersey_93e86e16-d7ff-466c-9599-ecc865ab3a85.png",
+    "generationTimeMs": 7617,
+    "promptLength": 1553,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsoccerkit for esports, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The esports jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a esports-specific design with appropriate structure and fit for the sport.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a high-performance poly-elastane blend with appropriate ventilation and structure for esports.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: #0062ff\n        • Secondary Color: #222020\n        • Accent: White trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe jersey features a modern, sport-authentic design with the #0062ff as the base and #222020 accents placed according to esports traditions.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n        • Front Body: Sport-appropriate design in #0062ff with #222020 detailing\n        • Back Body: Clean player name and number placement with #222020 numerals\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n⸻\n\n🌐 Design Mood & Cohesion\n\nA professional, competition-ready esports jersey design with modern styling, optimized for display and visualization.\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-13T01:44:05.179Z",
+    "imageId": "cca9748f-25df-404e-aa96-7e7796935356",
+    "filename": "jersey_cca9748f-25df-404e-aa96-7e7796935356.png",
+    "generationTimeMs": 8176,
+    "promptLength": 1553,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsoccerkit for esports, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The esports jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a esports-specific design with appropriate structure and fit for the sport.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a high-performance poly-elastane blend with appropriate ventilation and structure for esports.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: #0062ff\n        • Secondary Color: #222020\n        • Accent: White trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe jersey features a modern, sport-authentic design with the #0062ff as the base and #222020 accents placed according to esports traditions.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n        • Front Body: Sport-appropriate design in #0062ff with #222020 detailing\n        • Back Body: Clean player name and number placement with #222020 numerals\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n⸻\n\n🌐 Design Mood & Cohesion\n\nA professional, competition-ready esports jersey design with modern styling, optimized for display and visualization.\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-13T01:44:42.896Z",
+    "imageId": "9cc6029f-44f4-4696-8d14-295fa6e7c52f",
+    "filename": "jersey_9cc6029f-44f4-4696-8d14-295fa6e7c52f.png",
+    "generationTimeMs": 7596,
+    "promptLength": 1553,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsoccerkit for esports, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The esports jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a esports-specific design with appropriate structure and fit for the sport.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a high-performance poly-elastane blend with appropriate ventilation and structure for esports.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: #0062ff\n        • Secondary Color: #222020\n        • Accent: White trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe jersey features a modern, sport-authentic design with the #0062ff as the base and #222020 accents placed according to esports traditions.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n        • Front Body: Sport-appropriate design in #0062ff with #222020 detailing\n        • Back Body: Clean player name and number placement with #222020 numerals\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n⸻\n\n🌐 Design Mood & Cohesion\n\nA professional, competition-ready esports jersey design with modern styling, optimized for display and visualization.\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-13T01:46:48.324Z",
+    "imageId": "53d670a4-48dc-4776-a433-c1de3da09ec8",
+    "filename": "jersey_53d670a4-48dc-4776-a433-c1de3da09ec8.png",
+    "generationTimeMs": 9726,
+    "promptLength": 1553,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "⸻\n\nPrompt:\n\nA pfsoccerkit for esports, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The esports jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.\n\n⸻\n\n🧍‍♂️ Garment Structure\n\nThe jersey is a esports-specific design with appropriate structure and fit for the sport.\n\n⸻\n\n🧵 Fabric & Texture\n\nConstructed from a high-performance poly-elastane blend with appropriate ventilation and structure for esports.\n\n⸻\n\n🎨 Color Scheme\n        • Primary Color: #0062ff\n        • Secondary Color: #222020\n        • Accent: White trim and dark contours\n\n⸻\n\n🎨 Design Language\n\nThe jersey features a modern, sport-authentic design with the #0062ff as the base and #222020 accents placed according to esports traditions.\n\n⸻\n\n🧩 Panel & Trim Breakdown\n        • Front Body: Sport-appropriate design in #0062ff with #222020 detailing\n        • Back Body: Clean player name and number placement with #222020 numerals\n\n⸻\n\n🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)\n        • Jersey front left chest: Team crest\n        • Jersey front right chest: Sponsor logo\n        • Upper back (below collar): Player name\n        • Back center: Large number\n\n⸻\n\n🌐 Design Mood & Cohesion\n\nA professional, competition-ready esports jersey design with modern styling, optimized for display and visualization.\n",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
   }
 ]

@@ -19,70 +19,79 @@ export interface GenerateKitPromptOptions {
   designNotes?: string;
 }
 
-// Sample prompt template that serves as a structural guide
-const samplePrompt = `⸻
-
-Prompt:
-
-A pfsoccerkit for soccer, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The soccer jersey and shorts are presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the uniform, front and back.
+// Detailed jersey design prompt template
+const basePrompt = `A pfsoccerkit soccer jersey, shown in two aligned views — front (left) and back (right) — against a clean white studio background in a floating, mannequin-free layout, optimized for elite sportswear catalog presentation. The jersey is the sole focus, with no shorts, socks, or accessories.
 
 ⸻
 
-🧍‍♂️ Garment Structure
+🧵 Construction & Form
 
-The uniform consists of a short-sleeved soccer jersey and tapered mid-thigh athletic shorts. The jersey features a hybrid mandarin V-collar, angular shoulder seams, and a form-fitting streamlined cut through the torso. The shorts include sculpted side panels, a reinforced waistband, and slit hems for dynamic movement.
+The jersey is built with an athletic cut-and-sew panel system, tailored for high-mobility match play and visual layering. It includes:
+        •       Modern hybrid V-neck collar with angular contour
+        •       Set-in short sleeves with segmented print zones
+        •       Slight drop-tail hem and tapered waist
+        •       Full garment optimized for sublimated graphics and contrast motion visuals
 
 ⸻
 
-🧵 Fabric & Texture
-
-Constructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.
+🧪 Material & Texture Zones
+        •       Front body: Dual-fiber polyknit with a low-gloss tech-mesh surface
+        •       Side panels: Matte performance lycra, built to contrast the central gloss texture
+        •       Sleeves: Textured tri-blend poly with ribbed visual stretch zones
+        •       Stitching: Reinforced flatlock seams with contrast topstitching
+        •       Hemline: Double-needle finish with tonal trim
 
 ⸻
 
 🎨 Color Scheme
-        • Primary Color: deep royal blue
-        • Secondary Color: vibrant scarlet red
-        • Accent: Ice white trim and dark contours
+        •       Primary: Storm graphite black
+        •       Secondary: Pulse red
+        •       Accent Layers: Glitch white, spectral cyan, matte silver
 
 ⸻
 
-🎨 Design Language
+🎯 Front Design – Motion Graphic
 
-The front of the jersey features an elegant yet modern circuit crest pattern, radiating outward from the chest center in vibrant scarlet red, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in vibrant scarlet red with subtle dotted patterns near the hem.
-
-The back of the jersey includes a vibrant scarlet red vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large vibrant scarlet red numerals outlined in white. A deep deep royal blue halo gradient behind the number adds tonal contrast.
-
-⸻
-
-🩳 Shorts Design
-
-Shorts are deep royal blue with angular vibrant scarlet red side panels, shaped like descending wedges that taper toward the knee. A thin white trim outlines the bottom hem and side slits. Rear panel shaping follows the glute contour with internal stitching and a slight back yoke drop. The left thigh displays a vibrant scarlet red team crest; the right thigh features an optional player number or minimal icon.
+The front body explodes with a multi-layered motion burst graphic, engineered to create a sense of controlled chaos and speed.
+        •       A diagonal vector blast erupts from the lower left hem, extending upward to the right shoulder in layered angular shards
+        •       The core of the burst is pulse red, surrounded by flickering cyan echo lines and jagged glitch-white overlays
+        •       Matte silver vapor trails stretch behind the shards, giving a sense of layered depth and motion
+        •       A central breathable zone runs down the chest in storm graphite, framed by asymmetrical edges
+        •       Sleeves include streaking accents that mirror the core burst, wrapping slightly toward the triceps
 
 ⸻
 
-🧩 Panel & Trim Breakdown
-        • Collar: hybrid mandarin V-collar in deep royal blue with vibrant scarlet red edge taping
-        • Sleeves: Matte deep royal blue with dotted vibrant scarlet red cuff details
-        • Front Body: Circuit crest-centered vibrant scarlet red burst, angled white slash
-        • Back Body: Vertical vibrant scarlet red tech spine with clean typography block
-        • Shorts: Sculpted fit with angular vibrant scarlet red inserts and hem detailing
+🎯 Back Design – Extended Echo Pattern
+
+The back view mirrors the burst logic in a subtler, more spacious layout, built for number clarity:
+        •       A clean graphite field dominates the upper back to host player name and number
+        •       The echoed motion pattern emerges from the lower right hem, sweeping up toward the left shoulder blade
+        •       Light digital glitches and split-pulse arcs fade upward along the spine
+        •       Underarm panel lines continue seamlessly from the front, providing design wraparound
 
 ⸻
 
-🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)
-        • Jersey front left chest: Team crest
-        • Jersey front right chest: Sponsor logo
-        • Upper back (below collar): Player name
-        • Back center: Large number
-        • Shorts left thigh: Team crest
-        • Shorts right thigh: Player number or secondary crest
+🧩 Trim & Panel Detailing
+        •       Neckline: Angular hybrid V in pulse red with a silver inner binding strip
+        •       Sleeve cuffs: Dual-layer rib in glitch white with cyan piping
+        •       Side panels: Full contrast lycra in matte graphite with sublimated pattern bleed
+        •       Seams: All front-to-back transitions are matched and continuous
 
 ⸻
 
-🌐 Design Mood & Cohesion
+🏷️ Brand/Print Zones (Clean or Placeholder)
+        •       Front left chest: Emblem or club crest zone
+        •       Front right chest: Brand or sponsor logo
+        •       Back top: Player name block
+        •       Back center: Sublimated number space
+        •       Left sleeve: Optional badge zone
+        •       Right sleeve: Secondary graphic or tech icon
 
-The design is bold, distinctive, and meticulously engineered — merging the power of tradition with the precision of modern performancewear. The vibrant scarlet red-on-deep royal blue palette evokes prestige, while the circuit patterning adds a tech-forward identity. This uniform is ideal for trophy-season campaigns, limited-edition drops, or teams with a legacy-driven brand story.
+⸻
+
+🌐 Design Intent & Feel
+
+This jersey is built to evoke energy, speed, and visual disruption. The dynamic layout uses directional shards, motion echoes, and techno-glitch accents to create a kit that feels alive on the field. It's perfect for elite matchday gear, esports collabs, or urban street kit drops — high-performance in motion and in mindset.
 `;
 
 export async function generateKitPrompt(options: GenerateKitPromptOptions): Promise<string> {
@@ -124,33 +133,34 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
   
   // The instruction for OpenAI to generate a proper prompt
   const promptGenerationInstruction = `
-You are a highly skilled AI assistant specializing in generating production-ready prompts for image generation models based on user form inputs.
+You are a sports jersey design expert who creates detailed prompts for AI image generation.
 
-Your job is to take a given "sample prompt" as a template, and then recreate it in detail using the "form inputs" provided.
+🧾 TASKS:
+1. Take the BASE PROMPT provided and adapt it to the user's FORM INPUTS
+2. Keep the exact same structure and section dividers from the BASE PROMPT
+3. ALWAYS include the token "pfsoccerkit" even when changing the sport
+4. Make sport-specific adaptations (basketball jerseys must be sleeveless, soccer has short sleeves, etc.)
+5. Adjust color scheme to use the user's PRIMARY and SECONDARY colors
+6. Adapt design elements to match the user's chosen sport while keeping the detailed description style
+7. Return ONLY a JSON object with a single "prompt" key containing your adapted text
 
-🧾 Instructions:
-- Use the **sample prompt as your structural guide**.
-- Adapt and rewrite the content using the **provided form input** values.
-- The **prompt must always include the token "pfsoccerkit"**, even if the sport changes.
-- Make **contextual changes** based on the sport (e.g. basketball jerseys must be sleeveless).
-- Be extremely detailed in the garment construction, materials, and design elements.
-- Add intelligent detail for:
-  • front and back design
-  • sleeve variations (front, back, cuffs)
-  • fabric textures and technical structure
-  • placement of logos, numbers, patterns
-  • design motifs and color blends
-- Do **not paraphrase blindly** — understand the sport's kit format and **adjust intelligently**.
-- Maintain the same format and section dividers (⸻, 🎨, 🧍‍♂️, 🧵, etc.) from the sample.
+IMPORTANT SPORT-SPECIFIC NOTES:
+- Basketball: Always sleeveless design, wide armholes, focus on motion graphics for dynamic play
+- Soccer: Short sleeves, focus on team identity and technical performance elements
+- Rugby: Reinforced collar and shoulders, durable materials
+- American Football: Structured fit for pad accommodation, reinforced seams
+- Esports: Modern styling with neon accents, digital patterns, focus on branding zones
+- Baseball: Distinctive button front, contrast sleeves
+- Hockey: Performance cut for over-padding, reinforced hem
 
-👩‍🎨 Sample Prompt (Template):
-${samplePrompt}
+BASE PROMPT:
+${basePrompt}
 
-📋 Form Inputs (from user):
+FORM INPUTS:
 ${JSON.stringify(formInputs)}
 
-🎯 Now generate an enhanced AI image prompt with all changes applied, and return as:
-{ "prompt": "..." }
+Respond only with:
+{ "prompt": "your adapted prompt goes here" }
 `;
 
   try {
