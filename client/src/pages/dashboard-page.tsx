@@ -268,30 +268,30 @@ export default function DashboardPage() {
                   <p className="text-red-500">Error loading orders. Please try again.</p>
                 </div>
               ) : orders && orders.length > 0 ? (
-                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
-                  <table className="min-w-full divide-y divide-gray-300">
-                    <thead className="bg-gray-50">
+                <div className="overflow-hidden border border-gray-200 rounded-xl shadow-sm">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50/70">
                       <tr>
-                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                        <th scope="col" className="py-3 pl-4 pr-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:pl-6">
                           Order ID
                         </th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Date
                         </th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Total
                         </th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Status
                         </th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Actions
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
                       {orders.map((order) => (
-                        <tr key={order.id}>
+                        <tr key={order.id} className="hover:bg-gray-50/60 transition-colors">
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                             #{order.id}
                           </td>
@@ -302,26 +302,26 @@ export default function DashboardPage() {
                             {formatCurrency(order.totalAmount)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                               {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                             </span>
                           </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 space-x-2">
                             <Link href={`/orders/${order.id}`}>
-                              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/5 rounded-full">
                                 View Details
                               </Button>
                             </Link>
                             {order.pdfUrl && (
                               <a href={order.pdfUrl} target="_blank" rel="noopener noreferrer">
-                                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
-                                  Download PDF
+                                <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/5 rounded-full">
+                                  <i className="fas fa-file-pdf mr-1"></i> PDF
                                 </Button>
                               </a>
                             )}
                             {order.trackingId && (
-                              <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-800">
-                                Track Order
+                              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/5 rounded-full">
+                                <i className="fas fa-truck mr-1"></i> Track
                               </Button>
                             )}
                           </td>
@@ -359,8 +359,8 @@ export default function DashboardPage() {
               ) : designs && designs.filter(d => d.isFavorite).length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {designs.filter(d => d.isFavorite).map((design) => (
-                    <Card key={design.id} className="overflow-hidden">
-                      <div className="relative h-48 bg-gray-100">
+                    <Card key={design.id} className="overflow-hidden border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                      <div className="relative h-52 bg-gray-50">
                         {design.frontImageUrl ? (
                           <img
                             src={design.frontImageUrl}
@@ -374,24 +374,24 @@ export default function DashboardPage() {
                         )}
                         <button
                           onClick={() => handleToggleFavorite(design)}
-                          className="absolute top-2 right-2 bg-white p-2 rounded-full shadow hover:bg-gray-100"
+                          className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-colors"
                         >
-                          <i className="fas fa-heart text-red-500"></i>
+                          <i className="fas fa-heart text-primary"></i>
                         </button>
                       </div>
-                      <CardHeader>
-                        <CardTitle className="font-sora">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-medium">
                           {design.sport.charAt(0).toUpperCase() + design.sport.slice(1)} Kit
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="text-xs text-gray-500">
                           Created on {formatDate(design.createdAt)}
                         </CardDescription>
                       </CardHeader>
-                      <CardFooter className="flex justify-between">
+                      <CardFooter className="flex justify-between pt-2">
                         <Link href="/">
                           <Button
                             variant="outline"
-                            className="text-sm"
+                            className="text-sm rounded-full border-gray-200 text-gray-700 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
                             onClick={() => handleEditDesign(design)}
                           >
                             <i className="fas fa-pencil-alt mr-1"></i> Edit
@@ -399,7 +399,7 @@ export default function DashboardPage() {
                         </Link>
                         <Button
                           variant="ghost"
-                          className="text-sm text-red-500 hover:text-red-700 hover:bg-red-50"
+                          className="text-sm rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50"
                           onClick={() => handleDeleteDesign(design.id)}
                         >
                           <i className="fas fa-trash mr-1"></i> Delete
@@ -427,89 +427,92 @@ export default function DashboardPage() {
             {/* Subscription Tab */}
             <TabsContent value="subscription">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className={`border-2 ${user?.subscriptionTier === "free" ? "border-black" : "border-gray-200"}`}>
-                  <CardHeader>
-                    <CardTitle>Free Tier</CardTitle>
-                    <CardDescription>Basic jersey design capabilities</CardDescription>
+                <Card className={`border ${user?.subscriptionTier === "free" ? "bg-gray-50/50 border-gray-300" : "border-gray-200"} rounded-xl shadow-sm overflow-hidden`}>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-xl">Free Tier</CardTitle>
+                    <CardDescription className="text-sm text-gray-500">Basic jersey design capabilities</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="mb-4">
-                      <span className="text-3xl font-bold">$0</span>
+                  <CardContent className="pb-6">
+                    <div className="mb-6">
+                      <span className="text-4xl font-medium">$0</span>
                       <span className="text-gray-500 ml-1">/month</span>
                     </div>
-                    <ul className="space-y-3">
+                    <ul className="space-y-3 text-sm">
                       <li className="flex items-center">
-                        <i className="fas fa-check text-green-500 mr-2"></i>
+                        <i className="fas fa-check text-primary mr-2.5"></i>
                         <span>6 design generations per month</span>
                       </li>
                       <li className="flex items-center">
-                        <i className="fas fa-check text-green-500 mr-2"></i>
+                        <i className="fas fa-check text-primary mr-2.5"></i>
                         <span>Basic customization options</span>
                       </li>
                       <li className="flex items-center">
-                        <i className="fas fa-check text-green-500 mr-2"></i>
+                        <i className="fas fa-check text-primary mr-2.5"></i>
                         <span>Standard rendering queue</span>
                       </li>
                       <li className="flex items-center">
-                        <i className="fas fa-check text-green-500 mr-2"></i>
+                        <i className="fas fa-check text-primary mr-2.5"></i>
                         <span>Regular pricing on orders</span>
                       </li>
                     </ul>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="pt-2 pb-6">
                     {user?.subscriptionTier === "free" ? (
-                      <Button disabled className="w-full bg-gray-300 text-gray-700 cursor-not-allowed">
+                      <Button disabled className="w-full rounded-full bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed h-10">
                         Current Plan
                       </Button>
                     ) : (
-                      <Button className="w-full bg-black hover:bg-gray-800">
+                      <Button className="w-full rounded-full bg-white text-gray-900 border border-gray-300 hover:bg-gray-50 h-10">
                         Downgrade
                       </Button>
                     )}
                   </CardFooter>
                 </Card>
 
-                <Card className={`border-2 ${user?.subscriptionTier === "pro" ? "border-[#39FF14]" : "border-gray-200"}`}>
-                  <CardHeader>
+                <Card className={`border ${user?.subscriptionTier === "pro" ? "border-primary/30 bg-primary/5" : "border-gray-200"} rounded-xl shadow-sm overflow-hidden relative`}>
+                  {user?.subscriptionTier === "pro" && (
+                    <div className="absolute top-0 right-0 left-0 h-1 bg-primary"></div>
+                  )}
+                  <CardHeader className="pb-4">
                     <div className="flex justify-between items-center">
-                      <CardTitle>Pro Tier</CardTitle>
+                      <CardTitle className="text-xl">Pro Tier</CardTitle>
                       {user?.subscriptionTier === "pro" && (
-                        <Badge className="bg-[#39FF14] text-black">CURRENT</Badge>
+                        <Badge className="bg-primary/10 text-primary border-primary">CURRENT</Badge>
                       )}
                     </div>
-                    <CardDescription>Premium jersey design experience</CardDescription>
+                    <CardDescription className="text-sm text-gray-500">Premium jersey design experience</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="mb-4">
-                      <span className="text-3xl font-bold">$9</span>
+                  <CardContent className="pb-6">
+                    <div className="mb-6">
+                      <span className="text-4xl font-medium">$9</span>
                       <span className="text-gray-500 ml-1">/month</span>
                     </div>
-                    <ul className="space-y-3">
+                    <ul className="space-y-3 text-sm">
                       <li className="flex items-center">
-                        <i className="fas fa-check text-green-500 mr-2"></i>
+                        <i className="fas fa-check text-primary mr-2.5"></i>
                         <span className="font-medium">Unlimited design generations</span>
                       </li>
                       <li className="flex items-center">
-                        <i className="fas fa-check text-green-500 mr-2"></i>
+                        <i className="fas fa-check text-primary mr-2.5"></i>
                         <span className="font-medium">Advanced customization options</span>
                       </li>
                       <li className="flex items-center">
-                        <i className="fas fa-check text-green-500 mr-2"></i>
+                        <i className="fas fa-check text-primary mr-2.5"></i>
                         <span className="font-medium">Priority rendering queue</span>
                       </li>
                       <li className="flex items-center">
-                        <i className="fas fa-check text-green-500 mr-2"></i>
+                        <i className="fas fa-check text-primary mr-2.5"></i>
                         <span className="font-medium">15% discount on all orders</span>
                       </li>
                     </ul>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="pt-2 pb-6">
                     {user?.subscriptionTier === "pro" ? (
-                      <Button disabled className="w-full bg-gray-300 text-gray-700 cursor-not-allowed">
+                      <Button disabled className="w-full rounded-full bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed h-10">
                         Current Plan
                       </Button>
                     ) : (
-                      <Button className="w-full bg-[#39FF14] text-black hover:bg-opacity-80">
+                      <Button className="w-full rounded-full bg-primary text-white hover:bg-primary/90 h-10">
                         Upgrade to Pro
                       </Button>
                     )}
@@ -519,38 +522,46 @@ export default function DashboardPage() {
 
               {/* Subscription Details */}
               {user?.subscriptionTier === "pro" && (
-                <Card className="mt-8">
-                  <CardHeader>
-                    <CardTitle>Subscription Details</CardTitle>
+                <Card className="mt-8 border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                  <CardHeader className="pb-4 border-b border-gray-100">
+                    <CardTitle className="text-xl font-medium">Subscription Details</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6">
+                  <CardContent className="py-6">
+                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Status</dt>
-                        <dd className="mt-1 text-sm text-gray-900">Active</dd>
+                        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</dt>
+                        <dd className="mt-1 text-sm text-gray-900 flex items-center">
+                          <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                          Active
+                        </dd>
                       </div>
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Next billing date</dt>
+                        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">Next billing date</dt>
                         <dd className="mt-1 text-sm text-gray-900">
                           {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Payment method</dt>
-                        <dd className="mt-1 text-sm text-gray-900">Visa ending in 4242</dd>
+                        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">Payment method</dt>
+                        <dd className="mt-1 text-sm text-gray-900 flex items-center">
+                          <i className="fab fa-cc-visa text-blue-600 mr-2"></i>
+                          Visa ending in 4242
+                        </dd>
                       </div>
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Billing address</dt>
+                        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">Billing address</dt>
                         <dd className="mt-1 text-sm text-gray-900">
                           1234 Main St, San Francisco, CA 94110
                         </dd>
                       </div>
                     </dl>
                   </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button variant="outline">Update Payment Method</Button>
-                    <Button variant="ghost" className="text-red-500 hover:text-red-700 hover:bg-red-50">
-                      Cancel Subscription
+                  <CardFooter className="pt-2 pb-6 flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0">
+                    <Button variant="outline" className="rounded-full border-gray-300 text-gray-700 hover:bg-gray-50">
+                      <i className="fas fa-credit-card mr-2"></i> Update Payment Method
+                    </Button>
+                    <Button variant="ghost" className="rounded-full text-red-500 hover:text-red-600 hover:bg-red-50">
+                      <i className="fas fa-ban mr-2"></i> Cancel Subscription
                     </Button>
                   </CardFooter>
                 </Card>
