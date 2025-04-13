@@ -20,6 +20,8 @@ export interface GenerateKitPromptOptions {
 }
 
 export async function generateKitPrompt(options: GenerateKitPromptOptions): Promise<string> {
+  console.log("generateKitPrompt received options:", JSON.stringify(options, null, 2));
+  
   // Extract all form inputs
   const { 
     sport, 
@@ -35,6 +37,8 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
   // Format colors with hex: prefix if they are hex values
   const formattedPrimaryColor = primaryColor.startsWith('#') ? `hex:${primaryColor}` : primaryColor;
   const formattedSecondaryColor = secondaryColor.startsWith('#') ? `hex:${secondaryColor}` : secondaryColor;
+  
+  console.log(`Processing design for ${sport} with colors: ${formattedPrimaryColor}, ${formattedSecondaryColor}`);
   
   // Comprehensive instructions for OpenAI
   const promptGenerationInstruction = `

@@ -35,10 +35,11 @@ const initialFormValues: DesignFormValues = {
   sport: 'soccer',
   kitType: 'jerseyShorts',
   primaryColor: '#3B82F6',
-  secondaryColor: '#FFFFFF',
+  secondaryColor: '#FF4040',
   sleeveStyle: 'short',
   collarType: 'crew',
-  patternStyle: 'solid'
+  patternStyle: 'solid',
+  designNotes: '' // Add empty designNotes to prevent undefined values
 };
 
 export const useDesignStore = create<DesignStore>((set) => ({

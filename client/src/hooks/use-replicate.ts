@@ -34,11 +34,12 @@ export function useReplicate() {
         description: "This may take up to 30-60 seconds while we create your jersey design.",
       });
 
-      // Then, generate images for it
+      // Then, generate images for it - pass form data to ensure it has the latest values
+      console.log("Sending form data to generate API:", formData);
       const generateRes = await apiRequest(
         "POST", 
         `/api/designs/${designRecord.id}/generate`, 
-        {}
+        { formData }
       );
       return await generateRes.json();
     },

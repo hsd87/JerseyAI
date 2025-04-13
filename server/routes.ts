@@ -65,17 +65,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const { generateKitPrompt, generateJerseyImageWithReplicate } = await import("./openai");
         
+        // Check if there's form data in the request that should override DB values
+        const formData = req.body.formData;
+        console.log("Received form data:", formData);
+        
+        // Use form data if available, otherwise fallback to database values
+        const options = {
+          sport: formData?.sport || design.sport,
+          kitType: formData?.kitType || design.kitType,
+          primaryColor: formData?.primaryColor || design.primaryColor,
+          secondaryColor: formData?.secondaryColor || design.secondaryColor,
+          sleeveStyle: formData?.sleeveStyle || design.sleeveStyle || undefined,
+          collarType: formData?.collarType || design.collarType || undefined,
+          patternStyle: formData?.patternStyle || design.patternStyle || undefined,
+          designNotes: formData?.designNotes || design.designNotes || undefined
+        };
+        
+        console.log("Using kit options for prompt generation:", options);
+        
         // Generate a combined prompt using the template through OpenAI
-        const enhancedPrompt = await generateKitPrompt({
-          sport: design.sport,
-          kitType: design.kitType,
-          primaryColor: design.primaryColor,
-          secondaryColor: design.secondaryColor,
-          sleeveStyle: design.sleeveStyle || undefined,
-          collarType: design.collarType || undefined,
-          patternStyle: design.patternStyle || undefined,
-          designNotes: design.designNotes || undefined
-        });
+        const enhancedPrompt = await generateKitPrompt(options);
 
         console.log("Enhanced template prompt generated:", enhancedPrompt);
         
