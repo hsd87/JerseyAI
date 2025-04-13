@@ -19,80 +19,7 @@ export interface GenerateKitPromptOptions {
   designNotes?: string;
 }
 
-// Detailed jersey design prompt template
-const basePrompt = `A pfsoccerkit soccer jersey, shown in two aligned views — front (left) and back (right) — against a clean white studio background in a floating, mannequin-free layout, optimized for elite sportswear catalog presentation. The jersey is the sole focus, with no shorts, socks, or accessories.
-
-⸻
-
-🧵 Construction & Form
-
-The jersey is built with an athletic cut-and-sew panel system, tailored for high-mobility match play and visual layering. It includes:
-        •       Modern hybrid V-neck collar with angular contour
-        •       Set-in short sleeves with segmented print zones
-        •       Slight drop-tail hem and tapered waist
-        •       Full garment optimized for sublimated graphics and contrast motion visuals
-
-⸻
-
-🧪 Material & Texture Zones
-        •       Front body: Dual-fiber polyknit with a low-gloss tech-mesh surface
-        •       Side panels: Matte performance lycra, built to contrast the central gloss texture
-        •       Sleeves: Textured tri-blend poly with ribbed visual stretch zones
-        •       Stitching: Reinforced flatlock seams with contrast topstitching
-        •       Hemline: Double-needle finish with tonal trim
-
-⸻
-
-🎨 Color Scheme
-        •       Primary: Storm graphite black
-        •       Secondary: Pulse red
-        •       Accent Layers: Glitch white, spectral cyan, matte silver
-
-⸻
-
-🎯 Front Design – Motion Graphic
-
-The front body explodes with a multi-layered motion burst graphic, engineered to create a sense of controlled chaos and speed.
-        •       A diagonal vector blast erupts from the lower left hem, extending upward to the right shoulder in layered angular shards
-        •       The core of the burst is pulse red, surrounded by flickering cyan echo lines and jagged glitch-white overlays
-        •       Matte silver vapor trails stretch behind the shards, giving a sense of layered depth and motion
-        •       A central breathable zone runs down the chest in storm graphite, framed by asymmetrical edges
-        •       Sleeves include streaking accents that mirror the core burst, wrapping slightly toward the triceps
-
-⸻
-
-🎯 Back Design – Extended Echo Pattern
-
-The back view mirrors the burst logic in a subtler, more spacious layout, built for number clarity:
-        •       A clean graphite field dominates the upper back to host player name and number
-        •       The echoed motion pattern emerges from the lower right hem, sweeping up toward the left shoulder blade
-        •       Light digital glitches and split-pulse arcs fade upward along the spine
-        •       Underarm panel lines continue seamlessly from the front, providing design wraparound
-
-⸻
-
-🧩 Trim & Panel Detailing
-        •       Neckline: Angular hybrid V in pulse red with a silver inner binding strip
-        •       Sleeve cuffs: Dual-layer rib in glitch white with cyan piping
-        •       Side panels: Full contrast lycra in matte graphite with sublimated pattern bleed
-        •       Seams: All front-to-back transitions are matched and continuous
-
-⸻
-
-🏷️ Brand/Print Zones (Clean or Placeholder)
-        •       Front left chest: Emblem or club crest zone
-        •       Front right chest: Brand or sponsor logo
-        •       Back top: Player name block
-        •       Back center: Sublimated number space
-        •       Left sleeve: Optional badge zone
-        •       Right sleeve: Secondary graphic or tech icon
-
-⸻
-
-🌐 Design Intent & Feel
-
-This jersey is built to evoke energy, speed, and visual disruption. The dynamic layout uses directional shards, motion echoes, and techno-glitch accents to create a kit that feels alive on the field. It's perfect for elite matchday gear, esports collabs, or urban street kit drops — high-performance in motion and in mindset.
-`;
+// No template - we'll generate prompts from scratch
 
 export async function generateKitPrompt(options: GenerateKitPromptOptions): Promise<string> {
   // Extract all form inputs
@@ -133,17 +60,28 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
   
   // The instruction for OpenAI to generate a proper prompt
   const promptGenerationInstruction = `
-Adapt this jersey design template for a ${formInputs.sport} jersey. 
-Use ${formInputs.primaryColor} as the primary color and ${formInputs.secondaryColor} as the secondary color.
-Always keep the token "pfsoccerkit" in your response.
-Make the jersey design appropriate for ${formInputs.sport} (e.g. basketball jerseys must be sleeveless).
-Maintain the exact same structure and section headings.
+✅ Agent Instructions – ProJersey Prompt Generator
 
-TEMPLATE:
-${basePrompt}
+I need you to create a detailed, professional prompt for generating a ${formInputs.sport} jersey image. I'll give you the key information, and you'll craft a complete description.
 
-Respond with only a JSON object in this format:
-{ "prompt": "your adapted prompt text here" }
+FORM INPUTS:
+- Sport: ${formInputs.sport}
+- Primary Color: ${formInputs.primaryColor}
+- Secondary Color: ${formInputs.secondaryColor}
+${sleeveStyle ? `- Sleeve Style: ${sleeveStyle}` : ''}
+${collarType ? `- Collar Type: ${collarType}` : ''}
+${patternStyle ? `- Pattern Style: ${patternStyle}` : ''}
+${designNotes ? `- Design Notes: ${designNotes}` : ''}
+
+IMPORTANT RULES:
+1. Always include "pfsoccerkit" in your prompt, even for non-soccer jerseys
+2. Describe the jersey as showing both front and back views side by side
+3. Make sport-specific adaptations (basketball = sleeveless, soccer = short sleeves, etc.)
+4. Use technical garment terminology and vivid descriptions
+5. Respond with ONLY a JSON object containing a "prompt" key with your text
+
+Your response should contain ONLY:
+{ "prompt": "your detailed jersey description" }
 `;
 
   try {
