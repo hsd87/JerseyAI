@@ -192,9 +192,9 @@ Return ONLY a JSON object: { "prompt": "your detailed jersey description" }
       return generateBasicPrompt(options);
     }
     
-    // Call OpenAI to generate a prompt
+    // Call OpenAI to generate a prompt using the 4.5-preview model
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", 
+      model: "gpt-4-0125-preview", // Using GPT-4.5 Preview
       messages: [
         { role: "system", content: promptGenerationInstruction },
         { role: "user", content: "Generate prompt" }
