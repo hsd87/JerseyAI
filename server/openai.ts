@@ -119,12 +119,12 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
     designNotes: designNotes ? "Provided" : "None" 
   }, null, 2));
   
-  // Prepare form inputs as JSON string for OpenAI
+  // Prepare form inputs as JSON string for OpenAI with hex prefix for colors
   const formInputs = {
     sport,
     kitType,
-    primaryColor,
-    secondaryColor,
+    primaryColor: primaryColor.startsWith('#') ? `hex:${primaryColor}` : primaryColor,
+    secondaryColor: secondaryColor.startsWith('#') ? `hex:${secondaryColor}` : secondaryColor,
     ...(sleeveStyle ? { sleeveStyle } : {}),
     ...(collarType ? { collarType } : {}),
     ...(patternStyle ? { patternStyle } : {}),
@@ -266,21 +266,21 @@ Constructed from a high-performance poly-elastane blend with appropriate ventila
 ⸻
 
 🎨 Color Scheme
-        • Primary Color: ${primaryColor}
-        • Secondary Color: ${secondaryColor}
+        • Primary Color: ${primaryColor.startsWith('#') ? `hex:${primaryColor}` : primaryColor}
+        • Secondary Color: ${secondaryColor.startsWith('#') ? `hex:${secondaryColor}` : secondaryColor}
         • Accent: White trim and dark contours
 
 ⸻
 
 🎨 Design Language
 
-The jersey features a modern, sport-authentic design with the ${primaryColor} as the base and ${secondaryColor} accents placed according to ${sport} traditions.
+The jersey features a modern, sport-authentic design with the ${primaryColor.startsWith('#') ? `hex:${primaryColor}` : primaryColor} as the base and ${secondaryColor.startsWith('#') ? `hex:${secondaryColor}` : secondaryColor} accents placed according to ${sport} traditions.
 
 ⸻
 
 🧩 Panel & Trim Breakdown
-        • Front Body: Sport-appropriate design in ${primaryColor} with ${secondaryColor} detailing
-        • Back Body: Clean player name and number placement with ${secondaryColor} numerals
+        • Front Body: Sport-appropriate design in ${primaryColor.startsWith('#') ? `hex:${primaryColor}` : primaryColor} with ${secondaryColor.startsWith('#') ? `hex:${secondaryColor}` : secondaryColor} detailing
+        • Back Body: Clean player name and number placement with ${secondaryColor.startsWith('#') ? `hex:${secondaryColor}` : secondaryColor} numerals
 
 ⸻
 
