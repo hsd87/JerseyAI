@@ -10,7 +10,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, logoutMutation } = useAuth();
-  const subscription = useSubscription(); 
+  const subscription = useSubscription();
 
   // Add scroll detection for navbar shadow
   useEffect(() => {
@@ -31,20 +31,12 @@ export default function Navbar() {
   }, []);
 
   const toggleMenu = () => {
-    const newMenuState = !isMenuOpen;
-    setIsMenuOpen(newMenuState);
-    
-    // Prevent body scroll when menu is open
-    document.body.style.overflow = newMenuState ? 'hidden' : 'auto';
-    
-    // For debugging
-    console.log("Mobile menu toggled:", newMenuState);
+    setIsMenuOpen(!isMenuOpen);
   };
 
   // Close mobile menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
-    document.body.style.overflow = 'auto';
   }, [location]);
 
   const handleLogout = () => {
