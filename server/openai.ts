@@ -4,11 +4,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import Replicate from "replicate";
 
-// Import the smart prompt builder and color utilities
-import { generateSmartPrompt } from './lib/promptBuilder';
-import { convertToDescriptiveColor } from './utils/colorUtils';
-
-// Initialize OpenAI client
+// Initialize OpenAI client - using the newest model
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Export the prompt generation options interface for external use
@@ -23,20 +19,213 @@ export interface GenerateKitPromptOptions {
   designNotes?: string;
 }
 
+// Sample prompt template that serves as a structural guide
+const samplePrompt = `⸻
+
+Prompt:
+
+A pfsoccerkit for soccer, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The soccer jersey and shorts are presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the uniform, front and back.
+
+⸻
+
+🧍‍♂️ Garment Structure
+
+The uniform consists of a short-sleeved soccer jersey and tapered mid-thigh athletic shorts. The jersey features a hybrid mandarin V-collar, angular shoulder seams, and a form-fitting streamlined cut through the torso. The shorts include sculpted side panels, a reinforced waistband, and slit hems for dynamic movement.
+
+⸻
+
+🧵 Fabric & Texture
+
+Constructed from a dual-zone poly-elastane blend, the jersey incorporates diamond-knit mesh on the torso and smooth matte spandex sleeves. Side panels are embedded with vented hex-weave textures. The material has a low-luster finish, designed to reflect controlled lighting and rich color. Seams are bonded and flatlocked, with detail piping following panel boundaries.
+
+⸻
+
+🎨 Color Scheme
+        • Primary Color: deep royal blue
+        • Secondary Color: vibrant scarlet red
+        • Accent: Ice white trim and dark contours
+
+⸻
+
+🎨 Design Language
+
+The front of the jersey features an elegant yet modern circuit crest pattern, radiating outward from the chest center in vibrant scarlet red, resembling a digital emblem. Thin contour lines wrap along the ribs and upper chest in a tech-geometry. A sharp white slash element cuts diagonally across the midsection, forming a bold angle that intersects the main motif. Sleeve cuffs are trimmed in vibrant scarlet red with subtle dotted patterns near the hem.
+
+The back of the jersey includes a vibrant scarlet red vertical spine pattern, composed of interlocking bands. The player name is positioned just below the collar in clean uppercase text, with the number centered mid-back in large vibrant scarlet red numerals outlined in white. A deep deep royal blue halo gradient behind the number adds tonal contrast.
+
+⸻
+
+🩳 Shorts Design
+
+Shorts are deep royal blue with angular vibrant scarlet red side panels, shaped like descending wedges that taper toward the knee. A thin white trim outlines the bottom hem and side slits. Rear panel shaping follows the glute contour with internal stitching and a slight back yoke drop. The left thigh displays a vibrant scarlet red team crest; the right thigh features an optional player number or minimal icon.
+
+⸻
+
+🧩 Panel & Trim Breakdown
+        • Collar: hybrid mandarin V-collar in deep royal blue with vibrant scarlet red edge taping
+        • Sleeves: Matte deep royal blue with dotted vibrant scarlet red cuff details
+        • Front Body: Circuit crest-centered vibrant scarlet red burst, angled white slash
+        • Back Body: Vertical vibrant scarlet red tech spine with clean typography block
+        • Shorts: Sculpted fit with angular vibrant scarlet red inserts and hem detailing
+
+⸻
+
+🏷️ Logo & Branding Placement (Sublimated or Heat-Pressed)
+        • Jersey front left chest: Team crest
+        • Jersey front right chest: Sponsor logo
+        • Upper back (below collar): Player name
+        • Back center: Large number
+        • Shorts left thigh: Team crest
+        • Shorts right thigh: Player number or secondary crest
+
+⸻
+
+🌐 Design Mood & Cohesion
+
+The design is bold, distinctive, and meticulously engineered — merging the power of tradition with the precision of modern performancewear. The vibrant scarlet red-on-deep royal blue palette evokes prestige, while the circuit patterning adds a tech-forward identity. This uniform is ideal for trophy-season campaigns, limited-edition drops, or teams with a legacy-driven brand story.
+`;
+
 export async function generateKitPrompt(options: GenerateKitPromptOptions): Promise<string> {
-  // Use the new smart prompt generator for enhanced sport-specific prompts
+  // Extract all form inputs
+  const { 
+    sport, 
+    kitType, 
+    primaryColor, 
+    secondaryColor,
+    sleeveStyle,
+    collarType,
+    patternStyle,
+    designNotes 
+  } = options;
+  
+  // Log the inputs we're sending to OpenAI
+  console.log(`Generating prompt for ${sport} jersey with inputs:`, JSON.stringify({
+    sport,
+    kitType,
+    primaryColor,
+    secondaryColor,
+    sleeveStyle: sleeveStyle || "[default]",
+    collarType: collarType || "[default]",
+    patternStyle: patternStyle || "[default]",
+    designNotes: designNotes ? "Provided" : "None" 
+  }, null, 2));
+  
+  // Prepare form inputs as JSON string for OpenAI
+  const formInputs = {
+    sport,
+    kitType,
+    primaryColor,
+    secondaryColor,
+    ...(sleeveStyle ? { sleeveStyle } : {}),
+    ...(collarType ? { collarType } : {}),
+    ...(patternStyle ? { patternStyle } : {}),
+    ...(designNotes ? { designNotes } : {})
+  };
+  
+  // The instruction for OpenAI to generate a proper prompt
+  const promptGenerationInstruction = `
+You are a highly skilled AI assistant specializing in generating production-ready prompts for image generation models based on user form inputs.
+
+Your job is to take a given "sample prompt" as a template, and then recreate it in detail using the "form inputs" provided.
+
+🧾 Instructions:
+- Use the **sample prompt as your structural guide**.
+- Adapt and rewrite the content using the **provided form input** values.
+- The **prompt must always include the token "pfsoccerkit"**, even if the sport changes.
+- Make **contextual changes** based on the sport (e.g. basketball jerseys must be sleeveless).
+- Be extremely detailed in the garment construction, materials, and design elements.
+- Add intelligent detail for:
+  • front and back design
+  • sleeve variations (front, back, cuffs)
+  • fabric textures and technical structure
+  • placement of logos, numbers, patterns
+  • design motifs and color blends
+- Do **not paraphrase blindly** — understand the sport's kit format and **adjust intelligently**.
+- Maintain the same format and section dividers (⸻, 🎨, 🧍‍♂️, 🧵, etc.) from the sample.
+
+👩‍🎨 Sample Prompt (Template):
+${samplePrompt}
+
+📋 Form Inputs (from user):
+${JSON.stringify(formInputs)}
+
+🎯 Now generate an enhanced AI image prompt with all changes applied, and return as:
+{ "prompt": "..." }
+`;
+
   try {
-    console.log("Using smart prompt builder for enhanced sport-specific prompt generation");
-    return await generateSmartPrompt(options);
+    console.log("Calling OpenAI to generate enhanced prompt...");
+    
+    // Call OpenAI to generate an enhanced prompt
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // Using the newest model
+      messages: [
+        { role: "system", content: promptGenerationInstruction },
+        { role: "user", content: "Please generate the prompt based on the instructions and inputs above." }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    // Extract and log the generated prompt
+    const content = response.choices[0].message.content;
+    if (!content) {
+      console.warn("OpenAI returned empty content. Falling back to direct prompt.");
+      return generateBasicPrompt(options);
+    }
+
+    try {
+      // Parse the content to get the prompt
+      const jsonContent = JSON.parse(content);
+      const enhancedPrompt = jsonContent.prompt;
+      
+      // Log generated prompt (truncated for log readability)
+      console.log("Generated prompt (first 100 chars):", enhancedPrompt.substring(0, 100) + "...");
+      
+      // Create logs directory if it doesn't exist
+      const promptLogsDir = path.join(process.cwd(), 'logs');
+      if (!fs.existsSync(promptLogsDir)) {
+        fs.mkdirSync(promptLogsDir, { recursive: true });
+      }
+      
+      // Log successful prompts for future analysis
+      try {
+        const promptLogFile = path.join(promptLogsDir, 'successful_prompts.json');
+        let existingLogs: any[] = [];
+        
+        if (fs.existsSync(promptLogFile)) {
+          const logsContent = fs.readFileSync(promptLogFile, 'utf8');
+          existingLogs = JSON.parse(logsContent);
+        }
+        
+        // Add this prompt to logs
+        existingLogs.push({
+          timestamp: new Date().toISOString(),
+          sport,
+          primaryColor,
+          secondaryColor,
+          kitType,
+          prompt: enhancedPrompt
+        });
+        
+        fs.writeFileSync(promptLogFile, JSON.stringify(existingLogs, null, 2), 'utf8');
+      } catch (logError) {
+        console.warn("Failed to log prompt:", logError);
+      }
+      
+      return enhancedPrompt;
+    } catch (parseError) {
+      console.error("Failed to parse OpenAI response as JSON:", parseError);
+      console.warn("Falling back to basic prompt.");
+      return generateBasicPrompt(options);
+    }
   } catch (error) {
-    console.error("Error using smart prompt builder:", error);
-    console.warn("Using legacy prompt generation as fallback");
-    // Fall back to more basic prompt if smart prompt generation fails
+    console.error("Error generating enhanced prompt with OpenAI:", error);
+    console.warn("Falling back to basic prompt.");
     return generateBasicPrompt(options);
   }
 }
 
-// Legacy prompt generation function as fallback
+// Fallback prompt generation if OpenAI call fails
 async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<string> {
   const { 
     sport, 
@@ -45,16 +234,12 @@ async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<s
     secondaryColor 
   } = options;
   
-  // Convert colors to more descriptive terms
-  const primaryColorDesc = convertToDescriptiveColor(primaryColor);
-  const secondaryColorDesc = convertToDescriptiveColor(secondaryColor);
-  
-  // Create a simple prompt format that doesn't rely on any complex logic
+  // Create a simple prompt format that doesn't rely on OpenAI
   return `⸻
 
 Prompt:
 
-A pfsportskit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The ${sport} jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.
+A pfsoccerkit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a crisp white studio background. The ${sport} jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals. Both views are perfectly centered, evenly spaced, and fully visible. No cleats, socks, or models — just the jersey, front and back.
 
 ⸻
 
@@ -71,21 +256,21 @@ Constructed from a high-performance poly-elastane blend with appropriate ventila
 ⸻
 
 🎨 Color Scheme
-        • Primary Color: ${primaryColorDesc}
-        • Secondary Color: ${secondaryColorDesc}
+        • Primary Color: ${primaryColor}
+        • Secondary Color: ${secondaryColor}
         • Accent: White trim and dark contours
 
 ⸻
 
 🎨 Design Language
 
-The jersey features a modern, sport-authentic design with the ${primaryColorDesc} as the base and ${secondaryColorDesc} accents placed according to ${sport} traditions.
+The jersey features a modern, sport-authentic design with the ${primaryColor} as the base and ${secondaryColor} accents placed according to ${sport} traditions.
 
 ⸻
 
 🧩 Panel & Trim Breakdown
-        • Front Body: Sport-appropriate design in ${primaryColorDesc} with ${secondaryColorDesc} detailing
-        • Back Body: Clean player name and number placement with ${secondaryColorDesc} numerals
+        • Front Body: Sport-appropriate design in ${primaryColor} with ${secondaryColor} detailing
+        • Back Body: Clean player name and number placement with ${secondaryColor} numerals
 
 ⸻
 
