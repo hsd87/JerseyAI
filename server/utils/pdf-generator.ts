@@ -13,8 +13,8 @@ export async function generateOrderPDF(order: Order): Promise<string> {
   const pdfDir = path.join(process.cwd(), 'orders', 'pdfs');
   await fs.ensureDir(pdfDir);
   
-  // Create a unique filename based on the order UUID
-  const pdfFilePath = path.join(pdfDir, `order_${order.uuid}.pdf`);
+  // Create a filename based on the order ID
+  const pdfFilePath = path.join(pdfDir, `order_${order.id}.pdf`);
   
   // Create a write stream for the PDF file
   const stream = fs.createWriteStream(pdfFilePath);
@@ -38,7 +38,7 @@ export async function generateOrderPDF(order: Order): Promise<string> {
   doc.moveDown();
   
   // Order details
-  doc.fontSize(12).text(`Order #: ${order.uuid}`);
+  doc.fontSize(12).text(`Order #: ${order.id}`);
   doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`);
   doc.text(`Status: ${order.status}`);
   doc.moveDown();
@@ -60,9 +60,9 @@ export async function generateOrderPDF(order: Order): Promise<string> {
   // Sport and design information
   doc.fontSize(16).text('Design Information', { underline: true });
   doc.fontSize(12).text(`Sport: ${order.sport}`);
-  doc.text(`Kit Type: ${order.kitType}`);
-  if (order.customTeamName) {
-    doc.text(`Team Name: ${order.customTeamName}`);
+  doc.text(`Kit Type: ${order.orderDetails?.packageType || 'Jersey'}`);
+  if (order.orderDetails?.teamName) {
+    doc.text(`Team Name: ${order.orderDetails.teamName}`);
   }
   doc.moveDown();
   
