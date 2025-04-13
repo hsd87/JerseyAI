@@ -144,25 +144,29 @@ export default function DesignEditor() {
   // Loading or initial state
   if (isGenerating) {
     return (
-      <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200 text-center">
-          <div className="animate-pulse flex flex-col items-center space-y-6">
-            <div className="rounded-xl bg-gray-200 h-64 w-full"></div>
+      <div className="space-y-4 sm:space-y-6">
+        <div className="bg-white rounded-lg shadow-sm p-5 sm:p-8 border border-gray-200 text-center">
+          <div className="flex flex-col items-center space-y-5">
+            <div className="rounded-xl bg-gray-100 h-48 sm:h-64 w-full animate-pulse"></div>
             
-            <div className="flex justify-center">
-              <div className="inline-flex space-x-1">
-                <span className="w-3 h-3 bg-[#39FF14] rounded-full animate-bounce" style={{ animationDelay: "-0.32s" }}></span>
-                <span className="w-3 h-3 bg-[#39FF14] rounded-full animate-bounce" style={{ animationDelay: "-0.16s" }}></span>
-                <span className="w-3 h-3 bg-[#39FF14] rounded-full animate-bounce"></span>
+            <div className="flex justify-center mt-2">
+              <div className="inline-flex items-center space-x-2">
+                <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+                <span className="text-sm font-medium text-gray-700">Generating your design</span>
               </div>
             </div>
             
-            <div className="text-lg font-sora text-gray-800">
+            <div className="text-base sm:text-lg font-sora text-gray-800">
               Your kit design is being generated...
             </div>
             <p className="text-sm text-gray-600 max-w-md">
               Our AI is creating a unique design based on your preferences. This typically takes 20-30 seconds.
             </p>
+            
+            <div className="flex flex-wrap justify-center gap-2 w-full mt-2">
+              <div className="h-2 bg-gray-200 rounded-full w-3/4 animate-pulse"></div>
+              <div className="h-2 bg-gray-200 rounded-full w-1/2 animate-pulse"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -206,10 +210,10 @@ export default function DesignEditor() {
 
   // Design generated - show combined editor
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       {/* Editor Header */}
-      <div className="bg-gray-50 border-b border-gray-200 px-6 py-3 flex justify-between items-center">
-        <h2 className="text-lg font-sora font-medium">
+      <div className="bg-gray-50 border-b border-gray-200 px-4 sm:px-6 py-3 flex flex-wrap sm:flex-nowrap justify-between items-center gap-3">
+        <h2 className="text-base sm:text-lg font-sora font-medium text-gray-800">
           {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)} Jersey Designer
         </h2>
         <div className="flex items-center gap-2">
@@ -217,22 +221,22 @@ export default function DesignEditor() {
             variant="outline" 
             size="sm" 
             onClick={handleSaveDesign}
-            className="text-xs"
+            className="text-xs h-8 rounded-full"
             disabled={isSaving}
           >
-            <Save className="h-3 w-3 mr-1" /> Save
+            <Save className="h-3 w-3 mr-1" /> Save Design
           </Button>
         </div>
       </div>
       
       {/* Editor Body */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-6">
         {/* Canvas Area - Combined View */}
-        <div className="p-4 flex items-center justify-center bg-gray-50">
+        <div className="p-3 sm:p-4 flex items-center justify-center bg-gray-50">
           <div className="w-full max-w-2xl">
             <div 
               ref={canvasRef}
-              className="editor-container w-full relative rounded-lg overflow-hidden bg-white shadow-md border border-gray-300"
+              className="editor-container w-full relative rounded-lg overflow-hidden bg-white shadow-sm border border-gray-300"
               style={{ 
                 aspectRatio: aspectRatio,
                 maxHeight: '600px' 
@@ -281,7 +285,7 @@ export default function DesignEditor() {
               ))}
             </div>
             
-            <div className="flex justify-between mt-4">
+            <div className="flex flex-wrap justify-between gap-2 mt-4">
               <div className="text-xs text-gray-500">
                 Sport: {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)}
                 {formData.patternStyle && ` • Pattern: ${formData.patternStyle}`}
@@ -290,7 +294,7 @@ export default function DesignEditor() {
                 <Button 
                   size="sm" 
                   variant="outline"
-                  className="text-xs h-8"
+                  className="text-xs h-8 rounded-full"
                 >
                   <Download className="h-3 w-3 mr-1" /> Export
                 </Button>
@@ -300,30 +304,30 @@ export default function DesignEditor() {
         </div>
         
         {/* Tools Panel - Now below the image as requested */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-3 sm:p-4 border-t border-gray-200">
           <div className="max-w-2xl mx-auto">
             {/* Add Elements Section */}
-            <div className="mb-6">
+            <div className="mb-5">
               <h3 className="font-medium text-sm text-gray-700 mb-2">Add Elements</h3>
               <div className="flex flex-wrap gap-2">
                 <Button 
                   size="sm"
                   variant="outline"
-                  className="text-xs flex items-center"
+                  className="text-xs flex items-center rounded-full h-8"
                 >
                   <Type className="h-3 w-3 mr-1" /> Text
                 </Button>
                 <Button 
                   size="sm"
                   variant="outline"
-                  className="text-xs flex items-center"
+                  className="text-xs flex items-center rounded-full h-8"
                 >
                   <Hash className="h-3 w-3 mr-1" /> Number
                 </Button>
                 <Button 
                   size="sm"
                   variant="outline"
-                  className="text-xs flex items-center"
+                  className="text-xs flex items-center rounded-full h-8"
                 >
                   <Image className="h-3 w-3 mr-1" /> Logo
                 </Button>
@@ -331,14 +335,14 @@ export default function DesignEditor() {
             </div>
             
             {/* Text Tool Settings */}
-            <div className="mb-6">
+            <div className="mb-5">
               <h3 className="font-medium text-sm text-gray-700 mb-2">Text Settings</h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div>
                   <label className="block text-xs text-gray-600 mb-1">Text Content</label>
                   <Input 
                     type="text" 
-                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md" 
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
                     placeholder="Enter text" 
                     value={currentText}
                     onChange={(e) => setCurrentText(e.target.value)}
@@ -347,22 +351,22 @@ export default function DesignEditor() {
                 <div>
                   <label className="block text-xs text-gray-600 mb-1">Font</label>
                   <Select value={currentFont} onValueChange={setCurrentFont}>
-                    <SelectTrigger className="w-full text-xs h-8">
+                    <SelectTrigger className="w-full text-xs h-9">
                       <SelectValue placeholder="Select font" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[100]">
                       <SelectItem value="Arial">Arial</SelectItem>
                       <SelectItem value="Impact">Impact</SelectItem>
                       <SelectItem value="Helvetica">Helvetica</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Color</label>
                     <Input 
                       type="color" 
-                      className="w-full h-8 px-1 border border-gray-300 rounded-md" 
+                      className="w-full h-9 px-1 border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
                       value={currentColor}
                       onChange={(e) => setCurrentColor(e.target.value)}
                     />
@@ -370,10 +374,10 @@ export default function DesignEditor() {
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Size</label>
                     <Select value={currentSize} onValueChange={setCurrentSize}>
-                      <SelectTrigger className="w-full text-xs h-8">
+                      <SelectTrigger className="w-full text-xs h-9">
                         <SelectValue placeholder="Size" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-[100]">
                         <SelectItem value="small">Small</SelectItem>
                         <SelectItem value="medium">Medium</SelectItem>
                         <SelectItem value="large">Large</SelectItem>
@@ -383,7 +387,7 @@ export default function DesignEditor() {
                 </div>
                 <Button 
                   size="sm"
-                  className="w-full bg-black text-white px-2 py-1 rounded-md text-xs h-8"
+                  className="w-full bg-primary text-white px-4 py-2 rounded-full text-sm h-9"
                   onClick={handleAddText}
                 >
                   Add Text to Jersey
@@ -394,7 +398,7 @@ export default function DesignEditor() {
             {/* Help Section */}
             <div className="text-center">
               <p className="text-xs text-gray-600">
-                Click and drag elements to position them • Save your design before proceeding to order
+                Click and drag elements to position them • Use pinch gestures to zoom on mobile
               </p>
             </div>
           </div>
@@ -402,9 +406,9 @@ export default function DesignEditor() {
       </div>
       
       {/* Editor Footer */}
-      <div className="bg-gray-50 border-t border-gray-200 px-6 py-3 flex justify-end">
+      <div className="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-4 flex justify-between sm:justify-end">
         <Button 
-          className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm font-medium"
+          className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-full text-sm font-medium"
           onClick={handleProceedToOrder}
         >
           <ShoppingCart className="mr-2 h-4 w-4" /> Proceed to Order

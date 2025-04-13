@@ -61,8 +61,8 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-      <h2 className="font-sora font-medium text-xl mb-6">Design Your Kit</h2>
+    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
+      <h2 className="font-sora font-medium text-xl mb-4 sm:mb-6 text-gray-800">Design Your Kit</h2>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -118,7 +118,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           />
           
           {/* Color Selectors */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="primaryColor"
@@ -128,7 +128,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                   <FormControl>
                     <Input
                       type="color"
-                      className="h-10 w-full border border-gray-300 rounded-md"
+                      className="h-10 w-full border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
                       {...field}
                     />
                   </FormControl>
@@ -145,7 +145,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                   <FormControl>
                     <Input
                       type="color"
-                      className="h-10 w-full border border-gray-300 rounded-md"
+                      className="h-10 w-full border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
                       {...field}
                     />
                   </FormControl>
@@ -158,7 +158,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           {/* Dynamic Options Based on Sport - Soccer is default */}
           {form.watch("sport") === "soccer" && (
             <div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="sleeveStyle"
@@ -171,7 +171,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                             <SelectValue placeholder="Select sleeve style" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="z-[100]">
                           {sleeveOptions.map((sleeve) => (
                             <SelectItem key={sleeve} value={sleeve}>
                               {sleeve.charAt(0).toUpperCase() + sleeve.slice(1)} Sleeves
@@ -195,7 +195,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                             <SelectValue placeholder="Select collar type" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="z-[100]">
                           {collarOptions.map((collar) => (
                             <SelectItem key={collar} value={collar}>
                               {collar === "v" ? "V-Neck" : collar.charAt(0).toUpperCase() + collar.slice(1)} {collar !== "v" ? "Collar" : ""}
@@ -222,7 +222,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                             <SelectValue placeholder="Select pattern style" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="z-[100]">
                           {patternOptions.map((pattern) => (
                             <SelectItem key={pattern} value={pattern}>
                               {pattern.charAt(0).toUpperCase() + pattern.slice(1)}
@@ -250,7 +250,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                 <FormControl>
                   <Textarea
                     placeholder="I want a modern, geometric design inspired by urban architecture..."
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#39FF14] focus:border-[#39FF14]"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                     rows={3}
                     {...field}
                   />
@@ -264,7 +264,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           <div className="mt-6">
             <Button
               type="submit"
-              className="w-full bg-black text-white py-3 px-4 rounded-md font-medium hover:bg-gray-800 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14]"
+              className="w-full bg-primary text-white py-3 px-4 rounded-full font-medium hover:bg-primary/90 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               disabled={isGenerating || !user || (!subscription.isSubscribed && subscription.remainingDesigns <= 0)}
             >
               {isGenerating ? (
@@ -298,19 +298,24 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           
           {/* Subscription Upsell */}
           {user && !subscription.isSubscribed && (
-            <div className="bg-gray-50 border border-gray-200 rounded-md p-4 mt-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <i className="fas fa-bolt text-[#39FF14]"></i>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 mt-6">
+              <div className="flex flex-col sm:flex-row sm:items-start">
+                <div className="flex-shrink-0 mb-3 sm:mb-0">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <i className="fas fa-crown"></i>
+                  </div>
                 </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-gray-900">Upgrade to Pro</h3>
+                <div className="sm:ml-4">
+                  <h3 className="text-base font-medium text-gray-900">Upgrade to Pro</h3>
                   <div className="mt-1 text-sm text-gray-600">
                     <p>Get unlimited designs, 15% off orders, and priority rendering</p>
                   </div>
-                  <div className="mt-2">
-                    <Link href="/subscribe" className="text-sm font-medium text-black hover:text-[#39FF14]">
-                      $9/month - Subscribe <i className="fas fa-arrow-right ml-1"></i>
+                  <div className="mt-3">
+                    <Link 
+                      href="/subscribe" 
+                      className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-full transition-colors"
+                    >
+                      $9/month - Subscribe <i className="fas fa-arrow-right ml-2"></i>
                     </Link>
                   </div>
                 </div>
