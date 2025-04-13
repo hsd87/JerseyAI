@@ -164,26 +164,50 @@ Respond only with:
 `;
 
   try {
-    console.log("Calling OpenAI to generate enhanced prompt...");
+    console.log("DEBUG: About to call OpenAI to generate enhanced prompt...");
     
-    // Call OpenAI to generate an enhanced prompt
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // Using the newest model
-      messages: [
-        { role: "system", content: promptGenerationInstruction },
-        { role: "user", content: "Please generate the prompt based on the instructions and inputs above." }
-      ],
-      response_format: { type: "json_object" },
-    });
-
-    // Extract and log the generated prompt
-    const content = response.choices[0].message.content;
-    if (!content) {
-      console.warn("OpenAI returned empty content. Falling back to direct prompt.");
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("ERROR: OPENAI_API_KEY environment variable is not set!");
+      console.warn("Falling back to direct prompt generation due to missing API key.");
+      return generateBasicPrompt(options);
+    }
+    
+    let content: string | null = null;
+    
+    try {
+      console.log("DEBUG: OpenAI API Key check passed, actually calling API now");
+      
+      // Call OpenAI to generate an enhanced prompt
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // Using the newest model
+        messages: [
+          { role: "system", content: promptGenerationInstruction },
+          { role: "user", content: "Please generate the prompt based on the instructions and inputs above." }
+        ],
+        response_format: { type: "json_object" },
+      });
+      
+      console.log("DEBUG: OpenAI API call completed successfully");
+      
+      // Extract and log the generated prompt
+      content = response.choices[0].message.content;
+      console.log("DEBUG: Content received from OpenAI:", content ? content.substring(0, 50) + "..." : "No content");
+      
+      if (!content) {
+        console.warn("OpenAI returned empty content. Falling back to direct prompt.");
+        return generateBasicPrompt(options);
+      }
+    } catch (openaiError) {
+      console.error("ERROR calling OpenAI API:", openaiError);
+      console.warn("Falling back to direct prompt generation due to OpenAI API error.");
       return generateBasicPrompt(options);
     }
 
     try {
+      if (!content) {
+        throw new Error("Content is null after OpenAI call");
+      }
+      
       // Parse the content to get the prompt
       const jsonContent = JSON.parse(content);
       const enhancedPrompt = jsonContent.prompt;

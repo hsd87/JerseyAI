@@ -435,5 +435,93 @@
       "extra_lora_scale": 0.69,
       "extra_lora": ""
     }
+  },
+  {
+    "timestamp": "2025-04-13T01:59:39.765Z",
+    "imageId": "c98e4bbe-ad27-4976-b97b-9f67067c2f3b",
+    "filename": "jersey_c98e4bbe-ad27-4976-b97b-9f67067c2f3b.png",
+    "generationTimeMs": 8679,
+    "promptLength": 3179,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "A pfsoccerkit basketball jersey, shown in two aligned views — front (left) and back (right) — against a clean white studio background in a floating, mannequin-free layout, optimized for elite sportswear catalog presentation. The jersey is the sole focus, with no shorts, socks, or accessories.\n\n⸻\n\n🧵 Construction & Form\n\nThe jersey is built with an athletic cut-and-sew panel system, tailored for high-mobility match play and visual layering. It includes:\n        •       Modern crew neck collar with smooth contour\n        •       Sleeveless design with wide armholes for dynamic motion\n        •       Slight drop-tail hem and tapered waist\n        •       Full garment optimized for sublimated graphics and solid contrast visuals\n\n⸻\n\n🧪 Material & Texture Zones\n        •       Front body: Dual-fiber polyknit with a low-gloss tech-mesh surface\n        •       Side panels: Matte performance lycra, built to contrast the central gloss texture\n        •       Sleeves: N/A (sleeveless design for basketball)\n        •       Stitching: Reinforced flatlock seams with contrast topstitching\n        •       Hemline: Double-needle finish with tonal trim\n\n⸻\n\n🎨 Color Scheme\n        •       Primary: Brilliant neon yellow (hex:#fbff00)\n        •       Secondary: Vivid red (hex:#ff0000)\n        •       Accent Layers: Neutral white tones, soft charcoal gray\n\n⸻\n\n🎯 Front Design – Motion Graphic\n\nThe front body displays a sleek solid design, engineered to create a clean, stylish appearance.\n        •       A minimalist arc across the chest in vivid red over the neon yellow base\n        •       Subtle shadow effects give depth without clutter\n        •       Modern red side panel details align with the waist \n        •       A central breathable zone emphasizes the chest area for comfort\n        •       The wide armholes ensure free movement and match the core aesthetic\n\n⸻\n\n🎯 Back Design – Clean Focus Pattern\n\nThe back view provides simplicity, ensuring branding clarity:\n        •       A smooth neon yellow field dominates the upper back for player name and number\n        •       Minimal red accents emerge subtly at the lower back\n        •       Seamless transition from side panels enhance structure and design unity\n\n⸻\n\n🧩 Trim & Panel Detailing\n        •       Neckline: Crew neck in vivid red with a white inner lining\n        •       Side panels: Full contrast in red with precise transitions\n        •       Seams: All lines are smooth for a clean aesthetic\n\n⸻\n\n🏷️ Brand/Print Zones (Clean or Placeholder)\n        •       Front center chest: Emblem or team insignia zone\n        •       Front lower left: Brand or sponsor logo\n        •       Back top: Player name field\n        •       Back center: Number space\n        •       Side panels: Optional additional branding\n\n⸻\n\n🌐 Design Intent & Feel\n\nThis jersey is crafted to provide a blend of cleanliness and style, with an emphasis on a streamlined look. The integrity in design encourages focus on team identity and individual performance, making it an excellent choice for competitive play on the court or stylish street apparel. High-performance meets modern aesthetics in this basketball jersey design.",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-13T02:00:22.751Z",
+    "imageId": "bfff1736-a96b-4cb8-8264-37eab7b69f9b",
+    "filename": "jersey_bfff1736-a96b-4cb8-8264-37eab7b69f9b.png",
+    "generationTimeMs": 11443,
+    "promptLength": 2897,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "A pfsoccerkit basketball jersey, shown in two aligned views — front (left) and back (right) — against a clean white studio background in a floating, mannequin-free layout, optimized for elite sportswear catalog presentation. The jersey is the sole focus, with no shorts, socks, or accessories.\n\n⸻\n\n🧵 Construction & Form\n\nThe jersey is crafted with a sleek sleeveless design, tailored for high-mobility court play and visual layering. It includes:\n        •       Contemporary crew neck with a clean, rounded finish\n        •       Wide armholes with segmented print zones\n        •       Subtle elongated hem for an extended flow \n        •       Full garment optimized for flat color blocks and contrast visuals\n\n⸻\n\n🧪 Material & Texture Zones\n        •       Front body: Smooth poly-knit blend with a matte sheen for sharp appearance\n        •       Side panels: Performance mesh, enabling dynamic movement and airflow\n        •       Back panel: High-stretch fabric with a clean surface for graphics\n        •       Stitching: Reinforced seams with tonal topstitching for durability\n        •       Armholes: Precision finish for unrestricted arm movement\n\n⸻\n\n🎨 Color Scheme\n        •       Primary: Hex:#fbff00\n        •       Secondary: Hex:#ff0000\n        •       Accent Layers: Monochromatic blacks and whites\n\n⸻\n\n🎯 Front Design – Solid Composition\n\nThe front body showcases a clean and stylish layout designed for a modern impact.\n        •       A sleek, unbroken field of hex:#fbff00 extends across the chest area\n        •       Crisp hex:#ff0000 piping outlines the crew neck and armholes for visual emphasis\n        •       Minimalist brand zone featured on the left chest\n\n⸻\n\n🎯 Back Design – Streamlined Integration\n\nThe back view maintains a clean and professional appearance.\n        •       A solid hex:#fbff00 backdrop for maximum visibility of team number\n        •       Hex:#ff0000 applied at panel transitions delivering a sharp, focused look\n        •       Integrated mesh zones for breathability along the spine area\n\n⸻\n\n🧩 Trim & Panel Detailing\n        •       Neckline: Simple crew in hex:#ff0000 with a structured view\n        •       Armholes: Clean finish in hex:#ff0000 for uniform contrast\n        •       Side panels: Matte mesh with hex:#fbff00 for a sleek profile\n        •       Seam transitions: Continuous and fluid across the garment\n\n⸻\n\n🏷️ Brand/Print Zones (Clean or Placeholder)\n        •       Front left chest: Emblem or team crest zone\n        •       Front right chest: Brand or sponsor logo\n        •       Back top: Player number block\n\n⸻\n\n🌐 Design Intent & Feel\n\nThis basketball jersey is designed to project a sharp and modern look, emphasizing a clean and stylish appearance. The flat color scheme utilizes hex:#fbff00 and hex:#ff0000 to create a visually impactful kit for the court. It's ideal for high-performance play and urban trends.",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-13T02:02:56.597Z",
+    "imageId": "188cc318-b254-4550-9a9c-8abb214881ac",
+    "filename": "jersey_188cc318-b254-4550-9a9c-8abb214881ac.png",
+    "generationTimeMs": 10571,
+    "promptLength": 3306,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "A pfsoccerkit basketball jersey, shown in two aligned views — front (left) and back (right) — against a clean white studio background in a floating, mannequin-free layout, optimized for elite sportswear catalog presentation. The jersey is the sole focus, with no shorts, socks, or accessories.\n\n⸻\n\n🧵 Construction & Form\n\nThe jersey is built with a sleeveless cut-and-sew panel system, tailored for high-mobility match play and visual layering. It includes:\n        •       Modern crew neck collar with a clean round contour\n        •       Wide armholes for enhanced athletic movement\n        •       Straight hem with a slightly elongated back\n        •       Full garment optimized for sublimated graphics and contrast visuals\n\n⸻\n\n🧪 Material & Texture Zones\n        •       Front body: Soft-touch poly-knit with a matte surface\n        •       Side panels: Smooth performance lycra, built to complement the central texture\n        •       Shoulders: Reinforced poly fabric with flexible integrity\n        •       Stitching: Reinforced seams with contrast topstitching\n        •       Hemline: Single-needle finish with subtle tonal trim\n\n⸻\n\n🎨 Color Scheme\n        •       Primary: Neon yellow (hex:#fbff00)\n        •       Secondary: Bright red (hex:#ff0000)\n        •       Accent Layers: White, dark grey\n\n⸻\n\n🎯 Front Design – Clean and Stylish\n\nThe front body maintains a sleek solid color scheme, engineered for a minimalist yet impactful appearance.\n        •       A subtle diagonal contour line runs across the midsection, providing a modern touch\n        •       The primary neon yellow dominates the front, with streamlined red lateral inserts\n        •       A seamless integration of white accents adds crisp edges to the design\n        •       A central breathable zone is subtly incorporated to enhance comfort\n        •       Shoulder detail includes tonal streaks to add visual appeal\n\n⸻\n\n🎯 Back Design – Focused Minimalism\n\nThe back view continues the clean aesthetic, emphasizing player identification:\n        •       A controlled yellow panel covers the upper back to host player number\n        •       Minimalist red accent lines emerge, maintaining understated elegance\n        •       Light grey highlights add depth without overcrowding\n        •       Armhole lines are cleanly integrated into the overall design for flow continuity\n\n⸻\n\n🧩 Trim & Panel Detailing\n        •       Neckline: Smooth crew neck with tonal inner binding\n        •       Armholes: Dual-layer finish with decorative piping in bright red\n        •       Side panels: Complete contrast area in matte secondary color\n        •       Seams: Expertly matched for a sleek, continuous look\n\n⸻\n\n🏷️ Brand/Print Zones (Clean or Placeholder)\n        •       Front chest: Central emblem or sponsor logo\n        •       Upper back: Sublimated player name\n        •       Back center: Number block\n        •       Right shoulder: Optional badge zone\n        •       Left shoulder: Secondary graphic or branding element\n\n⸻\n\n🌐 Design Intent & Feel\n\nThis jersey is crafted to evoke a clean and stylish aesthetic. Its balanced and streamlined design employs minimalist elements and bold colors, making it suitable for both competitive play and street-style wear. High-performance in functionality and modern in style.",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
+  },
+  {
+    "timestamp": "2025-04-13T02:03:45.246Z",
+    "imageId": "622b346e-da4d-45d4-9e32-b2b703ee60c2",
+    "filename": "jersey_622b346e-da4d-45d4-9e32-b2b703ee60c2.png",
+    "generationTimeMs": 8512,
+    "promptLength": 3056,
+    "modelVersion": "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3",
+    "parameters": {
+      "prompt": "A pfsoccerkit basketball jersey, shown in two aligned views — front (left) and back (right) — against a clean white studio background in a floating, mannequin-free layout, optimized for elite sportswear catalog presentation. The jersey is the sole focus, with no shorts, socks, or accessories.\n\n⸻\n\n🧵 Construction & Form\n\nThe jersey is built with an athletic cut-and-sew panel system, tailored for high-mobility match play and visual layering. It includes:\n        •       Modern sleeveless design with wide armholes for dynamic motion\n        •       Crew neck collar with sleek contour\n        •       Slight drop-tail hem and tapered waist\n        •       Full garment optimized for sublimated graphics and contrast motion visuals\n\n⸻\n\n🧪 Material & Texture Zones\n        •       Front body: Dual-fiber polyknit with a low-gloss tech-mesh surface\n        •       Side panels: Matte performance lycra, built to contrast the central gloss texture\n        •       Shoulder straps: Textured tri-blend poly with ribbed visual stretch zones\n        •       Stitching: Reinforced flatlock seams with contrast topstitching\n        •       Hemline: Double-needle finish with tonal trim\n\n⸻\n\n🎨 Color Scheme\n        •       Primary: Vivid electric yellow (hex:#fbff00)\n        •       Secondary: Fiery red (hex:#ff0000)\n        •       Accent Layers: Glossy black, crisp white\n\n⸻\n\n🎯 Front Design – Motion Graphic\n\nThe front body features a solid design approach, embodying a clean and stylish look:\n        •       A central breathable zone in vivid electric yellow, framed by fiery red shoulder panels\n        •       Glossy black piping adds a sleek outline that emphasizes movement\n\n⸻\n\n🎯 Back Design – Extended Echo Pattern\n\nThe back view maintains the simplicity and elegance for clear player identification:\n        •       A dominant electric yellow field with a space for player name and number in contrasting black\n        •       Simple geometric accents near the hem in fiery red, adding visual interest without clutter\n\n⸻\n\n🧩 Trim & Panel Detailing\n        •       Neckline: Crew neck in vivid electric yellow with subtle white inner trim\n        •       Shoulder trims: Dual-layer in fiery red with black piping\n        •       Side panels: Full contrast lycra in matte red with seamless integration\n        •       Seams: All transitions are smooth and fluid\n\n⸻\n\n🏷️ Brand/Print Zones (Clean or Placeholder)\n        •       Front left chest: Emblem or team logo zone\n        •       Front right chest: Brand or sponsor logo\n        •       Upper back: Player name block\n        •       Back center: Number space\n        •       Left shoulder: Optional badge zone\n        •       Right shoulder: Secondary graphic or team insignia\n\n⸻\n\n🌐 Design Intent & Feel\n\nThis jersey is crafted to express a clean and stylish aesthetic, perfect for intense court action and urban street fashion. The blend of vivid colors with a focus on simplicity creates an elite look, suitable for high-performance basketball play and standout appearances on or off the court.",
+      "aspect_ratio": "3:2",
+      "prompt_strength": 0.8,
+      "model": "dev",
+      "num_outputs": 1,
+      "num_inference_steps": 28,
+      "guidance_scale": 2.9,
+      "output_format": "jpg",
+      "disable_safety_checker": false,
+      "lora_scale": 1.05,
+      "extra_lora_scale": 0.69,
+      "extra_lora": ""
+    }
   }
 ]
