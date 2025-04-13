@@ -133,34 +133,17 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
   
   // The instruction for OpenAI to generate a proper prompt
   const promptGenerationInstruction = `
-You are a sports jersey design expert who creates detailed prompts for AI image generation.
+Adapt this jersey design template for a ${formInputs.sport} jersey. 
+Use ${formInputs.primaryColor} as the primary color and ${formInputs.secondaryColor} as the secondary color.
+Always keep the token "pfsoccerkit" in your response.
+Make the jersey design appropriate for ${formInputs.sport} (e.g. basketball jerseys must be sleeveless).
+Maintain the exact same structure and section headings.
 
-🧾 TASKS:
-1. Take the BASE PROMPT provided and adapt it to the user's FORM INPUTS
-2. Keep the exact same structure and section dividers from the BASE PROMPT
-3. ALWAYS include the token "pfsoccerkit" even when changing the sport
-4. Make sport-specific adaptations (basketball jerseys must be sleeveless, soccer has short sleeves, etc.)
-5. Adjust color scheme to use the user's PRIMARY and SECONDARY colors
-6. Adapt design elements to match the user's chosen sport while keeping the detailed description style
-7. Return ONLY a JSON object with a single "prompt" key containing your adapted text
-
-IMPORTANT SPORT-SPECIFIC NOTES:
-- Basketball: Always sleeveless design, wide armholes, focus on motion graphics for dynamic play
-- Soccer: Short sleeves, focus on team identity and technical performance elements
-- Rugby: Reinforced collar and shoulders, durable materials
-- American Football: Structured fit for pad accommodation, reinforced seams
-- Esports: Modern styling with neon accents, digital patterns, focus on branding zones
-- Baseball: Distinctive button front, contrast sleeves
-- Hockey: Performance cut for over-padding, reinforced hem
-
-BASE PROMPT:
+TEMPLATE:
 ${basePrompt}
 
-FORM INPUTS:
-${JSON.stringify(formInputs)}
-
-Respond only with:
-{ "prompt": "your adapted prompt goes here" }
+Respond with only a JSON object in this format:
+{ "prompt": "your adapted prompt text here" }
 `;
 
   try {
