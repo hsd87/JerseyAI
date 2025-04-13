@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { CrownIcon, Menu, Moon, User, UserCircle, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useSubscription } from "@/hooks/use-subscription-store";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export default function Navbar() {
   const [location] = useLocation();

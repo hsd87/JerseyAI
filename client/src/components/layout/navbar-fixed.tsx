@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { CrownIcon, Menu, Moon, User, UserCircle, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useSubscription } from "@/hooks/use-subscription-store";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -23,10 +23,10 @@ export default function Navbar() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -35,7 +35,7 @@ export default function Navbar() {
     setIsMenuOpen(newMenuState);
     
     // Prevent body scroll when menu is open
-    document.body.style.overflow = newMenuState ? 'hidden' : 'auto';
+    document.body.style.overflow = newMenuState ? "hidden" : "auto";
     
     // For debugging
     console.log("Mobile menu toggled:", newMenuState);
@@ -44,7 +44,7 @@ export default function Navbar() {
   // Close mobile menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
-    document.body.style.overflow = 'auto';
+    document.body.style.overflow = "auto";
   }, [location]);
 
   const handleLogout = () => {
@@ -52,9 +52,10 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 ${scrolled ? 'shadow-sm' : ''} transition-shadow duration-300`}>
+    <nav className={`bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 ${scrolled ? "shadow-sm" : ""} transition-shadow duration-300`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
+          {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
@@ -63,12 +64,13 @@ export default function Navbar() {
             </div>
           </div>
           
+          {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-4 flex items-center space-x-7">
-              <Link href="/" className={`text-sm font-medium ${location === '/' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+              <Link href="/" className={`text-sm font-medium ${location === "/" ? "text-primary" : "text-gray-600 hover:text-gray-900"} transition-colors`}>
                 Home
               </Link>
-              <Link href="/designer" className={`text-sm font-medium ${location === '/designer' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+              <Link href="/designer" className={`text-sm font-medium ${location === "/designer" ? "text-primary" : "text-gray-600 hover:text-gray-900"} transition-colors`}>
                 AI Designer
               </Link>
               <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
@@ -81,6 +83,7 @@ export default function Navbar() {
                 How It Works
               </button>
               
+              {/* Auth buttons */}
               {user ? (
                 <>
                   {subscription.isSubscribed ? (
@@ -106,14 +109,15 @@ export default function Navbar() {
             </div>
           </div>
           
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center z-50">
             <button 
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary transition-colors"
+              className="inline-flex items-center justify-center p-2.5 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary transition-colors"
               aria-expanded={isMenuOpen}
+              style={{ touchAction: "manipulation" }}
             >
-              <span className="sr-only">{isMenuOpen ? 'Close menu' : 'Open menu'}</span>
+              <span className="sr-only">{isMenuOpen ? "Close menu" : "Open menu"}</span>
               {isMenuOpen ? (
                 <X className="block h-6 w-6" aria-hidden="true" />
               ) : (
@@ -122,6 +126,7 @@ export default function Navbar() {
             </button>
           </div>
           
+          {/* Desktop icons/user menu */}
           <div className="hidden md:flex items-center space-x-4">
             <button className="p-2 rounded-full text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary transition-colors">
               <span className="sr-only">Dark mode</span>
@@ -145,82 +150,82 @@ export default function Navbar() {
         </div>
       </div>
       
-      {/* Mobile menu, show/hide based on menu state */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="fixed inset-0 z-40 bg-black bg-opacity-25" onClick={toggleMenu}></div>
-          <div className="fixed inset-y-0 right-0 z-50 w-3/4 bg-white overflow-y-auto pb-12 shadow-xl">
-            <div className="px-5 pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="font-sora font-semibold text-lg">Menu</div>
-                <button
-                  onClick={toggleMenu}
-                  className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none"
-                >
-                  <X className="h-6 w-6" aria-hidden="true" />
-                </button>
-              </div>
+      {/* Mobile Menu */}
+      <div 
+        className={`md:hidden fixed inset-0 z-40 transition-opacity duration-300 ${isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      >
+        {/* Backdrop overlay */}
+        <div 
+          className="absolute inset-0 bg-black bg-opacity-40"
+          onClick={toggleMenu}
+          aria-hidden="true"
+        ></div>
+        
+        {/* Menu panel */}
+        <div 
+          className={`absolute inset-y-0 right-0 w-full max-w-sm bg-white transform transition-transform duration-300 ease-in-out ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
+          style={{ maxWidth: "85%" }}
+        >
+          <div className="h-full overflow-y-auto pb-12 pt-16 px-5">
+            <div className="space-y-4">
+              <Link href="/" className={`block py-3 text-base font-medium ${location === "/" ? "text-primary" : "text-gray-600"} transition-colors`}>
+                Home
+              </Link>
+              <Link href="/designer" className={`block py-3 text-base font-medium ${location === "/designer" ? "text-primary" : "text-gray-600"} transition-colors`}>
+                AI Designer
+              </Link>
+              <button className="block w-full text-left py-3 text-base font-medium text-gray-600 transition-colors">
+                Gallery
+              </button>
+              <button className="block w-full text-left py-3 text-base font-medium text-gray-600 transition-colors">
+                Pricing
+              </button>
+              <button className="block w-full text-left py-3 text-base font-medium text-gray-600 transition-colors">
+                How It Works
+              </button>
               
-              <div className="space-y-4 mt-6">
-                <Link href="/" className={`block py-3 text-base font-medium ${location === '/' ? 'text-primary' : 'text-gray-600'} transition-colors`}>
-                  Home
-                </Link>
-                <Link href="/designer" className={`block py-3 text-base font-medium ${location === '/designer' ? 'text-primary' : 'text-gray-600'} transition-colors`}>
-                  AI Designer
-                </Link>
-                <button className="block w-full text-left py-3 text-base font-medium text-gray-600 transition-colors">
-                  Gallery
-                </button>
-                <button className="block w-full text-left py-3 text-base font-medium text-gray-600 transition-colors">
-                  Pricing
-                </button>
-                <button className="block w-full text-left py-3 text-base font-medium text-gray-600 transition-colors">
-                  How It Works
-                </button>
-                
-                <div className="h-px bg-gray-200 my-4"></div>
-                
-                {user ? (
-                  <>
-                    {subscription.isSubscribed && (
-                      <div className="py-2">
-                        <Badge className="bg-primary/10 text-primary border-primary flex items-center gap-1 px-3 py-1">
-                          <CrownIcon className="h-4 w-4" />
-                          <span className="text-sm">Pro Member</span>
-                        </Badge>
-                      </div>
-                    )}
-                    <Link href="/dashboard" className="flex items-center py-3 text-base font-medium text-gray-600">
-                      <User className="h-5 w-5 mr-2" />
-                      Dashboard
-                    </Link>
-                    <Link href="/subscribe" className="flex items-center py-3 text-base font-medium text-gray-600">
-                      <CrownIcon className="h-5 w-5 mr-2" />
-                      {subscription.isSubscribed ? 'Manage Subscription' : 'Upgrade to Pro'}
-                    </Link>
-                    <button 
-                      onClick={handleLogout}
-                      className="flex items-center w-full text-left py-3 text-base font-medium text-gray-600"
-                    >
-                      <X className="h-5 w-5 mr-2" />
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <div className="pt-2">
-                    <Link 
-                      href="/auth" 
-                      className="block w-full bg-primary text-white py-3 px-4 rounded-full text-center text-base font-medium hover:bg-primary/90 transition-colors"
-                    >
-                      Sign In
-                    </Link>
-                  </div>
-                )}
-              </div>
+              <div className="h-px bg-gray-200 my-4"></div>
+              
+              {user ? (
+                <>
+                  {subscription.isSubscribed && (
+                    <div className="py-2">
+                      <Badge className="bg-primary/10 text-primary border-primary flex items-center gap-1 px-3 py-1">
+                        <CrownIcon className="h-4 w-4" />
+                        <span className="text-sm">Pro Member</span>
+                      </Badge>
+                    </div>
+                  )}
+                  <Link href="/dashboard" className="flex items-center py-3 text-base font-medium text-gray-600">
+                    <User className="h-5 w-5 mr-2" />
+                    Dashboard
+                  </Link>
+                  <Link href="/subscribe" className="flex items-center py-3 text-base font-medium text-gray-600">
+                    <CrownIcon className="h-5 w-5 mr-2" />
+                    {subscription.isSubscribed ? "Manage Subscription" : "Upgrade to Pro"}
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="flex items-center w-full text-left py-3 text-base font-medium text-gray-600"
+                  >
+                    <X className="h-5 w-5 mr-2" />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <div className="pt-2">
+                  <Link 
+                    href="/auth" 
+                    className="block w-full bg-primary text-white py-3 px-4 rounded-full text-center text-base font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 }
