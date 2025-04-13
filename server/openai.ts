@@ -34,9 +34,22 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
     designNotes 
   } = options;
   
-  // Format colors with hex: prefix if they are hex values
-  const formattedPrimaryColor = primaryColor.startsWith('#') ? `hex:${primaryColor}` : primaryColor;
-  const formattedSecondaryColor = secondaryColor.startsWith('#') ? `hex:${secondaryColor}` : secondaryColor;
+  // Convert hex colors to RGB format
+  function hexToRgb(hex: string) {
+    // Remove the # if present
+    hex = hex.replace(/^#/, '');
+    
+    // Parse the hex values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+  
+  // Convert colors to RGB format
+  const formattedPrimaryColor = primaryColor.startsWith('#') ? hexToRgb(primaryColor) : primaryColor;
+  const formattedSecondaryColor = secondaryColor.startsWith('#') ? hexToRgb(secondaryColor) : secondaryColor;
   
   console.log(`Processing design for ${sport} with colors: ${formattedPrimaryColor}, ${formattedSecondaryColor}`);
   
@@ -228,9 +241,22 @@ Return ONLY a JSON object: { "prompt": "your detailed jersey description" }
 async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<string> {
   const { sport, primaryColor, secondaryColor } = options;
   
-  // Format colors with hex: prefix if they are hex values
-  const formattedPrimaryColor = primaryColor.startsWith('#') ? `hex:${primaryColor}` : primaryColor;
-  const formattedSecondaryColor = secondaryColor.startsWith('#') ? `hex:${secondaryColor}` : secondaryColor;
+  // Convert hex colors to RGB format
+  function hexToRgb(hex: string) {
+    // Remove the # if present
+    hex = hex.replace(/^#/, '');
+    
+    // Parse the hex values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+  
+  // Convert colors to RGB format
+  const formattedPrimaryColor = primaryColor.startsWith('#') ? hexToRgb(primaryColor) : primaryColor;
+  const formattedSecondaryColor = secondaryColor.startsWith('#') ? hexToRgb(secondaryColor) : secondaryColor;
   
   // Create a simple prompt format
   return `A pfsoccerkit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a clean white studio background. The ${sport} jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals.
