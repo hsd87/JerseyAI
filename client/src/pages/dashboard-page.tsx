@@ -147,24 +147,24 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-grow bg-gray-50 py-10">
+      <main className="flex-grow bg-white py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex flex-col md:flex-row justify-between md:items-center mb-10 gap-4">
             <div>
-              <h1 className="text-3xl font-bold font-sora">Dashboard</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
+              <p className="text-gray-500 mt-1 text-sm">
                 Manage your designs, orders, and subscription
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-sm bg-gray-100 px-4 py-2 rounded-md flex items-center">
-                <span className="text-gray-700 mr-2">Subscription:</span>
-                <Badge className={user?.subscriptionTier === "pro" ? "bg-[#39FF14] text-black" : "bg-gray-200"}>
+              <div className="text-sm bg-gray-50 px-4 py-1.5 rounded-full flex items-center border border-gray-200">
+                <span className="text-gray-600 mr-2">Subscription:</span>
+                <Badge className={user?.subscriptionTier === "pro" ? "bg-primary/10 text-primary border-primary" : "bg-gray-200"}>
                   {user?.subscriptionTier === "pro" ? "PRO" : "FREE"}
                 </Badge>
               </div>
               <Link href="/">
-                <Button className="bg-black hover:bg-gray-800">
+                <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-full px-4 py-1.5 h-auto">
                   <i className="fas fa-plus mr-2"></i> New Design
                 </Button>
               </Link>
@@ -172,11 +172,11 @@ export default function DashboardPage() {
           </div>
 
           <Tabs defaultValue="designs" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-8">
-              <TabsTrigger value="designs">My Designs</TabsTrigger>
-              <TabsTrigger value="orders">Orders</TabsTrigger>
-              <TabsTrigger value="favorites">Favorites</TabsTrigger>
-              <TabsTrigger value="subscription">Subscription</TabsTrigger>
+            <TabsList className="mb-8 bg-gray-100/70 p-1 rounded-full border border-gray-200">
+              <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="designs">My Designs</TabsTrigger>
+              <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="orders">Orders</TabsTrigger>
+              <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="favorites">Favorites</TabsTrigger>
+              <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="subscription">Subscription</TabsTrigger>
             </TabsList>
 
             {/* Designs Tab */}
@@ -192,8 +192,8 @@ export default function DashboardPage() {
               ) : designs && designs.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {designs.map((design) => (
-                    <Card key={design.id} className="overflow-hidden">
-                      <div className="relative h-48 bg-gray-100">
+                    <Card key={design.id} className="overflow-hidden border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                      <div className="relative h-52 bg-gray-50">
                         {design.frontImageUrl ? (
                           <img
                             src={design.frontImageUrl}
@@ -207,24 +207,24 @@ export default function DashboardPage() {
                         )}
                         <button
                           onClick={() => handleToggleFavorite(design)}
-                          className="absolute top-2 right-2 bg-white p-2 rounded-full shadow hover:bg-gray-100"
+                          className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-colors"
                         >
-                          <i className={`fas fa-heart ${design.isFavorite ? 'text-red-500' : 'text-gray-400'}`}></i>
+                          <i className={`fas fa-heart ${design.isFavorite ? 'text-primary' : 'text-gray-400'}`}></i>
                         </button>
                       </div>
-                      <CardHeader>
-                        <CardTitle className="font-sora">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-medium">
                           {design.sport.charAt(0).toUpperCase() + design.sport.slice(1)} Kit
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="text-xs text-gray-500">
                           Created on {formatDate(design.createdAt)}
                         </CardDescription>
                       </CardHeader>
-                      <CardFooter className="flex justify-between">
+                      <CardFooter className="flex justify-between pt-2">
                         <Link href="/">
                           <Button
                             variant="outline"
-                            className="text-sm"
+                            className="text-sm rounded-full border-gray-200 text-gray-700 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
                             onClick={() => handleEditDesign(design)}
                           >
                             <i className="fas fa-pencil-alt mr-1"></i> Edit
@@ -232,7 +232,7 @@ export default function DashboardPage() {
                         </Link>
                         <Button
                           variant="ghost"
-                          className="text-sm text-red-500 hover:text-red-700 hover:bg-red-50"
+                          className="text-sm rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50"
                           onClick={() => handleDeleteDesign(design.id)}
                         >
                           <i className="fas fa-trash mr-1"></i> Delete
