@@ -180,7 +180,8 @@ List these (even if the image will not include actual text or logos):
         •       No vague terms like "cool design" or "modern style"
         •       Do not repeat colors in multiple zones unless justified
         •       Do not mirror the front design on the back unless stated — always describe how the back complements or extends the front
-        •       No mention of socks, shorts, cleats, players, or backgrounds
+        •       No mention of cleats, players, or backgrounds
+        •       ONLY include shorts if the kit component specifically includes them (jersey+shorts, full kit, or complete kit)
 
 ⸻
 
@@ -193,11 +194,16 @@ List these (even if the image will not include actual text or logos):
 
 SPECIFIC REQUIREMENTS FOR THIS JERSEY:
 - Sport: ${sport} jersey
+- Kit components: ${kitType === "jersey" ? "Jersey only" : 
+                 kitType === "jerseyShorts" ? "Jersey and shorts" : 
+                 kitType === "fullKit" ? "Full kit with socks" : 
+                 kitType === "completeKit" ? "Complete kit with headwear" : "Jersey"}
 ${sleeveStyle ? `- Sleeve style: ${sleeveStyle}` : ''}
 ${collarType ? `- Collar type: ${collarType}` : ''}
 ${patternStyle ? `- Pattern style: ${patternStyle}` : ''}
 ${designNotes ? `- Design notes: ${designNotes}` : ''}
 - Sport-specific features (basketball = sleeveless, soccer = short sleeves)
+- If kit includes shorts, ensure both jersey and shorts are visible in the final image
 
 Return ONLY a JSON object: { "prompt": "your detailed jersey description" }
 `;
@@ -239,7 +245,7 @@ Return ONLY a JSON object: { "prompt": "your detailed jersey description" }
 
 // Fallback prompt generation if OpenAI call fails
 async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<string> {
-  const { sport, primaryColor, secondaryColor } = options;
+  const { sport, primaryColor, secondaryColor, kitType } = options;
   
   // Convert hex colors to RGB format
   function hexToRgb(hex: string) {
@@ -259,14 +265,22 @@ async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<s
   const formattedSecondaryColor = secondaryColor.startsWith('#') ? hexToRgb(secondaryColor) : secondaryColor;
   
   // Create a simple prompt format
-  return `A pfsoccerkit for ${sport}, displayed in two cleanly aligned angles: front view (left) and back view (right), against a clean white studio background. The ${sport} jersey is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals.
+  const kitDescription = kitType === "jersey" ? "jersey only" :
+                       kitType === "jerseyShorts" ? "jersey and shorts" :
+                       kitType === "fullKit" ? "full kit with socks" :
+                       kitType === "completeKit" ? "complete kit with headwear" : "jersey";
+  
+  return `A pfsoccerkit for ${sport} (${kitDescription}), displayed in two cleanly aligned angles: front view (left) and back view (right), against a clean white studio background. The ${sport} ${kitDescription} is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals.
 
 🎨 Color Scheme:
 • Primary Color: ${formattedPrimaryColor}
 • Secondary Color: ${formattedSecondaryColor}
 • Accent: White trim and dark contours
 
-The jersey features a modern, sport-authentic design with the ${formattedPrimaryColor} as the base and ${formattedSecondaryColor} accents placed according to ${sport} traditions. Front body has sport-appropriate design in ${formattedPrimaryColor} with ${formattedSecondaryColor} detailing. Back body has clean player name and number placement with ${formattedSecondaryColor} numerals.`;
+The jersey features a modern, sport-authentic design with the ${formattedPrimaryColor} as the base and ${formattedSecondaryColor} accents placed according to ${sport} traditions. Front body has sport-appropriate design in ${formattedPrimaryColor} with ${formattedSecondaryColor} detailing. Back body has clean player name and number placement with ${formattedSecondaryColor} numerals.
+
+${kitType?.includes("Shorts") || kitType?.includes("Kit") ? 
+`• Shorts details: Matching ${sport} shorts in ${formattedPrimaryColor} with ${formattedSecondaryColor} accents, designed to complement the jersey style.` : ''}`;
 }
 
 export async function generateJerseyImageWithReplicate(prompt: string, kitType?: string): Promise<string> {
@@ -281,8 +295,9 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
       auth: process.env.REPLICATE_API_TOKEN,
     });
     
-    // Set aspect ratio to 3:2 for all jerseys
-    const aspectRatio = "3:2";
+    // Set aspect ratio based on kit type - 1:1 for jerseyShorts, 3:2 for others
+    const aspectRatio = kitType === "jerseyShorts" ? "1:1" : "3:2";
+    console.log(`Using aspect ratio ${aspectRatio} for kit type: ${kitType || "default"}`);
     
     // Define model and parameters
     const modelVersion = "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3";
