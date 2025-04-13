@@ -272,7 +272,7 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
       guidance_scale: 2.9,
       output_format: "jpg",
       disable_safety_checker: false,
-      lora_scale: 1.05,
+      lora_scale: 0.8, // Changed from 1.05 to 0.8 as requested
     };
     
     // Add extra parameters

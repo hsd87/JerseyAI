@@ -69,7 +69,7 @@ export const useDesignStore = create<DesignStore>((set) => ({
     isEditorOpen: open !== undefined ? open : !state.isEditorOpen 
   })),
   currentView: 'front',
-  setCurrentView: (view) => set({ currentView }),
+  setCurrentView: (view) => set({ currentView: view }),
   
   // Design ID (from saved design)
   designId: null,
