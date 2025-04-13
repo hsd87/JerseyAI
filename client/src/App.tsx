@@ -10,6 +10,7 @@ import LandingPage from "@/pages/landing-page";
 import DesignerPage from "@/pages/designer-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
+import OrderDetailPage from "@/pages/order-detail-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 
@@ -73,6 +74,9 @@ function AppContent() {
           </Route>
           <Route path="/test">
             <ProtectedRoute path="/test" component={TestPage} />
+          </Route>
+          <Route path="/orders/:id">
+            <ProtectedRoute path="/orders/:id" component={OrderDetailPage} />
           </Route>
           
           {/* 404 route */}

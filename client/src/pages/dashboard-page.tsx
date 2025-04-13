@@ -31,7 +31,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("designs");
-  const { setFormData, setImages, setDesignId, setHasGenerated } = useDesignStore();
+  const { updateFormData, setImages, setDesignId, setHasGenerated } = useDesignStore();
 
   // Fetch user designs
   const {
@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
   const handleEditDesign = (design: Design) => {
     // Set design data in store for editing
-    setFormData({
+    updateFormData({
       sport: design.sport,
       kitType: design.kitType,
       primaryColor: design.primaryColor,
@@ -307,11 +307,20 @@ export default function DashboardPage() {
                             </span>
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                              View Details
-                            </Button>
+                            <Link href={`/orders/${order.id}`}>
+                              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                                View Details
+                              </Button>
+                            </Link>
+                            {order.pdfUrl && (
+                              <a href={order.pdfUrl} target="_blank" rel="noopener noreferrer">
+                                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+                                  Download PDF
+                                </Button>
+                              </a>
+                            )}
                             {order.trackingId && (
-                              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+                              <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-800">
                                 Track Order
                               </Button>
                             )}
