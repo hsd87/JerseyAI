@@ -153,7 +153,6 @@ export default function OrderForm({ design, onSuccess }: OrderFormProps) {
       const orderData: InsertOrder = {
         userId: user!.id,
         designId: design.id,
-        uuid: uuidv4(),
         sport: design.sport,
         prompt: '',
         designUrls: {

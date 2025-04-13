@@ -86,7 +86,7 @@ export function registerOrderRoutes(app: Express) {
       const pdfPath = await generateOrderPDF(order);
       
       // Update the order with the PDF path
-      const pdfUrl = `/orders/pdfs/order_${order.uuid}.pdf`;
+      const pdfUrl = `/orders/pdfs/order_${order.id}.pdf`;
       const updatedOrder = await storage.updateOrderPdfUrl(order.id, pdfUrl);
       
       // Send confirmation email if the user has an email
@@ -155,10 +155,10 @@ export function registerOrderRoutes(app: Express) {
       }
       
       const filename = req.params.filename;
-      const orderUuid = filename.replace('order_', '').replace('.pdf', '');
+      const orderId = parseInt(filename.replace('order_', '').replace('.pdf', ''));
       
-      // Find the order by UUID
-      const [order] = await db.select().from(orders).where(eq(orders.uuid, orderUuid));
+      // Find the order by ID
+      const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
       
       if (!order) {
         return res.status(404).json({ message: 'Order not found' });

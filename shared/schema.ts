@@ -73,7 +73,8 @@ export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   designId: integer("design_id").notNull(),
-  uuid: text("uuid").notNull().unique(),
+  // Note: uuid column exists in schema but not in DB - we'll handle this in the code
+  // uuid: text("uuid").notNull().unique(),
   prompt: text("prompt"),
   designUrls: json("design_urls").$type<{front: string, back: string}>(),
   sport: text("sport").notNull(),

@@ -86,7 +86,7 @@ export default function OrderDetailPage() {
     const link = document.createElement("a");
     link.href = order.pdfUrl;
     link.target = "_blank";
-    link.download = `order_${order.uuid}.pdf`;
+    link.download = `order_${order.id}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

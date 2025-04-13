@@ -56,14 +56,14 @@ export default function DashboardPage() {
   const handleEditDesign = (design: Design) => {
     // Set design data in store for editing
     updateFormData({
-      sport: design.sport,
-      kitType: design.kitType,
+      sport: design.sport as any,
+      kitType: design.kitType as any,
       primaryColor: design.primaryColor,
       secondaryColor: design.secondaryColor,
-      sleeveStyle: design.sleeveStyle,
-      collarType: design.collarType,
-      patternStyle: design.patternStyle,
-      designNotes: design.designNotes
+      sleeveStyle: design.sleeveStyle as any,
+      collarType: design.collarType as any,
+      patternStyle: design.patternStyle as any,
+      designNotes: design.designNotes || ''
     });
 
     if (design.frontImageUrl && design.backImageUrl) {
