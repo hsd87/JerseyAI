@@ -94,32 +94,37 @@ export default function DesignEditor() {
     navigate('/checkout');
   };
 
-  const handleDragStart = (e: React.MouseEvent, elementId: string) => {
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent, elementId: string) => {
+    // Don't preventDefault for mouse events as it prevents focus
+    if (e.type === 'touchstart') {
+      e.preventDefault();
+    }
+    
     setActiveElement(elementId);
     
-    // Store initial position for drag calculation
-    const element = e.currentTarget as HTMLElement;
-    const rect = element.getBoundingClientRect();
-    
-    const handleMouseMove = (moveEvent: MouseEvent) => {
+    // Common handler for both mouse and touch moves
+    const updateElementPosition = (clientX: number, clientY: number) => {
       if (!canvasRef.current) return;
       
       const canvasRect = canvasRef.current.getBoundingClientRect();
-      const x = ((moveEvent.clientX - canvasRect.left) / canvasRect.width) * 100;
-      const y = ((moveEvent.clientY - canvasRect.top) / canvasRect.height) * 100;
+      const x = ((clientX - canvasRect.left) / canvasRect.width) * 100;
+      const y = ((clientY - canvasRect.top) / canvasRect.height) * 100;
+      
+      // Clamp values to ensure elements stay within bounds (5-95%)
+      const clampedX = Math.max(5, Math.min(95, x));
+      const clampedY = Math.max(5, Math.min(95, y));
       
       // Update position of the dragged element
       setTextElements(prev => prev.map(el => {
         if (el.id === elementId) {
-          return { ...el, position: { x, y } };
+          return { ...el, position: { x: clampedX, y: clampedY } };
         }
         return el;
       }));
     };
     
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+    // Handler for saving positions
+    const finishDrag = () => {
       setActiveElement(null);
       
       // Update customizations store with new positions
@@ -137,8 +142,38 @@ export default function DesignEditor() {
       });
     };
     
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    // Mouse event handlers
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      updateElementPosition(moveEvent.clientX, moveEvent.clientY);
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      finishDrag();
+    };
+    
+    // Touch event handlers
+    const handleTouchMove = (touchEvent: TouchEvent) => {
+      touchEvent.preventDefault(); // Prevent scrolling while dragging
+      const touch = touchEvent.touches[0];
+      updateElementPosition(touch.clientX, touch.clientY);
+    };
+    
+    const handleTouchEnd = () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      finishDrag();
+    };
+    
+    // Add the appropriate event listeners based on event type
+    if (e.type === 'touchstart') {
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+    } else {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
   };
 
   // Loading or initial state
@@ -176,30 +211,30 @@ export default function DesignEditor() {
   // No generation yet
   if (!hasGenerated) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
+      <div className="bg-white rounded-lg shadow-sm p-5 sm:p-8 border border-gray-200">
         <div className="text-center">
           <img 
             src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=800&auto=format&fit=crop" 
             alt="Soccer Jersey Design" 
-            className="mx-auto rounded-lg w-full max-w-lg h-auto object-cover mb-6" 
+            className="mx-auto rounded-lg w-full max-w-lg h-auto object-cover mb-4 sm:mb-6" 
           />
           
-          <h2 className="text-2xl font-sora font-semibold mb-2">Ready to create your dream kit?</h2>
-          <p className="text-gray-600 max-w-xl mx-auto mb-8">
+          <h2 className="text-xl sm:text-2xl font-sora font-semibold mb-2 text-gray-800">Ready to create your dream kit?</h2>
+          <p className="text-gray-600 text-sm sm:text-base max-w-xl mx-auto mb-6 sm:mb-8">
             Fill out the design form and let our AI generate a custom jersey based on your preferences. Then customize with your logo, name, and number.
           </p>
           
-          <div className="flex flex-wrap justify-center gap-3">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
               <i className="fas fa-tshirt mr-1"></i> 5 Sports
             </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
               <i className="fas fa-palette mr-1"></i> Custom Colors
             </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
               <i className="fas fa-bolt mr-1"></i> AI-Generated
             </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
               <i className="fas fa-users mr-1"></i> Team Orders
             </span>
           </div>
@@ -279,6 +314,7 @@ export default function DesignEditor() {
                     fontFamily: element.font
                   }}
                   onMouseDown={(e) => handleDragStart(e, element.id)}
+                  onTouchStart={(e) => handleDragStart(e, element.id)}
                 >
                   {element.content}
                 </div>
