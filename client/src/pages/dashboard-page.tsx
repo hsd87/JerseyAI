@@ -54,7 +54,7 @@ export default function DashboardPage() {
   });
 
   const handleEditDesign = (design: Design) => {
-    // Set design data in store for editing
+    // Set design data in store for editing and navigate to customize page
     updateFormData({
       sport: design.sport as any,
       kitType: design.kitType as any,
@@ -260,6 +260,66 @@ export default function DashboardPage() {
             </TabsContent>
 
             {/* Team Details Tab */}
+            <TabsContent value="addons" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Available Add-ons</CardTitle>
+                  <CardDescription>Enhance your jersey design with premium add-ons</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-gray-100 flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-medium mb-1">Premium Name Badge</h3>
+                        <p className="text-sm text-gray-500 mb-3">High-quality embroidered name badge</p>
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-gray-900">$12.99</span>
+                          <Button size="sm" variant="outline">Add to Cart</Button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-gray-100 flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                        </svg>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-medium mb-1">Team Logo Patch</h3>
+                        <p className="text-sm text-gray-500 mb-3">Custom embroidered team logo</p>
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-gray-900">$15.99</span>
+                          <Button size="sm" variant="outline">Add to Cart</Button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-gray-100 flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-medium mb-1">Performance Fabric Upgrade</h3>
+                        <p className="text-sm text-gray-500 mb-3">Premium breathable material</p>
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-gray-900">$9.99</span>
+                          <Button size="sm" variant="outline">Add to Cart</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
             <TabsContent value="team" className="space-y-4">
               <Card>
                 <CardHeader>
