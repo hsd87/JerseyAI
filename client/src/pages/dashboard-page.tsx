@@ -72,6 +72,9 @@ export default function DashboardPage() {
     }
 
     setDesignId(design.id);
+    
+    // Navigate to the customize page
+    window.location.href = '/customize';
   };
 
   const handleDeleteDesign = async (id: number) => {

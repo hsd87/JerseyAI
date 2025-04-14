@@ -36,6 +36,8 @@ export default function DesignEditor() {
   const [currentColor, setCurrentColor] = useState("#FFFFFF");
   const [currentSize, setCurrentSize] = useState("medium");
   const [currentFont, setCurrentFont] = useState("Arial");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [logoElements, setLogoElements] = useState<{id: string, url: string, position: {x: number, y: number}, size: {width: number, height: number}}[]>([]);
   
   const canvasRef = useRef<HTMLDivElement>(null);
 
