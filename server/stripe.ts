@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { storage } from './storage';
 import { User } from '@shared/schema';
+import { calculateFinalPrice, CartItem } from './utils/pricing';
 
 // Make sure to check if the API key is available
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -105,12 +106,28 @@ export async function createPaymentIntent(amount: number, customerId: string): P
   return paymentIntent.client_secret as string;
 }
 
-export async function calculateOrderAmount(items: any[]): Promise<number> {
-  // In a real application, this would calculate the actual cost based on items
-  // For now, we'll just sum up the price * quantity
-  return items.reduce((total, item) => {
-    return total + (item.price * item.quantity);
-  }, 0);
+export async function calculateOrderAmount(items: any[], isSubscriber: boolean = false): Promise<number> {
+  try {
+    // Convert items to CartItem format
+    const cartItems: CartItem[] = items.map(item => ({
+      productId: item.productId || item.id || 'unknown',
+      productType: item.productType || 'jersey',
+      basePrice: Math.round(item.price * 100), // Convert to cents
+      quantity: item.quantity
+    }));
+    
+    // Use the pricing module to calculate the final price
+    const priceBreakdown = calculateFinalPrice(cartItems, isSubscriber);
+    
+    // Return the grand total (already in cents)
+    return priceBreakdown.grandTotal;
+  } catch (error) {
+    console.error('Error calculating order amount:', error);
+    // Fallback to simple calculation if pricing module fails
+    return items.reduce((total, item) => {
+      return total + Math.round((item.price * item.quantity) * 100);
+    }, 0);
+  }
 }
 
 // Webhook handling for subscription events

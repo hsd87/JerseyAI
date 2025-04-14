@@ -82,6 +82,7 @@ export const orders = pgTable("orders", {
   status: text("status").default("pending").notNull(),
   orderDetails: json("order_details").$type<OrderDetails>(),
   shippingAddress: json("shipping_address").$type<ShippingAddress>(),
+  metadata: json("metadata").$type<Record<string, any>>(),
   pdfUrl: text("pdf_url"),
   trackingId: text("tracking_id"),
   createdAt: timestamp("created_at").defaultNow().notNull()
