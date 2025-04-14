@@ -448,36 +448,33 @@ export default function DesignEditor() {
             {/* Add Elements Section */}
             <div className="mb-5">
               <h3 className="font-medium text-sm text-gray-700 mb-2">Add Elements</h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <Button 
                   size="sm"
                   variant="outline"
-                  className="text-xs flex items-center rounded-full h-8"
+                  className="text-xs flex items-center justify-center rounded-md h-10"
                 >
-                  <Type className="h-3 w-3 mr-1" /> Text
+                  <Type className="h-4 w-4 mr-1" /> Text
                 </Button>
                 <Button 
                   size="sm"
                   variant="outline"
-                  className="text-xs flex items-center rounded-full h-8"
+                  className="text-xs flex items-center justify-center rounded-md h-10"
                 >
-                  <Hash className="h-3 w-3 mr-1" /> Number
+                  <Hash className="h-4 w-4 mr-1" /> Number
                 </Button>
-                <label className="inline-block">
+                <label className="inline-block cursor-pointer">
                   <input
                     type="file"
                     accept="image/*"
                     className="hidden"
                     onChange={handleLogoUpload}
                   />
-                  <Button 
-                    size="sm"
-                    variant="outline"
-                    className="text-xs flex items-center rounded-full h-8"
-                    type="button"
+                  <div 
+                    className="text-xs flex items-center justify-center rounded-md h-10 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium px-4 py-2"
                   >
-                    <Image className="h-3 w-3 mr-1" /> Logo
-                  </Button>
+                    <Image className="h-4 w-4 mr-1" /> Logo
+                  </div>
                 </label>
               </div>
             </div>
