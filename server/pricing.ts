@@ -1,17 +1,24 @@
-import { Express, Request, Response } from "express";
-import { z } from "zod";
-import { calculateFinalPrice, formatPriceBreakdown, CartItem } from "./utils/pricing";
+/**
+ * API Routes for price calculations and pricing information
+ */
 
-// Validation schema for the cart items
+import { Request, Response, Express } from "express";
+import { z } from "zod";
+import { calculatePrice, getPricingRules } from "./utils/pricing";
+import { CartItem } from "./types";
+
+// Schema for validating cart items in price calculation requests
 const cartItemSchema = z.object({
   productId: z.string(),
-  productType: z.enum(["jersey", "jersey_shorts", "kit"]),
+  productType: z.string(),
   basePrice: z.number().int().positive(),
   quantity: z.number().int().positive(),
 });
 
-const calculatePriceRequestSchema = z.object({
+// Schema for price estimation request body
+const priceEstimateSchema = z.object({
   cart: z.array(cartItemSchema),
+  isSubscriber: z.boolean().optional(),
 });
 
 /**
@@ -27,41 +34,28 @@ export function registerPricingRoutes(app: Express) {
    */
   app.post("/api/price/estimate", async (req: Request, res: Response) => {
     try {
-      // Validate the request body
-      const validation = calculatePriceRequestSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Invalid request data",
-          errors: validation.error.format()
+      // Validate request body
+      const validationResult = priceEstimateSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid request body",
+          errors: validationResult.error.format(),
         });
       }
       
-      // Get user subscription status
-      const isSubscriber = req.isAuthenticated() && 
-        req.user?.subscriptionTier === "pro";
+      const { cart, isSubscriber = false } = validationResult.data;
       
-      // Calculate price with full breakdown
-      const priceBreakdown = calculateFinalPrice(
-        validation.data.cart,
-        isSubscriber
-      );
+      // Calculate price breakdown
+      const result = calculatePrice(cart as CartItem[], isSubscriber);
       
-      // Format the breakdown for display (optional)
-      const formattedBreakdown = formatPriceBreakdown(priceBreakdown);
-      
-      // Return both raw data and formatted values
-      res.json({
-        success: true,
-        breakdown: priceBreakdown,
-        formatted: formattedBreakdown
-      });
-    } catch (error: any) {
+      return res.json(result);
+    } catch (error) {
       console.error("Error calculating price estimate:", error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
-        message: "An error occurred while calculating the price estimate",
-        error: error.message
+        message: "Failed to calculate price estimate",
       });
     }
   });
@@ -73,19 +67,15 @@ export function registerPricingRoutes(app: Express) {
    * Returns the current pricing rules for transparency
    */
   app.get("/api/price/rules", (req: Request, res: Response) => {
-    res.json({
-      success: true,
-      tierDiscounts: [
-        { threshold: 50, discount: "15%" },
-        { threshold: 20, discount: "10%" },
-        { threshold: 10, discount: "5%" },
-      ],
-      subscriptionDiscount: "10%",
-      shipping: [
-        { threshold: 500, cost: 0 }, // Free shipping
-        { threshold: 200, cost: 20 },
-        { threshold: 0, cost: 30 },
-      ]
-    });
+    try {
+      const rules = getPricingRules();
+      return res.json(rules);
+    } catch (error) {
+      console.error("Error fetching pricing rules:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch pricing rules",
+      });
+    }
   });
 }

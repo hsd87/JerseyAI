@@ -152,6 +152,11 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   setSport: (sport) => set({ sport }),
   setDesign: (designId, urls) => set({ designId, designUrls: urls }),
   
+  // Item Configuration
+  setGender: (gender) => set({ gender }),
+  setSize: (size) => set({ size }),
+  setQuantity: (quantity) => set({ quantity }),
+  
   // Team Order
   setIsTeamOrder: (isTeamOrder) => set({ isTeamOrder }),
   setTeamName: (teamName) => set({ teamName }),
