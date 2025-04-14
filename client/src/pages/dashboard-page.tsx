@@ -174,7 +174,9 @@ export default function DashboardPage() {
           <Tabs defaultValue="designs" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-8 bg-gray-100/70 p-1 rounded-full border border-gray-200">
               <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="designs">My Designs</TabsTrigger>
-              <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="orders">Orders</TabsTrigger>
+              <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="team">Team Details</TabsTrigger>
+              <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="orders">Track Orders</TabsTrigger>
+              <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="addons">Add-ons</TabsTrigger>
               <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="favorites">Favorites</TabsTrigger>
               <TabsTrigger className="rounded-full data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm" value="subscription">Subscription</TabsTrigger>
             </TabsList>
@@ -257,6 +259,75 @@ export default function DashboardPage() {
               )}
             </TabsContent>
 
+            {/* Team Details Tab */}
+            <TabsContent value="team" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Team Details</CardTitle>
+                  <CardDescription>Manage your team roster and details</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="team-name" className="block text-sm font-medium text-gray-700 mb-1">Team Name</label>
+                      <input 
+                        type="text" 
+                        id="team-name" 
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Enter team name"
+                      />
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Team Members</h3>
+                      <div className="border border-gray-200 rounded-md overflow-hidden">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            <tr>
+                              <td className="px-4 py-3 text-sm text-gray-900">John Doe</td>
+                              <td className="px-4 py-3 text-sm text-gray-900">10</td>
+                              <td className="px-4 py-3 text-sm text-gray-900">M</td>
+                              <td className="px-4 py-3 text-sm text-gray-900">1</td>
+                              <td className="px-4 py-3 text-sm text-gray-900">
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
+                                  <i className="fas fa-trash"></i>
+                                </Button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="px-4 py-3 text-sm text-gray-900">Jane Smith</td>
+                              <td className="px-4 py-3 text-sm text-gray-900">7</td>
+                              <td className="px-4 py-3 text-sm text-gray-900">S</td>
+                              <td className="px-4 py-3 text-sm text-gray-900">1</td>
+                              <td className="px-4 py-3 text-sm text-gray-900">
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
+                                  <i className="fas fa-trash"></i>
+                                </Button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      <Button className="mt-4">
+                        <i className="fas fa-plus mr-2"></i>
+                        Add Team Member
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
             {/* Orders Tab */}
             <TabsContent value="orders" className="space-y-4">
               {isLoadingOrders ? (

@@ -64,15 +64,7 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
     <div className="bg-white rounded-lg shadow-md p-4 w-80">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-medium">Editor Tools</h3>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onToggleView} 
-          className="flex items-center gap-1"
-        >
-          <RotateCw className="h-4 w-4" />
-          {currentView === 'front' ? 'View Back' : 'View Front'}
-        </Button>
+        {/* Back view toggle removed as requested - all views now in one generated image */}
       </div>
       
       <Tabs defaultValue="text">

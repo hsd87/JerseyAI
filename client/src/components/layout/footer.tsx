@@ -46,7 +46,7 @@ export default function Footer() {
               <li><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors">About</a></li>
               <li><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors">Careers</a></li>
               <li><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors">Contact</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors">Pricing</a></li>
+              <li><Link href="/pricing" className="text-sm text-gray-500 hover:text-primary transition-colors">Pricing Calculator</Link></li>
               <li><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors">Privacy Policy</a></li>
             </ul>
           </div>

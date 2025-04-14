@@ -249,10 +249,10 @@ const JerseyEditor = () => {
     updateItem(id, { scaleX, scaleY, rotation });
   };
   
-  // Toggle between front and back view
-  const handleToggleView = () => {
-    setCurrentView(currentView === 'front' ? 'back' : 'front');
-  };
+  // Always use front view only - all views are shown in one generated image
+  useEffect(() => {
+    setCurrentView('front');
+  }, [setCurrentView]);
   
   // Export canvas as image
   const handleExport = () => {
@@ -274,8 +274,8 @@ const JerseyEditor = () => {
     <div className="flex flex-col md:flex-row gap-6">
       <EditorSidebar 
         onExport={handleExport} 
-        currentView={currentView} 
-        onToggleView={handleToggleView} 
+        currentView="front" 
+        onToggleView={() => {}} 
       />
       
       <div className="flex-1 flex flex-col items-center">
@@ -291,18 +291,10 @@ const JerseyEditor = () => {
             onTap={handleStageClick}
           >
             <Layer>
-              {/* Background Jersey Image */}
-              {currentView === 'front' && frontImageObj && (
+              {/* Background Jersey Image - Front view only */}
+              {frontImageObj && (
                 <Image 
                   image={frontImageObj} 
-                  width={stageWidth} 
-                  height={stageHeight} 
-                />
-              )}
-              
-              {currentView === 'back' && backImageObj && (
-                <Image 
-                  image={backImageObj} 
                   width={stageWidth} 
                   height={stageHeight} 
                 />
