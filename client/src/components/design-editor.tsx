@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomizationData } from "@shared/schema";
-import { X, Save, ShoppingCart, Undo, Download, Image, Type, Hash, Move } from "lucide-react";
+import { X, Save, ShoppingCart, Undo, Download, Image, Type, Hash, Move, Plus } from "lucide-react";
 import { useLocation } from "wouter";
 
 type TextElement = {
@@ -78,6 +78,51 @@ export default function DesignEditor() {
     
     updateCustomizations(updatedCustomizations);
   };
+  
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const file = e.target.files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+    
+    // Read the file and convert to data URL
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (!event.target?.result) return;
+      
+      const logoImageUrl = event.target.result as string;
+      
+      // Create a new logo element
+      const newLogo = {
+        id: `logo-${Date.now()}`,
+        url: logoImageUrl,
+        position: { x: 50, y: 50 }, // Center of the canvas
+        size: { width: 100, height: 100 } // Default size
+      };
+      
+      setLogoElements([...logoElements, newLogo]);
+      
+      // Update customizations store
+      const updatedCustomizations: CustomizationData = {
+        ...customizations,
+        logos: [...(customizations.logos || []), {
+          url: newLogo.url,
+          position: newLogo.position,
+          size: newLogo.size
+        }]
+      };
+      
+      updateCustomizations(updatedCustomizations);
+    };
+    
+    reader.readAsDataURL(file);
+    
+    // Reset the input so the same file can be uploaded again
+    e.target.value = '';
+  };
 
   const handleSaveDesign = async () => {
     try {
@@ -116,32 +161,62 @@ export default function DesignEditor() {
       const clampedX = Math.max(5, Math.min(95, x));
       const clampedY = Math.max(5, Math.min(95, y));
       
-      // Update position of the dragged element
-      setTextElements(prev => prev.map(el => {
-        if (el.id === elementId) {
-          return { ...el, position: { x: clampedX, y: clampedY } };
-        }
-        return el;
-      }));
+      // Check if the element is a text element
+      if (elementId.startsWith('text-')) {
+        // Update position of the dragged text element
+        setTextElements(prev => prev.map(el => {
+          if (el.id === elementId) {
+            return { ...el, position: { x: clampedX, y: clampedY } };
+          }
+          return el;
+        }));
+      } 
+      // Check if element is a logo
+      else if (elementId.startsWith('logo-')) {
+        // Update position of the dragged logo element
+        setLogoElements(prev => prev.map(el => {
+          if (el.id === elementId) {
+            return { ...el, position: { x: clampedX, y: clampedY } };
+          }
+          return el;
+        }));
+      }
     };
     
     // Handler for saving positions
     const finishDrag = () => {
       setActiveElement(null);
       
-      // Update customizations store with new positions
-      const updatedText = textElements.map(el => ({
-        content: el.content,
-        position: el.position,
-        color: el.color,
-        size: el.size,
-        font: el.font
-      }));
+      // Get the type of element being dragged
+      const isLogoElement = elementId.startsWith('logo-');
       
-      updateCustomizations({
-        ...customizations,
-        text: updatedText
-      });
+      if (isLogoElement) {
+        // Update logo positions in the customizations store
+        const updatedLogos = logoElements.map(el => ({
+          url: el.url,
+          position: el.position,
+          size: el.size
+        }));
+        
+        updateCustomizations({
+          ...customizations,
+          logos: updatedLogos
+        });
+      } else {
+        // Update text positions in the customizations store
+        const updatedText = textElements.map(el => ({
+          content: el.content,
+          position: el.position,
+          color: el.color,
+          size: el.size,
+          font: el.font
+        }));
+        
+        updateCustomizations({
+          ...customizations,
+          text: updatedText
+        });
+      }
     };
     
     // Mouse event handlers
@@ -298,7 +373,7 @@ export default function DesignEditor() {
                 </div>
               )}
               
-              {/* Draggable Elements */}
+              {/* Draggable Text Elements */}
               {textElements.map((element) => (
                 <div 
                   key={element.id}
@@ -319,6 +394,32 @@ export default function DesignEditor() {
                   onTouchStart={(e) => handleDragStart(e, element.id)}
                 >
                   {element.content}
+                </div>
+              ))}
+              
+              {/* Draggable Logo Elements */}
+              {logoElements.map((logo) => (
+                <div
+                  key={logo.id}
+                  className={`absolute cursor-grab ${activeElement === logo.id ? 'cursor-grabbing z-30' : 'z-20'}`}
+                  style={{
+                    top: `${logo.position.y}%`,
+                    left: `${logo.position.x}%`,
+                    transform: 'translate(-50%, -50%)',
+                    border: activeElement === logo.id ? '2px dashed #39FF14' : '2px dashed transparent',
+                    width: `${logo.size.width}px`,
+                    height: 'auto',
+                    borderRadius: '0.25rem'
+                  }}
+                  onMouseDown={(e) => handleDragStart(e, logo.id)}
+                  onTouchStart={(e) => handleDragStart(e, logo.id)}
+                >
+                  <img 
+                    src={logo.url} 
+                    alt="Uploaded logo" 
+                    className="w-full h-auto object-contain"
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
+                  />
                 </div>
               ))}
             </div>
@@ -362,13 +463,22 @@ export default function DesignEditor() {
                 >
                   <Hash className="h-3 w-3 mr-1" /> Number
                 </Button>
-                <Button 
-                  size="sm"
-                  variant="outline"
-                  className="text-xs flex items-center rounded-full h-8"
-                >
-                  <Image className="h-3 w-3 mr-1" /> Logo
-                </Button>
+                <label className="inline-block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    className="text-xs flex items-center rounded-full h-8"
+                    type="button"
+                  >
+                    <Image className="h-3 w-3 mr-1" /> Logo
+                  </Button>
+                </label>
               </div>
             </div>
             
@@ -432,6 +542,72 @@ export default function DesignEditor() {
                 </Button>
               </div>
             </div>
+            
+            {/* Logo Settings */}
+            {logoElements.length > 0 && (
+              <div className="mb-5">
+                <h3 className="font-medium text-sm text-gray-700 mb-2">Logo Settings</h3>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex flex-wrap gap-2">
+                      {logoElements.map((logo) => (
+                        <div 
+                          key={logo.id}
+                          className={`w-16 h-16 border rounded-md flex items-center justify-center overflow-hidden cursor-pointer ${
+                            activeElement === logo.id ? 'border-primary border-2' : 'border-gray-200'
+                          }`}
+                          onClick={() => setActiveElement(logo.id)}
+                        >
+                          <img 
+                            src={logo.url} 
+                            alt="Logo thumbnail" 
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                      ))}
+                      <label className="w-16 h-16 border border-dashed border-gray-200 rounded-md flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleLogoUpload}
+                        />
+                        <Plus className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs text-gray-400 mt-1">Add New</span>
+                      </label>
+                    </div>
+                    
+                    {activeElement && activeElement.startsWith('logo-') && (
+                      <div className="mt-2">
+                        <Button 
+                          variant="destructive"
+                          size="sm"
+                          className="text-xs h-8 w-full"
+                          onClick={() => {
+                            const newLogoElements = logoElements.filter(logo => logo.id !== activeElement);
+                            setLogoElements(newLogoElements);
+                            setActiveElement(null);
+                            
+                            const updatedLogos = newLogoElements.map(el => ({
+                              url: el.url,
+                              position: el.position,
+                              size: el.size
+                            }));
+                            
+                            updateCustomizations({
+                              ...customizations,
+                              logos: updatedLogos
+                            });
+                          }}
+                        >
+                          Remove Selected Logo
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             
             {/* Help Section */}
             <div className="text-center">
