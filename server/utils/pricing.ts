@@ -3,7 +3,7 @@
  * Handles quantity-based discounts, subscription discounts, and shipping cost calculations
  */
 
-import { CartItem } from "../types";
+import type { CartItem } from "../types";
 
 // Tier discount thresholds and amounts (in percentages)
 const TIER_DISCOUNTS = [

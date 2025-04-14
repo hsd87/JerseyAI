@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
 import { storage } from './storage';
 import { User } from '@shared/schema';
-import { calculateFinalPrice, CartItem } from './utils/pricing';
+import { calculatePrice } from './utils/pricing';
+import type { CartItem } from './types';
 
 // Make sure to check if the API key is available
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -117,10 +118,10 @@ export async function calculateOrderAmount(items: any[], isSubscriber: boolean =
     }));
     
     // Use the pricing module to calculate the final price
-    const priceBreakdown = calculateFinalPrice(cartItems, isSubscriber);
+    const priceResult = calculatePrice(cartItems, isSubscriber);
     
     // Return the grand total (already in cents)
-    return priceBreakdown.grandTotal;
+    return priceResult.breakdown.grandTotal;
   } catch (error) {
     console.error('Error calculating order amount:', error);
     // Fallback to simple calculation if pricing module fails

@@ -1,0 +1,88 @@
+Here’s a ready-to-paste prompt you can send directly to your Replit agent to implement the form logic, conditional rendering, and pricing integration into the website. It includes:
+	1.	Conditional logic per sport
+	2.	Product configuration limits
+	3.	Training jacket types
+	4.	Order detail + matching sets info
+	5.	Price table CSV integration
+
+⸻
+
+✅ Replit Agent Prompt:
+
+⸻
+
+Prompt:
+
+We are now implementing the full product configuration logic into the website. Here’s what needs to be done:
+
+⸻
+
+🔧 1. Form Logic by Sport & Product Type
+
+Update the input form system with the following conditional logic per sport:
+
+Each user must select a sport first, and based on the selected sport, only the valid base product types should be shown (single-selection logic):
+
+Sport	Available Base Kit Options
+Soccer	Jersey, Jersey + Shorts
+Basketball	Jersey, Jersey + Shorts
+Rugby	Jersey, Jersey + Shorts
+Esports	Jersey only
+Cricket	Jersey, Jersey + Trousers
+
+✅ All sports also support the following training options as add-ons (can be multi-selected):
+	•	Training Jacket (Standard)
+	•	Training Jacket Full-Zip
+	•	Training Jacket Half-Zip
+	•	Training Jacket with Hood
+	•	Full Track Suit
+
+❗ Ensure the product options are conditionally rendered based on the selected sport. For example, “Jersey + Trousers” is only available in Cricket.
+
+⸻
+
+📦 2. Order Details Section Logic
+
+After the form, add an Order Detail Section with the following components:
+	•	Complementary Products Checklist (dynamic, based on what user picked in base set):
+	•	Matching Socks
+	•	Matching Beanie
+	•	Matching Kit Bag or Backpack
+	•	Matching Track Suit
+	•	All matching items should auto-inherit the color and design scheme from the AI-generated jersey, using inverse or complementary styles.
+	•	Add a Tooltip/Info Block that explains:
+“Away kits will be generated using inverse color schemes of your home kit. For fully different designs, please create and order a separate design. Matching complementary items will follow the same design language and will be shared with you for approval before production.”
+
+⸻
+
+💸 3. Integrate Pricing Logic from CSV
+
+Please connect the detailed pricing logic using the following provided CSV file:
+📂 ProJersey_Pricing___Strategy_Table.csv
+
+Use the pricing data to apply:
+	•	Per-product base prices
+	•	Tiered quantity discounts (e.g., 10+, 20+, 50+)
+	•	10% subscription discount
+	•	Unified pricing for all users (no separate B2B logic)
+	•	Shipping logic:
+	•	$30 for orders below $200
+	•	$20 for orders between $200–$500
+	•	Free shipping above $500
+
+✅ Also ensure:
+	•	Final calculated price is shown dynamically in the UI
+	•	Form logic correctly disables or hides irrelevant options
+	•	Output pricing + product details are bundled into the PDF order summary
+
+⸻
+
+This implementation will enable a fully dynamic, smart product configurator tailored to each sport while keeping our pricing accurate and flexible.
+
+Once complete, please confirm form rendering works for all sports and pricing calculations align with backend logic.
+
+Let me know if you need the latest CSV again or the latest pricing schema JSON.
+
+⸻
+
+Would you like a prompt next for the order review + checkout page?

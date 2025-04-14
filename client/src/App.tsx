@@ -19,6 +19,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
 const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
 const JerseyEditorPage = React.lazy(() => import('./pages/jersey-editor-page'));
+const PricingCalculatorPage = React.lazy(() => import('./pages/pricing-calculator-page'));
 const TestPage = React.lazy(() => import('./pages/test-page'));
 
 // Main application component that handles routing and subscription updates
@@ -65,6 +66,10 @@ function AppContent() {
           
           <Route path="/partner">
             <PartnerPage />
+          </Route>
+          
+          <Route path="/pricing">
+            <PricingCalculatorPage />
           </Route>
           
           {/* Protected routes */}
