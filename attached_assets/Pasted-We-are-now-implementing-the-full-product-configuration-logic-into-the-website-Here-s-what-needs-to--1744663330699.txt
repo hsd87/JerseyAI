@@ -1,0 +1,64 @@
+We are now implementing the full product configuration logic into the website. Here's what needs to be done:
+
+🔧 1. Form Logic by Sport & Product Type
+
+Update the input form system with the following conditional logic per sport:
+
+Each user must select a sport first, and based on the selected sport, only the valid base product types should be shown (single-selection logic):
+
+Sport       | Available Base Kit Options
+------------|---------------------------------------------
+Soccer      | Jersey, Jersey + Shorts
+Basketball  | Jersey, Jersey + Shorts
+Rugby       | Jersey, Jersey + Shorts
+Esports     | Jersey only
+Cricket     | Jersey, Jersey + Trousers
+
+✅ All sports also support the following training items (multi-select optional add-ons):
+
+- Training Jacket (Standard)
+- Training Jacket Full-Zip
+- Training Jacket Half-Zip
+- Training Jacket with Hood
+- Full Track Suit
+
+⚠️ Ensure the product options are conditionally rendered based on the selected sport. For example, "Jersey + Trousers" should only appear for Cricket.
+
+📦 2. Order Details Section Logic
+
+After base product selection, show the “Order Details” block with the following:
+
+- Complementary Products (checklist with prices):
+    - Matching Socks
+    - Matching Beanie
+    - Matching Kit Bag or Backpack
+    - Matching Track Suit
+
+✅ These items should automatically match the AI design and color scheme of the base kit and follow the same visual theme. 
+
+Add a tooltip/info box that explains:
+> “Away kits will be generated using inverse color schemes of your home kit. For fully different designs, please create and order a separate design. Matching items will follow the same theme and will be shown to you before production.”
+
+💸 3. Integrate Pricing Logic from CSV
+
+Link the pricing system to this provided CSV:
+📂 ProJersey_Pricing___Strategy_Table.csv
+
+From this file:
+- Pull base prices for each product
+- Apply tiered quantity discounts (10+, 20+, 50+)
+- Apply 10% subscription discount (if user is subscribed)
+- Use a single unified pricing model for all users (B2B and D2C)
+
+Shipping Rules:
+- $30 for orders below $200
+- $20 for orders between $200 and $500
+- Free shipping for orders above $500
+
+✅ Show final calculated price dynamically in the UI
+✅ Final product breakdown should be included in the downloadable order PDF
+✅ Backend logic should match front-end display pricing
+
+Please confirm correct form logic rendering, accurate tier-based pricing calculations, and integration of CSV logic into the frontend and backend pipeline.
+
+Let me know if you need the latest CSV or schema formats.
