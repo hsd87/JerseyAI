@@ -1,6 +1,12 @@
-import { users, designs, orders, type User, type InsertUser, type Design, type InsertDesign, type Order, type InsertOrder } from "@shared/schema";
+import { 
+  users, designs, orders, b2bLeads,
+  type User, type InsertUser, 
+  type Design, type InsertDesign, 
+  type Order, type InsertOrder,
+  type B2BLead, type InsertB2BLead
+} from "@shared/schema";
 import session from "express-session";
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import connectPg from "connect-pg-simple";
 import { db, pool } from './db';
 
@@ -34,6 +40,11 @@ export interface IStorage {
   // Generation Credits
   decrementDesignCredits(userId: number): Promise<User>;
   resetMonthlyDesignCredits(): Promise<void>;
+  
+  // B2B Leads Methods
+  createB2BLead(lead: InsertB2BLead): Promise<B2BLead>;
+  getB2BLeads(): Promise<B2BLead[]>;
+  updateB2BLeadStatus(id: number, status: string): Promise<B2BLead>;
   
   // Session Store
   sessionStore: any;
@@ -266,6 +277,40 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ remainingDesigns: 6 })
       .where(eq(users.subscriptionTier, "free"));
+  }
+  
+  // B2B Leads Methods
+  async createB2BLead(lead: InsertB2BLead): Promise<B2BLead> {
+    const [newLead] = await db
+      .insert(b2bLeads)
+      .values({
+        ...lead,
+        createdAt: new Date(),
+        status: "new"
+      })
+      .returning();
+    return newLead;
+  }
+  
+  async getB2BLeads(): Promise<B2BLead[]> {
+    return db
+      .select()
+      .from(b2bLeads)
+      .orderBy(desc(b2bLeads.createdAt));
+  }
+  
+  async updateB2BLeadStatus(id: number, status: string): Promise<B2BLead> {
+    const [updatedLead] = await db
+      .update(b2bLeads)
+      .set({ status })
+      .where(eq(b2bLeads.id, id))
+      .returning();
+      
+    if (!updatedLead) {
+      throw new Error(`B2B Lead with id ${id} not found`);
+    }
+    
+    return updatedLead;
   }
 }
 

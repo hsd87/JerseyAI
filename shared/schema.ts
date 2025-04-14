@@ -210,3 +210,31 @@ export const designFormSchema = z.object({
 });
 
 export type DesignFormValues = z.infer<typeof designFormSchema>;
+
+// B2B Lead Schema
+export const b2bLeads = pgTable("b2b_leads", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  company: text("company").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  country: text("country").notNull(),
+  partnershipType: text("partnership_type").notNull(),
+  orderSize: text("order_size").notNull(),
+  needsCustomBranding: boolean("needs_custom_branding").notNull(),
+  logoUrl: text("logo_url"),
+  notes: text("notes"),
+  preferredContactMethod: text("preferred_contact_method").notNull(),
+  bestTimeToReach: text("best_time_to_reach").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  status: text("status").default("new"),
+});
+
+export const insertB2BLeadSchema = createInsertSchema(b2bLeads).omit({
+  id: true,
+  createdAt: true,
+  status: true
+});
+
+export type InsertB2BLead = z.infer<typeof insertB2BLeadSchema>;
+export type B2BLead = typeof b2bLeads.$inferSelect;

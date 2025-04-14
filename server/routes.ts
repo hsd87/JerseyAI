@@ -209,6 +209,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   } catch (error) {
     console.error('Error registering order routes:', error);
   }
+  
+  // Partner routes - importing from partner.ts for B2B lead functionality
+  try {
+    const { registerPartnerRoutes } = await import('./partner');
+    registerPartnerRoutes(app);
+  } catch (error) {
+    console.error('Error registering partner routes:', error);
+  }
 
   // Subscription endpoints
   app.post("/api/subscribe", async (req, res, next) => {
