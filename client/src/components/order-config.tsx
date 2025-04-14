@@ -1,0 +1,440 @@
+import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { useAuth } from '@/hooks/use-auth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { useOrderStore } from '@/hooks/use-order-store';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { PlusCircle, MinusCircle, Info } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+// Pricing constants
+const PACKAGE_PRICES = {
+  jerseyOnly: 59.99,
+  jerseyShorts: 89.99,
+  fullKit: 119.99,
+};
+
+const ADDON_OPTIONS = [
+  { id: 'socks', name: 'Matching Socks', price: 12.99, image: '/images/addon-socks.png' },
+  { id: 'headwear', name: 'Beanie/Headband', price: 14.99, image: '/images/addon-headwear.png' },
+  { id: 'tracksuit', name: 'Matching Tracksuit', price: 79.99, image: '/images/addon-tracksuit.png' },
+  { id: 'kitbag', name: 'Kit Bag / Backpack', price: 24.99, image: '/images/addon-bag.png' },
+];
+
+// Form schema
+const orderConfigSchema = z.object({
+  packageType: z.enum(['jerseyOnly', 'jerseyShorts', 'fullKit'], {
+    required_error: 'Please select a package type',
+  }),
+  gender: z.enum(['Male', 'Female', 'Youth'], {
+    required_error: 'Please select a gender',
+  }),
+  size: z.enum(['XS', 'S', 'M', 'L', 'XL', 'XXL'], {
+    required_error: 'Please select a size',
+  }),
+  quantity: z.number().min(1).default(1),
+  isTeamOrder: z.boolean().default(false),
+});
+
+type OrderConfigValues = z.infer<typeof orderConfigSchema>;
+
+export default function OrderConfig() {
+  const { user } = useAuth();
+  const { 
+    packageType,
+    setPackageType,
+    gender,
+    setGender,
+    size,
+    setSize,
+    quantity,
+    setQuantity,
+    isTeamOrder,
+    setIsTeamOrder,
+    addons,
+    updateAddon
+  } = useOrderStore();
+  
+  const [activeTab, setActiveTab] = useState('package');
+
+  const form = useForm<OrderConfigValues>({
+    resolver: zodResolver(orderConfigSchema),
+    defaultValues: {
+      packageType,
+      gender,
+      size,
+      quantity,
+      isTeamOrder,
+    },
+  });
+
+  // Watch form values
+  const watchedPackageType = form.watch('packageType');
+  const watchedGender = form.watch('gender');
+
+  // Update store when form values change
+  const handlePackageTypeChange = (value: 'jerseyOnly' | 'jerseyShorts' | 'fullKit') => {
+    form.setValue('packageType', value);
+    setPackageType(value);
+  };
+
+  const handleGenderChange = (value: 'Male' | 'Female' | 'Youth') => {
+    form.setValue('gender', value);
+    setGender(value);
+  };
+
+  const handleSizeChange = (value: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL') => {
+    form.setValue('size', value);
+    setSize(value);
+  };
+
+  const handleTeamOrderChange = (checked: boolean) => {
+    form.setValue('isTeamOrder', checked);
+    setIsTeamOrder(checked);
+  };
+
+  const handleQuantityChange = (newQty: number) => {
+    const qty = Math.max(1, newQty);
+    form.setValue('quantity', qty);
+    setQuantity(qty);
+  };
+
+  const handleAddonQuantityChange = (id: string, change: number) => {
+    const currentAddon = addons.find(addon => addon.id === id);
+    const currentQty = currentAddon?.quantity || 0;
+    const newQty = Math.max(0, currentQty + change);
+    
+    updateAddon(id, newQty);
+  };
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Configure Your Order</CardTitle>
+        <CardDescription>
+          Choose your package type, size and add-ons
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="package">Package</TabsTrigger>
+            <TabsTrigger value="sizing">Sizing</TabsTrigger>
+            <TabsTrigger value="addons">Add-Ons</TabsTrigger>
+          </TabsList>
+          
+          {/* Package Selection Tab */}
+          <TabsContent value="package" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer ${watchedPackageType === 'jerseyOnly' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                onClick={() => handlePackageTypeChange('jerseyOnly')}
+              >
+                <h3 className="font-semibold">Jersey Only</h3>
+                <p className="text-lg font-bold">${PACKAGE_PRICES.jerseyOnly}</p>
+                <p className="text-sm text-gray-500">Custom jersey with your design</p>
+              </div>
+              
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer ${watchedPackageType === 'jerseyShorts' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                onClick={() => handlePackageTypeChange('jerseyShorts')}
+              >
+                <h3 className="font-semibold">Jersey + Shorts</h3>
+                <p className="text-lg font-bold">${PACKAGE_PRICES.jerseyShorts}</p>
+                <p className="text-sm text-gray-500">Custom jersey with matching shorts</p>
+              </div>
+              
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer ${watchedPackageType === 'fullKit' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                onClick={() => handlePackageTypeChange('fullKit')}
+              >
+                <h3 className="font-semibold">Full Kit</h3>
+                <p className="text-lg font-bold">${PACKAGE_PRICES.fullKit}</p>
+                <p className="text-sm text-gray-500">Jersey, shorts & personalized accessories</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 mt-4">
+              <Switch 
+                id="team-order" 
+                checked={isTeamOrder}
+                onCheckedChange={handleTeamOrderChange}
+              />
+              <Label htmlFor="team-order" className="cursor-pointer">This is a team order</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-gray-400" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Team orders allow you to add multiple players with different sizes and numbers</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            {!isTeamOrder && (
+              <div className="flex items-center space-x-4 mt-4">
+                <Label>Quantity:</Label>
+                <div className="flex items-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleQuantityChange(quantity - 1)}
+                    disabled={quantity <= 1}
+                  >
+                    <MinusCircle className="h-4 w-4" />
+                  </Button>
+                  <span className="mx-4">{quantity}</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleQuantityChange(quantity + 1)}
+                  >
+                    <PlusCircle className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+          
+          {/* Sizing Tab */}
+          <TabsContent value="sizing" className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium mb-2">Select Gender</h3>
+              <RadioGroup 
+                defaultValue={gender} 
+                onValueChange={(value) => handleGenderChange(value as 'Male' | 'Female' | 'Youth')}
+                className="flex space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Male" id="male" />
+                  <Label htmlFor="male">Men's</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Female" id="female" />
+                  <Label htmlFor="female">Women's</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Youth" id="youth" />
+                  <Label htmlFor="youth">Youth</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-medium mb-2">Select Size</h3>
+              
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((sizeOption) => (
+                  <div
+                    key={sizeOption}
+                    className={`border rounded-md p-3 text-center cursor-pointer transition-colors ${
+                      size === sizeOption 
+                        ? 'border-primary bg-primary/10 text-primary' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => handleSizeChange(sizeOption as any)}
+                  >
+                    {sizeOption}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="mt-4 rounded-md border p-4 bg-gray-50">
+              <h4 className="font-medium mb-2">Size Chart ({watchedGender})</h4>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-300 text-sm">
+                  <thead>
+                    <tr className="divide-x divide-gray-200">
+                      <th className="px-3 py-2 bg-gray-100">Size</th>
+                      <th className="px-3 py-2 bg-gray-100">Chest (in)</th>
+                      <th className="px-3 py-2 bg-gray-100">Waist (in)</th>
+                      <th className="px-3 py-2 bg-gray-100">Hips (in)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {watchedGender === 'Male' && (
+                      <>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XS</td>
+                          <td className="px-3 py-2">33-35</td>
+                          <td className="px-3 py-2">27-29</td>
+                          <td className="px-3 py-2">33-35</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">S</td>
+                          <td className="px-3 py-2">36-38</td>
+                          <td className="px-3 py-2">30-32</td>
+                          <td className="px-3 py-2">36-38</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">M</td>
+                          <td className="px-3 py-2">39-41</td>
+                          <td className="px-3 py-2">33-35</td>
+                          <td className="px-3 py-2">39-41</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">L</td>
+                          <td className="px-3 py-2">42-44</td>
+                          <td className="px-3 py-2">36-38</td>
+                          <td className="px-3 py-2">42-44</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XL</td>
+                          <td className="px-3 py-2">45-47</td>
+                          <td className="px-3 py-2">39-41</td>
+                          <td className="px-3 py-2">45-47</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XXL</td>
+                          <td className="px-3 py-2">48-50</td>
+                          <td className="px-3 py-2">42-44</td>
+                          <td className="px-3 py-2">48-50</td>
+                        </tr>
+                      </>
+                    )}
+                    
+                    {watchedGender === 'Female' && (
+                      <>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XS</td>
+                          <td className="px-3 py-2">30-32</td>
+                          <td className="px-3 py-2">24-26</td>
+                          <td className="px-3 py-2">33-35</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">S</td>
+                          <td className="px-3 py-2">33-35</td>
+                          <td className="px-3 py-2">27-29</td>
+                          <td className="px-3 py-2">36-38</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">M</td>
+                          <td className="px-3 py-2">36-38</td>
+                          <td className="px-3 py-2">30-32</td>
+                          <td className="px-3 py-2">39-41</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">L</td>
+                          <td className="px-3 py-2">39-41</td>
+                          <td className="px-3 py-2">33-35</td>
+                          <td className="px-3 py-2">42-44</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XL</td>
+                          <td className="px-3 py-2">42-44</td>
+                          <td className="px-3 py-2">36-38</td>
+                          <td className="px-3 py-2">45-47</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XXL</td>
+                          <td className="px-3 py-2">45-47</td>
+                          <td className="px-3 py-2">39-41</td>
+                          <td className="px-3 py-2">48-50</td>
+                        </tr>
+                      </>
+                    )}
+                    
+                    {watchedGender === 'Youth' && (
+                      <>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XS (6-7)</td>
+                          <td className="px-3 py-2">24-26</td>
+                          <td className="px-3 py-2">22-24</td>
+                          <td className="px-3 py-2">24-26</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">S (8-9)</td>
+                          <td className="px-3 py-2">26-28</td>
+                          <td className="px-3 py-2">24-25</td>
+                          <td className="px-3 py-2">26-28</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">M (10-11)</td>
+                          <td className="px-3 py-2">28-30</td>
+                          <td className="px-3 py-2">25-26</td>
+                          <td className="px-3 py-2">28-30</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">L (12-13)</td>
+                          <td className="px-3 py-2">30-32</td>
+                          <td className="px-3 py-2">26-27</td>
+                          <td className="px-3 py-2">30-32</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XL (14-15)</td>
+                          <td className="px-3 py-2">32-34</td>
+                          <td className="px-3 py-2">27-29</td>
+                          <td className="px-3 py-2">32-34</td>
+                        </tr>
+                        <tr className="divide-x divide-gray-200">
+                          <td className="px-3 py-2 font-medium">XXL (16)</td>
+                          <td className="px-3 py-2">34-36</td>
+                          <td className="px-3 py-2">29-31</td>
+                          <td className="px-3 py-2">34-36</td>
+                        </tr>
+                      </>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </TabsContent>
+          
+          {/* Add-Ons Tab */}
+          <TabsContent value="addons" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {ADDON_OPTIONS.map((addon) => {
+                const currentAddon = addons.find(a => a.id === addon.id);
+                const currentQty = currentAddon?.quantity || 0;
+                
+                return (
+                  <div 
+                    key={addon.id}
+                    className="border rounded-lg p-4 flex justify-between items-center"
+                  >
+                    <div>
+                      <h3 className="font-medium">{addon.name}</h3>
+                      <p className="text-sm font-bold">${addon.price}</p>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleAddonQuantityChange(addon.id, -1)}
+                        disabled={currentQty === 0}
+                      >
+                        <MinusCircle className="h-4 w-4" />
+                      </Button>
+                      <span className="w-6 text-center">{currentQty}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleAddonQuantityChange(addon.id, 1)}
+                      >
+                        <PlusCircle className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  );
+}

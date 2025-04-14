@@ -1,13 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import DesignForm from "@/components/design-form";
 import DesignEditor from "@/components/design-editor";
+import DesignResults from "@/components/design-results";
 import { useAuth } from "@/hooks/use-auth";
+import { useDesignStore } from "@/hooks/use-design-store";
+import OrderConfig from "@/components/order-config";
+import TeamRoster from "@/components/team-roster";
+import OrderSummary from "@/components/order-summary";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export default function DesignerPage() {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const { hasGenerated, isEditorOpen } = useDesignStore();
+
+  // Update current step based on design state
+  useEffect(() => {
+    if (hasGenerated && !isEditorOpen) {
+      setCurrentStep(1); // Generated but not customizing
+    } else if (hasGenerated && isEditorOpen) {
+      setCurrentStep(2); // Customizing
+    }
+  }, [hasGenerated, isEditorOpen]);
+
+  // Go to next step in the process
+  const nextStep = () => {
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  // Go to previous step in the process
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
   return (
     <div className="font-inter bg-white text-gray-900 min-h-screen">
@@ -42,40 +73,134 @@ export default function DesignerPage() {
             <div className="relative flex justify-between">
               {/* Step 1 */}
               <div className="flex flex-col items-center">
-                <div className={`flex items-center justify-center w-10 h-10 ${currentStep >= 1 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 1 ? 'text-white' : 'text-gray-600'} font-bold`}>1</div>
+                <div 
+                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 1 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 1 ? 'text-white' : 'text-gray-600'} font-bold cursor-pointer`}
+                  onClick={() => hasGenerated && setCurrentStep(1)}
+                >1</div>
                 <p className={`mt-2 text-xs font-medium ${currentStep >= 1 ? 'text-gray-900' : 'text-gray-500'}`}>Design</p>
               </div>
               {/* Step 2 */}
               <div className="flex flex-col items-center">
-                <div className={`flex items-center justify-center w-10 h-10 ${currentStep >= 2 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 2 ? 'text-white' : 'text-gray-600'} font-medium`}>2</div>
+                <div 
+                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 2 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 2 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
+                  onClick={() => hasGenerated && setCurrentStep(2)}
+                >2</div>
                 <p className={`mt-2 text-xs font-medium ${currentStep >= 2 ? 'text-gray-900' : 'text-gray-500'}`}>Customize</p>
               </div>
               {/* Step 3 */}
               <div className="flex flex-col items-center">
-                <div className={`flex items-center justify-center w-10 h-10 ${currentStep >= 3 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 3 ? 'text-white' : 'text-gray-600'} font-medium`}>3</div>
+                <div 
+                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 3 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 3 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
+                  onClick={() => hasGenerated && setCurrentStep(3)}
+                >3</div>
                 <p className={`mt-2 text-xs font-medium ${currentStep >= 3 ? 'text-gray-900' : 'text-gray-500'}`}>Order Details</p>
               </div>
               {/* Step 4 */}
               <div className="flex flex-col items-center">
-                <div className={`flex items-center justify-center w-10 h-10 ${currentStep >= 4 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 4 ? 'text-white' : 'text-gray-600'} font-medium`}>4</div>
+                <div 
+                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 4 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 4 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
+                  onClick={() => hasGenerated && setCurrentStep(4)}
+                >4</div>
                 <p className={`mt-2 text-xs font-medium ${currentStep >= 4 ? 'text-gray-900' : 'text-gray-500'}`}>Checkout</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Integrated Design Form and Editor */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Design Form */}
-          <div className="lg:col-span-1">
-            <DesignForm remainingDesigns={user?.remainingDesigns} />
-          </div>
+        {/* Main Content Area - Displays based on current step */}
+        {currentStep === 1 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Design Form */}
+            <div className="lg:col-span-1">
+              <DesignForm remainingDesigns={user?.remainingDesigns} />
+            </div>
 
-          {/* Right Column - Combined Design Editor */}
-          <div className="lg:col-span-2">
-            <DesignEditor />
+            {/* Right Column - Design Results */}
+            <div className="lg:col-span-2">
+              <DesignResults />
+              
+              {/* Continue button - shown only when design has been generated */}
+              {hasGenerated && (
+                <div className="mt-6 text-right">
+                  <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
+                    Customize Design <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Step 2: Customization */}
+        {currentStep === 2 && (
+          <div>
+            <DesignEditor />
+            
+            <div className="mt-6 flex justify-between">
+              <Button variant="outline" onClick={prevStep}>
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Design
+              </Button>
+              <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
+                Continue to Order Details <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Order Configuration */}
+        {currentStep === 3 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <div className="space-y-8">
+                <OrderConfig />
+                <TeamRoster />
+              </div>
+              
+              <div className="mt-6 flex justify-between">
+                <Button variant="outline" onClick={prevStep}>
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Back to Customization
+                </Button>
+                <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
+                  Review Order <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            {/* Preview panel */}
+            <div className="lg:col-span-1">
+              <OrderSummary showCheckoutButton={false} />
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Checkout */}
+        {currentStep === 4 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold mb-6">Complete Your Order</h2>
+                
+                {/* Shipping form will go here - to be built later */}
+                <div className="space-y-4">
+                  {/* Placeholder for shipping form */}
+                  <div className="border border-dashed border-gray-300 rounded-md p-6 text-center text-gray-500">
+                    Shipping form will be integrated here
+                  </div>
+                </div>
+                
+                <div className="mt-8 flex justify-between">
+                  <Button variant="outline" onClick={prevStep}>
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Order Details
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="lg:col-span-1">
+              <OrderSummary showCheckoutButton={true} />
+            </div>
+          </div>
+        )}
       </main>
       
       <Footer />

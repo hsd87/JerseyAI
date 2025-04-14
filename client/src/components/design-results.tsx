@@ -1,5 +1,7 @@
 import { useDesignStore } from "@/hooks/use-design-store";
 import { Button } from "@/components/ui/button";
+import { useOrderStore } from "@/hooks/use-order-store";
+import { ShoppingCart, PenSquare, RotateCcw } from "lucide-react";
 
 export default function DesignResults() {
   const { 
@@ -18,6 +20,11 @@ export default function DesignResults() {
   const handleGenerateNew = () => {
     // This will trigger a new design generation
     document.getElementById('generateButton')?.click();
+  };
+  
+  const handleBuyNow = () => {
+    // This will be implemented to proceed to order configuration step
+    // We'll handle this from the parent component for now
   };
 
   return (
@@ -157,19 +164,28 @@ export default function DesignResults() {
           
           {/* Action Buttons */}
           {hasGenerated && (
-            <div className="flex flex-col sm:flex-row gap-4 mt-6">
+            <div className="space-y-4 mt-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={handleCustomize}
+                  className="flex-1 inline-flex justify-center items-center py-3 px-4"
+                >
+                  <PenSquare className="h-4 w-4 mr-2" /> Customize Kit
+                </Button>
+                <Button
+                  onClick={handleGenerateNew}
+                  variant="outline" 
+                  className="flex-1 inline-flex justify-center items-center py-3 px-4"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" /> Generate New Design
+                </Button>
+              </div>
+              
               <Button
-                onClick={handleCustomize}
-                className="flex-1 inline-flex justify-center items-center py-3 px-4 border border-transparent shadow-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14] transition-colors"
+                onClick={handleBuyNow}
+                className="w-full bg-primary hover:bg-primary/90 inline-flex justify-center items-center py-3 px-4 text-base sm:text-lg"
               >
-                <i className="fas fa-pen-to-square mr-2"></i> Customize Kit
-              </Button>
-              <Button
-                onClick={handleGenerateNew}
-                variant="outline" 
-                className="flex-1 inline-flex justify-center items-center py-3 px-4 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14] transition-colors"
-              >
-                <i className="fas fa-redo mr-2"></i> Generate New Design
+                <ShoppingCart className="h-5 w-5 mr-2" /> Buy Now from $59.99
               </Button>
             </div>
           )}
