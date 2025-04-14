@@ -6,7 +6,8 @@ import { users, orders } from '@shared/schema';
 import { InsertOrder, OrderDetails } from '@shared/schema';
 import { generateOrderPDF } from './utils/pdf-generator';
 import { sendOrderConfirmationEmail } from './utils/email-sender';
-import { calculateFinalPrice, CartItem, PriceBreakdown } from './utils/pricing';
+import { calculatePrice } from './utils/pricing';
+import { CartItem, PriceBreakdown } from './types';
 
 /**
  * Convert OrderDetails to a format suitable for pricing calculations
@@ -60,7 +61,8 @@ export function calculateOrderPrice(orderData: InsertOrder, isSubscriber: boolea
     const cartItems = orderDetailsToCartItems(orderDetails);
     
     // Calculate price with full breakdown using the pricing module
-    const priceBreakdown = calculateFinalPrice(cartItems, isSubscriber);
+    const priceResult = calculatePrice(cartItems, isSubscriber);
+    const priceBreakdown = priceResult.breakdown;
     
     // Return both the total amount in cents and the full breakdown
     return {

@@ -18,6 +18,14 @@ export interface PriceBreakdown {
   grandTotal: number;
 }
 
+export interface TeamMember {
+  id: string;
+  name: string;
+  number: string;
+  size: string;
+  quantity: number;
+}
+
 interface OrderItem {
   type: string; // jersey, shorts, etc.
   size: string;
@@ -60,6 +68,7 @@ interface OrderState {
   // Team Order Fields
   isTeamOrder: boolean;
   teamName: string;
+  teamMembers: TeamMember[];
   
   // Shipping Info
   shippingAddress: ShippingAddress | null;
@@ -89,6 +98,11 @@ interface OrderState {
   setIsTeamOrder: (isTeamOrder: boolean) => void;
   setTeamName: (teamName: string) => void;
   
+  // Team Roster Management
+  addTeamMember: (member: TeamMember) => void;
+  updateTeamMember: (id: string, updates: Partial<TeamMember>) => void;
+  removeTeamMember: (id: string) => void;
+  
   setShippingAddress: (address: ShippingAddress) => void;
   
   setPriceBreakdown: (breakdown: PriceBreakdown) => void;
@@ -113,6 +127,7 @@ const initialState = {
   quantity: 1,
   isTeamOrder: false,
   teamName: '',
+  teamMembers: [] as TeamMember[],
   shippingAddress: null,
   priceBreakdown: null
 };
@@ -161,6 +176,21 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   setIsTeamOrder: (isTeamOrder) => set({ isTeamOrder }),
   setTeamName: (teamName) => set({ teamName }),
   
+  // Team Roster Management
+  addTeamMember: (member) => set((state) => ({
+    teamMembers: [...state.teamMembers, member]
+  })),
+  
+  updateTeamMember: (id, updates) => set((state) => ({
+    teamMembers: state.teamMembers.map(member => 
+      member.id === id ? { ...member, ...updates } : member
+    )
+  })),
+  
+  removeTeamMember: (id) => set((state) => ({
+    teamMembers: state.teamMembers.filter(member => member.id !== id)
+  })),
+  
   // Shipping
   setShippingAddress: (address) => set({ shippingAddress: address }),
   
@@ -169,7 +199,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   
   // Convert order items to cart items for price calculation
   getCartItems: () => {
-    const { items, addOns } = get();
+    const { items, addOns, teamMembers, isTeamOrder } = get();
     const cartItems: CartItem[] = [];
     
     // Convert regular items to cart items
@@ -191,6 +221,18 @@ export const useOrderStore = create<OrderState>((set, get) => ({
         quantity: addOn.quantity
       });
     });
+    
+    // Convert team members to cart items if it's a team order
+    if (isTeamOrder && teamMembers.length > 0) {
+      teamMembers.forEach(member => {
+        cartItems.push({
+          productId: `jersey-${member.number}`,
+          productType: 'jersey',
+          basePrice: 8999, // $89.99 per jersey
+          quantity: member.quantity
+        });
+      });
+    }
     
     return cartItems;
   },
