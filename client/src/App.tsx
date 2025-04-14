@@ -11,6 +11,7 @@ import DesignerPage from "@/pages/designer-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import OrderDetailPage from "@/pages/order-detail-page";
+import PartnerPage from "@/pages/partner-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 
@@ -60,6 +61,10 @@ function AppContent() {
           </Route>
           <Route path="/jersey-editor">
             <JerseyEditorPage />
+          </Route>
+          
+          <Route path="/partner">
+            <PartnerPage />
           </Route>
           
           {/* Protected routes */}

@@ -74,6 +74,9 @@ export default function Navbar() {
               <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
                 How It Works
               </button>
+              <Link href="/partner" className={`text-sm font-medium ${location === '/partner' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                Partner With Us
+              </Link>
               
               {user ? (
                 <>
@@ -153,6 +156,9 @@ export default function Navbar() {
           </Link>
           <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700">
             Pricing
+          </Link>
+          <Link href="/partner" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/partner' ? 'text-primary' : 'text-gray-700'}`}>
+            Partner With Us
           </Link>
           
           {user ? (

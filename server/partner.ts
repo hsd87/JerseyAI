@@ -1,12 +1,16 @@
 import { Express, Request, Response } from "express";
+import express from "express";
 import { storage } from "./storage";
 import { insertB2BLeadSchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from 'url';
 
 // Configure multer for file uploads
-const uploadDir = path.join(__dirname, "../uploads");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -71,7 +75,7 @@ export function registerPartnerRoutes(app: Express) {
         message: "Thank you! Our team will contact you within 24 hours.",
         id: lead.id
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving partner lead:", error);
       
       // Check if it's a validation error
