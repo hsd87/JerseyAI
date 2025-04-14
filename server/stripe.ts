@@ -3,6 +3,14 @@ import { storage } from './storage';
 import { User } from '@shared/schema';
 import { calculatePrice } from './utils/pricing';
 import type { CartItem } from './types';
+// Using type assertion to avoid Stripe types issues
+declare module 'stripe' {
+  namespace Stripe {
+    interface Invoice {
+      payment_intent?: Stripe.PaymentIntent;
+    }
+  }
+}
 
 // Make sure to check if the API key is available
 if (!process.env.STRIPE_SECRET_KEY) {
