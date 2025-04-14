@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { Design, Order } from "@shared/schema";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useDesignStore } from "@/hooks/use-design-store";
 import { Loader2 } from "lucide-react";
@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("designs");
   const { updateFormData, setImages, setDesignId, setHasGenerated } = useDesignStore();
+  const [_, navigate] = useLocation();
 
   // Fetch user designs
   const {
@@ -73,8 +74,8 @@ export default function DashboardPage() {
 
     setDesignId(design.id);
     
-    // Navigate to the customize page
-    window.location.href = '/customize';
+    // Navigate to the designer page
+    navigate('/');
   };
 
   const handleDeleteDesign = async (id: number) => {
@@ -226,15 +227,13 @@ export default function DashboardPage() {
                         </CardDescription>
                       </CardHeader>
                       <CardFooter className="flex justify-between pt-2">
-                        <Link href="/">
-                          <Button
-                            variant="outline"
-                            className="text-sm rounded-full border-gray-200 text-gray-700 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
-                            onClick={() => handleEditDesign(design)}
-                          >
-                            <i className="fas fa-pencil-alt mr-1"></i> Edit
-                          </Button>
-                        </Link>
+                        <Button
+                          variant="outline"
+                          className="text-sm rounded-full border-gray-200 text-gray-700 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
+                          onClick={() => handleEditDesign(design)}
+                        >
+                          <i className="fas fa-pencil-alt mr-1"></i> Edit
+                        </Button>
                         <Button
                           variant="ghost"
                           className="text-sm rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50"
@@ -381,17 +380,17 @@ export default function DashboardPage() {
                         </table>
                       </div>
                       
-                      <Button className="mt-4">
-                        <i className="fas fa-plus mr-2"></i>
-                        Add Team Member
-                      </Button>
+                      <div className="mt-4">
+                        <Button variant="outline" size="sm" className="text-sm">
+                          <i className="fas fa-plus mr-1"></i> Add Team Member
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
             
-            {/* Orders Tab */}
             <TabsContent value="orders" className="space-y-4">
               {isLoadingOrders ? (
                 <div className="flex justify-center py-12">
@@ -402,85 +401,84 @@ export default function DashboardPage() {
                   <p className="text-red-500">Error loading orders. Please try again.</p>
                 </div>
               ) : orders && orders.length > 0 ? (
-                <div className="overflow-hidden border border-gray-200 rounded-xl shadow-sm">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50/70">
-                      <tr>
-                        <th scope="col" className="py-3 pl-4 pr-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:pl-6">
-                          Order ID
-                        </th>
-                        <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Total
-                        </th>
-                        <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
-                      {orders.map((order) => (
-                        <tr key={order.id} className="hover:bg-gray-50/60 transition-colors">
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                            #{order.id}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {formatDate(order.createdAt)}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {formatCurrency(order.totalAmount)}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                <div className="space-y-6">
+                  {orders.map((order) => (
+                    <Card key={order.id} className="overflow-hidden border border-gray-200">
+                      <CardHeader className="bg-gray-50 border-b border-gray-200 py-4">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <CardTitle className="text-base font-medium">Order #{order.id}</CardTitle>
+                            <CardDescription className="text-xs">
+                              Placed on {formatDate(order.createdAt)}
+                            </CardDescription>
+                          </div>
+                          <div>
+                            <Badge className={getStatusColor(order.status)}>
                               {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                            </span>
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 space-x-2">
-                            <Link href={`/orders/${order.id}`}>
-                              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/5 rounded-full">
-                                View Details
-                              </Button>
-                            </Link>
-                            {order.pdfUrl && (
-                              <a href={order.pdfUrl} target="_blank" rel="noopener noreferrer">
-                                <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/5 rounded-full">
-                                  <i className="fas fa-file-pdf mr-1"></i> PDF
-                                </Button>
-                              </a>
-                            )}
-                            {order.trackingId && (
-                              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/5 rounded-full">
-                                <i className="fas fa-truck mr-1"></i> Track
-                              </Button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="py-4">
+                        <div className="flex flex-col md:flex-row justify-between gap-4">
+                          <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-gray-700">Order Details</h3>
+                            <div className="text-sm text-gray-600">
+                              <p>Total Amount: {formatCurrency(order.totalAmount)}</p>
+                              <p>Items: {order.quantity} jersey{order.quantity > 1 ? 's' : ''}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-gray-700">Shipping Address</h3>
+                            <div className="text-sm text-gray-600">
+                              <p>{order.shippingAddress}</p>
+                            </div>
+                          </div>
+                          
+                          {order.trackingId && (
+                            <div className="space-y-2">
+                              <h3 className="text-sm font-medium text-gray-700">Tracking</h3>
+                              <div className="text-sm">
+                                <a href={`https://track.shipment.com/${order.trackingId}`} className="text-primary hover:underline">
+                                  {order.trackingId}
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                      <CardFooter className="bg-gray-50 border-t border-gray-200 py-3">
+                        <div className="flex justify-end gap-2 w-full">
+                          {order.pdfUrl && (
+                            <Button variant="outline" size="sm" className="text-xs rounded">
+                              <i className="fas fa-download mr-1"></i> Invoice
+                            </Button>
+                          )}
+                          <Button variant="outline" size="sm" className="text-xs rounded">
+                            <i className="fas fa-boxes mr-1"></i> Track Order
+                          </Button>
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-12 bg-white rounded-lg shadow">
                   <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <i className="fas fa-shopping-cart text-gray-400 text-xl"></i>
+                    <i className="fas fa-shopping-bag text-gray-400 text-xl"></i>
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
-                  <p className="text-gray-500 mb-6">Design a jersey and place your first order</p>
-                  <Link href="/">
+                  <p className="text-gray-500 mb-6">After placing an order, you'll be able to track it here</p>
+                  <Link href="/checkout">
                     <Button className="bg-black hover:bg-gray-800">
-                      Start Shopping
+                      <i className="fas fa-shopping-cart mr-2"></i> Place Order
                     </Button>
                   </Link>
                 </div>
               )}
             </TabsContent>
-
-            {/* Favorites Tab */}
+            
             <TabsContent value="favorites" className="space-y-4">
               {isLoadingDesigns ? (
                 <div className="flex justify-center py-12">
@@ -488,7 +486,7 @@ export default function DashboardPage() {
                 </div>
               ) : designsError ? (
                 <div className="text-center py-12">
-                  <p className="text-red-500">Error loading favorites. Please try again.</p>
+                  <p className="text-red-500">Error loading designs. Please try again.</p>
                 </div>
               ) : designs && designs.filter(d => d.isFavorite).length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -522,15 +520,13 @@ export default function DashboardPage() {
                         </CardDescription>
                       </CardHeader>
                       <CardFooter className="flex justify-between pt-2">
-                        <Link href="/">
-                          <Button
-                            variant="outline"
-                            className="text-sm rounded-full border-gray-200 text-gray-700 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
-                            onClick={() => handleEditDesign(design)}
-                          >
-                            <i className="fas fa-pencil-alt mr-1"></i> Edit
-                          </Button>
-                        </Link>
+                        <Button
+                          variant="outline"
+                          className="text-sm rounded-full border-gray-200 text-gray-700 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
+                          onClick={() => handleEditDesign(design)}
+                        >
+                          <i className="fas fa-pencil-alt mr-1"></i> Edit
+                        </Button>
                         <Button
                           variant="ghost"
                           className="text-sm rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50"
@@ -548,163 +544,106 @@ export default function DashboardPage() {
                     <i className="fas fa-heart text-gray-400 text-xl"></i>
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No favorites yet</h3>
-                  <p className="text-gray-500 mb-6">Mark designs as favorites to see them here</p>
+                  <p className="text-gray-500 mb-6">Save designs to your favorites for quick access</p>
                   <Link href="/">
                     <Button className="bg-black hover:bg-gray-800">
-                      Browse Designs
+                      <i className="fas fa-plus mr-2"></i> Create Design
                     </Button>
                   </Link>
                 </div>
               )}
             </TabsContent>
-
-            {/* Subscription Tab */}
-            <TabsContent value="subscription">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className={`border ${user?.subscriptionTier === "free" ? "bg-gray-50/50 border-gray-300" : "border-gray-200"} rounded-xl shadow-sm overflow-hidden`}>
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-xl">Free Tier</CardTitle>
-                    <CardDescription className="text-sm text-gray-500">Basic jersey design capabilities</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-6">
-                    <div className="mb-6">
-                      <span className="text-4xl font-medium">$0</span>
-                      <span className="text-gray-500 ml-1">/month</span>
-                    </div>
-                    <ul className="space-y-3 text-sm">
-                      <li className="flex items-center">
-                        <i className="fas fa-check text-primary mr-2.5"></i>
-                        <span>6 design generations per month</span>
-                      </li>
-                      <li className="flex items-center">
-                        <i className="fas fa-check text-primary mr-2.5"></i>
-                        <span>Basic customization options</span>
-                      </li>
-                      <li className="flex items-center">
-                        <i className="fas fa-check text-primary mr-2.5"></i>
-                        <span>Standard rendering queue</span>
-                      </li>
-                      <li className="flex items-center">
-                        <i className="fas fa-check text-primary mr-2.5"></i>
-                        <span>Regular pricing on orders</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                  <CardFooter className="pt-2 pb-6">
-                    {user?.subscriptionTier === "free" ? (
-                      <Button disabled className="w-full rounded-full bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed h-10">
-                        Current Plan
-                      </Button>
-                    ) : (
-                      <Button className="w-full rounded-full bg-white text-gray-900 border border-gray-300 hover:bg-gray-50 h-10">
-                        Downgrade
-                      </Button>
-                    )}
-                  </CardFooter>
-                </Card>
-
-                <Card className={`border ${user?.subscriptionTier === "pro" ? "border-primary/30 bg-primary/5" : "border-gray-200"} rounded-xl shadow-sm overflow-hidden relative`}>
-                  {user?.subscriptionTier === "pro" && (
-                    <div className="absolute top-0 right-0 left-0 h-1 bg-primary"></div>
-                  )}
-                  <CardHeader className="pb-4">
-                    <div className="flex justify-between items-center">
-                      <CardTitle className="text-xl">Pro Tier</CardTitle>
-                      {user?.subscriptionTier === "pro" && (
-                        <Badge className="bg-primary/10 text-primary border-primary">CURRENT</Badge>
+            
+            <TabsContent value="subscription" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Subscription</CardTitle>
+                  <CardDescription>Manage your ProJersey subscription</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex-1">
+                        <h3 className="font-medium text-lg mb-1">
+                          {user?.subscriptionTier === "pro" ? (
+                            <>Pro Plan <Badge className="ml-2 bg-primary/10 text-primary">Active</Badge></>
+                          ) : (
+                            <>Free Plan</>
+                          )}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {user?.subscriptionTier === "pro"
+                            ? "Unlimited design credits, 15% discount on all orders, priority support"
+                            : "6 design credits per month, standard pricing, regular support"}
+                        </p>
+                        <div className="text-sm">
+                          <span className="font-medium">Design Credits Remaining:</span>{" "}
+                          {user?.designCreditsRemaining || 0}
+                        </div>
+                      </div>
+                      
+                      {user?.subscriptionTier === "pro" ? (
+                        <Button variant="outline" className="rounded-full">
+                          Manage Subscription
+                        </Button>
+                      ) : (
+                        <Link href="/pricing">
+                          <Button className="rounded-full bg-primary text-white">
+                            Upgrade to Pro
+                          </Button>
+                        </Link>
                       )}
                     </div>
-                    <CardDescription className="text-sm text-gray-500">Premium jersey design experience</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-6">
-                    <div className="mb-6">
-                      <span className="text-4xl font-medium">$9</span>
-                      <span className="text-gray-500 ml-1">/month</span>
+                    
+                    <div className="space-y-4">
+                      <h3 className="font-medium">Subscription Benefits</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-gray-200">
+                          <div className="bg-primary/10 rounded-full p-2 h-fit">
+                            <i className="fas fa-infinity text-primary"></i>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm">Unlimited Designs</h4>
+                            <p className="text-sm text-gray-600">Create as many designs as you want</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-gray-200">
+                          <div className="bg-primary/10 rounded-full p-2 h-fit">
+                            <i className="fas fa-tags text-primary"></i>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm">15% Discount</h4>
+                            <p className="text-sm text-gray-600">On all orders, automatically applied</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-gray-200">
+                          <div className="bg-primary/10 rounded-full p-2 h-fit">
+                            <i className="fas fa-headset text-primary"></i>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm">Priority Support</h4>
+                            <p className="text-sm text-gray-600">Get help faster when you need it</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-gray-200">
+                          <div className="bg-primary/10 rounded-full p-2 h-fit">
+                            <i className="fas fa-file-export text-primary"></i>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm">Export Options</h4>
+                            <p className="text-sm text-gray-600">Export your designs in high-resolution</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <ul className="space-y-3 text-sm">
-                      <li className="flex items-center">
-                        <i className="fas fa-check text-primary mr-2.5"></i>
-                        <span className="font-medium">Unlimited design generations</span>
-                      </li>
-                      <li className="flex items-center">
-                        <i className="fas fa-check text-primary mr-2.5"></i>
-                        <span className="font-medium">Advanced customization options</span>
-                      </li>
-                      <li className="flex items-center">
-                        <i className="fas fa-check text-primary mr-2.5"></i>
-                        <span className="font-medium">Priority rendering queue</span>
-                      </li>
-                      <li className="flex items-center">
-                        <i className="fas fa-check text-primary mr-2.5"></i>
-                        <span className="font-medium">15% discount on all orders</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                  <CardFooter className="pt-2 pb-6">
-                    {user?.subscriptionTier === "pro" ? (
-                      <Button disabled className="w-full rounded-full bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed h-10">
-                        Current Plan
-                      </Button>
-                    ) : (
-                      <Button className="w-full rounded-full bg-primary text-white hover:bg-primary/90 h-10">
-                        Upgrade to Pro
-                      </Button>
-                    )}
-                  </CardFooter>
-                </Card>
-              </div>
-
-              {/* Subscription Details */}
-              {user?.subscriptionTier === "pro" && (
-                <Card className="mt-8 border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                  <CardHeader className="pb-4 border-b border-gray-100">
-                    <CardTitle className="text-xl font-medium">Subscription Details</CardTitle>
-                  </CardHeader>
-                  <CardContent className="py-6">
-                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-                      <div>
-                        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</dt>
-                        <dd className="mt-1 text-sm text-gray-900 flex items-center">
-                          <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                          Active
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">Next billing date</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">Payment method</dt>
-                        <dd className="mt-1 text-sm text-gray-900 flex items-center">
-                          <i className="fab fa-cc-visa text-blue-600 mr-2"></i>
-                          Visa ending in 4242
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">Billing address</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          1234 Main St, San Francisco, CA 94110
-                        </dd>
-                      </div>
-                    </dl>
-                  </CardContent>
-                  <CardFooter className="pt-2 pb-6 flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0">
-                    <Button variant="outline" className="rounded-full border-gray-300 text-gray-700 hover:bg-gray-50">
-                      <i className="fas fa-credit-card mr-2"></i> Update Payment Method
-                    </Button>
-                    <Button variant="ghost" className="rounded-full text-red-500 hover:text-red-600 hover:bg-red-50">
-                      <i className="fas fa-ban mr-2"></i> Cancel Subscription
-                    </Button>
-                  </CardFooter>
-                </Card>
-              )}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
       </main>
-
+      
       <Footer />
     </div>
   );
