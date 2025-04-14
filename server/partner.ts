@@ -99,5 +99,7 @@ export function registerPartnerRoutes(app: Express) {
     // Add cache headers
     res.setHeader("Cache-Control", "public, max-age=86400"); // Cache for 24 hours
     next();
-  }, express.static(uploadDir));
+  });
+  
+  // Static file serving is handled by the main express app in index.ts
 }

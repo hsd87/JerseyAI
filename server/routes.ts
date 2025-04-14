@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
@@ -455,6 +456,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Serve uploads directory for partner logos
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   
   // Serve images from the output directory
   app.get('/output/:filename', (req, res, next) => {
