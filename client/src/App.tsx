@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { useSubscription } from "@/hooks/use-subscription-store";
+import { OrderInitializer } from "@/components/order-initializer";
 
 import LandingPage from "@/pages/landing-page";
 import DesignerPage from "@/pages/designer-page";
@@ -48,6 +49,9 @@ function AppContent() {
   
   return (
     <>
+      {/* OrderInitializer watches for design generation and initializes the order */}
+      <OrderInitializer />
+      
       <React.Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
         <Switch>
           {/* Regular routes */}

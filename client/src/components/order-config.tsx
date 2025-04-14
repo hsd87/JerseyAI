@@ -12,20 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { PlusCircle, MinusCircle, Info } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-// Pricing constants
-const PACKAGE_PRICES = {
-  jerseyOnly: 59.99,
-  jerseyShorts: 89.99,
-  fullKit: 119.99,
-};
-
-const ADDON_OPTIONS = [
-  { id: 'socks', name: 'Matching Socks', price: 12.99, image: '/images/addon-socks.png' },
-  { id: 'headwear', name: 'Beanie/Headband', price: 14.99, image: '/images/addon-headwear.png' },
-  { id: 'tracksuit', name: 'Matching Tracksuit', price: 79.99, image: '/images/addon-tracksuit.png' },
-  { id: 'kitbag', name: 'Kit Bag / Backpack', price: 24.99, image: '/images/addon-bag.png' },
-];
+import { PACKAGE_PRICES, ADDON_OPTIONS } from '@/lib/constants';
 
 // Form schema
 const orderConfigSchema = z.object({
