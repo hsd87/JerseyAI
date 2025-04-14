@@ -6,7 +6,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PriceBreakdown } from '../types';
+// Define the PriceBreakdown interface locally for now
+interface PriceBreakdown {
+  baseTotal: number;
+  tierDiscountApplied: string;
+  tierDiscountAmount: number;
+  subscriptionDiscountApplied: string;
+  subscriptionDiscountAmount: number;
+  subtotalAfterDiscounts: number;
+  shippingCost: number;
+  grandTotal: number;
+}
 
 interface PriceBreakdownProps {
   breakdown: PriceBreakdown;

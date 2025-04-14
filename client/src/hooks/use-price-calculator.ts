@@ -1,6 +1,19 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { CartItem, PriceBreakdown, PriceEstimateResponse, PricingRules } from '../types';
+import { CartItem, PriceBreakdown } from './use-order-store';
 import { apiRequest, getQueryFn } from '../lib/queryClient';
+
+// Types for the API responses
+interface PriceEstimateResponse {
+  success: boolean;
+  breakdown: PriceBreakdown;
+  formatted: Record<string, string>;
+}
+
+interface PricingRules {
+  tierDiscounts: { threshold: number; discount: string }[];
+  subscriptionDiscount: string;
+  shipping: { threshold: number; cost: number }[];
+}
 
 /**
  * Custom hook for fetching pricing rules from the server
@@ -8,7 +21,7 @@ import { apiRequest, getQueryFn } from '../lib/queryClient';
 export function usePricingRules() {
   return useQuery<PricingRules>({
     queryKey: ['/api/price/rules'],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "returnNull" }),
   });
 }
 

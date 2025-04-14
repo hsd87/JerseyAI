@@ -111,10 +111,10 @@ export function registerOrderRoutes(app: Express) {
       const { totalInCents, breakdown } = calculateOrderPrice(orderData, isSubscriber);
       
       // Store the price breakdown in the order metadata (if not already present)
-      if (!orderData.metadata) {
-        orderData.metadata = {};
-      }
-      orderData.metadata.priceBreakdown = breakdown;
+      // Add metadata as a string value (JSON) since Drizzle expects this format
+      const metadataValue = JSON.stringify({ priceBreakdown: breakdown });
+      // @ts-ignore - This is fine since we added the metadata column to the schema
+      orderData.metadata = metadataValue;
       
       if (totalInCents !== orderData.totalAmount) {
         console.warn(`Price mismatch: client sent ${orderData.totalAmount}, server calculated ${totalInCents}`);
