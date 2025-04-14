@@ -27,6 +27,7 @@ interface OrderItem {
 }
 
 interface AddOn {
+  id: string;
   name: string;
   price: number;
   quantity: number;
@@ -50,6 +51,11 @@ interface OrderState {
   sport: string;
   designId: number | null;
   designUrls: { front: string; back: string } | null;
+  
+  // Item Configuration
+  gender?: string; // Male, Female, Youth
+  size?: string;
+  quantity?: number;
   
   // Team Order Fields
   isTeamOrder: boolean;
@@ -75,6 +81,11 @@ interface OrderState {
   setSport: (sport: string) => void;
   setDesign: (designId: number, urls: { front: string; back: string }) => void;
   
+  // Configuration setters
+  setGender?: (gender: string) => void;
+  setSize?: (size: string) => void;
+  setQuantity?: (quantity: number) => void;
+  
   setIsTeamOrder: (isTeamOrder: boolean) => void;
   setTeamName: (teamName: string) => void;
   
@@ -93,10 +104,13 @@ interface OrderState {
 const initialState = {
   items: [],
   addOns: [],
-  packageType: 'Jersey only',
+  packageType: 'jerseyOnly',
   sport: '',
   designId: null,
   designUrls: null,
+  gender: 'Male',
+  size: 'M',
+  quantity: 1,
   isTeamOrder: false,
   teamName: '',
   shippingAddress: null,

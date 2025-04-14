@@ -49,16 +49,17 @@ export default function OrderConfig() {
   const { 
     packageType,
     setPackageType,
-    gender,
-    setGender,
-    size,
-    setSize,
-    quantity,
-    setQuantity,
+    gender = 'Male', // Provide defaults if these are not in the store yet
+    setGender = () => {},
+    size = 'M',
+    setSize = () => {},
+    quantity = 1,
+    setQuantity = () => {},
     isTeamOrder,
     setIsTeamOrder,
-    addons,
-    updateAddon
+    addOns = [], // This should be addOns not addons to match the store
+    addAddOn,
+    removeAddOn
   } = useOrderStore();
   
   const [activeTab, setActiveTab] = useState('package');
@@ -106,11 +107,25 @@ export default function OrderConfig() {
   };
 
   const handleAddonQuantityChange = (id: string, change: number) => {
-    const currentAddon = addons.find(addon => addon.id === id);
+    const currentAddon = addOns.find(addon => addon.id === id);
     const currentQty = currentAddon?.quantity || 0;
     const newQty = Math.max(0, currentQty + change);
     
-    updateAddon(id, newQty);
+    if (newQty === 0 && currentQty > 0) {
+      // Find the index of the add-on to remove it
+      const index = addOns.findIndex(addon => addon.id === id);
+      if (index !== -1) {
+        removeAddOn(index);
+      }
+    } else if (newQty > 0) {
+      // Add or update add-on
+      addAddOn({
+        id,
+        name: ADDON_OPTIONS.find(a => a.id === id)?.name || '',
+        price: ADDON_OPTIONS.find(a => a.id === id)?.price || 0,
+        quantity: newQty
+      });
+    }
   };
 
   return (
@@ -395,7 +410,7 @@ export default function OrderConfig() {
           <TabsContent value="addons" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {ADDON_OPTIONS.map((addon) => {
-                const currentAddon = addons.find(a => a.id === addon.id);
+                const currentAddon = addOns.find(a => a.id === addon.id);
                 const currentQty = currentAddon?.quantity || 0;
                 
                 return (
