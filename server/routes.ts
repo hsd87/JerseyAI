@@ -218,6 +218,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   } catch (error) {
     console.error('Error registering partner routes:', error);
   }
+  
+  // Pricing routes - importing from pricing.ts for dynamic pricing functionality
+  try {
+    const { registerPricingRoutes } = await import('./pricing');
+    registerPricingRoutes(app);
+  } catch (error) {
+    console.error('Error registering pricing routes:', error);
+  }
 
   // Subscription endpoints
   app.post("/api/subscribe", async (req, res, next) => {

@@ -6,12 +6,49 @@ import { users, orders } from '@shared/schema';
 import { InsertOrder, OrderDetails } from '@shared/schema';
 import { generateOrderPDF } from './utils/pdf-generator';
 import { sendOrderConfirmationEmail } from './utils/email-sender';
+import { calculateFinalPrice, CartItem, PriceBreakdown } from './utils/pricing';
+
+/**
+ * Convert OrderDetails to a format suitable for pricing calculations
+ */
+function orderDetailsToCartItems(orderDetails: OrderDetails): CartItem[] {
+  const cartItems: CartItem[] = [];
+  
+  // Convert regular items to CartItems
+  if (orderDetails.items && orderDetails.items.length > 0) {
+    orderDetails.items.forEach(item => {
+      cartItems.push({
+        productId: item.type, // Use type as the product ID
+        productType: item.type as any, // Cast to the expected type
+        basePrice: item.price * 100, // Convert to cents
+        quantity: item.quantity
+      });
+    });
+  }
+  
+  // Convert add-ons to CartItems if present
+  if (orderDetails.addOns && orderDetails.addOns.length > 0) {
+    orderDetails.addOns.forEach(addon => {
+      cartItems.push({
+        productId: addon.name,
+        productType: 'jersey' as any, // Default to jersey for add-ons
+        basePrice: addon.price * 100, // Convert to cents
+        quantity: addon.quantity
+      });
+    });
+  }
+  
+  return cartItems;
+}
 
 /**
  * Calculate the price for an order based on its items and addons
- * Also applies a 15% discount for subscribers
+ * Uses the dynamic pricing module that applies tier discounts, subscription discounts, and shipping costs
  */
-export function calculateOrderPrice(orderData: InsertOrder): number {
+export function calculateOrderPrice(orderData: InsertOrder, isSubscriber: boolean = false): {
+  totalInCents: number;
+  breakdown: PriceBreakdown;
+} {
   try {
     if (!orderData.orderDetails) {
       throw new Error('Order details are missing');
@@ -19,37 +56,33 @@ export function calculateOrderPrice(orderData: InsertOrder): number {
     
     const orderDetails = orderData.orderDetails as OrderDetails;
     
-    // Calculate base price from items
-    let baseTotal = 0;
-    if (orderDetails.items && orderDetails.items.length > 0) {
-      baseTotal = orderDetails.items.reduce((total, item) => {
-        return total + (item.price * item.quantity);
-      }, 0);
-    }
+    // Convert order details to cart items for pricing calculation
+    const cartItems = orderDetailsToCartItems(orderDetails);
     
-    // Add addon prices
-    let addonsTotal = 0;
-    if (orderDetails.addOns && orderDetails.addOns.length > 0) {
-      addonsTotal = orderDetails.addOns.reduce((total, addon) => {
-        return total + (addon.price * addon.quantity);
-      }, 0);
-    }
+    // Calculate price with full breakdown using the pricing module
+    const priceBreakdown = calculateFinalPrice(cartItems, isSubscriber);
     
-    // Apply discount if applicable
-    let discount = 0;
-    if (orderDetails.discount) {
-      discount = orderDetails.discount;
-    }
-    
-    // Calculate final total
-    const total = baseTotal + addonsTotal - discount;
-    
-    // Convert to cents for Stripe
-    return Math.round(total * 100);
+    // Return both the total amount in cents and the full breakdown
+    return {
+      totalInCents: priceBreakdown.grandTotal,
+      breakdown: priceBreakdown
+    };
   } catch (error) {
     console.error('Error calculating order price:', error);
     // Return the provided total amount if calculation fails
-    return orderData.totalAmount;
+    return {
+      totalInCents: orderData.totalAmount,
+      breakdown: {
+        baseTotal: orderData.totalAmount,
+        tierDiscountApplied: "0%",
+        tierDiscountAmount: 0,
+        subscriptionDiscountApplied: "0%",
+        subscriptionDiscountAmount: 0,
+        subtotalAfterDiscounts: orderData.totalAmount,
+        shippingCost: 0,
+        grandTotal: orderData.totalAmount
+      }
+    };
   }
 }
 
@@ -71,12 +104,22 @@ export function registerOrderRoutes(app: Express) {
         return res.status(403).json({ message: 'You can only create orders for your own designs' });
       }
       
+      // Get user subscription status for pricing
+      const isSubscriber = req.user?.subscriptionTier === 'pro';
+      
       // Recalculate the price on the server side to ensure accuracy
-      const calculatedPrice = calculateOrderPrice(orderData);
-      if (calculatedPrice !== orderData.totalAmount) {
-        console.warn(`Price mismatch: client sent ${orderData.totalAmount}, server calculated ${calculatedPrice}`);
+      const { totalInCents, breakdown } = calculateOrderPrice(orderData, isSubscriber);
+      
+      // Store the price breakdown in the order metadata (if not already present)
+      if (!orderData.metadata) {
+        orderData.metadata = {};
+      }
+      orderData.metadata.priceBreakdown = breakdown;
+      
+      if (totalInCents !== orderData.totalAmount) {
+        console.warn(`Price mismatch: client sent ${orderData.totalAmount}, server calculated ${totalInCents}`);
         // Use the server's calculation for security
-        orderData.totalAmount = calculatedPrice;
+        orderData.totalAmount = totalInCents;
       }
       
       // Create the order in the database
