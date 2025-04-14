@@ -1,0 +1,125 @@
+🎯 Objective:
+Implement the **full buying and eCommerce flow** directly on the **image generation page** of the ProJersey platform. This includes post-generation editing, product configuration, cart logic, team roster input, pricing, and checkout handling.
+
+---
+
+🧩 Scope of Work:
+
+🔹 1. 🖼️ Design Page Flow
+
+Ensure the entire flow happens in a single interactive view (react component-based):
+
+- **[Step 1]** 🧾 Form Input → 🧠 ChatGPT Prompt → 🖼️ Image Generation  
+- **[Step 2]** Canvas Editing (Logo/Name/Number placement)  
+- **[Step 3]** Product Configuration + Add-ons + Pricing  
+- **[Step 4]** Team Roster / Sizing  
+- **[Step 5]** Checkout Page → Summary + PDF → Payment  
+
+---
+
+🔹 2. 🧰 Implement Functional Blocks
+
+### A. Canvas Editor (after image is generated)
+- Allow users to upload logo (PNG/JPEG/SVG) and place it (drag to move, pinch/slider to resize).
+- Allow input for player name and number (e.g., text fields shown above image) and dynamically overlay them.
+- Save updated state to backend or as metadata to include in PDF & order.
+
+### B. Add-On Product Selection (shown below image editor)
+- Show complementary product blocks:
+  - Matching Socks → $6  
+  - Matching Beanie/Headband → $10  
+  - Matching Tracksuit → $25  
+  - Matching Kit Bag / Backpack → $18
+- Each product:
+  - ✅ Checkbox or “Add to Cart” toggle
+  - 🧾 Price display
+  - Optional thumbnail (ref image)
+- Save selected add-ons to order object.
+
+### C. Size Chart Toggle (Reusable Modal/Section)
+- Implement a size chart modal or dropdown that toggles open for Male, Female, Youth.
+- Load pre-defined sizing charts based on sport (can be hardcoded or pulled from static JSON).
+- Make it accessible before filling the roster.
+
+---
+
+🔹 3. 🧮 Price Calculator
+
+Dynamic total price updates based on:
+- Base kit type (jersey only / jersey + shorts / full kit, etc.)
+- Add-ons selected
+- Team size (unit price x qty)
+- Subscription discount (if user is Pro subscriber → apply 15% discount)
+- Live display:
+  - Unit Price
+  - Quantity
+  - Subtotal
+  - Add-ons total
+  - Final Total (post-discount)
+
+---
+
+🔹 4. 🧑‍🤝‍🧑 Team/Individual Roster Input
+
+Create a flexible component:
+- **Switch** between:
+  - Individual Order (simple name/number/size/qty)
+  - Team Order (table input)
+- Table Columns:
+  - Player Name
+  - Number
+  - Size (Dropdown from size chart)
+  - Quantity (default 1)
+- Allow + / – row addition
+- Validate for completeness before allowing checkout
+
+---
+
+🔹 5. 📦 Order Summary + Checkout Integration
+
+- Show a live “Order Summary” block:
+  - Design preview
+  - Roster summary
+  - Add-ons list
+  - Price breakdown
+- ✅ “Download PDF Summary” Button
+  - Includes:
+    - Generated image (final edited state)
+    - Roster
+    - Itemized breakdown (base kit, add-ons, discount)
+    - Billing & shipping details
+
+- 🛒 Proceed to Checkout:
+  - Collect billing + shipping info (reuse existing component if available)
+  - Stripe Checkout Integration (already set up)
+  - Store order in DB with:
+    - Design metadata
+    - Roster
+    - Add-ons
+    - Subscription tag
+    - Payment status
+
+---
+
+⚙️ Backend Tasks:
+- Extend order schema to support:
+  - Add-ons
+  - Roster (array)
+  - Final image reference
+  - Discount tracking
+- Store design + metadata in user profile (available from dashboard)
+- Trigger email confirmation with PDF attached (optional phase 2)
+
+---
+
+📱 UI Guidance:
+- Keep layout scroll-friendly, sectioned using anchors:
+  - “Your Design”, “Add Customization”, “Add-ons”, “Sizing”, “Roster”, “Checkout”
+- Highlight Total Price as sticky footer element on mobile
+- Use cards with icons for add-ons, clean table input for roster
+- Primary CTA: “Proceed to Checkout” visible at all times
+
+---
+
+🧪 Outcome:
+A complete on-page ordering system turning image generation into a personalized, monetizable eCommerce flow — seamlessly integrating creative, customization, and purchasing without jumping between views.
