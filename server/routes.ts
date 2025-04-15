@@ -3,6 +3,7 @@ import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
+import { registerAdminRoutes } from "./admin";
 import { designFormSchema, insertOrderSchema } from "@shared/schema";
 import path from "path";
 import fs from "fs";
@@ -225,6 +226,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     registerPricingRoutes(app);
   } catch (error) {
     console.error('Error registering pricing routes:', error);
+  }
+  
+  // Admin routes - importing from admin.ts for admin dashboard functionality
+  try {
+    registerAdminRoutes(app);
+    console.log('Admin routes registered successfully');
+  } catch (error) {
+    console.error('Error registering admin routes:', error);
   }
 
   // Subscription endpoints
