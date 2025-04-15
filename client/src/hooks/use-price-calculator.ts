@@ -46,7 +46,15 @@ export function usePriceCalculator() {
           }
         }
 
-        const response = await apiRequest('POST', '/api/price/estimate', { cart });
+        // The API expects cart items in a specific format
+        const response = await apiRequest('POST', '/api/price/estimate', { 
+          cart: cart.map(item => ({
+            productId: item.productId,
+            productType: item.productType,
+            basePrice: item.basePrice,
+            quantity: item.quantity
+          }))
+        });
         return await response.json();
       } catch (error) {
         console.error("Error in calculate price mutation:", error);

@@ -34,10 +34,14 @@ export function registerPricingRoutes(app: Express) {
    */
   app.post("/api/price/estimate", async (req: Request, res: Response) => {
     try {
+      // Log the incoming request for debugging
+      console.log("Price estimate request:", JSON.stringify(req.body));
+      
       // Validate request body
       const validationResult = priceEstimateSchema.safeParse(req.body);
       
       if (!validationResult.success) {
+        console.error("Validation error:", validationResult.error.format());
         return res.status(400).json({
           success: false,
           message: "Invalid request body",
@@ -56,6 +60,7 @@ export function registerPricingRoutes(app: Express) {
       return res.status(500).json({
         success: false,
         message: "Failed to calculate price estimate",
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   });
