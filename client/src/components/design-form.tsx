@@ -12,7 +12,11 @@ import {
   kitTypeOptions,
   sleeveOptions,
   collarOptions,
-  patternOptions
+  patternOptions,
+  sportKitTypeMapping,
+  sportCollarMapping,
+  sportPatternMapping,
+  addonOptions
 } from "@shared/schema";
 import {
   Form,
@@ -26,7 +30,23 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  TooltipProvider, 
+  Tooltip, 
+  TooltipTrigger, 
+  TooltipContent 
+} from "@/components/ui/tooltip";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { HelpCircle, RotateCw } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { createHash } from "crypto-browserify";
 
 interface DesignFormProps {
   remainingDesigns?: number;

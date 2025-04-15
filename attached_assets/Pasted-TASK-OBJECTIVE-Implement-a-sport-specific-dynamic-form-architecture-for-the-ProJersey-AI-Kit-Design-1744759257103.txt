@@ -1,0 +1,52 @@
+TASK OBJECTIVE:
+Implement a sport-specific dynamic form architecture for the ProJersey AI Kit Designer page. The form allows users to input kit preferences based on the sport selected. Each sport should load a unique set of product types (e.g., jersey-only, jersey + shorts, jacket options) and associated input fields (e.g., collar, sleeves, colors, patterns).
+
+⬇️ USE THE PROVIDED FORM LOGIC (ALREADY LOADED OR AVAILABLE IN /data/Form_Structure_Config.csv):
+
+✅ SUPPORTED SPORTS:
+• Soccer
+• Basketball
+• Rugby
+• Cricket
+• Esports
+
+✅ PRODUCT TYPE SELECTION LOGIC:
+Each sport allows only specific kit combinations:
+• Soccer: Jersey | Jersey + Shorts | All training jackets | Tracksuit
+• Basketball: Jersey | Jersey + Shorts | All training jackets | Tracksuit
+• Rugby: Jersey | Jersey + Shorts | All training jackets | Tracksuit
+• Cricket: Jersey | Jersey + Trousers | All training jackets | Tracksuit
+• Esports: Jersey | All training jackets | Tracksuit (No shorts or trousers)
+
+✅ FORM INPUT COMPONENTS (shown conditionally based on product type):
+• Primary Color [Color Picker]
+• Secondary Color [Color Picker]
+• Collar Type [Dropdown]
+• Sleeve Style [Dropdown]
+• Pattern Style [Dropdown]
+• Design Notes [Textarea]
+• Upload Logo(s) [Optional File Upload]
+
+✅ DESIGN TOKENS (MUST be passed to prompt logic):
+Always embed `"pfsportskit"` in the final prompt sent to OpenAI, no matter the sport.
+
+✅ NEXT STEPS:
+1. Dynamically render all inputs based on sport → product-type selection (based on CSV config).
+2. Connect these inputs to the `generateKitPrompt()` system (already available in the codebase).
+3. Ensure default values and disabled options are handled cleanly.
+4. Ensure form resets when a new sport is selected.
+5. Add a preview of the generated image placeholder after prompt execution.
+6. Include hidden field logic for backend tracking: `sport_type`, `product_type_selected`, and `form_payload_hash`.
+
+✅ OPTIONAL UX:
+- Show friendly tooltip: “Kit options are based on your sport – only allowed combos are shown”
+- If user selects “Away Kit” checkbox, auto-invert primary/secondary colors and flag in payload.
+
+⚙️ FILE LOCATIONS:
+• Frontend Form: `client/src/components/design-form.tsx`
+• Prompt routing system: `server/openai/generateKitPrompt.ts`
+• Form data config: `data/Form_Structure_Config.csv`
+
+⚠️ DO NOT connect this yet to pricing or ordering logic — this prompt only covers UI + prompt input pass-through for AI generation.
+
+Once complete, return a ✅ confirmation and optionally open `design-form.tsx` to show the changes.

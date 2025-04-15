@@ -172,33 +172,77 @@ export const sportOptions = [
   "esports"
 ] as const;
 
+// Common kit types across sports
 export const kitTypeOptions = [
   "jersey",
   "jerseyShorts",
-  "fullKit",
-  "completeKit"
+  "tracksuit",
+  "trackjacket",
+  "trackhoodie",
+  "trackjackethzip",
+  "jerseyTrousers",
+  "esportsjacket",
+  "esportshoodie"
 ] as const;
 
+// Sport-specific kit type mapping
+export const sportKitTypeMapping: Record<string, string[]> = {
+  soccer: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
+  basketball: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
+  rugby: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
+  cricket: ["jersey", "jerseyTrousers", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
+  esports: ["jersey", "esportsjacket", "esportshoodie"]
+};
+
 export const sleeveOptions = [
+  "sleeveless",
   "short",
-  "long",
-  "raglan"
+  "long"
 ] as const;
+
+// Sport-specific collar type mapping
+export const sportCollarMapping: Record<string, string[]> = {
+  soccer: ["crew", "v", "mandarin", "polo"],
+  basketball: ["crew", "v", "roundzip"],
+  rugby: ["v", "polo", "roundzip"],
+  cricket: ["mandarin", "polo", "roundzip"],
+  esports: ["v", "crew", "roundzip"]
+};
 
 export const collarOptions = [
   "crew",
   "v",
   "polo",
-  "henley"
+  "mandarin",
+  "roundzip"
 ] as const;
 
+// Sport-specific pattern type mapping
+export const sportPatternMapping: Record<string, string[]> = {
+  soccer: ["gradient", "slash", "panel", "striped", "digital", "minimal"],
+  basketball: ["gradient", "slash", "panel", "digital"],
+  rugby: ["panel", "striped", "digital"],
+  cricket: ["gradient", "minimal", "striped"],
+  esports: ["digital", "minimal"]
+};
+
 export const patternOptions = [
-  "solid",
-  "stripes",
   "gradient",
-  "geometric",
-  "camo"
+  "slash",
+  "panel", 
+  "striped",
+  "digital",
+  "minimal"
 ] as const;
+
+// Add-on products by sport
+export const addonOptions: Record<string, string[]> = {
+  soccer: ["socks", "headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
+  basketball: ["socks", "headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
+  rugby: ["socks", "headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
+  cricket: ["cap", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
+  esports: ["headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"]
+};
 
 export const designFormSchema = z.object({
   sport: z.enum(sportOptions),
