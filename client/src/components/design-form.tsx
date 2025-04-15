@@ -46,7 +46,6 @@ import {
 } from "@/components/ui/card";
 import { HelpCircle, RotateCw } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { createHash } from "crypto-browserify";
 
 interface DesignFormProps {
   remainingDesigns?: number;
@@ -57,12 +56,83 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   const { formData, updateFormData } = useDesignStore();
   const { generateDesign, isGenerating } = useReplicate();
   const subscription = useSubscription();
+  
+  const [awayKit, setAwayKit] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [formPayloadHash, setFormPayloadHash] = useState<string>('');
+
+  // Default form values with soccer selected initially
+  const defaultValues: Partial<DesignFormValues> = {
+    sport: formData.sport || "soccer",
+    kitType: formData.kitType || "jersey",
+    primaryColor: formData.primaryColor || "#0071e3",
+    secondaryColor: formData.secondaryColor || "#ffffff",
+    sleeveStyle: formData.sleeveStyle || "short",
+    collarType: formData.collarType || "crew",
+    patternStyle: formData.patternStyle || "solid",
+    designNotes: formData.designNotes || ""
+  };
 
   // Initialize the form with values from the store
   const form = useForm<DesignFormValues>({
     resolver: zodResolver(designFormSchema),
-    defaultValues: formData,
+    defaultValues,
   });
+
+  // Watch for sport changes to reset and update form fields appropriately
+  const selectedSport = form.watch("sport");
+  const selectedKitType = form.watch("kitType");
+  const primaryColor = form.watch("primaryColor");
+  const secondaryColor = form.watch("secondaryColor");
+
+  // Reset kit type when sport changes
+  useEffect(() => {
+    // Set default kit type for the selected sport
+    if (selectedSport && sportKitTypeMapping[selectedSport]?.length > 0) {
+      // Cast to ensure type safety
+      const defaultKitType = sportKitTypeMapping[selectedSport][0] as any;
+      form.setValue("kitType", defaultKitType);
+    }
+    
+    // Reset sleeve style, collar type, and pattern style based on sport defaults
+    if (sleeveOptions.length > 0) {
+      const defaultSleeveStyle = sleeveOptions[0];
+      form.setValue("sleeveStyle", defaultSleeveStyle);
+    }
+    
+    if (selectedSport && sportCollarMapping[selectedSport]?.length > 0) {
+      // Cast to ensure type safety
+      const defaultCollarType = sportCollarMapping[selectedSport][0] as any;
+      form.setValue("collarType", defaultCollarType);
+    }
+    
+    if (selectedSport && sportPatternMapping[selectedSport]?.length > 0) {
+      // Cast to ensure type safety
+      const defaultPatternStyle = sportPatternMapping[selectedSport][0] as any;
+      form.setValue("patternStyle", defaultPatternStyle);
+    }
+  }, [selectedSport, form]);
+
+  // Handle away kit toggle - invert primary and secondary colors
+  useEffect(() => {
+    if (awayKit) {
+      const temp = primaryColor;
+      form.setValue("primaryColor", secondaryColor);
+      form.setValue("secondaryColor", temp);
+    }
+  }, [awayKit]);
+
+  // Generate form payload hash for tracking
+  useEffect(() => {
+    const formValues = form.getValues();
+    const hashString = JSON.stringify(formValues);
+    // Simple hash for tracking changes
+    const hash = hashString
+      .split('')
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0)
+      .toString(16);
+    setFormPayloadHash(hash);
+  }, [form.watch()]);
 
   // Update the store when form values change
   useEffect(() => {
@@ -72,9 +142,66 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
     return () => subscription.unsubscribe();
   }, [form.watch, updateFormData]);
 
+  // Filter kit types based on selected sport
+  const availableKitTypes = selectedSport ? sportKitTypeMapping[selectedSport] || [] : [];
+  
+  // Filter collar types based on selected sport
+  const availableCollarTypes = selectedSport ? sportCollarMapping[selectedSport] || [] : [];
+  
+  // Filter pattern styles based on selected sport
+  const availablePatternStyles = selectedSport ? sportPatternMapping[selectedSport] || [] : [];
+
+  const formatKitTypeLabel = (kitType: string): string => {
+    switch (kitType) {
+      case "jersey": return "Jersey Only";
+      case "jerseyShorts": return "Jersey + Shorts";
+      case "jerseyTrousers": return "Jersey + Trousers";
+      case "tracksuit": return "Track Suit";
+      case "trackjacket": return "Track Jacket";
+      case "trackhoodie": return "Track Hoodie";
+      case "trackjackethzip": return "Track Jacket Half Zip";
+      case "esportsjacket": return "Esports Jacket";
+      case "esportshoodie": return "Esports Hoodie";
+      default: return kitType.charAt(0).toUpperCase() + kitType.slice(1).replace(/([A-Z])/g, ' $1');
+    }
+  };
+
+  const formatCollarTypeLabel = (collarType: string): string => {
+    switch (collarType) {
+      case "v": return "V-Neck";
+      case "roundzip": return "Round Zip";
+      default: return collarType.charAt(0).toUpperCase() + collarType.slice(1);
+    }
+  };
+
   const onSubmit = async (data: DesignFormValues) => {
     try {
-      await generateDesign();
+      // Add pfsportskit token to the designNotes
+      const dataWithToken = {
+        ...data,
+        designNotes: `${data.designNotes || ""} [pfsportskit]`.trim()
+      };
+      
+      // Track submission data
+      const trackingData = {
+        sport_type: data.sport,
+        product_type_selected: data.kitType,
+        form_payload_hash: formPayloadHash,
+        is_away_kit: awayKit
+      };
+      
+      console.log("Submitting design with tracking data:", trackingData);
+      
+      // Generate design using the data
+      const result = await generateDesign();
+      if (result) {
+        // Extract the image URL from the result if needed
+        if (typeof result === 'string') {
+          setGeneratedImage(result);
+        } else if (result.frontImageUrl) {
+          setGeneratedImage(result.frontImageUrl);
+        }
+      }
     } catch (error) {
       console.error("Error generating design:", error);
     }
@@ -126,10 +253,11 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="jersey">Jersey Only</SelectItem>
-                    <SelectItem value="jerseyShorts">Jersey + Shorts</SelectItem>
-                    <SelectItem value="fullKit">Full Kit (incl. Socks)</SelectItem>
-                    <SelectItem value="completeKit">Complete Kit (incl. Headwear)</SelectItem>
+                    {availableKitTypes.map((kitType) => (
+                      <SelectItem key={kitType} value={kitType as any}>
+                        {formatKitTypeLabel(kitType)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -175,88 +303,114 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             />
           </div>
           
-          {/* Dynamic Options Based on Sport - Soccer is default */}
-          {form.watch("sport") === "soccer" && (
-            <div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="sleeveStyle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Sleeve Style</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select sleeve style" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="z-[100]">
-                          {sleeveOptions.map((sleeve) => (
-                            <SelectItem key={sleeve} value={sleeve}>
-                              {sleeve.charAt(0).toUpperCase() + sleeve.slice(1)} Sleeves
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="collarType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Collar Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select collar type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="z-[100]">
-                          {collarOptions.map((collar) => (
-                            <SelectItem key={collar} value={collar}>
-                              {collar === "v" ? "V-Neck" : collar.charAt(0).toUpperCase() + collar.slice(1)} {collar !== "v" ? "Collar" : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <div className="mt-4">
-                <FormField
-                  control={form.control}
-                  name="patternStyle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Pattern Style</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select pattern style" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="z-[100]">
-                          {patternOptions.map((pattern) => (
-                            <SelectItem key={pattern} value={pattern}>
-                              {pattern.charAt(0).toUpperCase() + pattern.slice(1)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+          {/* Dynamic Sport-Specific Options */}
+          <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="sleeveStyle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Sleeve Style</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select sleeve style" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="z-[100]">
+                        {sleeveOptions.map((sleeve) => (
+                          <SelectItem key={sleeve} value={sleeve}>
+                            {sleeve.charAt(0).toUpperCase() + sleeve.slice(1)} {sleeve !== "sleeveless" ? "Sleeves" : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="collarType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Collar Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select collar type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="z-[100]">
+                        {availableCollarTypes.map((collar) => (
+                          <SelectItem key={collar} value={collar as any}>
+                            {formatCollarTypeLabel(collar)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          )}
+            
+            <div className="mt-4">
+              <FormField
+                control={form.control}
+                name="patternStyle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Pattern Style</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select pattern style" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="z-[100]">
+                        {availablePatternStyles.map((pattern) => (
+                          <SelectItem key={pattern} value={pattern as any}>
+                            {pattern.charAt(0).toUpperCase() + pattern.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            {/* Away Kit Option */}
+            <div className="mt-4 flex items-center space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                onClick={() => setAwayKit(!awayKit)}
+              >
+                <RotateCw className="h-4 w-4" />
+                {awayKit ? "Show Home Kit Colors" : "Show Away Kit Colors"}
+              </Button>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full p-0">
+                      <span className="sr-only">Info</span>
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="w-[200px] text-xs">Away kits typically invert the primary and secondary colors</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </div>
           
           {/* Design Philosophy - Optional Text Input */}
           <FormField

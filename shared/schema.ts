@@ -232,7 +232,8 @@ export const patternOptions = [
   "panel", 
   "striped",
   "digital",
-  "minimal"
+  "minimal",
+  "solid"
 ] as const;
 
 // Add-on products by sport
