@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -174,14 +174,7 @@ export default function AdminDashboard() {
     enabled: !!user && user.role === 'admin',
   });
 
-  // Check if user is admin and redirect if not
-  useEffect(() => {
-    if (!authLoading && user && user.role !== 'admin') {
-      setLocation('/');
-    } else if (!authLoading && !user) {
-      setLocation('/auth');
-    }
-  }, [user, authLoading, setLocation]);
+  // Admin check happens in render method instead of useEffect
 
   // Format revenue for display
   const formatCurrency = (amount: number) => {
@@ -345,8 +338,9 @@ export default function AdminDashboard() {
     );
   }
 
+  // Redirect non-admin users via ProtectedRoute in App.tsx
   if (!user || user.role !== 'admin') {
-    return null; // User will be redirected by the useEffect
+    return <Redirect to="/" />;
   }
 
   return (
