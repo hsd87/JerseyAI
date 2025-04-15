@@ -85,6 +85,25 @@ export default function OrderConfig() {
   const handleTeamOrderChange = (checked: boolean) => {
     form.setValue('isTeamOrder', checked);
     setIsTeamOrder(checked);
+    
+    // When switching to team order mode, if there are no items in the cart,
+    // we need to make sure there's at least one item for pricing calculations
+    if (checked) {
+      // If there are no items yet, add a default one based on the current form values
+      const { items, addItem } = useOrderStore.getState();
+      if (items.length === 0) {
+        const packageType = form.getValues('packageType') || 'jerseyOnly';
+        const price = PACKAGE_PRICES[packageType] || 59.99;
+        
+        addItem({
+          type: packageType,
+          size: form.getValues('size') || 'M',
+          quantity: 1,
+          gender: form.getValues('gender') || 'Male',
+          price: price,
+        });
+      }
+    }
   };
 
   const handleQuantityChange = (newQty: number) => {

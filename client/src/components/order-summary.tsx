@@ -97,6 +97,18 @@ export default function OrderSummary({
     );
   }
   
+  // Verify that the price breakdown has all required properties to avoid errors
+  const isValidPriceBreakdown = (pb: any): boolean => {
+    return pb && 
+      typeof pb.baseTotal === 'number' && 
+      typeof pb.shippingCost === 'number' && 
+      typeof pb.subtotalAfterDiscounts === 'number' && 
+      typeof pb.grandTotal === 'number';
+  };
+  
+  // Use validated price breakdown or null
+  const validatedPriceBreakdown = isValidPriceBreakdown(priceBreakdown) ? priceBreakdown : null;
+
   return (
     <Card className={className}>
       <CardHeader>
@@ -113,18 +125,18 @@ export default function OrderSummary({
           {items.map((item, index) => (
             <div key={index} className="flex justify-between text-sm">
               <span>
-                {item.quantity}× {item.type} ({item.size}, {item.gender})
+                {item.quantity}× {item.type} ({item.size || 'M'}, {item.gender || 'Male'})
               </span>
-              <span>${(item.price * item.quantity).toFixed(2)}</span>
+              <span>${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
             </div>
           ))}
           
           {addOns.map((addon, index) => (
             <div key={index} className="flex justify-between text-sm">
               <span>
-                {addon.quantity}× {addon.name}
+                {addon.quantity || 1}× {addon.name || 'Add-on'}
               </span>
-              <span>${(addon.price * addon.quantity).toFixed(2)}</span>
+              <span>${((addon.price || 0) * (addon.quantity || 1)).toFixed(2)}</span>
             </div>
           ))}
         </div>
@@ -136,11 +148,11 @@ export default function OrderSummary({
               <Loader2 className="w-5 h-5 animate-spin mr-2" />
               <span>Calculating price...</span>
             </div>
-          ) : priceBreakdown ? (
+          ) : validatedPriceBreakdown ? (
             showDetailed ? (
-              <PriceBreakdownCard breakdown={priceBreakdown} />
+              <PriceBreakdownCard breakdown={validatedPriceBreakdown} />
             ) : (
-              <SimplePriceSummary breakdown={priceBreakdown} />
+              <SimplePriceSummary breakdown={validatedPriceBreakdown} />
             )
           ) : (
             <div className="flex justify-between font-bold text-lg">
@@ -151,12 +163,12 @@ export default function OrderSummary({
         </div>
         
         {/* Shipping threshold notifications */}
-        {priceBreakdown && priceBreakdown.shippingCost > 0 && (
+        {validatedPriceBreakdown && validatedPriceBreakdown.shippingCost > 0 && (
           <div className="text-sm bg-muted p-2 rounded-md text-center">
-            {priceBreakdown.subtotalAfterDiscounts < 20000 ? (
+            {validatedPriceBreakdown.subtotalAfterDiscounts < 20000 ? (
               <p>Add more items to qualify for reduced shipping ($20)</p>
-            ) : priceBreakdown.subtotalAfterDiscounts < 50000 ? (
-              <p>Spend ${((50000 - priceBreakdown.subtotalAfterDiscounts) / 100).toFixed(2)} more for free shipping</p>
+            ) : validatedPriceBreakdown.subtotalAfterDiscounts < 50000 ? (
+              <p>Spend ${((50000 - validatedPriceBreakdown.subtotalAfterDiscounts) / 100).toFixed(2)} more for free shipping</p>
             ) : null}
           </div>
         )}
