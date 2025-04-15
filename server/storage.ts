@@ -17,11 +17,14 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<User>): Promise<User>;
+  updateUserRole(id: number, role: string): Promise<User>;
+  getAllUsers(): Promise<User[]>;
   
   // Design Methods
   createDesign(design: InsertDesign): Promise<Design>;
   getDesignById(id: number): Promise<Design | undefined>;
   getUserDesigns(userId: number): Promise<Design[]>;
+  getAllDesigns(): Promise<Design[]>;
   updateDesign(id: number, data: Partial<Design>): Promise<Design>;
   deleteDesign(id: number): Promise<void>;
   
@@ -29,6 +32,7 @@ export interface IStorage {
   createOrder(order: InsertOrder): Promise<Order>;
   getOrderById(id: number): Promise<Order | undefined>;
   getUserOrders(userId: number): Promise<Order[]>;
+  getAllOrders(): Promise<Order[]>;
   updateOrderStatus(id: number, status: string, trackingId?: string): Promise<Order>;
   updateOrderPdfUrl(id: number, pdfUrl: string): Promise<Order>;
   
@@ -101,6 +105,24 @@ export class DatabaseStorage implements IStorage {
     return updatedUser;
   }
 
+  async updateUserRole(id: number, role: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ role })
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    
+    return updatedUser;
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(users).orderBy(users.username);
+  }
+
   // Design Methods
   async createDesign(design: InsertDesign): Promise<Design> {
     const [newDesign] = await db
@@ -122,6 +144,10 @@ export class DatabaseStorage implements IStorage {
 
   async getUserDesigns(userId: number): Promise<Design[]> {
     return db.select().from(designs).where(eq(designs.userId, userId));
+  }
+  
+  async getAllDesigns(): Promise<Design[]> {
+    return db.select().from(designs).orderBy(desc(designs.createdAt));
   }
 
   async updateDesign(id: number, data: Partial<Design>): Promise<Design> {
@@ -162,6 +188,10 @@ export class DatabaseStorage implements IStorage {
 
   async getUserOrders(userId: number): Promise<Order[]> {
     return db.select().from(orders).where(eq(orders.userId, userId));
+  }
+  
+  async getAllOrders(): Promise<Order[]> {
+    return db.select().from(orders).orderBy(desc(orders.createdAt));
   }
 
   async updateOrderStatus(id: number, status: string, trackingId?: string): Promise<Order> {
