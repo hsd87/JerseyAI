@@ -54,9 +54,9 @@ export default function OrderConfig() {
   const form = useForm<OrderConfigValues>({
     resolver: zodResolver(orderConfigSchema),
     defaultValues: {
-      packageType,
-      gender,
-      size,
+      packageType: packageType as 'jerseyOnly' | 'jerseyShorts' | 'fullKit',
+      gender: gender as 'Male' | 'Female' | 'Youth',
+      size: size as 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL',
       quantity,
       isTeamOrder,
     },

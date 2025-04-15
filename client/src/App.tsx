@@ -18,6 +18,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 
 // Lazy-loaded components
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
+const OrderConfirmationPage = React.lazy(() => import('./pages/order-confirmation'));
 const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
 const JerseyEditorPage = React.lazy(() => import('./pages/jersey-editor-page'));
 const PricingCalculatorPage = React.lazy(() => import('./pages/pricing-calculator-page'));
@@ -91,6 +92,9 @@ function AppContent() {
           </Route>
           <Route path="/orders/:id">
             <ProtectedRoute path="/orders/:id" component={OrderDetailPage} />
+          </Route>
+          <Route path="/order-confirmation">
+            <OrderConfirmationPage />
           </Route>
           
           {/* 404 route */}
