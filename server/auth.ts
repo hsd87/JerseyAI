@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Express } from "express";
+import { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -29,6 +29,14 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  // Set up debugging middleware to log auth status
+  app.use((req, res, next) => {
+    console.log('Auth Debug - isAuthenticated:', req.isAuthenticated ? req.isAuthenticated() : 'method not available');
+    console.log('Auth Debug - session:', req.session ? 'session exists' : 'no session');
+    console.log('Auth Debug - cookies:', req.headers.cookie || 'no cookies');
+    next();
+  });
+
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || 'projersey-session-secret',
     resave: false,
@@ -37,6 +45,8 @@ export function setupAuth(app: Express) {
     cookie: {
       secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      sameSite: 'lax', // Helps with CSRF protection while allowing redirects
+      httpOnly: true, // Cookie cannot be accessed via JavaScript
     }
   };
 
@@ -92,14 +102,39 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
-      if (err) return next(err);
+    console.log('Login attempt:', req.body.username);
+    
+    passport.authenticate("local", (err: any, user: SelectUser | false, info: any) => {
+      if (err) {
+        console.error('Login error:', err);
+        return next(err);
+      }
+      
       if (!user) {
+        console.log('Login failed: Invalid credentials');
         return res.status(401).json({ message: "Invalid username or password" });
       }
+      
+      console.log('Login successful for user:', user.username);
+      
       req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(200).json(user);
+        if (err) {
+          console.error('Session error during login:', err);
+          return next(err);
+        }
+        
+        console.log('Session created, user logged in with ID:', user.id);
+        
+        // Create a safe version of the user object without sensitive data
+        const safeUser = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          subscriptionTier: user.subscriptionTier,
+          remainingDesigns: user.remainingDesigns
+        };
+        
+        res.status(200).json(safeUser);
       });
     })(req, res, next);
   });
