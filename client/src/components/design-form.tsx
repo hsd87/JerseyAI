@@ -53,7 +53,13 @@ interface DesignFormProps {
 
 export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   const { user } = useAuth();
-  const { formData, updateFormData } = useDesignStore();
+  const { 
+    formData, 
+    updateFormData, 
+    resetFormDataForSport, 
+    toggleAwayKit, 
+    isAwayKit: storeAwayKit 
+  } = useDesignStore();
   const { generateDesign, isGenerating } = useReplicate();
   const subscription = useSubscription();
   
@@ -220,7 +226,23 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Sport</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select 
+                  onValueChange={(value) => {
+                    // First update the form field
+                    field.onChange(value);
+                    
+                    // Then use the resetFormDataForSport to update all related fields
+                    resetFormDataForSport(value);
+                    
+                    // Update the form with all new values from the store
+                    const newFormData = formData;
+                    Object.keys(newFormData).forEach(key => {
+                      if (key !== 'sport') { // Skip sport as we just set it
+                        form.setValue(key as any, newFormData[key as keyof DesignFormValues]);
+                      }
+                    });
+                  }} 
+                  defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select sport" />
@@ -390,7 +412,18 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
-                onClick={() => setAwayKit(!awayKit)}
+                onClick={() => {
+                  // Use the store's toggle function which will also swap colors
+                  toggleAwayKit();
+                  
+                  // Update local state
+                  setAwayKit(!awayKit);
+                  
+                  // Update form values from store
+                  const newFormData = formData;
+                  form.setValue("primaryColor", newFormData.primaryColor);
+                  form.setValue("secondaryColor", newFormData.secondaryColor);
+                }}
               >
                 <RotateCw className="h-4 w-4" />
                 {awayKit ? "Show Home Kit Colors" : "Show Away Kit Colors"}
