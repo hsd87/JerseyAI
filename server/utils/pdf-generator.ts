@@ -9,15 +9,22 @@ import { Order } from "@shared/schema";
  * @returns Path to the generated PDF file
  */
 export async function generateOrderPDF(order: Order): Promise<string> {
-  // Create output directory if it doesn't exist
+  // Create both output directories if they don't exist
   const outputDir = path.join(process.cwd(), "output");
+  const orderPdfDir = path.join(process.cwd(), "orders", "pdfs");
+  
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
+  
+  if (!fs.existsSync(orderPdfDir)) {
+    fs.mkdirSync(orderPdfDir, { recursive: true });
+  }
 
   // Create PDF filename
-  const fileName = `order_${order.id}_${Date.now()}.pdf`;
+  const fileName = `order_${order.id}.pdf`;
   const filePath = path.join(outputDir, fileName);
+  const orderPdfPath = path.join(orderPdfDir, fileName);
   
   // Create PDF
   const doc = new PDFDocument({ margin: 50 });
@@ -130,14 +137,24 @@ export async function generateOrderPDF(order: Order): Promise<string> {
   // Finalize PDF
   doc.end();
   
-  // Return a Promise that resolves when the file is written
+  // Return a Promise that resolves when the file is written and copied
   return new Promise((resolve, reject) => {
     stream.on("finish", () => {
-      // Return the relative path from the project root (for easier URL construction)
-      resolve(`/output/${fileName}`);
+      try {
+        // Copy the file to the orders/pdfs directory
+        fs.copyFileSync(filePath, orderPdfPath);
+        console.log(`PDF copied to ${orderPdfPath}`);
+        
+        // Return the URL path for the PDF
+        resolve(`/orders/pdfs/${fileName}`);
+      } catch (err) {
+        console.error('Error copying PDF file:', err);
+        reject(err);
+      }
     });
     
     stream.on("error", (err) => {
+      console.error('Error writing PDF file:', err);
       reject(err);
     });
   });
