@@ -1,279 +1,222 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { sportOptions, kitTypeOptions, sleeveOptions, collarOptions, patternOptions } from "@shared/schema";
-import { Loader2 } from "lucide-react";
+import { orderService } from "@/lib/order-service";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function TestPage() {
-  const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    sport: "soccer",
-    kitType: "jersey+shorts",
-    primaryColor: "#0062ff",
-    secondaryColor: "#ffffff",
-    sleeveStyle: "short-sleeved",
-    collarType: "crew",
-    patternStyle: "geometric",
-    designNotes: "A modern, sleek kit with dynamic geometric patterns. The design should feel technical and forward-looking."
-  });
-
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      console.log('Submitting request to /api/generate-image:', formData);
-      
-      const response = await fetch('/api/generate-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("checkout");
+  
+  // Test create order
+  const handleCreateTestOrder = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You need to be logged in to create an order",
+        variant: "destructive",
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to generate image');
-      }
-
-      const data = await response.json();
-      console.log('API response:', data);
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Create a basic test order with minimal data
+      const order = await orderService.createOrder({
+        userId: user.id,
+        designId: 1, // Assuming at least one design exists
+        orderDetails: {
+          items: [
+            {
+              type: "jerseyOnly",
+              size: "M",
+              quantity: 1,
+              gender: "Male",
+              price: 59.99,
+            }
+          ],
+          addOns: [],
+          packageType: "jerseyOnly",
+          isTeamOrder: false,
+        },
+        shippingAddress: {
+          name: "Test User",
+          street: "123 Test St",
+          city: "Test City",
+          state: "TS",
+          zip: "12345",
+          country: "Test Country",
+          phone: "+1234567890",
+        },
+        totalAmount: 5999, // $59.99 in cents
+        sport: "soccer",
+        designUrls: {
+          front: "https://example.com/front.jpg",
+          back: "https://example.com/back.jpg",
+        },
+      });
       
-      if (data.imageUrl) {
-        setImageUrl(data.imageUrl);
-      } else {
-        throw new Error('No image URL in response');
-      }
-    } catch (err) {
-      console.error('Error generating image:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      toast({
+        title: "Test Order Created",
+        description: `Order ID: ${order.id}`,
+      });
+    } catch (error: any) {
+      console.error("Error creating test order:", error);
+      toast({
+        title: "Order Creation Failed",
+        description: error.message || "An error occurred",
+        variant: "destructive",
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-
+  
+  // Test fetch orders
+  const handleFetchOrders = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You need to be logged in to fetch orders",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const userOrders = await orderService.getUserOrders();
+      setOrders(userOrders);
+      
+      toast({
+        title: "Orders Fetched",
+        description: `Found ${userOrders.length} orders`,
+      });
+    } catch (error: any) {
+      console.error("Error fetching orders:", error);
+      toast({
+        title: "Fetch Orders Failed",
+        description: error.message || "An error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
+  };
+  
   return (
-    <div className="container py-10">
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="md:w-1/2">
+    <div className="container max-w-6xl py-8">
+      <h1 className="text-3xl font-bold mb-6">eCommerce Flow Test Page</h1>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-8">
+        <TabsList className="w-full grid grid-cols-2">
+          <TabsTrigger value="checkout">Order Creation Test</TabsTrigger>
+          <TabsTrigger value="orders">Order Listing Test</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="checkout" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Test Direct Image Generation</CardTitle>
+              <CardTitle>Create Test Order</CardTitle>
               <CardDescription>
-                This page tests the enhanced prompt-to-image pipeline with the structured template.
+                This will create a test order with minimal data to test the database connection.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="sport">Sport</Label>
-                  <Select 
-                    value={formData.sport} 
-                    onValueChange={(value) => handleChange('sport', value)}
-                  >
-                    <SelectTrigger id="sport">
-                      <SelectValue placeholder="Select sport" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sportOptions.map((sport) => (
-                        <SelectItem key={sport} value={sport}>{sport}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="kitType">Kit Type</Label>
-                  <Select 
-                    value={formData.kitType} 
-                    onValueChange={(value) => handleChange('kitType', value)}
-                  >
-                    <SelectTrigger id="kitType">
-                      <SelectValue placeholder="Select kit type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {kitTypeOptions.map((type) => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="primaryColor">Primary Color</Label>
-                    <div className="flex items-center space-x-2">
-                      <Input 
-                        type="color" 
-                        id="primaryColor" 
-                        value={formData.primaryColor} 
-                        onChange={(e) => handleChange('primaryColor', e.target.value)}
-                        className="w-12 h-10 p-1"
-                      />
-                      <Input 
-                        type="text" 
-                        value={formData.primaryColor} 
-                        onChange={(e) => handleChange('primaryColor', e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="secondaryColor">Secondary Color</Label>
-                    <div className="flex items-center space-x-2">
-                      <Input 
-                        type="color" 
-                        id="secondaryColor" 
-                        value={formData.secondaryColor} 
-                        onChange={(e) => handleChange('secondaryColor', e.target.value)}
-                        className="w-12 h-10 p-1"
-                      />
-                      <Input 
-                        type="text" 
-                        value={formData.secondaryColor} 
-                        onChange={(e) => handleChange('secondaryColor', e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="sleeveStyle">Sleeve Style</Label>
-                  <Select 
-                    value={formData.sleeveStyle} 
-                    onValueChange={(value) => handleChange('sleeveStyle', value)}
-                  >
-                    <SelectTrigger id="sleeveStyle">
-                      <SelectValue placeholder="Select sleeve style" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sleeveOptions.map((style) => (
-                        <SelectItem key={style} value={style}>{style}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="collarType">Collar Type</Label>
-                  <Select 
-                    value={formData.collarType} 
-                    onValueChange={(value) => handleChange('collarType', value)}
-                  >
-                    <SelectTrigger id="collarType">
-                      <SelectValue placeholder="Select collar type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {collarOptions.map((collar) => (
-                        <SelectItem key={collar} value={collar}>{collar}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="patternStyle">Pattern Style</Label>
-                  <Select 
-                    value={formData.patternStyle} 
-                    onValueChange={(value) => handleChange('patternStyle', value)}
-                  >
-                    <SelectTrigger id="patternStyle">
-                      <SelectValue placeholder="Select pattern style" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {patternOptions.map((pattern) => (
-                        <SelectItem key={pattern} value={pattern}>{pattern}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="designNotes">Design Notes</Label>
-                  <Textarea 
-                    id="designNotes" 
-                    value={formData.designNotes} 
-                    onChange={(e) => handleChange('designNotes', e.target.value)}
-                    placeholder="Add any specific design notes..."
-                    rows={4}
-                  />
-                </div>
-              
-                <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    'Generate Image'
-                  )}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="md:w-1/2">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Generated Image</CardTitle>
-              <CardDescription>
-                The result will display here after generation
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center min-h-[400px]">
-              {loading ? (
-                <div className="flex flex-col items-center justify-center">
-                  <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    Generating image... This may take up to 30 seconds.
-                  </p>
-                </div>
-              ) : error ? (
-                <div className="text-center p-6 bg-red-50 border border-red-200 rounded-md">
-                  <p className="text-red-600 font-medium">Error</p>
-                  <p className="text-sm text-red-500 mt-1">{error}</p>
-                </div>
-              ) : imageUrl ? (
-                <div className="flex flex-col items-center">
-                  <img
-                    src={imageUrl}
-                    alt="Generated jersey design"
-                    className="max-w-full max-h-[400px] object-contain border border-border rounded-md shadow-sm"
-                  />
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {imageUrl}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-10">
-                  Fill out the form and click "Generate Image" to see the result
-                </p>
-              )}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <p className="text-xs text-muted-foreground">
-                Uses the new structured prompt format with "pfsportskit" token
+              <p className="text-gray-500 mb-4">
+                Test order details:
               </p>
+              <ul className="list-disc pl-5 space-y-1 text-sm">
+                <li>Product: Jersey Only ($59.99)</li>
+                <li>Quantity: 1</li>
+                <li>Size: Medium</li>
+                <li>Sport: Soccer</li>
+                <li>Shipping: Test Address</li>
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                onClick={handleCreateTestOrder} 
+                disabled={isLoading || !user}
+              >
+                {isLoading ? "Creating..." : "Create Test Order"}
+              </Button>
             </CardFooter>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="orders" className="space-y-4 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Orders</CardTitle>
+              <CardDescription>
+                Fetch and display your orders from the database
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={handleFetchOrders} 
+                disabled={isLoading || !user}
+                className="mb-4"
+              >
+                {isLoading ? "Fetching..." : "Fetch Orders"}
+              </Button>
+              
+              {orders.length > 0 ? (
+                <div className="space-y-4">
+                  {orders.map((order) => (
+                    <Card key={order.id} className="p-4">
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="font-medium">Order ID:</div>
+                        <div>{order.id}</div>
+                        
+                        <div className="font-medium">Date:</div>
+                        <div>{formatDate(order.createdAt)}</div>
+                        
+                        <div className="font-medium">Status:</div>
+                        <div className="capitalize">{order.status}</div>
+                        
+                        <div className="font-medium">Amount:</div>
+                        <div>${(order.totalAmount / 100).toFixed(2)}</div>
+                        
+                        <div className="font-medium">Sport:</div>
+                        <div className="capitalize">{order.sport}</div>
+                        
+                        {order.trackingId && (
+                          <>
+                            <div className="font-medium">Tracking:</div>
+                            <div>{order.trackingId}</div>
+                          </>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500">No orders found. Create a test order first or fetch your orders.</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      
+      {!user && (
+        <div className="bg-yellow-100 p-4 rounded-md text-yellow-800 text-sm">
+          <strong>Note:</strong> You must be logged in to test the order functionality. Please log in first.
         </div>
-      </div>
+      )}
     </div>
   );
 }
