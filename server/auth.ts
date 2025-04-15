@@ -7,6 +7,13 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 
+// Extend the Express Session interface to allow for custom properties
+declare module 'express-session' {
+  interface SessionData {
+    views?: number;
+  }
+}
+
 declare global {
   namespace Express {
     interface User extends SelectUser {}
@@ -147,7 +154,67 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
+    console.log('API User Request - Session ID:', req.sessionID);
+    console.log('API User Request - Session:', req.session);
+    console.log('API User Request - isAuthenticated:', req.isAuthenticated());
+    console.log('API User Request - User:', req.user);
+    
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
+  });
+  
+  // Debug test endpoint
+  app.get("/api/test-auth", (req, res) => {
+    console.log('Test Auth - Session ID:', req.sessionID);
+    console.log('Test Auth - Session:', req.session);
+    
+    // Create a session manually for testing
+    if (!req.session.views) {
+      req.session.views = 0;
+    }
+    req.session.views++;
+    
+    res.json({
+      sessionID: req.sessionID,
+      views: req.session.views,
+      isAuthenticated: req.isAuthenticated(),
+      session: req.session
+    });
+  });
+  
+  // Debug test login endpoint
+  app.get("/api/test-login", async (req, res) => {
+    try {
+      // Get test user
+      const testUser = await storage.getUserByUsername('testuser');
+      
+      if (!testUser) {
+        return res.status(404).json({ message: "Test user not found" });
+      }
+      
+      // Manually log in the test user
+      req.login(testUser, (err) => {
+        if (err) {
+          console.error('Test login error:', err);
+          return res.status(500).json({ message: "Login error", error: err.message });
+        }
+        
+        console.log('Test login successful - Session ID:', req.sessionID);
+        console.log('Test login successful - User:', testUser.username);
+        
+        res.json({
+          message: "Test login successful",
+          user: {
+            id: testUser.id,
+            username: testUser.username,
+            email: testUser.email
+          },
+          sessionID: req.sessionID
+        });
+      });
+    } catch (error: any) {
+      console.error('Test login exception:', error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
   });
 }
