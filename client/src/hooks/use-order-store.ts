@@ -202,35 +202,57 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     const { items, addOns, teamMembers, isTeamOrder } = get();
     const cartItems: CartItem[] = [];
     
+    // Map our internal package types to the API expected product types
+    const mapProductType = (type: string): "jersey" | "jersey_shorts" | "kit" => {
+      switch(type) {
+        case 'jerseyOnly':
+          return 'jersey';
+        case 'jerseyShorts':
+          return 'jersey_shorts';
+        case 'fullKit':
+          return 'kit';
+        case 'shorts':
+          return 'jersey_shorts';
+        default:
+          return 'jersey'; // Default fallback
+      }
+    };
+    
     // Convert regular items to cart items
     items.forEach(item => {
-      cartItems.push({
-        productId: item.type,
-        productType: item.type === 'shorts' ? 'jersey_shorts' : (item.type as "jersey" | "jersey_shorts" | "kit"),
-        basePrice: Math.round(item.price * 100), // Convert to cents, ensure it's an integer
-        quantity: item.quantity
-      });
+      if (item && item.type && typeof item.price === 'number' && typeof item.quantity === 'number') {
+        cartItems.push({
+          productId: item.type,
+          productType: mapProductType(item.type),
+          basePrice: Math.round(item.price * 100), // Convert to cents, ensure it's an integer
+          quantity: item.quantity
+        });
+      }
     });
     
     // Convert add-ons to cart items
     addOns.forEach(addOn => {
-      cartItems.push({
-        productId: addOn.id,
-        productType: 'jersey', // Default to jersey for add-ons
-        basePrice: Math.round(addOn.price * 100), // Convert to cents, ensure it's an integer
-        quantity: addOn.quantity
-      });
+      if (addOn && addOn.id && typeof addOn.price === 'number' && typeof addOn.quantity === 'number') {
+        cartItems.push({
+          productId: addOn.id,
+          productType: 'jersey', // Default to jersey for add-ons
+          basePrice: Math.round(addOn.price * 100), // Convert to cents, ensure it's an integer
+          quantity: addOn.quantity
+        });
+      }
     });
     
     // Convert team members to cart items if it's a team order
     if (isTeamOrder && teamMembers && teamMembers.length > 0) {
       teamMembers.forEach(member => {
-        cartItems.push({
-          productId: `jersey-${member.number}`,
-          productType: 'jersey',
-          basePrice: 8999, // $89.99 per jersey
-          quantity: member.quantity || 1
-        });
+        if (member && member.id && typeof member.quantity === 'number') {
+          cartItems.push({
+            productId: `jersey-${member.number}`,
+            productType: 'jersey',
+            basePrice: 8999, // $89.99 per jersey
+            quantity: member.quantity || 1
+          });
+        }
       });
     }
     

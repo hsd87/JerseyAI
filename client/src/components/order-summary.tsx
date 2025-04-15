@@ -57,14 +57,23 @@ export default function OrderSummary({
   // Calculate and update price breakdown when items change
   useEffect(() => {
     const updatePriceBreakdown = async () => {
-      // Only calculate if we have items
-      if (items.length > 0) {
-        const cartItems = getCartItems();
-        const breakdown = await calculatePrice(cartItems);
-        
-        if (breakdown) {
-          setPriceBreakdown(breakdown);
+      try {
+        // Only calculate if we have items
+        if (items.length > 0) {
+          const cartItems = getCartItems();
+          
+          // Log cart items to debug
+          console.log('Calculate price for cart items:', cartItems);
+          
+          const breakdown = await calculatePrice(cartItems);
+          
+          if (breakdown) {
+            setPriceBreakdown(breakdown);
+          }
         }
+      } catch (error) {
+        // Log the error but don't crash the component
+        console.error('Failed to update price breakdown:', error);
       }
     };
     

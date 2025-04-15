@@ -32,8 +32,26 @@ export function usePriceCalculator() {
   // Mutation for calculating price estimates
   const calculatePriceMutation = useMutation<PriceEstimateResponse, Error, { cart: CartItem[] }>({
     mutationFn: async ({ cart }) => {
-      const response = await apiRequest('POST', '/api/price/estimate', { cart });
-      return response.json();
+      try {
+        // Ensure cart is valid and not empty
+        if (!cart || !Array.isArray(cart) || cart.length === 0) {
+          throw new Error("Invalid cart data");
+        }
+
+        // Validate cart items have required properties to prevent API errors
+        for (const item of cart) {
+          if (!item.productId || !item.productType || typeof item.basePrice !== 'number' || typeof item.quantity !== 'number') {
+            console.warn("Invalid cart item:", item);
+            throw new Error("Invalid cart item detected");
+          }
+        }
+
+        const response = await apiRequest('POST', '/api/price/estimate', { cart });
+        return await response.json();
+      } catch (error) {
+        console.error("Error in calculate price mutation:", error);
+        throw error;
+      }
     },
   });
 
@@ -43,6 +61,11 @@ export function usePriceCalculator() {
    * @returns Promise resolving to price breakdown or undefined if error
    */
   const calculatePrice = async (cart: CartItem[]): Promise<PriceBreakdown | undefined> => {
+    // Don't try to calculate if cart is empty
+    if (!cart || cart.length === 0) {
+      return createDefaultPriceBreakdown();
+    }
+    
     try {
       const result = await calculatePriceMutation.mutateAsync({ cart });
       
@@ -50,12 +73,26 @@ export function usePriceCalculator() {
         return result.breakdown;
       } else {
         console.error('Error calculating price:', result);
-        return undefined;
+        return createDefaultPriceBreakdown();
       }
     } catch (error) {
       console.error('Error calculating price:', error);
-      return undefined;
+      return createDefaultPriceBreakdown();
     }
+  };
+  
+  // Create a default price breakdown for fallback
+  const createDefaultPriceBreakdown = (): PriceBreakdown => {
+    return {
+      baseTotal: 0,
+      tierDiscountApplied: "None",
+      tierDiscountAmount: 0,
+      subscriptionDiscountApplied: "None",
+      subscriptionDiscountAmount: 0,
+      subtotalAfterDiscounts: 0,
+      shippingCost: 0,
+      grandTotal: 0
+    };
   };
 
   return {
