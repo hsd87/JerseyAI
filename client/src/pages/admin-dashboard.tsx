@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -340,7 +340,8 @@ export default function AdminDashboard() {
 
   // Redirect non-admin users via ProtectedRoute in App.tsx
   if (!user || user.role !== 'admin') {
-    return <Redirect to="/" />;
+    setLocation('/');
+    return null;
   }
 
   return (
