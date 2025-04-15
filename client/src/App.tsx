@@ -15,6 +15,7 @@ import OrderDetailPage from "@/pages/order-detail-page";
 import PartnerPage from "@/pages/partner-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
+import AdminDashboard from "@/pages/admin-dashboard";
 
 // Lazy-loaded components
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
@@ -89,6 +90,9 @@ function AppContent() {
           </Route>
           <Route path="/test">
             <ProtectedRoute path="/test" component={TestPage} />
+          </Route>
+          <Route path="/admin">
+            <ProtectedRoute path="/admin" component={AdminDashboard} />
           </Route>
           <Route path="/orders/:id">
             <ProtectedRoute path="/orders/:id" component={OrderDetailPage} />

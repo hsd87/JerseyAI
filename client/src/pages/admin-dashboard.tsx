@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { 
@@ -116,7 +116,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export default function AdminDashboard() {
   const { user, isLoading: authLoading } = useAuth();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
@@ -177,11 +177,11 @@ export default function AdminDashboard() {
   // Check if user is admin and redirect if not
   useEffect(() => {
     if (!authLoading && user && user.role !== 'admin') {
-      navigate('/');
+      setLocation('/');
     } else if (!authLoading && !user) {
-      navigate('/auth');
+      setLocation('/auth');
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, setLocation]);
 
   // Format revenue for display
   const formatCurrency = (amount: number) => {
