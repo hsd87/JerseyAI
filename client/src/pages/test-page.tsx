@@ -1,222 +1,233 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { orderService } from "@/lib/order-service";
-import { useAuth } from "@/hooks/use-auth";
-import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import Navbar from '@/components/layout/navbar';
+import Footer from '@/components/layout/footer';
 
 export default function TestPage() {
-  const { user } = useAuth();
+  const { user, loginMutation, logoutMutation } = useAuth();
   const { toast } = useToast();
+  const [sessionInfo, setSessionInfo] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState("checkout");
-  
-  // Test create order
-  const handleCreateTestOrder = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "You need to be logged in to create an order",
-        variant: "destructive",
-      });
-      return;
-    }
-    
+
+  const testAuth = async () => {
     setIsLoading(true);
-    
     try {
-      // Create a basic test order with minimal data
-      const order = await orderService.createOrder({
-        userId: user.id,
-        designId: 1, // Assuming at least one design exists
-        orderDetails: {
-          items: [
-            {
-              type: "jerseyOnly",
-              size: "M",
-              quantity: 1,
-              gender: "Male",
-              price: 59.99,
-            }
-          ],
-          addOns: [],
-          packageType: "jerseyOnly",
-          isTeamOrder: false,
-        },
-        shippingAddress: {
-          name: "Test User",
-          street: "123 Test St",
-          city: "Test City",
-          state: "TS",
-          zip: "12345",
-          country: "Test Country",
-          phone: "+1234567890",
-        },
-        totalAmount: 5999, // $59.99 in cents
-        sport: "soccer",
-        designUrls: {
-          front: "https://example.com/front.jpg",
-          back: "https://example.com/back.jpg",
-        },
+      const res = await fetch('/api/test-auth', {
+        credentials: 'include'
       });
-      
+      const data = await res.json();
+      setSessionInfo(data);
       toast({
-        title: "Test Order Created",
-        description: `Order ID: ${order.id}`,
+        title: 'Session Info',
+        description: `Session ID: ${data.sessionID}, Views: ${data.views}`,
       });
     } catch (error: any) {
-      console.error("Error creating test order:", error);
       toast({
-        title: "Order Creation Failed",
-        description: error.message || "An error occurred",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
-  // Test fetch orders
-  const handleFetchOrders = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "You need to be logged in to fetch orders",
-        variant: "destructive",
-      });
-      return;
-    }
-    
+
+  const testQuickLogin = async () => {
     setIsLoading(true);
-    
     try {
-      const userOrders = await orderService.getUserOrders();
-      setOrders(userOrders);
-      
-      toast({
-        title: "Orders Fetched",
-        description: `Found ${userOrders.length} orders`,
+      const res = await fetch('/api/test-login', {
+        credentials: 'include'
       });
-    } catch (error: any) {
-      console.error("Error fetching orders:", error);
+      const data = await res.json();
       toast({
-        title: "Fetch Orders Failed",
-        description: error.message || "An error occurred",
-        variant: "destructive",
+        title: 'Test Login',
+        description: `Logged in as ${data.user.username}. Session ID: ${data.sessionID}`,
+      });
+      // Refresh user data
+      window.location.reload();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+
+  const testUserAPI = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/user', {
+        credentials: 'include'
+      });
+      if (res.status === 401) {
+        toast({
+          title: 'Not Authenticated',
+          description: 'You are not logged in.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      const data = await res.json();
+      toast({
+        title: 'User API',
+        description: `Authenticated as ${data.username}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
-  
+
+  const testOrderList = async () => {
+    setIsLoading(true);
+    try {
+      const res = await apiRequest('GET', '/api/orders');
+      const data = await res.json();
+      toast({
+        title: 'Orders API',
+        description: `Found ${data.length} orders`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="container max-w-6xl py-8">
-      <h1 className="text-3xl font-bold mb-6">eCommerce Flow Test Page</h1>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-8">
-        <TabsList className="w-full grid grid-cols-2">
-          <TabsTrigger value="checkout">Order Creation Test</TabsTrigger>
-          <TabsTrigger value="orders">Order Listing Test</TabsTrigger>
-        </TabsList>
+      <main className="flex-grow container mx-auto p-6">
+        <h1 className="text-3xl font-bold mb-6">Authentication Test Page</h1>
         
-        <TabsContent value="checkout" className="space-y-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Create Test Order</CardTitle>
-              <CardDescription>
-                This will create a test order with minimal data to test the database connection.
-              </CardDescription>
+              <CardTitle>Authentication Status</CardTitle>
+              <CardDescription>Current user authentication status</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-500 mb-4">
-                Test order details:
-              </p>
-              <ul className="list-disc pl-5 space-y-1 text-sm">
-                <li>Product: Jersey Only ($59.99)</li>
-                <li>Quantity: 1</li>
-                <li>Size: Medium</li>
-                <li>Sport: Soccer</li>
-                <li>Shipping: Test Address</li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                onClick={handleCreateTestOrder} 
-                disabled={isLoading || !user}
-              >
-                {isLoading ? "Creating..." : "Create Test Order"}
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="orders" className="space-y-4 mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Orders</CardTitle>
-              <CardDescription>
-                Fetch and display your orders from the database
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={handleFetchOrders} 
-                disabled={isLoading || !user}
-                className="mb-4"
-              >
-                {isLoading ? "Fetching..." : "Fetch Orders"}
-              </Button>
-              
-              {orders.length > 0 ? (
-                <div className="space-y-4">
-                  {orders.map((order) => (
-                    <Card key={order.id} className="p-4">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="font-medium">Order ID:</div>
-                        <div>{order.id}</div>
-                        
-                        <div className="font-medium">Date:</div>
-                        <div>{formatDate(order.createdAt)}</div>
-                        
-                        <div className="font-medium">Status:</div>
-                        <div className="capitalize">{order.status}</div>
-                        
-                        <div className="font-medium">Amount:</div>
-                        <div>${(order.totalAmount / 100).toFixed(2)}</div>
-                        
-                        <div className="font-medium">Sport:</div>
-                        <div className="capitalize">{order.sport}</div>
-                        
-                        {order.trackingId && (
-                          <>
-                            <div className="font-medium">Tracking:</div>
-                            <div>{order.trackingId}</div>
-                          </>
-                        )}
-                      </div>
-                    </Card>
-                  ))}
+              {user ? (
+                <div className="bg-green-50 p-4 rounded-md border border-green-200">
+                  <p className="font-medium text-green-800">Authenticated</p>
+                  <p className="text-sm text-green-700">Username: {user.username}</p>
+                  <p className="text-sm text-green-700">Email: {user.email || 'Not provided'}</p>
+                  <p className="text-sm text-green-700">Subscription: {user.subscriptionTier}</p>
                 </div>
               ) : (
-                <p className="text-gray-500">No orders found. Create a test order first or fetch your orders.</p>
+                <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200">
+                  <p className="font-medium text-yellow-800">Not authenticated</p>
+                  <p className="text-sm text-yellow-700">Please log in first</p>
+                </div>
               )}
             </CardContent>
+            <CardFooter className="flex justify-end space-x-2">
+              {user ? (
+                <Button 
+                  variant="destructive" 
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending || isLoading}
+                >
+                  {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => loginMutation.mutate({ username: 'testuser', password: 'password' })}
+                  disabled={loginMutation.isPending || isLoading}
+                >
+                  {loginMutation.isPending ? 'Logging in...' : 'Login as testuser'}
+                </Button>
+              )}
+            </CardFooter>
           </Card>
-        </TabsContent>
-      </Tabs>
-      
-      {!user && (
-        <div className="bg-yellow-100 p-4 rounded-md text-yellow-800 text-sm">
-          <strong>Note:</strong> You must be logged in to test the order functionality. Please log in first.
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Test Actions</CardTitle>
+              <CardDescription>Test various authentication endpoints</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Button 
+                  className="w-full" 
+                  onClick={testAuth}
+                  disabled={isLoading}
+                >
+                  Test Session
+                </Button>
+                <p className="text-sm text-gray-500 mt-1">
+                  Checks if a session exists and increments a counter
+                </p>
+              </div>
+              
+              <div>
+                <Button 
+                  className="w-full" 
+                  onClick={testQuickLogin}
+                  disabled={isLoading}
+                >
+                  Quick Login
+                </Button>
+                <p className="text-sm text-gray-500 mt-1">
+                  Uses the test-login endpoint to login as testuser
+                </p>
+              </div>
+              
+              <div>
+                <Button 
+                  className="w-full" 
+                  onClick={testUserAPI}
+                  disabled={isLoading}
+                >
+                  Test User API
+                </Button>
+                <p className="text-sm text-gray-500 mt-1">
+                  Tests the /api/user endpoint directly
+                </p>
+              </div>
+              
+              <div>
+                <Button 
+                  className="w-full" 
+                  onClick={testOrderList}
+                  disabled={isLoading}
+                >
+                  Test Orders API
+                </Button>
+                <p className="text-sm text-gray-500 mt-1">
+                  Tests the /api/orders endpoint (requires auth)
+                </p>
+              </div>
+            </CardContent>
+            <CardFooter>
+              {sessionInfo && (
+                <pre className="text-xs bg-gray-100 p-2 rounded w-full overflow-auto">
+                  {JSON.stringify(sessionInfo, null, 2)}
+                </pre>
+              )}
+            </CardFooter>
+          </Card>
         </div>
-      )}
+      </main>
+      
+      <Footer />
     </div>
   );
 }

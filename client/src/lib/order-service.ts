@@ -1,9 +1,31 @@
 import { apiRequest } from "@/lib/queryClient";
 import { type OrderDetails, type ShippingAddress } from "@shared/schema";
+import { queryClient } from "@/lib/queryClient";
 
 /**
- * Service for managing orders
+ * Helper to check authentication status before making order API calls
+ * @returns True if authenticated, false otherwise
  */
+export const checkAuthStatus = async (): Promise<boolean> => {
+  try {
+    // Try to fetch user info
+    const response = await fetch('/api/user', { credentials: 'include' });
+    
+    // If 401, redirect to auth page
+    if (response.status === 401) {
+      console.warn('User not authenticated, need to log in first');
+      // Invalidate user data in cache to trigger auth state update
+      queryClient.setQueryData(['/api/user'], null);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error checking auth status:', error);
+    return false;
+  }
+};
+
 export const orderService = {
   /**
    * Create a new order in the database
