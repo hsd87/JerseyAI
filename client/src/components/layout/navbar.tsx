@@ -94,6 +94,11 @@ export default function Navbar() {
                   <Link href="/dashboard" className="bg-primary text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-primary/90 transition-colors">
                     Dashboard
                   </Link>
+                  {user.role === 'admin' && (
+                    <Link href="/admin" className="bg-gray-800 text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-700 transition-colors">
+                      Admin
+                    </Link>
+                  )}
                 </>
               ) : (
                 <Link href="/auth" className="bg-primary text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-primary/90 transition-colors">
@@ -166,6 +171,11 @@ export default function Navbar() {
               <Link href="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-primary">
                 Dashboard
               </Link>
+              {user.role === 'admin' && (
+                <Link href="/admin" className="block px-3 py-2 rounded-md text-base font-medium bg-gray-800 text-white">
+                  Admin Dashboard
+                </Link>
+              )}
               <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700">
                 Sign Out
               </button>
