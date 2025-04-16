@@ -139,6 +139,7 @@ floating, mannequin-free layout, ideal for product catalog, mockups, or ecommerc
 
 6. 🎯 Back Design Description
         •       Must mirror or complement the front design logically
+        •       Front and back design must be cohesive in terms of sleeves, trims, elements, design, and construction
         •       Describe:
         •       Shoulder yoke
         •       Back panel texture
@@ -149,6 +150,7 @@ floating, mannequin-free layout, ideal for product catalog, mockups, or ecommerc
 ⸻
 
 7. 🧩 Panel & Seam Flow
+        •       Emphasize cohesiveness between front and back design in terms of sleeves, trims, elements and construction
         •       Describe panel transitions between:
         •       Sleeves ↔ chest
         •       Side panels ↔ front/back
@@ -189,6 +191,7 @@ List these (even if the image will not include actual text or logos):
         •       No vague terms like "cool design" or "modern style"
         •       Do not repeat colors in multiple zones unless justified
         •       Do not mirror the front design on the back unless stated — always describe how the back complements or extends the front
+        •       Avoid designs that lack cohesiveness between front and back in terms of sleeves, trims, elements, and construction
         •       No mention of cleats, players, or backgrounds
         •       ONLY include shorts if the kit component specifically includes them (jersey+shorts, full kit, or complete kit)
 
@@ -294,6 +297,8 @@ The jersey features a modern, sport-authentic design with the ${formattedPrimary
 ${formattedAccentColor1 ? `Details and trim are highlighted with ${formattedAccentColor1} for contrast.` : ''}
 ${formattedAccentColor2 ? `Additional accents in ${formattedAccentColor2} for depth and visual appeal.` : ''}
 Front body has sport-appropriate design in ${formattedPrimaryColor} with ${formattedSecondaryColor} detailing. Back body has clean player name and number placement with ${formattedSecondaryColor} numerals.
+
+Front and back designs are cohesive in terms of sleeves, trims, elements, design, and construction, ensuring a unified and professional look from all angles.
 
 ${kitType?.includes("Shorts") || kitType?.includes("Kit") ? 
 `• Shorts details: Matching ${sport} shorts in ${formattedPrimaryColor} with ${formattedSecondaryColor} accents${formattedAccentColor1 ? ` and ${formattedAccentColor1} trim` : ''}${formattedAccentColor2 ? `, plus ${formattedAccentColor2} details` : ''}, designed to complement the jersey style.` : ''}`;
