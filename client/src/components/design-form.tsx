@@ -97,6 +97,8 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
     kitType: formData.kitType || "jersey",
     primaryColor: formData.primaryColor || "#0071e3",
     secondaryColor: formData.secondaryColor || "#ffffff",
+    accentColor1: formData.accentColor1 || "#dddddd",
+    accentColor2: formData.accentColor2 || "#333333",
     sleeveStyle: formData.sleeveStyle || "short",
     collarType: formData.collarType || "crew",
     patternStyle: formData.patternStyle || "solid",
@@ -473,7 +475,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           />
           
           {/* Color Selectors */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="primaryColor"
@@ -509,6 +511,50 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
               )}
             />
           </div>
+          
+          {/* Accent Colors - Only shown when formConfig specifies colors includes accent options */}
+          {(!formConfig || formConfig.colors?.includes('accent1') || formConfig.colors?.includes('accent2')) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mt-4">
+              {(!formConfig || formConfig.colors?.includes('accent1')) && (
+                <FormField
+                  control={form.control}
+                  name="accentColor1"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Accent Color 1</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="color"
+                          className="h-10 w-full border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {(!formConfig || formConfig.colors?.includes('accent2')) && (
+                <FormField
+                  control={form.control}
+                  name="accentColor2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Accent Color 2</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="color"
+                          className="h-10 w-full border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+          )}
           
           {/* Dynamic Sport-Specific Options */}
           <div>

@@ -324,6 +324,8 @@ export const designFormSchema = z.object({
   kitType: z.enum(kitTypeOptions),
   primaryColor: z.string().min(1),
   secondaryColor: z.string().min(1),
+  accentColor1: z.string().min(1).optional(),
+  accentColor2: z.string().min(1).optional(),
   sleeveStyle: z.enum(sleeveOptions).optional(),
   collarType: z.enum(collarOptions).optional(),
   patternStyle: z.enum(patternOptions).optional(),

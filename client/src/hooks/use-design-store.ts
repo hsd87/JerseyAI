@@ -45,15 +45,20 @@ interface DesignStore {
 // Using types imported from shared/schema.ts
 
 // Color palettes for each sport for a consistent look
-const sportColorPalettes: Record<SportType, { primary: string, secondary: string }> = {
-  soccer: { primary: '#0071e3', secondary: '#ffffff' },
-  basketball: { primary: '#FF4500', secondary: '#000000' },
-  cricket: { primary: '#006B54', secondary: '#F0E68C' },
-  rugby: { primary: '#006400', secondary: '#FFD700' },
-  esports: { primary: '#6f42c1', secondary: '#20c997' },
-  "feild hockey": { primary: '#9C5A32', secondary: '#C4C4C4' },
-  volleyball: { primary: '#4F2683', secondary: '#FFFFFF' },
-  handball: { primary: '#005B7F', secondary: '#FFCC00' }
+const sportColorPalettes: Record<SportType, { 
+  primary: string, 
+  secondary: string, 
+  accent1: string, 
+  accent2: string 
+}> = {
+  soccer: { primary: '#0071e3', secondary: '#ffffff', accent1: '#dddddd', accent2: '#333333' },
+  basketball: { primary: '#FF4500', secondary: '#000000', accent1: '#FFD700', accent2: '#C0C0C0' },
+  cricket: { primary: '#006B54', secondary: '#F0E68C', accent1: '#ffffff', accent2: '#000000' },
+  rugby: { primary: '#006400', secondary: '#FFD700', accent1: '#ffffff', accent2: '#333333' },
+  esports: { primary: '#6f42c1', secondary: '#20c997', accent1: '#ff0099', accent2: '#000000' },
+  "feild hockey": { primary: '#9C5A32', secondary: '#C4C4C4', accent1: '#ffffcc', accent2: '#660000' },
+  volleyball: { primary: '#4F2683', secondary: '#FFFFFF', accent1: '#ff9933', accent2: '#003366' },
+  handball: { primary: '#005B7F', secondary: '#FFCC00', accent1: '#ffffff', accent2: '#003366' }
 };
 
 // Function to get default values for a sport
@@ -82,6 +87,8 @@ const getDefaultValuesForSport = (sportInput: SportType | string): DesignFormVal
     kitType,
     primaryColor: sportColorPalettes[sport].primary,
     secondaryColor: sportColorPalettes[sport].secondary,
+    accentColor1: sportColorPalettes[sport].accent1,
+    accentColor2: sportColorPalettes[sport].accent2,
     sleeveStyle: 'short',
     collarType,
     patternStyle,
