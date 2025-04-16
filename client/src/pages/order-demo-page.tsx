@@ -70,34 +70,19 @@ export default function OrderDemoPage() {
           </CardContent>
         </Card>
         
-        {/* Design Preview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Front View</CardTitle>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <img 
-                src={designUrls.front} 
-                alt="Jersey front view" 
-                className="max-h-[400px] object-contain border border-gray-200 rounded" 
-              />
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Back View</CardTitle>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <img 
-                src={designUrls.back} 
-                alt="Jersey back view" 
-                className="max-h-[400px] object-contain border border-gray-200 rounded" 
-              />
-            </CardContent>
-          </Card>
-        </div>
+        {/* Design Preview - Single Image */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Jersey Design</CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <img 
+              src={designUrls.front} 
+              alt="Jersey design" 
+              className="max-h-[550px] object-contain border border-gray-200 rounded" 
+            />
+          </CardContent>
+        </Card>
         
         {/* Order Detail Builder */}
         <OrderDetailBuilder 

@@ -309,20 +309,18 @@ export default function OrderDetailPage() {
               </Card>
             )}
 
-            {/* Design Preview */}
+            {/* Design Preview - Single Image */}
             {order.designUrls && (order.designUrls.front || order.designUrls.back) && (
               <Card>
                 <CardHeader>
                   <CardTitle>Jersey Design</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="aspect-w-16 aspect-h-9 rounded-md overflow-hidden">
-                    <img
-                      src={order.designUrls.front || order.designUrls.back}
-                      alt="Jersey Design"
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
+                <CardContent className="flex justify-center">
+                  <img
+                    src={order.designUrls.front || order.designUrls.back}
+                    alt="Jersey Design"
+                    className="max-h-[550px] object-contain border border-gray-200 rounded"
+                  />
                 </CardContent>
               </Card>
             )}

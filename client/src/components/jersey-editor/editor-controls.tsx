@@ -31,7 +31,7 @@ const EditorControls = ({ selectedItemId, jerseyZones }: EditorControlsProps) =>
   const [outlineWidth, setOutlineWidth] = useState(0);
   const [hasOutline, setHasOutline] = useState(false);
   
-  // Available font families
+  // Available font families (expanded to 20+ fonts)
   const fontFamilies = [
     'Arial', 
     'Verdana', 
@@ -40,7 +40,23 @@ const EditorControls = ({ selectedItemId, jerseyZones }: EditorControlsProps) =>
     'Times New Roman', 
     'Georgia', 
     'Impact', 
-    'Courier New'
+    'Courier New',
+    'Trebuchet MS',
+    'Arial Black',
+    'Comic Sans MS',
+    'Lucida Sans',
+    'Palatino Linotype',
+    'Book Antiqua',
+    'Garamond',
+    'Lucida Console',
+    'Franklin Gothic Medium',
+    'Century Gothic',
+    'Copperplate',
+    'Optima',
+    'Brush Script MT',
+    'Futura',
+    'Rockwell',
+    'Segoe UI'
   ];
   
   // Find the selected item
