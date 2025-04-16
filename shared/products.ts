@@ -1,205 +1,41 @@
+/**
+ * Product and order types for the e-commerce system
+ */
+
+// Product type enum
+export enum ProductType {
+  Jersey = 'jersey',
+  Shorts = 'shorts',
+  Tracksuit = 'tracksuit',
+  TrainingJacket = 'trainingJacket',
+  TrainingTrouser = 'trainingTrouser',
+  Kitbag = 'kitbag',
+  Backpack = 'backpack',
+  Socks = 'socks',
+  Beanie = 'beanie',
+  Cap = 'cap'
+}
+
+// Gender enum
+export type Gender = 'male' | 'female';
+
+// Size enum
+export type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+
+// Base product interface
 export interface Product {
   skuId: string;
   name: string;
-  productType: ProductType;
-  sports: string[];
+  description: string;
+  productType: string;
   basePrice: number;
+  sport?: string;
   allowedInAiDesigner: boolean;
   addOnsAllowed: boolean;
-  sizesAvailable: SizeAvailability;
-  gender: GenderAvailability;
-  currency: string;
+  imageUrl?: string;
 }
 
-export type ProductType = 
-  | 'JERSEY'
-  | 'SHORTS'
-  | 'JACKET'
-  | 'TROUSER'
-  | 'KITBAG'
-  | 'BAGPACK'
-  | 'SOCKS'
-  | 'BEANIE'
-  | 'CAPS';
-
-export type SizeAvailability = 'all' | 'STANDARD';
-export type GenderAvailability = 'all' | 'male' | 'female';
-
-export type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
-export type Gender = 'male' | 'female';
-
-export const defaultProducts: Product[] = [
-  {
-    skuId: 'PFJS01',
-    name: 'Jersey',
-    productType: 'JERSEY',
-    sports: ['ALL'],
-    basePrice: 40,
-    allowedInAiDesigner: true,
-    addOnsAllowed: true,
-    sizesAvailable: 'all',
-    gender: 'all',
-    currency: 'USD'
-  },
-  {
-    skuId: 'PFSS02',
-    name: 'Shorts',
-    productType: 'SHORTS',
-    sports: ['ALL'],
-    basePrice: 15,
-    allowedInAiDesigner: true,
-    addOnsAllowed: true,
-    sizesAvailable: 'all',
-    gender: 'all',
-    currency: 'USD'
-  },
-  {
-    skuId: 'PFJKT03',
-    name: 'Training Jacket',
-    productType: 'JACKET',
-    sports: ['ALL'],
-    basePrice: 50,
-    allowedInAiDesigner: true,
-    addOnsAllowed: true,
-    sizesAvailable: 'all',
-    gender: 'all',
-    currency: 'USD'
-  },
-  {
-    skuId: 'PFTR04',
-    name: 'Training Trouser',
-    productType: 'TROUSER',
-    sports: ['ALL'],
-    basePrice: 20,
-    allowedInAiDesigner: true,
-    addOnsAllowed: true,
-    sizesAvailable: 'all',
-    gender: 'all',
-    currency: 'USD'
-  },
-  {
-    skuId: 'PFKB05',
-    name: 'Kitbag',
-    productType: 'KITBAG',
-    sports: ['ALL'],
-    basePrice: 35,
-    allowedInAiDesigner: false,
-    addOnsAllowed: true,
-    sizesAvailable: 'STANDARD',
-    gender: 'all',
-    currency: 'USD'
-  },
-  {
-    skuId: 'PFBP06',
-    name: 'Bagpack',
-    productType: 'BAGPACK',
-    sports: ['ALL'],
-    basePrice: 30,
-    allowedInAiDesigner: false,
-    addOnsAllowed: true,
-    sizesAvailable: 'STANDARD',
-    gender: 'all',
-    currency: 'USD'
-  },
-  {
-    skuId: 'PFSK07',
-    name: 'Socks',
-    productType: 'SOCKS',
-    sports: ['ALL'],
-    basePrice: 10,
-    allowedInAiDesigner: false,
-    addOnsAllowed: true,
-    sizesAvailable: 'all',
-    gender: 'all',
-    currency: 'USD'
-  },
-  {
-    skuId: 'PFBN08',
-    name: 'Beanie',
-    productType: 'BEANIE',
-    sports: ['ALL'],
-    basePrice: 10,
-    allowedInAiDesigner: false,
-    addOnsAllowed: true,
-    sizesAvailable: 'all',
-    gender: 'all',
-    currency: 'USD'
-  },
-  {
-    skuId: 'PFSC09',
-    name: 'Sports Cap',
-    productType: 'CAPS',
-    sports: ['ALL'],
-    basePrice: 10,
-    allowedInAiDesigner: false,
-    addOnsAllowed: true,
-    sizesAvailable: 'all',
-    gender: 'all',
-    currency: 'USD'
-  }
-];
-
-// Pricing Tiers
-export const quantityDiscountTiers = [
-  { minQuantity: 50, discountPercentage: 15 },
-  { minQuantity: 20, discountPercentage: 10 },
-  { minQuantity: 10, discountPercentage: 5 }
-];
-
-export const subscriberDiscountPercentage = 10;
-
-// Map design form kit types to product types
-export const kitTypeToProductMapping: Record<string, ProductType[]> = {
-  'jerseyOnly': ['JERSEY'],
-  'jerseyShorts': ['JERSEY', 'SHORTS'],
-  'jerseyTrousers': ['JERSEY', 'TROUSER'],
-  'tracksuit': ['JACKET', 'TROUSER'],
-  'fullKit': ['JERSEY', 'SHORTS', 'JACKET', 'TROUSER'],
-  'jerseyShortsJacket': ['JERSEY', 'SHORTS', 'JACKET'],
-  'esportsjacket': ['JACKET'],
-  'esportsTrouser': ['TROUSER']
-};
-
-// Get list of sizes based on availability type
-export function getAvailableSizes(sizesAvailable: SizeAvailability): Size[] {
-  if (sizesAvailable === 'all') {
-    return ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  }
-  return ['M']; // For STANDARD
-}
-
-// Helper to get product price with discount based on quantity and subscription status
-export function calculateProductPrice(
-  product: Product, 
-  quantity: number, 
-  isSubscriber: boolean = false
-): number {
-  let price = product.basePrice;
-  
-  // Apply quantity discount
-  for (const tier of quantityDiscountTiers) {
-    if (quantity >= tier.minQuantity) {
-      price = price * (1 - tier.discountPercentage / 100);
-      break;
-    }
-  }
-  
-  // Apply subscriber discount if applicable
-  if (isSubscriber) {
-    price = price * (1 - subscriberDiscountPercentage / 100);
-  }
-  
-  return Math.round(price * 100) / 100; // Round to 2 decimal places
-}
-
-// Helper to calculate order total
-export function calculateOrderTotal(orderItems: OrderItem[]): number {
-  return orderItems.reduce((total, item) => {
-    return total + (item.price * item.quantity);
-  }, 0);
-}
-
-// Order data structures
+// Cart/Order item interface
 export interface OrderItem {
   skuId: string;
   name: string;
@@ -207,18 +43,110 @@ export interface OrderItem {
   gender: Gender;
   quantity: number;
   price: number;
-  playerName?: string;
-  playerNumber?: string;
+  customization?: {
+    name?: string;
+    number?: string;
+  };
 }
 
-export interface Order {
-  id?: number;
-  userId: number;
-  designId: number;
-  items: OrderItem[];
-  totalPrice: number;
-  status: OrderStatus;
-  createdAt: Date;
-}
+// Kit type to product type mapping
+export const kitTypeToProductMapping: Record<string, string[]> = {
+  'jerseyOnly': [ProductType.Jersey],
+  'jerseyShorts': [ProductType.Jersey, ProductType.Shorts],
+  'fullKit': [ProductType.Jersey, ProductType.Shorts, ProductType.Socks],
+  'trainingKit': [ProductType.TrainingJacket, ProductType.TrainingTrouser],
+  'jerseyTracksuit': [ProductType.Jersey, ProductType.TrainingJacket, ProductType.TrainingTrouser],
+  'jerseyShortsTracksuit': [ProductType.Jersey, ProductType.Shorts, ProductType.TrainingJacket, ProductType.TrainingTrouser],
+  'basketball-jersey': [ProductType.Jersey],
+  'basketball-jerseyShorts': [ProductType.Jersey, ProductType.Shorts],
+  'esportsJersey': [ProductType.Jersey],
+  'esportsHoodie': [ProductType.TrainingJacket]
+};
 
-export type OrderStatus = 'draft' | 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+// Default product catalog
+export const defaultProducts: Product[] = [
+  // Main products - these can be designed with AI
+  {
+    skuId: 'PFJS01',
+    name: 'Custom Jersey',
+    description: 'High-quality custom jersey with your team design',
+    productType: ProductType.Jersey,
+    basePrice: 40,
+    allowedInAiDesigner: true,
+    addOnsAllowed: false
+  },
+  {
+    skuId: 'PFSS02',
+    name: 'Matching Shorts',
+    description: 'Team shorts that match your custom jersey',
+    productType: ProductType.Shorts,
+    basePrice: 15,
+    allowedInAiDesigner: true,
+    addOnsAllowed: false
+  },
+  {
+    skuId: 'PFJKT03',
+    name: 'Training Jacket',
+    description: 'Premium team training jacket',
+    productType: ProductType.TrainingJacket,
+    basePrice: 50,
+    allowedInAiDesigner: true,
+    addOnsAllowed: false
+  },
+  {
+    skuId: 'PFTR04',
+    name: 'Training Trousers',
+    description: 'Premium team training trousers',
+    productType: ProductType.TrainingTrouser,
+    basePrice: 20,
+    allowedInAiDesigner: true,
+    addOnsAllowed: false
+  },
+  
+  // Add-on products - these cannot be designed with AI but can be added to order
+  {
+    skuId: 'PFKB05',
+    name: 'Team Kitbag',
+    description: 'Large kitbag with your team colors',
+    productType: ProductType.Kitbag,
+    basePrice: 35,
+    allowedInAiDesigner: false,
+    addOnsAllowed: true
+  },
+  {
+    skuId: 'PFBP06',
+    name: 'Team Backpack',
+    description: 'Durable backpack with your team logo',
+    productType: ProductType.Backpack,
+    basePrice: 30,
+    allowedInAiDesigner: false,
+    addOnsAllowed: true
+  },
+  {
+    skuId: 'PFSK07',
+    name: 'Team Socks',
+    description: 'Matching team socks',
+    productType: ProductType.Socks,
+    basePrice: 10,
+    allowedInAiDesigner: false,
+    addOnsAllowed: true
+  },
+  {
+    skuId: 'PFBN08',
+    name: 'Team Beanie',
+    description: 'Team-colored beanie hat',
+    productType: ProductType.Beanie,
+    basePrice: 10,
+    allowedInAiDesigner: false,
+    addOnsAllowed: true
+  },
+  {
+    skuId: 'PFSC09',
+    name: 'Sports Cap',
+    description: 'Team-colored sports cap',
+    productType: ProductType.Cap,
+    basePrice: 10,
+    allowedInAiDesigner: false,
+    addOnsAllowed: true
+  }
+];
