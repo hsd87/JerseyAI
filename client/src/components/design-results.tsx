@@ -128,16 +128,10 @@ export default function DesignResults() {
             </div>
           )}
           
-          {/* Action Buttons */}
+          {/* Action Buttons - Removed as per client request */}
           {hasGenerated && (
             <div className="space-y-4 mt-6">
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  onClick={handleCustomize}
-                  className="flex-1 inline-flex justify-center items-center py-3 px-4"
-                >
-                  <PenSquare className="h-4 w-4 mr-2" /> Customize Kit
-                </Button>
                 <Button
                   onClick={handleGenerateNew}
                   variant="outline" 
@@ -146,13 +140,6 @@ export default function DesignResults() {
                   <RotateCcw className="h-4 w-4 mr-2" /> Generate New Design
                 </Button>
               </div>
-              
-              <Button
-                onClick={handleBuyNow}
-                className="w-full bg-primary hover:bg-primary/90 inline-flex justify-center items-center py-3 px-4 text-base sm:text-lg"
-              >
-                <ShoppingCart className="h-5 w-5 mr-2" /> Buy Now from $59.99
-              </Button>
             </div>
           )}
         </div>

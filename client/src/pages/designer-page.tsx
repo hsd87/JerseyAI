@@ -121,22 +121,7 @@ export default function DesignerPage() {
             <div className="lg:col-span-2">
               <DesignResults />
               
-              {/* Continue button - shown only when design has been generated */}
-              {hasGenerated && (
-                <div className="mt-6 flex justify-end space-x-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={nextStep}
-                    className="flex items-center"
-                  >
-                    <ShoppingCart className="mr-2 h-4 w-4" /> 
-                    Order Configuration
-                  </Button>
-                  <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
-                    Customize Design <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {/* Buttons removed as per client request */}
             </div>
           </div>
         )}
@@ -150,19 +135,7 @@ export default function DesignerPage() {
               <Button variant="outline" onClick={prevStep}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Design
               </Button>
-              <div className="flex space-x-3">
-                <Button 
-                  variant="outline" 
-                  onClick={nextStep}
-                  className="flex items-center"
-                >
-                  <ShoppingCart className="mr-2 h-4 w-4" /> 
-                  Order Configuration
-                </Button>
-                <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
-                  Continue to Order Details <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
+              {/* Buttons removed as per client request */}
             </div>
           </div>
         )}
