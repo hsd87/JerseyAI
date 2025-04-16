@@ -128,7 +128,7 @@ export default function DesignResults() {
             </div>
           )}
           
-          {/* Action Buttons - Removed as per client request */}
+          {/* Action Buttons - Added Next button for customization */}
           {hasGenerated && (
             <div className="space-y-4 mt-6">
               <div className="flex flex-col sm:flex-row gap-4">
@@ -138,6 +138,12 @@ export default function DesignResults() {
                   className="flex-1 inline-flex justify-center items-center py-3 px-4"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" /> Generate New Design
+                </Button>
+                <Button
+                  onClick={handleCustomize}
+                  className="flex-1 bg-primary hover:bg-primary/90 inline-flex justify-center items-center py-3 px-4"
+                >
+                  Next
                 </Button>
               </div>
             </div>
