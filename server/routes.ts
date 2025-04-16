@@ -235,6 +235,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error('Error registering pricing routes:', error);
   }
   
+  // Product routes - importing from products.ts for product catalog functionality
+  try {
+    const { registerProductRoutes } = await import('./products');
+    registerProductRoutes(app);
+    console.log('Product routes registered successfully');
+  } catch (error) {
+    console.error('Error registering product routes:', error);
+  }
+  
   // Admin routes - importing from admin.ts for admin dashboard functionality
   try {
     registerAdminRoutes(app);
