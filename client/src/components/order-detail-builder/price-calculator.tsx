@@ -63,7 +63,7 @@ export default function PriceCalculator() {
   /**
    * Check if a product should use a bundle price instead of individual pricing
    */
-  function shouldUseBundlePrice(items: OrderItem[]): {useBundle: boolean, bundleType: string} {
+  function shouldUseBundlePrice(items: any[]): {useBundle: boolean, bundleType: string} {
     // Check for soccer full kit (jersey + shorts + socks)
     if (sport === 'soccer') {
       const hasJersey = items.some(item => item.type === 'jersey');

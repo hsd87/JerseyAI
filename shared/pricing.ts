@@ -5,7 +5,7 @@
 /**
  * Base prices for all products
  */
-export const BASE_PRICES = {
+export const BASE_PRICES: Record<string, number> = {
   // Soccer products
   'soccer_jersey': 20,
   'soccer_shorts': 15,
