@@ -69,6 +69,7 @@ export interface OrderState {
   addOns: AddOn[];
   teamMembers: TeamMember[];
   isTeamOrder: boolean;
+  packageType?: string;
   
   // Pricing
   sport: string;
@@ -93,4 +94,6 @@ export interface OrderState {
   setOrderDetails: (details: OrderDetails) => void;
   setPriceBreakdown: (breakdown: PriceBreakdown | null) => void;
   setSport: (sport: string) => void;
+  setPackageType: (packageType: string) => void;
+  setDesign: (designId: number, designUrls: { front: string; back: string }) => void;
 }

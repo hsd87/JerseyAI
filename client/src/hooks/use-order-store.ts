@@ -26,6 +26,7 @@ export const useOrderStore = create<OrderState>((set) => ({
   addOns: [],
   teamMembers: [],
   isTeamOrder: false,
+  packageType: 'jerseyOnly', // Default package type
   
   // Pricing
   sport: 'soccer',
@@ -34,6 +35,7 @@ export const useOrderStore = create<OrderState>((set) => ({
   // Design reference
   designId: null,
   orderDetails: null,
+  designUrls: null,
   
   // Methods
   addItem: (item: OrderItem) => set((state) => {
@@ -104,5 +106,12 @@ export const useOrderStore = create<OrderState>((set) => ({
     priceBreakdown: breakdown ?? defaultPriceBreakdown 
   }),
   
-  setSport: (sport: string) => set({ sport })
+  setSport: (sport: string) => set({ sport }),
+  
+  setPackageType: (packageType: string) => set({ packageType }),
+  
+  setDesign: (designId: number, designUrls: { front: string; back: string }) => set({ 
+    designId, 
+    designUrls 
+  })
 }));
