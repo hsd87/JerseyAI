@@ -25,6 +25,8 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
   const [textInput, setTextInput] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [fontSize, setFontSize] = useState(24);
+  const [fontFamily, setFontFamily] = useState('Arial');
+  const [textColor, setTextColor] = useState('#000000');
   const [fontOutline, setFontOutline] = useState(false);
   const [outlineWidth, setOutlineWidth] = useState(1);
   const [outlineColor, setOutlineColor] = useState('#000000');
@@ -33,8 +35,14 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (textInput.trim()) {
-      // Add text at the center of the canvas
-      addTextItem(textInput, 240, 200, { fontSize });
+      // Add text at the center of the canvas with all the configurable options
+      addTextItem(textInput, 240, 200, { 
+        fontSize,
+        fontFamily,
+        fill: textColor,
+        stroke: fontOutline ? outlineColor : undefined,
+        strokeWidth: fontOutline ? outlineWidth : 0
+      });
       setTextInput('');
     }
   };
@@ -100,9 +108,9 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
             <div className="space-y-2">
               <Label htmlFor="font-family">Font Style</Label>
               <Select 
-                defaultValue="Arial"
+                value={fontFamily}
                 onValueChange={(value) => {
-                  // Font family will be applied when text is added
+                  setFontFamily(value);
                 }}
               >
                 <SelectTrigger id="font-family">
@@ -148,9 +156,9 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
             <div className="space-y-2">
               <Label htmlFor="text-color">Text Color</Label>
               <ColorPicker 
-                color="#000000" 
+                color={textColor} 
                 onChange={(color) => {
-                  // Text color will be applied when text is added
+                  setTextColor(color);
                 }}
               />
             </div>

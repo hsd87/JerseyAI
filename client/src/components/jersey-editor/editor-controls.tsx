@@ -23,6 +23,7 @@ interface EditorControlsProps {
 const EditorControls = ({ selectedItemId, jerseyZones }: EditorControlsProps) => {
   const { items, updateItem, deleteItem } = useEditorStore();
   const [rotation, setRotation] = useState(0);
+  // Text properties
   const [fontSize, setFontSize] = useState(24);
   const [textValue, setTextValue] = useState('');
   const [textColor, setTextColor] = useState('#000000');
@@ -30,6 +31,12 @@ const EditorControls = ({ selectedItemId, jerseyZones }: EditorControlsProps) =>
   const [outlineColor, setOutlineColor] = useState('#000000');
   const [outlineWidth, setOutlineWidth] = useState(0);
   const [hasOutline, setHasOutline] = useState(false);
+  // Image properties
+  const [imageWidth, setImageWidth] = useState(100);
+  const [imageHeight, setImageHeight] = useState(100);
+  const [scaleX, setScaleX] = useState(1);
+  const [scaleY, setScaleY] = useState(1);
+  const [maintainAspectRatio, setMaintainAspectRatio] = useState(true);
   
   // Available font families (expanded to 20+ fonts)
   const fontFamilies = [
@@ -77,6 +84,16 @@ const EditorControls = ({ selectedItemId, jerseyZones }: EditorControlsProps) =>
         setOutlineColor(selectedItem.stroke || '#000000');
         setOutlineWidth(selectedItem.strokeWidth || 0);
         setHasOutline(!!selectedItem.strokeWidth);
+      } 
+      else if (selectedItem.type === 'image') {
+        // Update image state
+        setImageWidth(selectedItem.width || 100);
+        setImageHeight(selectedItem.height || 100);
+        setScaleX(selectedItem.scaleX || 1);
+        setScaleY(selectedItem.scaleY || 1);
+        
+        // If the scales match, maintain aspect ratio is likely enabled
+        setMaintainAspectRatio(selectedItem.scaleX === selectedItem.scaleY);
       }
     }
   }, [selectedItem]);
@@ -114,6 +131,63 @@ const EditorControls = ({ selectedItemId, jerseyZones }: EditorControlsProps) =>
     if (selectedItem.type !== 'text') return;
     setTextColor(color);
     updateItem(selectedItem.id, { fill: color });
+  };
+  
+  const handleWidthChange = (value: number[]) => {
+    if (selectedItem.type !== 'image') return;
+    const newWidth = value[0];
+    setImageWidth(newWidth);
+    
+    // If maintaining aspect ratio, adjust height proportionally
+    if (maintainAspectRatio) {
+      const aspectRatio = imageHeight / imageWidth;
+      const newHeight = Math.round(newWidth * aspectRatio);
+      setImageHeight(newHeight);
+      updateItem(selectedItem.id, { width: newWidth, height: newHeight });
+    } else {
+      updateItem(selectedItem.id, { width: newWidth });
+    }
+  };
+  
+  const handleHeightChange = (value: number[]) => {
+    if (selectedItem.type !== 'image') return;
+    const newHeight = value[0];
+    setImageHeight(newHeight);
+    
+    // If maintaining aspect ratio, adjust width proportionally
+    if (maintainAspectRatio) {
+      const aspectRatio = imageWidth / imageHeight;
+      const newWidth = Math.round(newHeight * aspectRatio);
+      setImageWidth(newWidth);
+      updateItem(selectedItem.id, { width: newWidth, height: newHeight });
+    } else {
+      updateItem(selectedItem.id, { height: newHeight });
+    }
+  };
+  
+  const handleScaleChange = (axis: 'x' | 'y', value: number[]) => {
+    if (selectedItem.type !== 'image') return;
+    const newScale = value[0];
+    
+    if (axis === 'x') {
+      setScaleX(newScale);
+      
+      if (maintainAspectRatio) {
+        setScaleY(newScale);
+        updateItem(selectedItem.id, { scaleX: newScale, scaleY: newScale });
+      } else {
+        updateItem(selectedItem.id, { scaleX: newScale });
+      }
+    } else {
+      setScaleY(newScale);
+      
+      if (maintainAspectRatio) {
+        setScaleX(newScale);
+        updateItem(selectedItem.id, { scaleX: newScale, scaleY: newScale });
+      } else {
+        updateItem(selectedItem.id, { scaleY: newScale });
+      }
+    }
   };
   
   const handleDelete = () => {
