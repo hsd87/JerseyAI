@@ -50,19 +50,22 @@ const sportColorPalettes: Record<SportType, { primary: string, secondary: string
   basketball: { primary: '#FF4500', secondary: '#000000' },
   cricket: { primary: '#006B54', secondary: '#F0E68C' },
   rugby: { primary: '#006400', secondary: '#FFD700' },
-  esports: { primary: '#6f42c1', secondary: '#20c997' }
+  esports: { primary: '#6f42c1', secondary: '#20c997' },
+  "feild hockey": { primary: '#9C5A32', secondary: '#C4C4C4' },
+  volleyball: { primary: '#4F2683', secondary: '#FFFFFF' },
+  handball: { primary: '#005B7F', secondary: '#FFCC00' }
 };
 
 // Function to get default values for a sport
 const getDefaultValuesForSport = (sportInput: SportType | string): DesignFormValues => {
-  // Validate sport type with proper error handling
-  const validSports = ['soccer', 'basketball', 'cricket', 'rugby', 'esports'] as const;
+  // Get all valid sports from the sportColorPalettes keys
+  const validSports = Object.keys(sportColorPalettes) as SportType[];
   
-  if (!validSports.includes(sportInput as any)) {
+  if (!validSports.includes(sportInput as SportType)) {
     console.warn(`Invalid sport type: "${sportInput}". Defaulting to "soccer".`);
   }
   
-  const sport = validSports.includes(sportInput as any) ? sportInput as SportType : 'soccer';
+  const sport = validSports.includes(sportInput as SportType) ? sportInput as SportType : 'soccer';
   
   // Get sport-specific options with proper fallbacks
   const kitTypeOptions = sportKitTypeMapping[sport] || ['jersey'];
