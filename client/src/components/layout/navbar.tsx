@@ -65,6 +65,9 @@ export default function Navbar() {
               <Link href="/designer" className={`text-sm font-medium ${location === '/designer' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
                 AI Designer
               </Link>
+              <Link href="/jersey-editor" className={`text-sm font-medium ${location === '/jersey-editor' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                Jersey Editor
+              </Link>
               <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
                 Gallery
               </button>
