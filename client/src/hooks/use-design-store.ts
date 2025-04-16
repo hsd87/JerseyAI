@@ -42,7 +42,12 @@ interface DesignStore {
   toggleAwayKit: () => void;
 }
 
+// Define our sport types and their expected design form field types
 type SportType = 'soccer' | 'basketball' | 'cricket' | 'rugby' | 'esports';
+type KitType = 'jersey' | 'jerseyShorts' | 'tracksuit' | 'trackjacket' | 'trackhoodie' | 
+               'trackjackethzip' | 'jerseyTrousers' | 'esportsjacket' | 'esportshoodie';
+type CollarType = 'crew' | 'v' | 'polo' | 'mandarin' | 'roundzip';
+type PatternStyle = 'gradient' | 'slash' | 'panel' | 'striped' | 'digital' | 'minimal' | 'solid';
 
 // Color palettes for each sport for a consistent look
 const sportColorPalettes: Record<SportType, { primary: string, secondary: string }> = {
@@ -55,24 +60,28 @@ const sportColorPalettes: Record<SportType, { primary: string, secondary: string
 
 // Function to get default values for a sport
 const getDefaultValuesForSport = (sportInput: string): DesignFormValues => {
-  // Convert to SportType and use default if invalid
-  const sport = (['soccer', 'basketball', 'cricket', 'rugby', 'esports'].includes(sportInput) 
-    ? sportInput as SportType 
-    : 'soccer');
+  // Validate sport type
+  const validSports = ['soccer', 'basketball', 'cricket', 'rugby', 'esports'];
+  const sport = validSports.includes(sportInput) ? sportInput as SportType : 'soccer';
   
-  // Get sport-specific kit type, collar, and pattern with fallbacks
+  // Get sport-specific options with fallbacks
   const kitTypeOptions = sportKitTypeMapping[sport] || ['jersey'];
   const collarTypeOptions = sportCollarMapping[sport] || ['crew'];
   const patternStyleOptions = sportPatternMapping[sport] || ['solid'];
   
+  // Cast first option to appropriate type with fallbacks if the lists are empty
+  const kitType = (kitTypeOptions[0] || 'jersey') as KitType;
+  const collarType = (collarTypeOptions[0] || 'crew') as CollarType;
+  const patternStyle = (patternStyleOptions[0] || 'solid') as PatternStyle;
+  
   return {
     sport,
-    kitType: kitTypeOptions[0],
+    kitType,
     primaryColor: sportColorPalettes[sport].primary,
     secondaryColor: sportColorPalettes[sport].secondary,
     sleeveStyle: 'short',
-    collarType: collarTypeOptions[0],
-    patternStyle: patternStyleOptions[0],
+    collarType,
+    patternStyle,
     designNotes: ''
   };
 };
