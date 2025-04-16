@@ -303,7 +303,7 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     // Define model and parameters
     const modelVersion = "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3";
     
-    // Create input parameters
+    // Create input parameters with proper types
     const input = {
       prompt: prompt,
       aspect_ratio: aspectRatio,
@@ -315,11 +315,9 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
       output_format: "jpg",
       disable_safety_checker: false,
       lora_scale: 0.8, // Changed from 1.05 to 0.8 as requested
+      extra_lora: "", // Must be a string as per API error
+      extra_lora_scale: 0.69 // Must be a number as per API error
     };
-    
-    // Add extra parameters
-    (input as any).extra_lora_scale = 0.69;
-    (input as any).extra_lora = "";
     
     // Run the model prediction
     const startTime = Date.now();

@@ -1,138 +1,288 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
-import { useOrderStore } from "@/hooks/use-order-store";
-import { Loader2 } from "lucide-react";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useOrderStore } from '@/hooks/use-order-store';
+import { TShirt, Users, Package, CreditCard, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 
-// Create placeholder components for now to fix the module resolution issues
-const PlaceholderComponent = () => (
-  <div className="p-4 border rounded-md bg-gray-50">
-    <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
-    <p className="text-sm text-gray-500">Loading component...</p>
-  </div>
-);
+// Import sub-components
+import AddonSelector from './addon-selector';
+import RosterBuilder from './roster-builder';
+import SizeChartDisplay from './size-chart-display';
+import PriceCalculator from './price-calculator';
 
-// Use dynamic imports with fallback to placeholders
-const AddonSelector = React.lazy(() => 
-  import("./addon-selector").catch(() => ({ default: PlaceholderComponent })));
-const RosterBuilder = React.lazy(() => 
-  import("./roster-builder").catch(() => ({ default: PlaceholderComponent })));
-const SizeChartDisplay = React.lazy(() => 
-  import("./size-chart-display").catch(() => ({ default: PlaceholderComponent })));
-const PriceCalculator = React.lazy(() => 
-  import("./price-calculator").catch(() => ({ default: PlaceholderComponent })));
+export default function OrderDetailBuilder() {
+  const { items, addOns, teamMembers, isTeamOrder, setTeamOrder } = useOrderStore();
+  const [activeTab, setActiveTab] = useState('sizes');
 
-interface OrderDetailBuilderProps {
-  designId?: number;
-  designUrls?: {
-    front: string;
-    back: string;
-  };
-  sport?: string;
-  kitType?: string;
-}
+  // Count total items in cart (including addons)
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0) + 
+                    addOns.reduce((sum, addon) => sum + addon.quantity, 0);
 
-export default function OrderDetailBuilder({
-  designId,
-  designUrls,
-  sport = "soccer",
-  kitType = "jersey",
-}: OrderDetailBuilderProps) {
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>("individual");
-  const { isTeamOrder, setIsTeamOrder } = useOrderStore();
-  
-  // Setup order with design details if provided
-  useEffect(() => {
-    if (designId && designUrls) {
-      // Initialize order with design details
-      useOrderStore.getState().setDesign(designId, designUrls);
-    }
-    
-    if (sport) {
-      useOrderStore.getState().setSport(sport);
-    }
-    
-    if (kitType) {
-      useOrderStore.getState().setPackageType(kitType);
-    }
-  }, [designId, designUrls, sport, kitType]);
-  
+  // Handle tab change and navigation
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    setIsTeamOrder(value === "team");
+  };
+
+  const goToNextTab = () => {
+    if (activeTab === 'sizes') setActiveTab('addons');
+    else if (activeTab === 'addons') setActiveTab(isTeamOrder ? 'team' : 'checkout');
+    else if (activeTab === 'team') setActiveTab('checkout');
+  };
+
+  const goToPrevTab = () => {
+    if (activeTab === 'checkout') setActiveTab(isTeamOrder ? 'team' : 'addons');
+    else if (activeTab === 'team') setActiveTab('addons');
+    else if (activeTab === 'addons') setActiveTab('sizes');
   };
 
   return (
-    <Card className="w-full my-8">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Complete Your Order</CardTitle>
-        <CardDescription>
-          Customize your kit with size options, team details, and optional add-ons
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        {/* Order Type Tabs */}
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid grid-cols-2 w-full">
-            <TabsTrigger value="individual">Individual Order</TabsTrigger>
-            <TabsTrigger value="team">Team Order</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="individual" className="pt-4">
-            {/* Size Chart Display */}
-            <Suspense fallback={<PlaceholderComponent />}>
-              <SizeChartDisplay />
-            </Suspense>
-          </TabsContent>
-          
-          <TabsContent value="team" className="pt-4">
-            {/* Team Order Roster Builder */}
-            <Suspense fallback={<PlaceholderComponent />}>
-              <RosterBuilder />
-            </Suspense>
-          </TabsContent>
-        </Tabs>
-        
-        {/* Add-on Product Selector */}
-        <Suspense fallback={<PlaceholderComponent />}>
-          <AddonSelector sport={sport} kitType={kitType} />
-        </Suspense>
-        
-        {/* Dynamic Price Calculation */}
-        <Suspense fallback={<PlaceholderComponent />}>
-          <PriceCalculator />
-        </Suspense>
-      </CardContent>
-      
-      <CardFooter className="bg-gray-50 border-t border-gray-200 flex justify-end">
-        <button 
-          className="px-6 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition-colors"
-          onClick={() => {
-            // Validate order
-            if (!user) {
-              toast({
-                title: "Sign in required",
-                description: "Please sign in to complete your order",
-                variant: "destructive",
-              });
-              return;
-            }
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Order Details</CardTitle>
+          <CardDescription>
+            Customize your order with sizes, add-ons, and team information
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="sizes" className="flex items-center">
+                <TShirt className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Sizes</span>
+                <span className="ml-1.5">{items.length > 0 ? `(${items.reduce((sum, item) => sum + item.quantity, 0)})` : ''}</span>
+              </TabsTrigger>
+              
+              <TabsTrigger value="addons" className="flex items-center">
+                <Package className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Add-ons</span>
+                <span className="ml-1.5">{addOns.length > 0 ? `(${addOns.length})` : ''}</span>
+              </TabsTrigger>
+              
+              <TabsTrigger value="team" disabled={!isTeamOrder} className="flex items-center">
+                <Users className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Team</span>
+                <span className="ml-1.5">{teamMembers.length > 0 ? `(${teamMembers.length})` : ''}</span>
+              </TabsTrigger>
+              
+              <TabsTrigger value="checkout" disabled={items.length === 0} className="flex items-center">
+                <CreditCard className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Checkout</span>
+              </TabsTrigger>
+            </TabsList>
             
-            // TODO: Navigate to checkout page with order details
-            toast({
-              title: "Order Ready",
-              description: "Proceeding to checkout...",
-            });
-          }}
-        >
-          Proceed to Checkout
-        </button>
-      </CardFooter>
-    </Card>
+            <div className="mt-6">
+              <TabsContent value="sizes">
+                <div className="grid md:grid-cols-12 gap-4">
+                  <div className="md:col-span-8">
+                    <SizeChartDisplay />
+                  </div>
+                  
+                  <div className="md:col-span-4">
+                    <div className="space-y-4">
+                      <PriceCalculator />
+                      
+                      <Card>
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Team Order?</span>
+                            <Button 
+                              variant={isTeamOrder ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setTeamOrder(!isTeamOrder)}
+                              className="gap-2"
+                            >
+                              <Users className="h-4 w-4" />
+                              {isTeamOrder ? 'Team Order Active' : 'Make Team Order'}
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end mt-6">
+                  <Button 
+                    onClick={goToNextTab} 
+                    disabled={items.length === 0}
+                    className="flex items-center"
+                  >
+                    Continue to Add-ons
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="addons">
+                <div className="grid md:grid-cols-12 gap-4">
+                  <div className="md:col-span-8">
+                    <AddonSelector />
+                  </div>
+                  
+                  <div className="md:col-span-4">
+                    <PriceCalculator />
+                  </div>
+                </div>
+                
+                <div className="flex justify-between mt-6">
+                  <Button 
+                    variant="outline" 
+                    onClick={goToPrevTab}
+                    className="flex items-center"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    Back to Sizes
+                  </Button>
+                  
+                  <Button 
+                    onClick={goToNextTab}
+                    className="flex items-center"
+                  >
+                    {isTeamOrder ? 'Continue to Team Roster' : 'Continue to Checkout'}
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="team">
+                <div className="grid md:grid-cols-12 gap-4">
+                  <div className="md:col-span-8">
+                    <RosterBuilder />
+                  </div>
+                  
+                  <div className="md:col-span-4">
+                    <PriceCalculator />
+                  </div>
+                </div>
+                
+                <div className="flex justify-between mt-6">
+                  <Button 
+                    variant="outline" 
+                    onClick={goToPrevTab}
+                    className="flex items-center"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    Back to Add-ons
+                  </Button>
+                  
+                  <Button 
+                    onClick={goToNextTab}
+                    disabled={teamMembers.length === 0}
+                    className="flex items-center"
+                  >
+                    Continue to Checkout
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="checkout">
+                <div className="grid md:grid-cols-12 gap-4">
+                  <div className="md:col-span-8">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Order Summary</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {/* Items Summary */}
+                          <div>
+                            <h3 className="font-medium mb-2">Selected Items</h3>
+                            <ul className="space-y-3">
+                              {items.map((item, index) => (
+                                <li key={index} className="flex justify-between border-b pb-2">
+                                  <div>
+                                    <div className="font-medium">{item.type === 'jersey' ? 'Jersey' : item.type}</div>
+                                    <div className="text-sm text-muted-foreground">
+                                      Size: {item.size}, Qty: {item.quantity}
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    ${(item.price * item.quantity).toFixed(2)}
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          
+                          {/* Add-ons Summary */}
+                          {addOns.length > 0 && (
+                            <div>
+                              <h3 className="font-medium mb-2">Add-ons</h3>
+                              <ul className="space-y-3">
+                                {addOns.map((addon, index) => (
+                                  <li key={index} className="flex justify-between border-b pb-2">
+                                    <div>
+                                      <div className="font-medium">{addon.name || addon.type}</div>
+                                      {addon.customValue && (
+                                        <div className="text-sm text-muted-foreground">
+                                          Value: {addon.customValue}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="text-right">
+                                      ${addon.price.toFixed(2)}
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {/* Team Members Summary (if applicable) */}
+                          {isTeamOrder && teamMembers.length > 0 && (
+                            <div>
+                              <h3 className="font-medium mb-2">Team Roster</h3>
+                              <div className="text-sm">
+                                <p>Total Players: {teamMembers.length}</p>
+                                {teamMembers.length >= 10 && (
+                                  <p className="text-green-600">Team discount will be applied!</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  <div className="md:col-span-4">
+                    <PriceCalculator />
+                  </div>
+                </div>
+                
+                <div className="flex justify-between mt-6">
+                  <Button 
+                    variant="outline" 
+                    onClick={goToPrevTab}
+                    className="flex items-center"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    {isTeamOrder ? 'Back to Team Roster' : 'Back to Add-ons'}
+                  </Button>
+                </div>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </CardContent>
+      </Card>
+      
+      {/* Floating action buttons for mobile */}
+      {totalItems > 0 && (
+        <div className="fixed bottom-4 right-4 md:hidden z-10">
+          <Button
+            className="rounded-full w-12 h-12 flex items-center justify-center"
+            onClick={() => setActiveTab('checkout')}
+          >
+            <ShoppingBag className="h-5 w-5" />
+            <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs">
+              {totalItems}
+            </span>
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
