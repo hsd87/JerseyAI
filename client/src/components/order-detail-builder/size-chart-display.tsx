@@ -1,283 +1,360 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useOrderStore } from "@/hooks/use-order-store";
+import { OrderItem } from '@/hooks/use-order-types';
+import { Plus, Minus, Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-// Size charts for different sports
-const SIZE_CHARTS = {
-  soccer: {
-    men: {
-      'S': { chest: '36-38"', waist: '28-30"' },
-      'M': { chest: '38-40"', waist: '32-34"' },
-      'L': { chest: '42-44"', waist: '36-38"' },
-      'XL': { chest: '46-48"', waist: '40-42"' },
-      '2XL': { chest: '50-52"', waist: '44-46"' },
-    },
-    women: {
-      'S': { chest: '33-35"', waist: '25-27"' },
-      'M': { chest: '36-38"', waist: '28-30"' },
-      'L': { chest: '39-41"', waist: '31-33"' },
-      'XL': { chest: '42-44"', waist: '34-36"' },
-      '2XL': { chest: '45-47"', waist: '37-39"' },
-    },
-    youth: {
-      'Youth S': { chest: '26-28"', waist: '22-24"' },
-      'Youth M': { chest: '28-30"', waist: '24-26"' },
-      'Youth L': { chest: '30-32"', waist: '26-28"' },
-    }
-  },
-  basketball: {
-    men: {
-      'S': { chest: '36-38"', length: '27-28"' },
-      'M': { chest: '40-42"', length: '29-30"' },
-      'L': { chest: '44-46"', length: '31-32"' },
-      'XL': { chest: '48-50"', length: '33-34"' },
-      '2XL': { chest: '52-54"', length: '35-36"' },
-    },
-    women: {
-      'S': { chest: '33-35"', length: '24-25"' },
-      'M': { chest: '36-38"', length: '26-27"' },
-      'L': { chest: '39-41"', length: '28-29"' },
-      'XL': { chest: '42-45"', length: '30-31"' },
-      '2XL': { chest: '46-49"', length: '32-33"' },
-    },
-    youth: {
-      'Youth S': { chest: '26-28"', length: '21-22"' },
-      'Youth M': { chest: '29-31"', length: '23-24"' },
-      'Youth L': { chest: '32-34"', length: '25-26"' },
-    }
-  },
-  default: {
-    men: {
-      'S': { chest: '36-38"' },
-      'M': { chest: '40-42"' },
-      'L': { chest: '44-46"' },
-      'XL': { chest: '48-50"' },
-      '2XL': { chest: '52-54"' },
-    },
-    women: {
-      'S': { chest: '33-35"' },
-      'M': { chest: '36-38"' },
-      'L': { chest: '39-41"' },
-      'XL': { chest: '42-45"' },
-      '2XL': { chest: '46-49"' },
-    },
-    youth: {
-      'Youth S': { chest: '26-28"' },
-      'Youth M': { chest: '29-31"' },
-      'Youth L': { chest: '32-34"' },
-    }
-  }
-};
+// Size chart data - unisex adult sizes
+const ADULT_SIZES = [
+  { size: 'S', chest: '35-37"', waist: '29-31"', height: '5\'4"-5\'7"', metric: { chest: '89-94cm', waist: '74-79cm', height: '163-170cm' } },
+  { size: 'M', chest: '38-40"', waist: '32-34"', height: '5\'8"-5\'11"', metric: { chest: '97-102cm', waist: '81-86cm', height: '173-180cm' } },
+  { size: 'L', chest: '41-43"', waist: '35-37"', height: '5\'11"-6\'2"', metric: { chest: '104-109cm', waist: '89-94cm', height: '180-188cm' } },
+  { size: 'XL', chest: '44-46"', waist: '38-40"', height: '6\'2"-6\'5"', metric: { chest: '112-117cm', waist: '97-102cm', height: '188-196cm' } },
+  { size: '2XL', chest: '47-49"', waist: '41-43"', height: '6\'4"-6\'6"', metric: { chest: '119-124cm', waist: '104-109cm', height: '193-198cm' } },
+];
 
-// Available sizes for each category
-const AVAILABLE_SIZES = {
-  men: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-  women: ['S', 'M', 'L', 'XL', '2XL'],
-  youth: ['Youth S', 'Youth M', 'Youth L'],
-};
+// Size chart data - women's sizes
+const WOMENS_SIZES = [
+  { size: 'S', chest: '33-35"', waist: '25-27"', height: '5\'2"-5\'4"', metric: { chest: '84-89cm', waist: '64-69cm', height: '157-163cm' } },
+  { size: 'M', chest: '36-38"', waist: '28-30"', height: '5\'4"-5\'6"', metric: { chest: '91-97cm', waist: '71-76cm', height: '163-168cm' } },
+  { size: 'L', chest: '39-41"', waist: '31-33"', height: '5\'6"-5\'8"', metric: { chest: '99-104cm', waist: '79-84cm', height: '168-173cm' } },
+  { size: 'XL', chest: '42-44"', waist: '34-36"', height: '5\'7"-5\'9"', metric: { chest: '107-112cm', waist: '86-91cm', height: '170-175cm' } },
+  { size: '2XL', chest: '45-47"', waist: '37-39"', height: '5\'8"-5\'10"', metric: { chest: '114-119cm', waist: '94-99cm', height: '173-178cm' } },
+];
+
+// Size chart data - youth sizes
+const YOUTH_SIZES = [
+  { size: 'Youth S', chest: '26-28"', waist: '22-24"', height: '4\'0"-4\'3"', age: '6-8', metric: { chest: '66-71cm', waist: '56-61cm', height: '122-130cm' } },
+  { size: 'Youth M', chest: '29-31"', waist: '25-26"', height: '4\'4"-4\'7"', age: '8-10', metric: { chest: '74-79cm', waist: '64-66cm', height: '132-140cm' } },
+  { size: 'Youth L', chest: '32-34"', waist: '27-29"', height: '4\'8"-4\'11"', age: '10-12', metric: { chest: '81-86cm', waist: '69-74cm', height: '142-150cm' } },
+  { size: 'Youth XL', chest: '35-37"', waist: '30-32"', height: '5\'0"-5\'3"', age: '12-14', metric: { chest: '89-94cm', waist: '76-81cm', height: '152-160cm' } },
+];
 
 export default function SizeChartDisplay() {
-  const { addItem, items, updateItem, sport: storeSport } = useOrderStore();
-  const [gender, setGender] = useState<string>('men');
-  const [size, setSize] = useState<string>('M');
-  const [quantity, setQuantity] = useState<number>(1);
-  const [sport, setSport] = useState<string>(storeSport || 'soccer');
+  const { items, addItem, updateItem } = useOrderStore();
+  const [activeTab, setActiveTab] = useState('men');
+  const [measurementUnit, setMeasurementUnit] = useState<'imperial' | 'metric'>('imperial');
+  const [jerseyQuantity, setJerseyQuantity] = useState(1);
+  const [jerseySize, setJerseySize] = useState('M');
   
-  // Get the item from the store if it exists
-  const existingItem = items.find(item => 
-    item.type === 'jersey' && 
-    item.size === size && 
-    (item as any).gender === gender
-  );
-
-  // Function to handle adding or updating item
-  const handleAddToCart = () => {
-    const jerseyPrice = 69.99; // Base price
-    const itemId = existingItem?.id || `jersey-${gender}-${size}`;
+  // Handle adding jersey to cart
+  const addJerseyToCart = () => {
+    const jersey: OrderItem = {
+      id: crypto.randomUUID(),
+      type: 'jersey',
+      name: 'Team Jersey',
+      size: jerseySize,
+      gender: activeTab,
+      quantity: jerseyQuantity,
+      price: 69.99, // Base price
+    };
     
-    if (existingItem) {
-      // Update existing item quantity
-      updateItem(existingItem.id, {
-        ...existingItem,
-        quantity: existingItem.quantity + quantity
-      });
-    } else {
-      // Add new item
-      addItem({
-        id: itemId,
-        name: `${gender === 'youth' ? 'Youth ' : gender === 'women' ? 'Women\'s ' : 'Men\'s '} ${sport.charAt(0).toUpperCase() + sport.slice(1)} Jersey`,
-        type: 'jersey',
-        size,
-        gender,
-        quantity,
-        price: jerseyPrice,
-      });
+    addItem(jersey);
+    
+    // Reset quantity
+    setJerseyQuantity(1);
+  };
+  
+  // Handle quantity changes
+  const incrementQuantity = () => setJerseyQuantity(prev => prev + 1);
+  const decrementQuantity = () => setJerseyQuantity(prev => Math.max(1, prev - 1));
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value > 0) {
+      setJerseyQuantity(value);
     }
+  };
+  
+  // Handle updating cart item
+  const handleUpdateCartItem = (item: OrderItem, newSize: string, newQuantity: number) => {
+    const updatedItem = {
+      ...item,
+      size: newSize,
+      quantity: newQuantity
+    };
     
-    // Reset quantity after adding
-    setQuantity(1);
+    updateItem(item.id, updatedItem);
   };
   
-  // Get size chart based on sport and gender
-  const getSizeChart = () => {
-    const sportChart = SIZE_CHARTS[sport as keyof typeof SIZE_CHARTS] || SIZE_CHARTS.default;
-    return sportChart[gender as keyof typeof sportChart] || {};
+  // Get the current size data based on the active tab
+  const getSizeData = () => {
+    switch (activeTab) {
+      case 'men':
+        return ADULT_SIZES;
+      case 'women':
+        return WOMENS_SIZES;
+      case 'youth':
+        return YOUTH_SIZES;
+      default:
+        return ADULT_SIZES;
+    }
   };
   
-  const sizeChart = getSizeChart();
+  // Get already added jerseys for the current gender
+  const currentGenderJerseys = items.filter(item => 
+    item.type === 'jersey' && item.gender === activeTab
+  );
   
   return (
-    <div className="space-y-6">
-      {/* Sport and Gender Selection */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="sport-select">Sport</Label>
-          <Select value={sport} onValueChange={(value) => setSport(value)}>
-            <SelectTrigger id="sport-select">
-              <SelectValue placeholder="Select sport" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="soccer">Soccer</SelectItem>
-              <SelectItem value="basketball">Basketball</SelectItem>
-              <SelectItem value="volleyball">Volleyball</SelectItem>
-              <SelectItem value="baseball">Baseball</SelectItem>
-              <SelectItem value="hockey">Hockey</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div>
-          <Label htmlFor="gender-select">Category</Label>
-          <Select value={gender} onValueChange={(value) => {
-            setGender(value);
-            // Reset size to default when changing gender
-            setSize(AVAILABLE_SIZES[value as keyof typeof AVAILABLE_SIZES][1]); 
-          }}>
-            <SelectTrigger id="gender-select">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="men">Men's</SelectItem>
-              <SelectItem value="women">Women's</SelectItem>
-              <SelectItem value="youth">Youth</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex justify-between items-center">
+          <span>Size Selection</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-muted-foreground">Measurements:</span>
+            <div className="flex border rounded-md overflow-hidden">
+              <Button
+                variant={measurementUnit === 'imperial' ? 'default' : 'ghost'}
+                size="sm"
+                className="rounded-none h-8 px-3"
+                onClick={() => setMeasurementUnit('imperial')}
+              >
+                Imperial
+              </Button>
+              <Button
+                variant={measurementUnit === 'metric' ? 'default' : 'ghost'}
+                size="sm"
+                className="rounded-none h-8 px-3"
+                onClick={() => setMeasurementUnit('metric')}
+              >
+                Metric
+              </Button>
+            </div>
+          </div>
+        </CardTitle>
+      </CardHeader>
       
-      {/* Size Chart Display */}
-      <Card>
-        <CardContent className="p-4">
-          <Tabs defaultValue="sizes">
-            <TabsList className="mb-4">
-              <TabsTrigger value="sizes">Size Selection</TabsTrigger>
-              <TabsTrigger value="chart">Size Chart</TabsTrigger>
-            </TabsList>
+      <CardContent>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="men">Men's</TabsTrigger>
+            <TabsTrigger value="women">Women's</TabsTrigger>
+            <TabsTrigger value="youth">Youth</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="men" className="mt-4">
+            <SizeChart 
+              sizeData={ADULT_SIZES} 
+              measurementUnit={measurementUnit} 
+              showAge={false}
+            />
+          </TabsContent>
+          
+          <TabsContent value="women" className="mt-4">
+            <SizeChart 
+              sizeData={WOMENS_SIZES} 
+              measurementUnit={measurementUnit}
+              showAge={false} 
+            />
+          </TabsContent>
+          
+          <TabsContent value="youth" className="mt-4">
+            <SizeChart 
+              sizeData={YOUTH_SIZES} 
+              measurementUnit={measurementUnit}
+              showAge={true}
+            />
+          </TabsContent>
+        </Tabs>
+        
+        <div className="border rounded-lg p-4 mt-4 space-y-4">
+          <h3 className="font-medium">Add to Cart</h3>
+          
+          <div className="grid grid-cols-12 gap-3">
+            <div className="col-span-4">
+              <label className="text-sm text-muted-foreground mb-1 block">Size</label>
+              <Select value={jerseySize} onValueChange={setJerseySize}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select size" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getSizeData().map(size => (
+                    <SelectItem key={size.size} value={size.size}>
+                      {size.size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             
-            <TabsContent value="sizes" className="space-y-4">
-              <div className="grid grid-cols-3 gap-2">
-                {AVAILABLE_SIZES[gender as keyof typeof AVAILABLE_SIZES].map((availableSize) => (
-                  <Button
-                    key={availableSize}
-                    variant={availableSize === size ? "default" : "outline"}
-                    onClick={() => setSize(availableSize)}
-                    className="flex-1"
-                  >
-                    {availableSize}
-                  </Button>
-                ))}
-              </div>
-              
-              <div className="flex items-end gap-4 mt-4">
-                <div className="flex-1">
-                  <Label htmlFor="quantity-input">Quantity</Label>
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    >
-                      -
-                    </Button>
-                    <Input
-                      id="quantity-input"
-                      type="number"
-                      min="1"
-                      value={quantity}
-                      onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="w-20 text-center"
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      onClick={() => setQuantity(quantity + 1)}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                
-                <Button className="px-8" onClick={handleAddToCart}>
-                  {existingItem ? 'Update Cart' : 'Add to Cart'}
+            <div className="col-span-3">
+              <label className="text-sm text-muted-foreground mb-1 block">Quantity</label>
+              <div className="flex h-10">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  className="h-10 w-10 rounded-r-none"
+                  onClick={decrementQuantity}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  type="number"
+                  value={jerseyQuantity}
+                  onChange={handleQuantityChange}
+                  min={1}
+                  className="h-10 w-12 rounded-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  className="h-10 w-10 rounded-l-none"
+                  onClick={incrementQuantity}
+                >
+                  <Plus className="h-4 w-4" />
                 </Button>
               </div>
-            </TabsContent>
+            </div>
             
-            <TabsContent value="chart">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border p-2 text-left">Size</th>
-                      {Object.keys(Object.values(sizeChart)[0] || {}).map((measurement) => (
-                        <th key={measurement} className="border p-2 text-left capitalize">
-                          {measurement}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(sizeChart).map(([sizeName, measurements]) => (
-                      <tr key={sizeName} className="hover:bg-gray-50">
-                        <td className="border p-2 font-medium">{sizeName}</td>
-                        {Object.values(measurements).map((value, index) => (
-                          <td key={index} className="border p-2">{value}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              <p className="text-sm text-gray-500 mt-4">
-                Measurements are approximate. For best fit, please measure yourself and compare to the chart.
-              </p>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-      
-      {/* Current Selection */}
-      {items.length > 0 && (
-        <div className="p-4 bg-gray-50 rounded-md">
-          <h3 className="font-medium mb-2">Current Selection</h3>
-          <ul className="space-y-2">
-            {items.map((item) => (
-              <li key={item.id} className="flex justify-between items-center">
-                <span>
-                  {item.name} - {item.size} ({item.quantity})
-                </span>
-                <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
-              </li>
-            ))}
-          </ul>
+            <div className="col-span-5 flex items-end">
+              <Button 
+                className="w-full"
+                onClick={addJerseyToCart}
+              >
+                Add to Cart - ${(69.99 * jerseyQuantity).toFixed(2)}
+              </Button>
+            </div>
+          </div>
+          
+          {/* Display already added jerseys for this gender */}
+          {currentGenderJerseys.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-sm font-medium mb-2">Already in Cart:</h4>
+              <ul className="space-y-2">
+                {currentGenderJerseys.map((jersey, index) => (
+                  <li key={index} className="flex items-center justify-between border-b pb-2">
+                    <div>
+                      <span>{activeTab === 'men' ? "Men's" : 
+                              activeTab === 'women' ? "Women's" : 
+                              "Youth"} Jersey - Size {jersey.size}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Select 
+                        value={jersey.size}
+                        onValueChange={(newSize) => handleUpdateCartItem(jersey, newSize, jersey.quantity)}
+                      >
+                        <SelectTrigger className="h-8 w-20">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getSizeData().map(size => (
+                            <SelectItem key={size.size} value={size.size}>
+                              {size.size}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <div className="flex h-8">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-r-none"
+                          onClick={() => {
+                            const newQty = Math.max(1, jersey.quantity - 1);
+                            handleUpdateCartItem(jersey, jersey.size, newQty);
+                          }}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <Input
+                          type="number"
+                          value={jersey.quantity}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value) && value > 0) {
+                              handleUpdateCartItem(jersey, jersey.size, value);
+                            }
+                          }}
+                          min={1}
+                          className="h-8 w-10 rounded-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-l-none"
+                          onClick={() => handleUpdateCartItem(jersey, jersey.size, jersey.quantity + 1)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      
+                      <div className="text-sm w-16 text-right">
+                        ${(jersey.price * jersey.quantity).toFixed(2)}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
-      )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Size chart component
+interface SizeChartProps {
+  sizeData: any[];
+  measurementUnit: 'imperial' | 'metric';
+  showAge: boolean;
+}
+
+function SizeChart({ sizeData, measurementUnit, showAge }: SizeChartProps) {
+  return (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-16">Size</TableHead>
+            <TableHead>Chest</TableHead>
+            <TableHead>Waist</TableHead>
+            <TableHead>Height</TableHead>
+            {showAge && <TableHead>Age</TableHead>}
+            <TableHead className="w-8">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">
+                      These are general sizing guidelines. For a more precise fit,
+                      refer to your own measurements.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sizeData.map((size) => (
+            <TableRow key={size.size}>
+              <TableCell className="font-medium">{size.size}</TableCell>
+              <TableCell>{measurementUnit === 'imperial' ? size.chest : size.metric.chest}</TableCell>
+              <TableCell>{measurementUnit === 'imperial' ? size.waist : size.metric.waist}</TableCell>
+              <TableCell>{measurementUnit === 'imperial' ? size.height : size.metric.height}</TableCell>
+              {showAge && <TableCell>{size.age} yrs</TableCell>}
+              <TableCell></TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useOrderStore } from '@/hooks/use-order-store';
-import { TShirt, Users, Package, CreditCard, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Shirt, Users, Package, CreditCard, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 
 // Import sub-components
 import AddonSelector from './addon-selector';
@@ -49,7 +49,7 @@ export default function OrderDetailBuilder() {
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="sizes" className="flex items-center">
-                <TShirt className="mr-2 h-4 w-4" />
+                <Shirt className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Sizes</span>
                 <span className="ml-1.5">{items.length > 0 ? `(${items.reduce((sum, item) => sum + item.quantity, 0)})` : ''}</span>
               </TabsTrigger>

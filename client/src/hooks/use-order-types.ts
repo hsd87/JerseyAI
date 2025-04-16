@@ -1,60 +1,96 @@
-/**
- * Types for the order module
- */
+// Define the core types for our order system
 
-// Item in a customer's cart/order
 export interface OrderItem {
-  type: string; // jersey, shorts, etc.
+  id: string;
+  type: string;
   size: string;
   quantity: number;
-  gender: string; // Male, Female, Youth
+  gender: string;
   price: number;
+  name?: string;
+  customValue?: string;
 }
 
-// Add-on product added to an order
-export interface AddOn {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
+export interface AddOn extends OrderItem {
+  customValue?: string;
 }
 
-// Team member for team orders
 export interface TeamMember {
   id: string;
   name: string;
   number: string;
   size: string;
-  quantity: number;
+  gender: string;
 }
 
-// Shipping address information
+export interface PriceBreakdown {
+  subtotal: number;
+  discount: number;
+  discountPercentage: number;
+  shipping: number;
+  tax: number;
+  grandTotal: number;
+  itemCount: number;
+  baseTotal: number;
+  tierDiscountApplied: boolean;
+  tierDiscountAmount: number;
+  subscriptionDiscountApplied: boolean;
+  subscriptionDiscountAmount: number;
+  shippingFreeThresholdApplied: boolean;
+  priceBeforeTax: number;
+}
+
+export interface OrderDetails {
+  items: OrderItem[];
+  addOns: AddOn[];
+  isTeamOrder: boolean;
+  packageType: string;
+  teamMembers?: TeamMember[];
+  paymentMethod?: string;
+  shippingAddress?: ShippingAddress;
+  priceBreakdown?: PriceBreakdown;
+}
+
 export interface ShippingAddress {
-  name: string;
+  firstName: string;
+  lastName: string;
   street: string;
   city: string;
   state: string;
-  zip: string;
+  zipCode: string;
   country: string;
   phone: string;
+  email: string;
 }
 
-// Cart item for price calculation
-export interface CartItem {
-  productId: string;
-  productType: string;
-  basePrice: number;
-  quantity: number;
-}
-
-// Price breakdown information
-export interface PriceBreakdown {
-  baseTotal: number;
-  tierDiscountApplied: string;
-  tierDiscountAmount: number;
-  subscriptionDiscountApplied: string;
-  subscriptionDiscountAmount: number;
-  subtotalAfterDiscounts: number;
-  shippingCost: number;
-  grandTotal: number;
+export interface OrderState {
+  // Order items
+  items: OrderItem[];
+  addOns: AddOn[];
+  teamMembers: TeamMember[];
+  isTeamOrder: boolean;
+  
+  // Pricing
+  sport: string;
+  priceBreakdown: PriceBreakdown | null;
+  
+  // Cart actions
+  addItem: (item: OrderItem) => void;
+  updateItem: (id: string, updatedItem: OrderItem) => void;
+  removeItem: (id: string) => void;
+  clearItems: () => void;
+  
+  // Team order actions
+  setTeamOrder: (isTeam: boolean) => void;
+  setTeamMembers: (members: TeamMember[] | (() => TeamMember[])) => void;
+  
+  // Design reference
+  designId: number | null;
+  setDesignId: (id: number | null) => void;
+  
+  // Order processing
+  orderDetails: OrderDetails | null;
+  setOrderDetails: (details: OrderDetails) => void;
+  setPriceBreakdown: (breakdown: PriceBreakdown | null) => void;
+  setSport: (sport: string) => void;
 }

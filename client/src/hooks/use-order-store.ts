@@ -1,221 +1,108 @@
 import { create } from 'zustand';
-import { 
-  CartItem, 
-  PriceBreakdown, 
-  TeamMember, 
-  OrderItem, 
-  AddOn, 
-  ShippingAddress 
-} from './use-order-types';
+import { OrderState, OrderItem, TeamMember, AddOn, PriceBreakdown, OrderDetails } from './use-order-types';
 
-interface OrderState {
-  // Order Items Management
-  items: OrderItem[];
-  addOns: AddOn[];
-  packageType: string;
-  sport: string;
-  designId: number | null;
-  designUrls: { front: string; back: string } | null;
-  
-  // Item Configuration
-  gender?: string; // Male, Female, Youth
-  size?: string;
-  quantity?: number;
-  
-  // Team Order Fields
-  isTeamOrder: boolean;
-  teamName: string;
-  teamMembers: TeamMember[];
-  
-  // Shipping Info
-  shippingAddress: ShippingAddress | null;
-  
-  // Payment and Price Calculation
-  priceBreakdown: PriceBreakdown | null;
-  
-  // Actions
-  setItems: (items: OrderItem[]) => void;
-  addItem: (item: OrderItem) => void;
-  removeItem: (index: number) => void;
-  updateItemQuantity: (index: number, quantity: number) => void;
-  
-  setAddOns: (addOns: AddOn[]) => void;
-  addAddOn: (addOn: AddOn) => void;
-  removeAddOn: (index: number) => void;
-  
-  setPackageType: (packageType: string) => void;
-  setSport: (sport: string) => void;
-  setDesign: (designId: number, urls: { front: string; back: string }) => void;
-  
-  // Configuration setters
-  setGender?: (gender: string) => void;
-  setSize?: (size: string) => void;
-  setQuantity?: (quantity: number) => void;
-  
-  setIsTeamOrder: (isTeamOrder: boolean) => void;
-  setTeamName: (teamName: string) => void;
-  
-  // Team Roster Management
-  addTeamMember: (member: TeamMember) => void;
-  updateTeamMember: (id: string, updates: Partial<TeamMember>) => void;
-  removeTeamMember: (id: string) => void;
-  
-  setShippingAddress: (address: ShippingAddress) => void;
-  
-  setPriceBreakdown: (breakdown: PriceBreakdown) => void;
-  
-  // Helper to convert order items to cart items for price calculation
-  getCartItems: () => CartItem[];
-  
-  // Clear the store
-  resetOrder: () => void;
-}
-
-// Initial state
-const initialState = {
-  items: [],
-  addOns: [],
-  packageType: 'jerseyOnly',
-  sport: '',
-  designId: null,
-  designUrls: null,
-  gender: 'Male',
-  size: 'M',
-  quantity: 1,
-  isTeamOrder: false,
-  teamName: '',
-  teamMembers: [] as TeamMember[],
-  shippingAddress: null,
-  priceBreakdown: null
+// Default values for price breakdown
+const defaultPriceBreakdown: PriceBreakdown = {
+  subtotal: 0,
+  discount: 0,
+  discountPercentage: 0,
+  shipping: 9.99,
+  tax: 0,
+  grandTotal: 0,
+  itemCount: 0,
+  baseTotal: 0,
+  tierDiscountApplied: false,
+  tierDiscountAmount: 0,
+  subscriptionDiscountApplied: false,
+  subscriptionDiscountAmount: 0,
+  shippingFreeThresholdApplied: false,
+  priceBeforeTax: 0
 };
 
-export const useOrderStore = create<OrderState>((set, get) => ({
-  ...initialState,
-  
-  // Items Management
-  setItems: (items) => set({ items }),
-  
-  addItem: (item) => set((state) => ({
-    items: [...state.items, item]
-  })),
-  
-  removeItem: (index) => set((state) => ({
-    items: state.items.filter((_, i) => i !== index)
-  })),
-  
-  updateItemQuantity: (index, quantity) => set((state) => ({
-    items: state.items.map((item, i) => 
-      i === index ? { ...item, quantity } : item)
-  })),
-  
-  // Add-ons Management
-  setAddOns: (addOns) => set({ addOns }),
-  
-  addAddOn: (addOn) => set((state) => ({
-    addOns: [...state.addOns, addOn]
-  })),
-  
-  removeAddOn: (index) => set((state) => ({
-    addOns: state.addOns.filter((_, i) => i !== index)
-  })),
-  
-  // Order Settings
-  setPackageType: (packageType) => set({ packageType }),
-  setSport: (sport) => set({ sport }),
-  setDesign: (designId, urls) => set({ designId, designUrls: urls }),
-  
-  // Item Configuration
-  setGender: (gender) => set({ gender }),
-  setSize: (size) => set({ size }),
-  setQuantity: (quantity) => set({ quantity }),
-  
-  // Team Order
-  setIsTeamOrder: (isTeamOrder) => set({ isTeamOrder }),
-  setTeamName: (teamName) => set({ teamName }),
-  
-  // Team Roster Management
-  addTeamMember: (member) => set((state) => ({
-    teamMembers: [...state.teamMembers, member]
-  })),
-  
-  updateTeamMember: (id, updates) => set((state) => ({
-    teamMembers: state.teamMembers.map(member => 
-      member.id === id ? { ...member, ...updates } : member
-    )
-  })),
-  
-  removeTeamMember: (id) => set((state) => ({
-    teamMembers: state.teamMembers.filter(member => member.id !== id)
-  })),
-  
-  // Shipping
-  setShippingAddress: (address) => set({ shippingAddress: address }),
+// Create the store with Zustand
+export const useOrderStore = create<OrderState>((set) => ({
+  // Order items
+  items: [],
+  addOns: [],
+  teamMembers: [],
+  isTeamOrder: false,
   
   // Pricing
-  setPriceBreakdown: (breakdown) => set({ priceBreakdown: breakdown }),
+  sport: 'soccer',
+  priceBreakdown: null,
   
-  // Convert order items to cart items for price calculation
-  getCartItems: () => {
-    const { items, addOns, teamMembers, isTeamOrder } = get();
-    const cartItems: CartItem[] = [];
+  // Design reference
+  designId: null,
+  orderDetails: null,
+  
+  // Methods
+  addItem: (item: OrderItem) => set((state) => {
+    // Check if item with same type and size already exists
+    const existingItemIndex = state.items.findIndex(
+      i => i.type === item.type && i.size === item.size && i.gender === item.gender
+    );
     
-    // Map our internal package types to the API expected product types
-    const mapProductType = (type: string): "jersey" | "jersey_shorts" | "kit" => {
-      switch(type) {
-        case 'jerseyOnly':
-          return 'jersey';
-        case 'jerseyShorts':
-          return 'jersey_shorts';
-        case 'fullKit':
-          return 'kit';
-        case 'shorts':
-          return 'jersey_shorts';
-        default:
-          return 'jersey'; // Default fallback
-      }
-    };
-    
-    // Convert regular items to cart items
-    items.forEach(item => {
-      if (item && item.type && typeof item.price === 'number' && typeof item.quantity === 'number') {
-        cartItems.push({
-          productId: item.type,
-          productType: mapProductType(item.type),
-          basePrice: Math.round(item.price * 100), // Convert to cents, ensure it's an integer
-          quantity: item.quantity
-        });
-      }
-    });
-    
-    // Convert add-ons to cart items
-    addOns.forEach(addOn => {
-      if (addOn && addOn.id && typeof addOn.price === 'number' && typeof addOn.quantity === 'number') {
-        cartItems.push({
-          productId: addOn.id,
-          productType: 'jersey', // Default to jersey for add-ons
-          basePrice: Math.round(addOn.price * 100), // Convert to cents, ensure it's an integer
-          quantity: addOn.quantity
-        });
-      }
-    });
-    
-    // Convert team members to cart items if it's a team order
-    if (isTeamOrder && teamMembers && teamMembers.length > 0) {
-      teamMembers.forEach(member => {
-        if (member && member.id && typeof member.quantity === 'number') {
-          cartItems.push({
-            productId: `jersey-${member.number}`,
-            productType: 'jersey',
-            basePrice: 8999, // $89.99 per jersey
-            quantity: member.quantity || 1
-          });
-        }
-      });
+    if (existingItemIndex >= 0) {
+      // Update quantity of existing item
+      const updatedItems = [...state.items];
+      updatedItems[existingItemIndex] = {
+        ...updatedItems[existingItemIndex],
+        quantity: updatedItems[existingItemIndex].quantity + item.quantity
+      };
+      return { items: updatedItems };
     }
     
-    return cartItems;
-  },
+    // Add new item
+    return { items: [...state.items, item] };
+  }),
   
-  // Reset the store to initial state
-  resetOrder: () => set(initialState)
+  updateItem: (id: string, updatedItem: OrderItem) => set((state) => {
+    const isAddon = state.addOns.some(addon => addon.type === id);
+    
+    if (isAddon) {
+      // Update add-on
+      const updatedAddOns = state.addOns.map(addon => 
+        addon.type === id ? { ...addon, ...updatedItem } : addon
+      );
+      return { addOns: updatedAddOns };
+    } else {
+      // Update regular item
+      const updatedItems = state.items.map(item => 
+        item.id === id ? { ...item, ...updatedItem } : item
+      );
+      return { items: updatedItems };
+    }
+  }),
+  
+  removeItem: (id: string) => set((state) => {
+    const isAddon = state.addOns.some(addon => addon.type === id);
+    
+    if (isAddon) {
+      // Remove add-on
+      return { addOns: state.addOns.filter(addon => addon.type !== id) };
+    } else {
+      // Remove regular item
+      return { items: state.items.filter(item => item.id !== id) };
+    }
+  }),
+  
+  clearItems: () => set({ items: [], addOns: [] }),
+  
+  setTeamOrder: (isTeam: boolean) => set({ isTeamOrder: isTeam }),
+  
+  setTeamMembers: (members: TeamMember[] | (() => TeamMember[])) => set((state) => ({
+    teamMembers: typeof members === 'function' ? members() : members,
+    // Also activate team order mode if there are members
+    isTeamOrder: (typeof members === 'function' ? members() : members).length > 0 ? true : state.isTeamOrder
+  })),
+  
+  setDesignId: (id: number | null) => set({ designId: id }),
+  
+  setOrderDetails: (details: OrderDetails) => set({ orderDetails: details }),
+  
+  setPriceBreakdown: (breakdown: PriceBreakdown | null) => set({ 
+    priceBreakdown: breakdown ?? defaultPriceBreakdown 
+  }),
+  
+  setSport: (sport: string) => set({ sport })
 }));
