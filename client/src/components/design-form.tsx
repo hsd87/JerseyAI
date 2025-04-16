@@ -16,8 +16,11 @@ import {
   sportKitTypeMapping,
   sportCollarMapping,
   sportPatternMapping,
-  addonOptions
+  addonOptions,
+  SportType,
+  KitType
 } from "@shared/schema";
+import { getFormConfig } from "@shared/form-config";
 import {
   Form,
   FormControl,
@@ -167,15 +170,81 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
     return selectedSport ? sportKitTypeMapping[selectedSport] || [] : [];
   }, [selectedSport]);
   
+  // Get form configuration based on selected sport and kit type
+  const formConfig = useMemo(() => {
+    if (!selectedSport || !selectedKitType) {
+      return null;
+    }
+    return getFormConfig(selectedSport as SportType, selectedKitType as KitType);
+  }, [selectedSport, selectedKitType]);
+  
   // Filter collar types based on selected sport using useMemo for optimization
   const availableCollarTypes = useMemo(() => {
+    // First try to get from form config if available
+    if (formConfig && formConfig.collarStyle) {
+      // Map the collar style strings to our enum values
+      const configStyles = formConfig.collarStyle.map(style => {
+        // Map CSV values to our schema enum values
+        switch(style.toLowerCase()) {
+          case 'v-neck': return 'v';
+          case 'crew neck': return 'crew';
+          case 'polo collar': return 'polo';
+          case 'polo collar without button': return 'polo-no-button';
+          case 'full zip': return 'full-zip';
+          case 'half zip': return 'half-zip';
+          case 'scoop neck': return 'scoop';
+          case 'deep neck': return 'deep';
+          default: return style.toLowerCase();
+        }
+      });
+      // Filter to ensure only valid enum values are included
+      return configStyles.filter(style => collarOptions.includes(style as any));
+    }
+    // Fall back to schema mapping if config not available
     return selectedSport ? sportCollarMapping[selectedSport] || [] : [];
-  }, [selectedSport]);
+  }, [selectedSport, formConfig]);
   
-  // Filter pattern styles based on selected sport using useMemo for optimization
+  // Determine sleeve options based on sport and kit type
+  const availableSleeveOptions = useMemo(() => {
+    if (formConfig && formConfig.sleeveLength) {
+      // Map CSV values to our schema enum values
+      const sleeveTypes = formConfig.sleeveLength.map(length => {
+        if (length.includes('/')) {
+          // Handle combined options like "sleeveless/short/long"
+          return length;
+        }
+        return length.toLowerCase();
+      });
+      
+      // Filter to ensure only valid enum values are included
+      return sleeveTypes.filter(length => 
+        sleeveOptions.includes(length as any) || 
+        length.split('/').every(part => sleeveOptions.includes(part as any))
+      );
+    }
+    // Default to all sleeve options if not specified in config
+    return sleeveOptions;
+  }, [formConfig]);
+  
+  // Filter pattern styles based on selected sport and kit using useMemo
   const availablePatternStyles = useMemo(() => {
+    if (formConfig && formConfig.patternStyle) {
+      // Map the pattern style strings to our enum values
+      const configStyles = formConfig.patternStyle.map(style => {
+        // Convert to lowercase and normalize
+        const normalized = style.toLowerCase()
+          .replace(/\s+/g, '-') // Replace spaces with dashes
+          .replace(/\s+plus\s+/g, '-'); // Handle "plus" in names
+        
+        return normalized;
+      });
+      
+      // Filter to ensure only valid enum values are included
+      return configStyles.filter(style => patternOptions.includes(style as any));
+    }
+    // Fall back to schema mapping
     return selectedSport ? sportPatternMapping[selectedSport] || [] : [];
-  }, [selectedSport]);
+  }, [selectedSport, formConfig]);
 
   const formatKitTypeLabel = (kitType: string): string => {
     switch (kitType) {

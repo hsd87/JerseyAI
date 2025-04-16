@@ -193,17 +193,16 @@ export const sportOptions = [
 
 // Common kit types across sports
 export const kitTypeOptions = [
-  "jersey",
+  "jerseyOnly",
   "jerseyShorts",
   "tracksuit",
   "trackjacket",
-  "trackhoodie",
-  "trackjackethzip",
+  "trackTrouser",
   "jerseyTrousers",
+  "jersey", // for esports
   "esportsjacket",
   "esportshoodie",
-  "esportsTrouser",
-  "trackTrouser"
+  "esportsTrouser"
 ] as const;
 
 // Export the types for use in other files
@@ -213,51 +212,63 @@ export type SleeveStyle = typeof sleeveOptions[number];
 export type CollarType = typeof collarOptions[number];
 export type PatternType = typeof patternOptions[number];
 
-// Sport-specific kit type mapping
+// Sport-specific kit type mapping based on CSV configuration
 export const sportKitTypeMapping: Record<SportType, KitType[]> = {
-  soccer: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
-  basketball: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
-  rugby: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
-  cricket: ["jersey", "jerseyTrousers", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
-  esports: ["jersey", "esportsjacket", "esportshoodie", "esportsTrouser"],
-  "feild hockey": ["jersey", "jerseyShorts", "tracksuit", "trackjacket"],
-  volleyball: ["jersey", "jerseyShorts", "trackTrouser"],
-  handball: ["jersey", "jerseyShorts", "trackTrouser"]
+  soccer: ["jerseyOnly", "jerseyShorts", "tracksuit", "trackjacket", "trackTrouser"],
+  basketball: ["jerseyOnly", "jerseyShorts", "tracksuit", "trackjacket", "trackTrouser"],
+  rugby: ["jerseyOnly", "jerseyShorts", "tracksuit", "trackjacket", "trackTrouser"],
+  cricket: ["jerseyOnly", "jerseyTrousers", "tracksuit", "trackjacket", "trackTrouser"],
+  esports: ["jersey", "esportsjacket", "esportsTrouser"],
+  "feild hockey": ["jerseyOnly", "jerseyShorts", "tracksuit", "trackjacket", "trackTrouser"],
+  volleyball: ["jerseyOnly", "jerseyShorts", "tracksuit", "trackjacket", "trackTrouser"],
+  handball: ["jerseyOnly", "jerseyShorts", "tracksuit", "trackjacket", "trackTrouser"]
 };
 
 export const sleeveOptions = [
   "sleeveless",
   "short",
   "long",
-  "sleeveless/short",
   "sleeveless/short/long"
 ] as const;
 
-// Sport-specific collar type mapping
-export const sportCollarMapping: Record<SportType, CollarType[]> = {
-  soccer: ["crew", "v", "mandarin", "polo", "scoop", "deep"],
-  basketball: ["crew", "v", "roundzip", "scoop", "deep"],
-  rugby: ["v", "polo", "roundzip", "crew"],
-  cricket: ["mandarin", "polo", "roundzip"],
-  esports: ["v", "crew", "roundzip", "hooded", "half-zip"],
-  "feild hockey": ["crew", "v", "mandarin", "polo"],
-  volleyball: ["crew", "v", "scoop"],
-  handball: ["crew", "v", "polo"]
+// Define special types for sport+kit component combinations
+export type SportKitComponent = `${SportType}-${KitType}`;
+
+// Define type for form option configurations
+export type FormOptionConfig = {
+  showFields: string[];
+  gender: string[];
+  colors: string[];
+  sleeveLength?: string[];
+  collarStyle?: string[];
+  patternStyle: string[];
 };
 
+// Define collar options from CSV data
 export const collarOptions = [
-  "crew",
-  "v",
-  "polo",
+  "crew", // crew neck
+  "v", // V-neck
   "mandarin",
-  "roundzip",
-  "scoop",
-  "deep",
-  "polo-no-button",
-  "full-zip",
-  "hooded",
-  "half-zip"
+  "polo",
+  "polo-no-button", // polo collar without button
+  "scoop", // for basketball
+  "deep", // for basketball
+  "full-zip", // for tracksuits
+  "hooded", // for tracksuits
+  "half-zip" // for tracksuits
 ] as const;
+
+// Sport-specific collar mappings based on CSV
+export const sportCollarMapping: Record<SportType, CollarType[]> = {
+  soccer: ["v", "crew", "mandarin", "polo", "polo-no-button"],
+  basketball: ["v", "crew", "scoop", "deep"],
+  rugby: ["v", "crew", "mandarin", "polo", "polo-no-button"],
+  cricket: ["v", "crew", "mandarin", "polo", "polo-no-button"],
+  esports: ["v", "crew", "mandarin", "polo", "polo-no-button"],
+  "feild hockey": ["v", "crew", "mandarin", "polo", "polo-no-button"],
+  volleyball: ["v", "crew", "mandarin", "polo", "polo-no-button"],
+  handball: ["v", "crew", "mandarin", "polo", "polo-no-button"]
+};
 
 // Sport-specific pattern type mapping
 export const sportPatternMapping: Record<SportType, PatternType[]> = {
