@@ -45,7 +45,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { HelpCircle, RotateCw } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 
 interface DesignFormProps {
   remainingDesigns?: number;
@@ -148,14 +148,20 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
     return () => subscription.unsubscribe();
   }, [form.watch, updateFormData]);
 
-  // Filter kit types based on selected sport
-  const availableKitTypes = selectedSport ? sportKitTypeMapping[selectedSport] || [] : [];
+  // Filter kit types based on selected sport using useMemo for optimization
+  const availableKitTypes = useMemo(() => {
+    return selectedSport ? sportKitTypeMapping[selectedSport] || [] : [];
+  }, [selectedSport]);
   
-  // Filter collar types based on selected sport
-  const availableCollarTypes = selectedSport ? sportCollarMapping[selectedSport] || [] : [];
+  // Filter collar types based on selected sport using useMemo for optimization
+  const availableCollarTypes = useMemo(() => {
+    return selectedSport ? sportCollarMapping[selectedSport] || [] : [];
+  }, [selectedSport]);
   
-  // Filter pattern styles based on selected sport
-  const availablePatternStyles = selectedSport ? sportPatternMapping[selectedSport] || [] : [];
+  // Filter pattern styles based on selected sport using useMemo for optimization
+  const availablePatternStyles = useMemo(() => {
+    return selectedSport ? sportPatternMapping[selectedSport] || [] : [];
+  }, [selectedSport]);
 
   const formatKitTypeLabel = (kitType: string): string => {
     switch (kitType) {
@@ -231,16 +237,33 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                     // First update the form field
                     field.onChange(value);
                     
-                    // Then use the resetFormDataForSport to update all related fields
+                    // Reset form data for the selected sport
                     resetFormDataForSport(value);
                     
-                    // Update the form with all new values from the store
-                    const newFormData = formData;
-                    Object.keys(newFormData).forEach(key => {
-                      if (key !== 'sport') { // Skip sport as we just set it
-                        form.setValue(key as any, newFormData[key as keyof DesignFormValues]);
+                    // Wait for next tick to ensure store is updated
+                    setTimeout(() => {
+                      // Update all form values from the store with proper typing
+                      const newFormData = formData;
+                      
+                      // Update form values while maintaining primaryColor and secondaryColor
+                      // These are preserved to avoid UI flicker when switching sports
+                      const currentPrimaryColor = form.getValues('primaryColor');
+                      const currentSecondaryColor = form.getValues('secondaryColor');
+                      
+                      form.setValue('kitType', newFormData.kitType);
+                      form.setValue('collarType', newFormData.collarType);
+                      form.setValue('patternStyle', newFormData.patternStyle);
+                      form.setValue('sleeveStyle', newFormData.sleeveStyle);
+                      
+                      // Only update colors if they're significantly different to avoid UI flicker
+                      if (currentPrimaryColor !== newFormData.primaryColor) {
+                        form.setValue('primaryColor', newFormData.primaryColor);
                       }
-                    });
+                      
+                      if (currentSecondaryColor !== newFormData.secondaryColor) {
+                        form.setValue('secondaryColor', newFormData.secondaryColor);
+                      }
+                    }, 0);
                   }} 
                   defaultValue={field.value}>
                   <FormControl>
