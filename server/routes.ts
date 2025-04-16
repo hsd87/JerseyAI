@@ -8,7 +8,6 @@ import { designFormSchema, insertOrderSchema } from "@shared/schema";
 import path from "path";
 import fs from "fs";
 import { z } from "zod";
-import { registerKitConfigRoutes } from "./services/kit-config-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Authentication Routes
@@ -240,14 +239,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('Admin routes registered successfully');
   } catch (error) {
     console.error('Error registering admin routes:', error);
-  }
-
-  // Kit configuration routes - dynamic form configuration and pricing system
-  try {
-    registerKitConfigRoutes(app);
-    console.log('Kit configuration routes registered successfully');
-  } catch (error) {
-    console.error('Error registering kit configuration routes:', error);
   }
 
   // Subscription endpoints
@@ -532,8 +523,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
-
-  // Kit configuration routes were registered earlier using registerKitConfigRoutes()
 
   const httpServer = createServer(app);
 

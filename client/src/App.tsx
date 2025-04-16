@@ -17,7 +17,6 @@ import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import AdminDashboard from "@/pages/admin-dashboard";
 import OrderConfigurationPage from "@/pages/order-configuration-page";
-import KitDesignerPage from "@/pages/kit-designer-page";
 
 // Lazy-loaded components
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
@@ -87,10 +86,6 @@ function AppContent() {
           
           <Route path="/order-config">
             <OrderConfigurationPage />
-          </Route>
-          
-          <Route path="/kit-designer">
-            <KitDesignerPage />
           </Route>
           
           {/* Protected routes */}
