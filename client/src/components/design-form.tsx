@@ -25,6 +25,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -42,9 +43,20 @@ import {
   CardContent, 
   CardDescription, 
   CardHeader, 
-  CardTitle 
+  CardTitle,
+  CardFooter
 } from "@/components/ui/card";
-import { HelpCircle, RotateCw } from "lucide-react";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2, AlertCircle, HelpCircle, RotateCw } from "lucide-react";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 
 interface DesignFormProps {
@@ -66,6 +78,9 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   const [awayKit, setAwayKit] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [formPayloadHash, setFormPayloadHash] = useState<string>('');
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [showRetryDialog, setShowRetryDialog] = useState(false);
+  const [retryAttempt, setRetryAttempt] = useState(0);
 
   // Default form values with soccer selected initially
   const defaultValues: Partial<DesignFormValues> = {
@@ -186,8 +201,48 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
     }
   };
 
+  const handleRetry = async () => {
+    setRetryAttempt(prevAttempt => prevAttempt + 1);
+    setShowRetryDialog(false);
+    
+    try {
+      console.log(`Retry attempt ${retryAttempt + 1} for design generation`);
+      // Get the current form values
+      const data = form.getValues();
+      
+      // Generate design again using the same data
+      const result = await generateDesign();
+      if (result) {
+        // Extract the image URL from the result if needed
+        if (typeof result === 'string') {
+          setGeneratedImage(result);
+        } else if (result.frontImageUrl) {
+          setGeneratedImage(result.frontImageUrl);
+        }
+        // Clear any previous errors
+        setGenerationError(null);
+      }
+    } catch (error) {
+      console.error(`Retry failed (attempt ${retryAttempt + 1}):`, error);
+      
+      // If this was the third retry, show a more detailed error message
+      if (retryAttempt >= 2) {
+        setGenerationError(
+          "We're experiencing issues with our AI design service. Please try again later or contact support if the issue persists."
+        );
+      } else {
+        // Otherwise, show the retry dialog again
+        setShowRetryDialog(true);
+      }
+    }
+  };
+  
   const onSubmit = async (data: DesignFormValues) => {
     try {
+      // Reset error states
+      setGenerationError(null);
+      setShowRetryDialog(false);
+      
       // Validate all required fields are present
       const requiredFields = ['sport', 'kitType', 'primaryColor', 'secondaryColor', 'collarType', 'patternStyle'];
       const missingFields = requiredFields.filter(field => !data[field as keyof DesignFormValues]);
@@ -220,6 +275,9 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
       
       console.log("Submitting design with tracking data:", trackingData);
       
+      // Reset retry attempt counter for new submissions
+      setRetryAttempt(0);
+      
       // Generate design using the data (passing the complete form data)
       const result = await generateDesign();
       if (result) {
@@ -229,10 +287,22 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
         } else if (result.frontImageUrl) {
           setGeneratedImage(result.frontImageUrl);
         }
+      } else {
+        // No result but no error - could be an empty response
+        setShowRetryDialog(true);
       }
     } catch (error) {
       console.error("Error generating design:", error);
+      
       // Set form error to display to user
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      
+      setGenerationError(errorMessage);
+      
+      // Show retry dialog
+      setShowRetryDialog(true);
+      
+      // Also set form error for immediate visibility
       form.setError('root', {
         type: 'server',
         message: 'An error occurred while generating the design. Please try again.'

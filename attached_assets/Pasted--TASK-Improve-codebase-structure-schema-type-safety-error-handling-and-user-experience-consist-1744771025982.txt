@@ -1,0 +1,70 @@
+🔧 TASK: Improve codebase structure, schema type safety, error handling, and user experience consistency to ensure MVP stability and production readiness.
+
+👨‍🔧 OBJECTIVE:
+We’ve completed the core functional build of the ProJersey platform. Now we need to clean up, secure, and polish the system before launch. This includes:
+- Redundant file cleanup
+- Schema tightening (better TypeScript enforcement)
+- Fallback UX and retry handling for image generation
+- Light testing framework scaffolding
+- Improved form validation logic
+
+---
+
+### ✅ Step 1: File & Folder Cleanup
+- Search for and **remove unnecessary/duplicate/unreferenced files**, such as:
+  - `Form_Structure_Config - Copy.csv` or similar duplicates
+  - Unused assets in `public/` and `output/` directories
+  - Old screenshots or ZIP extractions in the repo
+- Create a new directory `/archive/unused/` and move potential deprecated items there for manual review
+- Leave a log comment in the commit message outlining all files removed/moved
+
+---
+
+### ✅ Step 2: Tighten Shared Schema Definitions (in `shared/schema.ts`)
+- Improve typing for all enums and input structures
+- Ensure all form-related values (e.g., sport, kitType, collar, sleeveStyle, pattern) have:
+  - ✅ explicit string union types or enums
+  - ✅ centralized default value logic
+  - ✅ consistent casing (e.g., "Full Zip" vs "full_zip")
+- Add TypeScript utility types for handling conditional mappings (e.g., allowed kit types per sport)
+
+---
+
+### ✅ Step 3: Add Minimal Testing Scaffolding
+- Set up **unit test structure** using Vitest or Jest (whichever integrates faster with Vite project)
+- Create test stubs for:
+  - `generateKitPrompt()` function in `openai.ts`
+  - Schema mapping logic
+  - Any critical utility/helper functions (e.g., color parsing, prompt overrides)
+- Include at least one working test for each of the above as a sanity check (can be basic assertions)
+
+---
+
+### ✅ Step 4: Improve Form UX & Validation (in `design-form.tsx`)
+- Add basic validations for form fields:
+  - Required fields should not allow prompt submission
+  - Conditional rendering: if kitType requires shorts/trousers, make size field appear
+- Add field-level helper text or tooltips where logic might confuse the user (e.g., “Away kits use reversed colors unless a separate design is created.”)
+- Disable “Generate” button unless all required values are filled
+- Add `aria-labels` or simple accessibility notes where needed
+
+---
+
+### ✅ Step 5: Add Prompt Fallback UX to Frontend
+- Detect failed responses or blank `prompt/image` return from OpenAI/Replicate API
+- Display a retry modal or alert:
+  - ❌ "Prompt failed to generate. Want to try again?"
+  - ✅ Add a “Retry” button that re-triggers the prompt using the same form inputs
+- Optionally show a spinner or fun loading UI (e.g., "Hang tight... your kit is being stitched by AI ⚙️")
+
+---
+
+⏳ Timeline: All of this is critical for MVP production polish. Prioritize file cleanup and schema tightening first, then UX logic.
+
+📁 Key Files:
+- `shared/schema.ts`
+- `client/src/components/design-form.tsx`
+- `client/src/utils/openai.ts`
+- `public/`, `/output/`, `/logs/`, `/data/`
+
+🧪 Bonus (if time allows): Add an environment variable fallback logger or internal error monitoring.
