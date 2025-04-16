@@ -284,7 +284,13 @@ ${kitType?.includes("Shorts") || kitType?.includes("Kit") ?
 `• Shorts details: Matching ${sport} shorts in ${formattedPrimaryColor} with ${formattedSecondaryColor} accents, designed to complement the jersey style.` : ''}`;
 }
 
-export async function generateJerseyImageWithReplicate(prompt: string, kitType?: string): Promise<string> {
+// Define a type for the image generation result
+export interface ImageGenerationResult {
+  imageUrl: string;
+  imageData: string;
+}
+
+export async function generateJerseyImageWithReplicate(prompt: string, kitType?: string): Promise<ImageGenerationResult> {
   // Check for API token
   if (!process.env.REPLICATE_API_TOKEN) {
     throw new Error("REPLICATE_API_TOKEN is not set. Please add this secret to continue.");
@@ -425,10 +431,17 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     
     const outputPath = path.join(outputDir, filename);
     const arrayBuffer = await imageResponse.arrayBuffer();
-    fs.writeFileSync(outputPath, Buffer.from(arrayBuffer));
+    const buffer = Buffer.from(arrayBuffer);
+    fs.writeFileSync(outputPath, buffer);
+    
+    // Convert buffer to base64 for database storage
+    const base64Data = buffer.toString('base64');
     
     console.log(`Successfully saved image from URL to ${outputPath}`);
-    return `/output/${filename}`;
+    return {
+      imageUrl: `/output/${filename}`,
+      imageData: base64Data
+    };
     
   } catch (error) {
     console.error("Error generating or processing image:", error);
@@ -437,7 +450,25 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     const fallbackImage = "/output/fallback_jersey.png";
     if (fs.existsSync(path.join(process.cwd(), fallbackImage.substring(1)))) {
       console.log("Using fallback image:", fallbackImage);
-      return fallbackImage;
+      
+      try {
+        // Read the fallback image and convert to base64
+        const fallbackPath = path.join(process.cwd(), fallbackImage.substring(1));
+        const imageBuffer = fs.readFileSync(fallbackPath);
+        const base64Data = imageBuffer.toString('base64');
+        
+        return {
+          imageUrl: fallbackImage,
+          imageData: base64Data
+        };
+      } catch (readError) {
+        console.error("Error reading fallback image:", readError);
+        // If we can't read the fallback image, just return the URL
+        return {
+          imageUrl: fallbackImage,
+          imageData: ""
+        };
+      }
     }
     
     // Otherwise throw error

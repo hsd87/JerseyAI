@@ -1,0 +1,90 @@
+🔧 TASK: Improve the `client/src/components/order/price-calculator.tsx` component to support full dynamic pricing, including:
+- Centralized base prices
+- Tiered quantity discounts
+- 10% subscription savings
+- Shipping cost calculation
+- Optional bundle pricing
+- Final subtotal & total breakdown
+
+🔄 CONTEXT:
+This component currently calculates base prices per product, but it:
+- Hardcodes prices inline
+- Doesn’t apply tiered discounts
+- Ignores shipping
+- Doesn’t apply subscription savings
+- Lacks a final “total with breakdown” object
+
+✅ WHAT TO DO (Step-by-step):
+
+1. 🗂 Centralize Pricing:
+- Move all base prices to a new file: `shared/pricing.ts`
+  - Export a constant like:
+    ```ts
+    export const BASE_PRICES = {
+      'soccer_jersey': 20,
+      'soccer_jersey_short': 35,
+      'soccer_full_kit': 49,
+      'cricket_jersey_trouser': 39,
+      'tracksuit': 45,
+      'hoodie': 42,
+      'halfzip': 38,
+      'fullzip': 40,
+      'matching_socks': 8,
+      'matching_kitbag': 15,
+      'matching_beanie': 12
+    }
+    ```
+
+2. 💸 Add Tiered Discount Rules:
+- Inside `price-calculator.tsx`, define:
+    ```ts
+    function getTieredDiscountRate(quantity: number): number {
+      if (quantity >= 50) return 0.15;
+      if (quantity >= 20) return 0.10;
+      if (quantity >= 10) return 0.05;
+      return 0;
+    }
+    ```
+
+3. 💳 Add Subscription Discount Logic:
+- If `user?.subscriptionTier === 'pro'`, apply a flat 10% discount **after tier discount is calculated**.
+
+4. 📦 Add Bundle Pricing (Optional logic):
+- If user selects `jersey + shorts + socks` (full kit), apply a bundled price from `BASE_PRICES['soccer_full_kit']` instead of summing individual prices.
+- Make this conditional: `if (product === 'soccer' && selectedSet === 'jersey_short_socks')`
+
+5. 🚚 Add Shipping Logic:
+- After calculating the subtotal:
+    ```ts
+    function calculateShipping(subtotal: number): number {
+      if (subtotal > 500) return 0;
+      if (subtotal >= 200) return 20;
+      return 30;
+    }
+    ```
+
+6. 🧾 Return Final Price Breakdown:
+- Refactor the output to return an object like:
+    ```ts
+    {
+      baseTotal: 320,
+      tierDiscount: 32,
+      subscriptionDiscount: 28.8,
+      shipping: 20,
+      grandTotal: 279.2
+    }
+    ```
+
+7. 🧪 Add Console Logs (for now):
+- Add logs for `quantity`, `tier`, `subtotal`, `shipping`, and `finalTotal` for debugging and testing until we build the visual UI.
+
+🚨 Notes:
+- Do not alter the UI yet – just refactor the backend logic.
+- Ensure backward compatibility with individual orders and team rooster loop.
+- Keep this purely inside the `price-calculator.tsx` logic for now.
+
+📁 Files to edit/create:
+- [x] `shared/pricing.ts` → centralized base prices
+- [x] `client/src/components/order/price-calculator.tsx` → full pricing logic
+
+After this, we’ll build a separate UI component to show the breakdown to users.
