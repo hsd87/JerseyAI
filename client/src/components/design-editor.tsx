@@ -387,16 +387,13 @@ export default function DesignEditor() {
               }}
             >
               {/* Combined Jersey Image */}
-              {frontImage && backImage && (
+              {frontImage && (
                 <div className="relative w-full h-full">
                   <img 
                     src={frontImage} 
-                    alt={`${formData.sport} jersey combined view`}
+                    alt={`${formData.sport} jersey front view`}
                     className="absolute top-0 left-0 w-full h-full object-contain"
                   />
-                  <div className="absolute top-1 left-1 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                    Front View
-                  </div>
                   <div className="absolute text-center w-full bottom-2">
                     <span className="inline-flex items-center gap-1 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
                       <Move className="h-3 w-3" /> Drag elements to position
