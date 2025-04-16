@@ -16,6 +16,7 @@ import PartnerPage from "@/pages/partner-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import AdminDashboard from "@/pages/admin-dashboard";
+import OrderConfigurationPage from "@/pages/order-configuration-page";
 
 // Lazy-loaded components
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
