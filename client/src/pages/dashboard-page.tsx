@@ -67,14 +67,21 @@ export default function DashboardPage() {
       designNotes: design.designNotes || ''
     });
 
-    if (design.frontImageUrl && design.backImageUrl) {
-      setImages(design.frontImageUrl, design.backImageUrl);
+    // Only use the front image as per updated requirements
+    if (design.frontImageUrl) {
+      // Set same image for both front and back for compatibility
+      // but we'll only display the front image
+      setImages(design.frontImageUrl, design.frontImageUrl);
       setHasGenerated(true);
     }
 
     setDesignId(design.id);
     
     // Navigate to the designer page
+    toast({
+      title: "Design loaded",
+      description: "You can now edit your design."
+    });
     navigate('/');
   };
 

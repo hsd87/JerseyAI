@@ -88,8 +88,9 @@ export default function SizingOptions({ gender, size, onSelectGender, onSelectSi
         <h3 className="text-lg font-medium mb-3">Select Size</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
           {sizes.map((sizeOption) => (
-            <div
+            <button
               key={sizeOption}
+              type="button"
               className={cn(
                 "flex items-center justify-center h-12 border rounded-md cursor-pointer transition-all hover:border-primary/50",
                 size === sizeOption ? "border-primary border-2 bg-primary/5" : "border-gray-200"
@@ -97,7 +98,7 @@ export default function SizingOptions({ gender, size, onSelectGender, onSelectSi
               onClick={() => onSelectSize(sizeOption)}
             >
               {sizeOption}
-            </div>
+            </button>
           ))}
         </div>
       </div>

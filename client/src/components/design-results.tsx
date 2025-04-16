@@ -91,14 +91,14 @@ export default function DesignResults() {
           
           {/* Generated Results - After Generation */}
           {hasGenerated && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Front View Card */}
+            <div className="w-full max-w-3xl mx-auto">
+              {/* Front View Card Only */}
               <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
                 <div className="relative">
                   <img 
                     src={frontImage || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=600&auto=format&fit=crop"} 
                     alt="Front view of generated jersey" 
-                    className="w-full h-96 object-cover" 
+                    className="w-full h-[500px] object-contain bg-gray-50" 
                   />
                   
                   {/* Preview Overlay */}
@@ -112,7 +112,7 @@ export default function DesignResults() {
                   </div>
                   
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-4">
-                    <span className="text-sm font-medium">Front View</span>
+                    <span className="text-sm font-medium">Jersey Preview</span>
                   </div>
                 </div>
                 
@@ -121,41 +121,7 @@ export default function DesignResults() {
                     <h3 className="font-sora font-medium">
                       {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)} Jersey - Design #{Math.floor(Math.random() * 10000)}
                     </h3>
-                    <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">Front</span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Back View Card */}
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-                <div className="relative">
-                  <img 
-                    src={backImage || "https://images.unsplash.com/photo-1580087433295-ab2600c1030e?q=80&w=600&auto=format&fit=crop"} 
-                    alt="Back view of generated jersey" 
-                    className="w-full h-96 object-cover"
-                  />
-                  
-                  {/* Preview Overlay */}
-                  <div className="absolute top-2 right-2 flex space-x-2">
-                    <button className="bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 rounded-full transition-colors">
-                      <i className="fas fa-expand-alt"></i>
-                    </button>
-                    <button className="bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 rounded-full transition-colors">
-                      <i className="fas fa-heart"></i>
-                    </button>
-                  </div>
-                  
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-4">
-                    <span className="text-sm font-medium">Back View</span>
-                  </div>
-                </div>
-                
-                <div className="p-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-sora font-medium">
-                      {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)} Jersey - Design #{Math.floor(Math.random() * 10000)}
-                    </h3>
-                    <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">Back</span>
+                    <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">Front View</span>
                   </div>
                 </div>
               </div>

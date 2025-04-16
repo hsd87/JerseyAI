@@ -139,23 +139,21 @@ export default function OrderConfig({
                 <div className="flex items-center">
                   <h3 className="text-lg font-medium mr-4">Quantity:</h3>
                   <div className="flex items-center">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-9 w-9 rounded-md p-0"
+                    <button
+                      type="button"
+                      className="h-9 w-9 rounded-md border border-gray-200 flex items-center justify-center"
                       onClick={handleDecrementQuantity}
                     >
                       <MinusCircle className="h-4 w-4" />
-                    </Button>
+                    </button>
                     <span className="w-12 text-center font-medium">{quantity}</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-9 w-9 rounded-md p-0"
+                    <button
+                      type="button"
+                      className="h-9 w-9 rounded-md border border-gray-200 flex items-center justify-center"
                       onClick={handleIncrementQuantity}
                     >
                       <PlusCircle className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               </div>
