@@ -4,7 +4,11 @@ import {
   CustomizationData, 
   sportKitTypeMapping, 
   sportCollarMapping, 
-  sportPatternMapping 
+  sportPatternMapping,
+  SportType,
+  KitType,
+  CollarType,
+  PatternType
 } from '@shared/schema';
 
 interface DesignStore {
@@ -42,12 +46,7 @@ interface DesignStore {
   toggleAwayKit: () => void;
 }
 
-// Define our sport types and their expected design form field types
-type SportType = 'soccer' | 'basketball' | 'cricket' | 'rugby' | 'esports';
-type KitType = 'jersey' | 'jerseyShorts' | 'tracksuit' | 'trackjacket' | 'trackhoodie' | 
-               'trackjackethzip' | 'jerseyTrousers' | 'esportsjacket' | 'esportshoodie';
-type CollarType = 'crew' | 'v' | 'polo' | 'mandarin' | 'roundzip';
-type PatternStyle = 'gradient' | 'slash' | 'panel' | 'striped' | 'digital' | 'minimal' | 'solid';
+// Using types imported from shared/schema.ts
 
 // Color palettes for each sport for a consistent look
 const sportColorPalettes: Record<SportType, { primary: string, secondary: string }> = {
@@ -72,7 +71,7 @@ const getDefaultValuesForSport = (sportInput: string): DesignFormValues => {
   // Cast first option to appropriate type with fallbacks if the lists are empty
   const kitType = (kitTypeOptions[0] || 'jersey') as KitType;
   const collarType = (collarTypeOptions[0] || 'crew') as CollarType;
-  const patternStyle = (patternStyleOptions[0] || 'solid') as PatternStyle;
+  const patternStyle = (patternStyleOptions[0] || 'solid') as PatternType;
   
   return {
     sport,
