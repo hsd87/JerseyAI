@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { Label } from '@/components/ui/label';
@@ -36,20 +35,18 @@ export default function OrderConfig() {
   const { 
     packageType,
     setPackageType,
-    gender = 'Male', // Provide defaults if these are not in the store yet
-    setGender = () => {},
-    size = 'M',
-    setSize = () => {},
-    quantity = 1,
-    setQuantity = () => {},
     isTeamOrder,
     setTeamOrder,
-    addOns = [], // This should be addOns not addons to match the store
-    addAddOn,
-    removeAddOn
+    addOns = [], 
+    // Assuming these functions are available in the store, if not they need to be added
+    addAddOn = () => {},
+    removeAddOn = () => {}
   } = useOrderStore();
   
-  const [activeTab, setActiveTab] = useState('package');
+  // Local state for form values if not in global store
+  const [gender, setGender] = useState('Male');
+  const [size, setSize] = useState('M');
+  const [quantity, setQuantity] = useState(1);
 
   const form = useForm<OrderConfigValues>({
     resolver: zodResolver(orderConfigSchema),
@@ -85,26 +82,6 @@ export default function OrderConfig() {
   const handleTeamOrderChange = (checked: boolean) => {
     form.setValue('isTeamOrder', checked);
     setTeamOrder(checked);
-    
-    // When switching to team order mode, if there are no items in the cart,
-    // we need to make sure there's at least one item for pricing calculations
-    if (checked) {
-      // If there are no items yet, add a default one based on the current form values
-      const { items, addItem } = useOrderStore.getState();
-      if (items.length === 0) {
-        const packageType = form.getValues('packageType') || 'jerseyOnly';
-        const price = PACKAGE_PRICES[packageType] || 59.99;
-        
-        addItem({
-          id: Date.now().toString(), // Add id for new item
-          type: packageType,
-          size: form.getValues('size') || 'M',
-          quantity: 1,
-          gender: form.getValues('gender') || 'Male',
-          price: price,
-        });
-      }
-    }
   };
 
   const handleQuantityChange = (newQty: number) => {
@@ -144,15 +121,10 @@ export default function OrderConfig() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="package">Package</TabsTrigger>
-            <TabsTrigger value="sizing">Sizing</TabsTrigger>
-            <TabsTrigger value="addons">Add-Ons</TabsTrigger>
-          </TabsList>
-          
-          {/* Package Selection Tab */}
-          <TabsContent value="package" className="space-y-4">
+        <div className="space-y-8">
+          {/* Package Selection section */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-medium mb-4">Package</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
               <div 
                 className={`border rounded-lg p-4 cursor-pointer ${watchedPackageType === 'jerseyOnly' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
@@ -226,10 +198,55 @@ export default function OrderConfig() {
                 </div>
               </div>
             )}
-          </TabsContent>
+          </div>
           
-          {/* Sizing Tab */}
-          <TabsContent value="sizing" className="space-y-6">
+          {/* Add-Ons section */}
+          <div className="pt-6 border-t border-gray-200">
+            <h2 className="text-xl font-medium mb-4">Add-Ons</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {ADDON_OPTIONS.map((addon) => {
+                const currentAddon = addOns.find(a => a.id === addon.id);
+                const currentQty = currentAddon?.quantity || 0;
+                
+                return (
+                  <div 
+                    key={addon.id}
+                    className="border rounded-lg p-4 flex justify-between items-center"
+                  >
+                    <div>
+                      <h3 className="font-medium">{addon.name}</h3>
+                      <p className="text-sm font-bold">${addon.price}</p>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleAddonQuantityChange(addon.id, -1)}
+                        disabled={currentQty === 0}
+                      >
+                        <MinusCircle className="h-4 w-4" />
+                      </Button>
+                      <span className="w-6 text-center">{currentQty}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleAddonQuantityChange(addon.id, 1)}
+                      >
+                        <PlusCircle className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          
+          {/* Sizing Section */}
+          <div className="pt-6 border-t border-gray-200">
+            <h2 className="text-xl font-medium mb-4">Sizing</h2>
             <div>
               <h3 className="text-lg font-medium mb-2">Select Gender</h3>
               <RadioGroup 
@@ -411,51 +428,20 @@ export default function OrderConfig() {
                 </table>
               </div>
             </div>
-          </TabsContent>
+          </div>
           
-          {/* Add-Ons Tab */}
-          <TabsContent value="addons" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {ADDON_OPTIONS.map((addon) => {
-                const currentAddon = addOns.find(a => a.id === addon.id);
-                const currentQty = currentAddon?.quantity || 0;
-                
-                return (
-                  <div 
-                    key={addon.id}
-                    className="border rounded-lg p-4 flex justify-between items-center"
-                  >
-                    <div>
-                      <h3 className="font-medium">{addon.name}</h3>
-                      <p className="text-sm font-bold">${addon.price}</p>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleAddonQuantityChange(addon.id, -1)}
-                        disabled={currentQty === 0}
-                      >
-                        <MinusCircle className="h-4 w-4" />
-                      </Button>
-                      <span className="w-6 text-center">{currentQty}</span>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleAddonQuantityChange(addon.id, 1)}
-                      >
-                        <PlusCircle className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
+          {/* Action buttons section */}
+          <div className="pt-6 border-t border-gray-200">
+            <div className="flex justify-end space-x-4">
+              <Button type="button" variant="outline">
+                Back
+              </Button>
+              <Button type="submit">
+                Proceed to Checkout
+              </Button>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
