@@ -95,12 +95,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(JSON.stringify(enhancedPrompt, null, 2));
         
         // Generate a single combined image showing both front and back views
-        const jerseyImage = await generateJerseyImageWithReplicate(enhancedPrompt, design.kitType);
+        const imageResult = await generateJerseyImageWithReplicate(enhancedPrompt, design.kitType);
         
-        // For backward compatibility, set both front and back image URLs to the same combined image
+        console.log("Image generation result received with URL:", imageResult.imageUrl);
+        console.log("Image data size:", imageResult.imageData ? `${Math.round(imageResult.imageData.length / 1024)} KB` : "None");
+        
+        // Save both the image URL and the binary data to the database
         const updatedDesign = await storage.updateDesign(designId, {
-          frontImageUrl: jerseyImage,
-          backImageUrl: jerseyImage // Same image contains both views
+          frontImageUrl: imageResult.imageUrl,
+          backImageUrl: imageResult.imageUrl, // Same image contains both views
+          frontImageData: imageResult.imageData,
+          backImageData: imageResult.imageData // Same image data for both views
         });
 
         res.json(updatedDesign);
@@ -458,10 +463,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Enhanced prompt for direct image generation:", enhancedPrompt.substring(0, 200) + "...");
         
         // Step 2: Generate image with Replicate
-        const imageUrl = await generateJerseyImageWithReplicate(enhancedPrompt, kitType);
+        const imageResult = await generateJerseyImageWithReplicate(enhancedPrompt, kitType);
         
-        // Return the image URL directly
-        res.json({ imageUrl });
+        // Return the image URL directly (for compatibility)
+        res.json({ 
+          imageUrl: imageResult.imageUrl,
+          imageData: imageResult.imageData
+        });
       } catch (error: any) {
         console.error("Error generating image:", error);
         res.status(500).json({ 
