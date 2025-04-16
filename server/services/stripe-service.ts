@@ -11,7 +11,7 @@ export const initStripe = () => {
   }
   
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2024-04-10' // Update to the latest version as needed
+    apiVersion: '2023-10-16' // Latest available version
   });
   
   return stripe;
@@ -141,7 +141,8 @@ export const createCheckoutSession = async (
     success_url: `${successUrl}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: cancelUrl,
     client_reference_id: order.id.toString(),
-    customer_email: order.user?.email, // If we have user's email
+    // Get customer email from storage if needed
+    // customer_email will be populated on the server side
     shipping_address_collection: {
       allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'ES', 'IT', 'JP'],
     },

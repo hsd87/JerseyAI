@@ -1,0 +1,60 @@
+🧠 Objective:
+Resolve the `[plugin:runtime-error-plugin] Failed to fetch` error in the frontend.
+
+🎯 Context:
+We're using a React + TypeScript frontend with a shared `queryClient.ts` file that handles fetch requests. The error is triggered when the user configures a product and the app tries to calculate price via `calculatePrice()` or `updatePriceBreakdown()`.
+
+📸 Screenshot Reference:
+The error occurs at:
+`/client/src/lib/queryClient.ts:15` → `const res = await fetch(url, { ... })`
+
+Likely involved functions:
+- `calculatePrice`
+- `updatePriceBreakdown`
+
+⚙️ Expected Backend Endpoint:
+This fetch is meant to connect to a backend route that calculates dynamic pricing based on form data. It should point to something like `/api/price`.
+
+📦 What to Do:
+
+1. **Verify Backend is Running**
+   - Check if the backend server (FastAPI / Node / Express) is actively running and accessible on the correct port.
+   - Ensure CORS is enabled if needed.
+
+2. **Log Fetch URL and Payload**
+   - Add `console.log(url)` and `console.log(data)` before the `fetch()` in `queryClient.ts`.
+   - Confirm that the `url` is not `undefined` or empty and is pointing to a real API route.
+
+3. **Check API Route**
+   - Open the backend route handler for the dynamic pricing calculation.
+   - Make sure it accepts a POST request and handles the incoming payload correctly.
+   - Add error logging to the backend if needed.
+
+4. **Update API Base URL**
+   - If the API is local, ensure your base URL in `queryClient.ts` is correct:
+     - Use `"http://localhost:5000/api"` in development OR
+     - Just `"/api"` if using a proxy or monorepo setup.
+
+5. **Handle Missing Headers**
+   - If `data` is present, make sure headers are defined:
+     ```ts
+     headers: { "Content-Type": "application/json" }
+     ```
+   - Ensure the server expects JSON.
+
+6. **Improve Error Handling**
+   - Add a `try/catch` block around the fetch and display a user-friendly error if the API fails.
+
+7. **Optional: Disable HMR Overlay**
+   - If needed, in `vite.config.js`:
+     ```ts
+     server: {
+       hmr: {
+         overlay: false
+       }
+     }
+     ```
+
+✅ Goal: Make sure `calculatePrice()` correctly connects to the backend, receives a valid response, and the UI continues smoothly without crash overlays.
+
+💡 Once fixed, confirm the `Design Summary` and `Price Breakdown` sections reflect accurate pricing and update in real time.

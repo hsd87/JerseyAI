@@ -6,6 +6,7 @@ import { db } from './db';
 import path from 'path';
 import fs from 'fs';
 import { generateOrderPDF } from './utils/pdf-generator';
+import Stripe from 'stripe';
 
 export function registerPaymentRoutes(app: Express) {
   // Initialize Stripe
@@ -39,6 +40,12 @@ export function registerPaymentRoutes(app: Express) {
       // Create success and cancel URLs
       const successUrl = `${req.protocol}://${req.get('host')}/payment-success`;
       const cancelUrl = `${req.protocol}://${req.get('host')}/checkout`;
+      
+      // Get user info for checkout
+      const user = await storage.getUser(order.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
       
       // Create checkout session
       const session = await createCheckoutSession(order, successUrl, cancelUrl);

@@ -33,6 +33,7 @@ export interface IStorage {
   getOrderById(id: number): Promise<Order | undefined>;
   getUserOrders(userId: number): Promise<Order[]>;
   getAllOrders(): Promise<Order[]>;
+  updateOrder(id: number, data: Partial<Order>): Promise<Order>;
   updateOrderStatus(id: number, status: string, trackingId?: string): Promise<Order>;
   updateOrderPdfUrl(id: number, pdfUrl: string): Promise<Order>;
   
@@ -49,6 +50,8 @@ export interface IStorage {
   createB2BLead(lead: InsertB2BLead): Promise<B2BLead>;
   getB2BLeads(): Promise<B2BLead[]>;
   updateB2BLeadStatus(id: number, status: string): Promise<B2BLead>;
+  
+  // Payment Methods
   
   // Session Store
   sessionStore: any;
@@ -215,6 +218,20 @@ export class DatabaseStorage implements IStorage {
     const [updatedOrder] = await db
       .update(orders)
       .set({ pdfUrl })
+      .where(eq(orders.id, id))
+      .returning();
+    
+    if (!updatedOrder) {
+      throw new Error(`Order with id ${id} not found`);
+    }
+    
+    return updatedOrder;
+  }
+
+  async updateOrder(id: number, data: Partial<Order>): Promise<Order> {
+    const [updatedOrder] = await db
+      .update(orders)
+      .set(data)
       .where(eq(orders.id, id))
       .returning();
     

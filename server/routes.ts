@@ -477,6 +477,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploads directory for partner logos
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   
+  // Payment routes - importing from payment.ts for Stripe checkout flow
+  try {
+    const { registerPaymentRoutes } = await import('./payment');
+    registerPaymentRoutes(app);
+    console.log('Payment routes registered successfully');
+  } catch (error) {
+    console.error('Error registering payment routes:', error);
+  }
+
   // Serve images from the output directory
   app.get('/output/:filename', (req, res, next) => {
     try {
