@@ -205,72 +205,33 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   const [diagnosticData, setDiagnosticData] = useState<any>(null);
   
   const handleRetry = async () => {
+    // Don't automatically retry - just track the attempt and show proper diagnostics
     setRetryAttempt(prevAttempt => prevAttempt + 1);
     setShowRetryDialog(false);
     
-    try {
-      console.log(`Retry attempt ${retryAttempt + 1} for design generation`);
-      // Get the current form values
-      const data = form.getValues();
-      
-      // Collect diagnostic info
-      const diagnosticInfo = {
-        retryAttempt: retryAttempt + 1,
-        formData: { ...data },
-        timestamp: new Date().toISOString(),
-        browser: navigator.userAgent,
-        viewport: {
-          width: window.innerWidth,
-          height: window.innerHeight
-        }
-      };
-      
-      // Log diagnostic info for troubleshooting
-      console.info("Design generation retry diagnostic info:", diagnosticInfo);
-      
-      // Generate design again using the same data
-      const result = await generateDesign();
-      if (result) {
-        // Extract the image URL from the result if needed
-        if (typeof result === 'string') {
-          setGeneratedImage(result);
-        } else if (result.frontImageUrl) {
-          setGeneratedImage(result.frontImageUrl);
-        }
-        // Reset error states
-        setGenerationError(null);
-        setRetryAttempt(0); // Reset retry counter on success
-        
-        // Success notification
-        toast({
-          title: "Design generated successfully",
-          description: "Your jersey design has been created after retry.",
-        });
+    // Get the current form values
+    const data = form.getValues();
+    
+    // Collect and log diagnostic info for troubleshooting
+    const diagnosticInfo = {
+      retryAttempt: retryAttempt + 1,
+      formData: { ...data },
+      timestamp: new Date().toISOString(),
+      browser: navigator.userAgent,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
       }
-    } catch (error) {
-      console.error(`Retry failed (attempt ${retryAttempt + 1}):`, error);
-      
-      // Build diagnostic data
-      const errorDetail = error instanceof Error ? error.message : String(error);
-      const diagnosticInfo = {
-        retryAttempt: retryAttempt + 1,
-        errorDetail,
-        timestamp: new Date().toISOString(),
-        formValues: form.getValues()
-      };
-      
-      setDiagnosticData(diagnosticInfo);
-      
-      // If this was the third retry, show a more detailed error message
-      if (retryAttempt >= 2) {
-        setGenerationError(
-          "We're experiencing issues with our AI design service. Please try again later or contact support if the issue persists."
-        );
-      } else {
-        // Otherwise, show the retry dialog again
-        setShowRetryDialog(true);
-      }
-    }
+    };
+    
+    console.info("Design generation retry diagnostic info:", diagnosticInfo);
+    setDiagnosticData(diagnosticInfo);
+    
+    // Show a message to the user that they need to manually try again
+    toast({
+      title: "Ready to try again",
+      description: "Please click 'Generate Design' to retry the process.",
+    });
   };
   
   const onSubmit = async (data: DesignFormValues) => {

@@ -66,68 +66,51 @@ export function useReplicate() {
         
         console.log("Sending cleaned form data to generate API:", cleanedFormData);
         
-        // Add retry mechanism with exponential backoff
-        let attempt = 0;
-        const maxAttempts = 3;
-        let generateRes;
-        let lastError = null;
+        // Remove automatic retry mechanism to prevent duplicate API calls
+        // Simply make a single request with proper error handling
+        console.log("Starting design generation for design ID:", designRecord.id);
         
-        while (attempt < maxAttempts) {
-          try {
-            console.log(`Generation attempt ${attempt + 1}/${maxAttempts}`);
-            
-            // Track generation start time for performance metrics
-            const startTime = Date.now();
-            
-            generateRes = await apiRequest(
-              "POST", 
-              `/api/designs/${designRecord.id}/generate`, 
-              { formData: cleanedFormData }
-            );
-            
-            const duration = Date.now() - startTime;
-            console.log(`Generation request completed in ${duration}ms`);
-            
-            break; // Success, exit retry loop
-          } catch (err) {
-            lastError = err;
-            attempt++;
-            
-            // Log details about the error
-            console.error(
-              `Generation attempt ${attempt} failed:`, 
-              err instanceof Error ? err.message : err
-            );
-            
-            if (attempt >= maxAttempts) {
-              console.error("All retry attempts failed, giving up.");
-              throw new Error(`Failed after ${maxAttempts} attempts: ${lastError instanceof Error ? lastError.message : 'API error'}`);
-            }
-            
-            const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
-            console.warn(`Retrying in ${delay}ms (attempt ${attempt}/${maxAttempts})`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-          }
+        // Track generation start time for performance metrics
+        const startTime = Date.now();
+        
+        // Set a reasonable timeout for image generation (120 seconds)
+        const timeout = 120000; // 2 minutes
+        
+        // Create a promise that will reject after the timeout
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error(`Request timed out after ${timeout/1000} seconds`)), timeout);
+        });
+        
+        // Create the actual API request promise
+        const apiPromise = apiRequest(
+          "POST", 
+          `/api/designs/${designRecord.id}/generate`, 
+          { formData: cleanedFormData }
+        );
+        
+        // Race the API request against the timeout
+        const generateRes = await Promise.race([apiPromise, timeoutPromise]) as Response;
+        
+        const duration = Date.now() - startTime;
+        console.log(`Generation request completed in ${duration}ms`);
+        
+        // Check if the response is OK
+        if (!generateRes.ok) {
+          const errorData = await generateRes.json().catch(() => null);
+          const errorMessage = errorData?.message || `Server responded with status: ${generateRes.status}`;
+          throw new Error(errorMessage);
         }
         
-        if (!generateRes) {
-          throw new Error("Failed to generate design: No response received");
+        // Process the response data
+        const responseData = await generateRes.json();
+        console.log("Generation response:", responseData);
+        
+        // Validate response - ensure images are present
+        if (!responseData.frontImageUrl || !responseData.backImageUrl) {
+          throw new Error("Generated design is missing one or more images");
         }
         
-        try {
-          const responseData = await generateRes.json();
-          console.log("Generation response:", responseData);
-          
-          // Validate response - ensure images are present
-          if (!responseData.frontImageUrl || !responseData.backImageUrl) {
-            throw new Error("Generated design is missing one or more images");
-          }
-          
-          return responseData;
-        } catch (parseError) {
-          console.error("Failed to parse generation response:", parseError);
-          throw new Error("Failed to parse design response");
-        }
+        return responseData;
       } catch (error) {
         console.error("Error in design generation process:", error);
         throw error;
