@@ -1,367 +1,283 @@
-import { useState, useEffect } from "react";
+import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useOrderStore } from "@/hooks/use-order-store";
-import { Ruler, Info } from "lucide-react";
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-import { OrderItem } from "@/hooks/use-order-types";
+
+// Size charts for different sports
+const SIZE_CHARTS = {
+  soccer: {
+    men: {
+      'S': { chest: '36-38"', waist: '28-30"' },
+      'M': { chest: '38-40"', waist: '32-34"' },
+      'L': { chest: '42-44"', waist: '36-38"' },
+      'XL': { chest: '46-48"', waist: '40-42"' },
+      '2XL': { chest: '50-52"', waist: '44-46"' },
+    },
+    women: {
+      'S': { chest: '33-35"', waist: '25-27"' },
+      'M': { chest: '36-38"', waist: '28-30"' },
+      'L': { chest: '39-41"', waist: '31-33"' },
+      'XL': { chest: '42-44"', waist: '34-36"' },
+      '2XL': { chest: '45-47"', waist: '37-39"' },
+    },
+    youth: {
+      'Youth S': { chest: '26-28"', waist: '22-24"' },
+      'Youth M': { chest: '28-30"', waist: '24-26"' },
+      'Youth L': { chest: '30-32"', waist: '26-28"' },
+    }
+  },
+  basketball: {
+    men: {
+      'S': { chest: '36-38"', length: '27-28"' },
+      'M': { chest: '40-42"', length: '29-30"' },
+      'L': { chest: '44-46"', length: '31-32"' },
+      'XL': { chest: '48-50"', length: '33-34"' },
+      '2XL': { chest: '52-54"', length: '35-36"' },
+    },
+    women: {
+      'S': { chest: '33-35"', length: '24-25"' },
+      'M': { chest: '36-38"', length: '26-27"' },
+      'L': { chest: '39-41"', length: '28-29"' },
+      'XL': { chest: '42-45"', length: '30-31"' },
+      '2XL': { chest: '46-49"', length: '32-33"' },
+    },
+    youth: {
+      'Youth S': { chest: '26-28"', length: '21-22"' },
+      'Youth M': { chest: '29-31"', length: '23-24"' },
+      'Youth L': { chest: '32-34"', length: '25-26"' },
+    }
+  },
+  default: {
+    men: {
+      'S': { chest: '36-38"' },
+      'M': { chest: '40-42"' },
+      'L': { chest: '44-46"' },
+      'XL': { chest: '48-50"' },
+      '2XL': { chest: '52-54"' },
+    },
+    women: {
+      'S': { chest: '33-35"' },
+      'M': { chest: '36-38"' },
+      'L': { chest: '39-41"' },
+      'XL': { chest: '42-45"' },
+      '2XL': { chest: '46-49"' },
+    },
+    youth: {
+      'Youth S': { chest: '26-28"' },
+      'Youth M': { chest: '29-31"' },
+      'Youth L': { chest: '32-34"' },
+    }
+  }
+};
+
+// Available sizes for each category
+const AVAILABLE_SIZES = {
+  men: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+  women: ['S', 'M', 'L', 'XL', '2XL'],
+  youth: ['Youth S', 'Youth M', 'Youth L'],
+};
 
 export default function SizeChartDisplay() {
-  const { gender, size, quantity, packageType, items, addItem } = useOrderStore();
-  const [selectedGender, setSelectedGender] = useState<string>(gender || "Male");
-  const [selectedSize, setSelectedSize] = useState<string>(size || "M");
-  const [selectedQuantity, setSelectedQuantity] = useState<number>(quantity || 1);
+  const { addItem, items, updateItem, sport: storeSport } = useOrderStore();
+  const [gender, setGender] = useState<string>('men');
+  const [size, setSize] = useState<string>('M');
+  const [quantity, setQuantity] = useState<number>(1);
+  const [sport, setSport] = useState<string>(storeSport || 'soccer');
   
-  // Update store when selections change
-  useEffect(() => {
-    useOrderStore.getState().setGender?.(selectedGender);
-    useOrderStore.getState().setSize?.(selectedSize);
-    useOrderStore.getState().setQuantity?.(selectedQuantity);
-  }, [selectedGender, selectedSize, selectedQuantity]);
-  
-  // Get price for a product type
-  const getPrice = (type: string): number => {
-    const prices: Record<string, number> = {
-      jerseyOnly: 6999,
-      jerseyShorts: 8999,
-      fullKit: 12999,
-      default: 6999
-    };
+  // Get the item from the store if it exists
+  const existingItem = items.find(item => 
+    item.type === 'jersey' && 
+    item.size === size && 
+    (item as any).gender === gender
+  );
+
+  // Function to handle adding or updating item
+  const handleAddToCart = () => {
+    const jerseyPrice = 69.99; // Base price
+    const itemId = existingItem?.id || `jersey-${gender}-${size}`;
     
-    return prices[type] || prices.default;
+    if (existingItem) {
+      // Update existing item quantity
+      updateItem(existingItem.id, {
+        ...existingItem,
+        quantity: existingItem.quantity + quantity
+      });
+    } else {
+      // Add new item
+      addItem({
+        id: itemId,
+        name: `${gender === 'youth' ? 'Youth ' : gender === 'women' ? 'Women\'s ' : 'Men\'s '} ${sport.charAt(0).toUpperCase() + sport.slice(1)} Jersey`,
+        type: 'jersey',
+        size,
+        gender,
+        quantity,
+        price: jerseyPrice,
+      });
+    }
+    
+    // Reset quantity after adding
+    setQuantity(1);
   };
   
-  // Add to cart
-  const handleAddToOrder = () => {
-    const newItem: OrderItem = {
-      type: packageType,
-      size: selectedSize,
-      quantity: selectedQuantity,
-      gender: selectedGender,
-      price: getPrice(packageType)
-    };
-    
-    addItem(newItem);
+  // Get size chart based on sport and gender
+  const getSizeChart = () => {
+    const sportChart = SIZE_CHARTS[sport as keyof typeof SIZE_CHARTS] || SIZE_CHARTS.default;
+    return sportChart[gender as keyof typeof sportChart] || {};
   };
+  
+  const sizeChart = getSizeChart();
   
   return (
-    <Card className="relative">
-      <CardContent className="pt-6">
-        {/* Gender Selection */}
-        <div className="mb-6">
-          <Label className="text-base font-medium mb-2 block">Gender</Label>
-          <RadioGroup
-            defaultValue={selectedGender}
-            value={selectedGender}
-            onValueChange={setSelectedGender}
-            className="flex space-x-4"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Male" id="gender-male" />
-              <Label htmlFor="gender-male">Men's</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Female" id="gender-female" />
-              <Label htmlFor="gender-female">Women's</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Youth" id="gender-youth" />
-              <Label htmlFor="gender-youth">Youth</Label>
-            </div>
-          </RadioGroup>
-        </div>
-        
-        {/* Size Selection */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <Label className="text-base font-medium">Size</Label>
-            
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 text-primary">
-                  <Ruler className="h-4 w-4 mr-1" />
-                  Size Chart
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Size Chart</DialogTitle>
-                  <DialogDescription>
-                    Measurements are in inches
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="mt-4">
-                  <h3 className="font-medium mb-2">{selectedGender === "Youth" ? "Youth Sizes" : selectedGender === "Female" ? "Women's Sizes" : "Men's Sizes"}</h3>
-                  
-                  <div className="border rounded-md">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b bg-gray-50">
-                          <th className="p-2 text-left">Size</th>
-                          <th className="p-2 text-left">Chest</th>
-                          <th className="p-2 text-left">Waist</th>
-                          <th className="p-2 text-left">Hips</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedGender === "Male" ? (
-                          <>
-                            <tr className="border-b">
-                              <td className="p-2">XS</td>
-                              <td className="p-2">34-36</td>
-                              <td className="p-2">28-30</td>
-                              <td className="p-2">34-36</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">S</td>
-                              <td className="p-2">36-38</td>
-                              <td className="p-2">30-32</td>
-                              <td className="p-2">36-38</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">M</td>
-                              <td className="p-2">38-40</td>
-                              <td className="p-2">32-34</td>
-                              <td className="p-2">38-40</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">L</td>
-                              <td className="p-2">40-42</td>
-                              <td className="p-2">34-36</td>
-                              <td className="p-2">40-42</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">XL</td>
-                              <td className="p-2">42-44</td>
-                              <td className="p-2">36-38</td>
-                              <td className="p-2">42-44</td>
-                            </tr>
-                            <tr>
-                              <td className="p-2">XXL</td>
-                              <td className="p-2">44-46</td>
-                              <td className="p-2">38-40</td>
-                              <td className="p-2">44-46</td>
-                            </tr>
-                          </>
-                        ) : selectedGender === "Female" ? (
-                          <>
-                            <tr className="border-b">
-                              <td className="p-2">XS</td>
-                              <td className="p-2">32-34</td>
-                              <td className="p-2">24-26</td>
-                              <td className="p-2">34-36</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">S</td>
-                              <td className="p-2">34-36</td>
-                              <td className="p-2">26-28</td>
-                              <td className="p-2">36-38</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">M</td>
-                              <td className="p-2">36-38</td>
-                              <td className="p-2">28-30</td>
-                              <td className="p-2">38-40</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">L</td>
-                              <td className="p-2">38-40</td>
-                              <td className="p-2">30-32</td>
-                              <td className="p-2">40-42</td>
-                            </tr>
-                            <tr>
-                              <td className="p-2">XL</td>
-                              <td className="p-2">40-42</td>
-                              <td className="p-2">32-34</td>
-                              <td className="p-2">42-44</td>
-                            </tr>
-                          </>
-                        ) : (
-                          <>
-                            <tr className="border-b">
-                              <td className="p-2">YS</td>
-                              <td className="p-2">26-28</td>
-                              <td className="p-2">22-24</td>
-                              <td className="p-2">26-28</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">YM</td>
-                              <td className="p-2">28-30</td>
-                              <td className="p-2">24-26</td>
-                              <td className="p-2">28-30</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="p-2">YL</td>
-                              <td className="p-2">30-32</td>
-                              <td className="p-2">26-28</td>
-                              <td className="p-2">30-32</td>
-                            </tr>
-                            <tr>
-                              <td className="p-2">YXL</td>
-                              <td className="p-2">32-34</td>
-                              <td className="p-2">28-30</td>
-                              <td className="p-2">32-34</td>
-                            </tr>
-                          </>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          
-          <Select 
-            value={selectedSize} 
-            onValueChange={setSelectedSize}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select size" />
+    <div className="space-y-6">
+      {/* Sport and Gender Selection */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="sport-select">Sport</Label>
+          <Select value={sport} onValueChange={(value) => setSport(value)}>
+            <SelectTrigger id="sport-select">
+              <SelectValue placeholder="Select sport" />
             </SelectTrigger>
             <SelectContent>
-              {selectedGender === "Youth" ? (
-                <SelectGroup>
-                  <SelectLabel>Youth Sizes</SelectLabel>
-                  <SelectItem value="YS">Youth Small (YS)</SelectItem>
-                  <SelectItem value="YM">Youth Medium (YM)</SelectItem>
-                  <SelectItem value="YL">Youth Large (YL)</SelectItem>
-                  <SelectItem value="YXL">Youth XL (YXL)</SelectItem>
-                </SelectGroup>
-              ) : (
-                <SelectGroup>
-                  <SelectLabel>Adult Sizes</SelectLabel>
-                  <SelectItem value="XS">Extra Small (XS)</SelectItem>
-                  <SelectItem value="S">Small (S)</SelectItem>
-                  <SelectItem value="M">Medium (M)</SelectItem>
-                  <SelectItem value="L">Large (L)</SelectItem>
-                  <SelectItem value="XL">Extra Large (XL)</SelectItem>
-                  {selectedGender === "Male" && (
-                    <SelectItem value="XXL">Double XL (XXL)</SelectItem>
-                  )}
-                </SelectGroup>
-              )}
+              <SelectItem value="soccer">Soccer</SelectItem>
+              <SelectItem value="basketball">Basketball</SelectItem>
+              <SelectItem value="volleyball">Volleyball</SelectItem>
+              <SelectItem value="baseball">Baseball</SelectItem>
+              <SelectItem value="hockey">Hockey</SelectItem>
             </SelectContent>
           </Select>
         </div>
         
-        {/* Quantity Selection */}
-        <div className="mb-6">
-          <Label className="text-base font-medium mb-2 block">Quantity</Label>
-          <div className="flex items-center w-[180px]">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 rounded-r-none"
-              onClick={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
-              disabled={selectedQuantity <= 1}
-            >
-              -
-            </Button>
-            <Input
-              type="number"
-              min="1"
-              value={selectedQuantity}
-              onChange={(e) => setSelectedQuantity(parseInt(e.target.value) || 1)}
-              className="h-8 rounded-none text-center w-16"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 rounded-l-none"
-              onClick={() => setSelectedQuantity(selectedQuantity + 1)}
-            >
-              +
-            </Button>
-          </div>
+        <div>
+          <Label htmlFor="gender-select">Category</Label>
+          <Select value={gender} onValueChange={(value) => {
+            setGender(value);
+            // Reset size to default when changing gender
+            setSize(AVAILABLE_SIZES[value as keyof typeof AVAILABLE_SIZES][1]); 
+          }}>
+            <SelectTrigger id="gender-select">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="men">Men's</SelectItem>
+              <SelectItem value="women">Women's</SelectItem>
+              <SelectItem value="youth">Youth</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        
-        <Separator className="my-4" />
-        
-        {/* Order Summary */}
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="font-medium">{
-              packageType === 'jerseyOnly' ? 'Jersey Only' :
-              packageType === 'jerseyShorts' ? 'Jersey + Shorts' :
-              packageType === 'fullKit' ? 'Full Kit (Jersey + Shorts + Socks)' : 
-              'Kit Package'
-            }</p>
-            <p className="text-sm text-gray-500">
-              {selectedGender === "Youth" ? "Youth" : selectedGender === "Female" ? "Women's" : "Men's"} size {selectedSize}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="font-medium">${(getPrice(packageType) / 100).toFixed(2)}</p>
-            <Button 
-              variant="default"
-              size="sm" 
-              className="mt-2"
-              onClick={handleAddToOrder}
-            >
-              Add to Order
-            </Button>
-          </div>
-        </div>
-        
-        {/* Item list */}
-        {items.length > 0 && (
-          <div className="mt-6 border-t pt-4">
-            <h3 className="font-medium mb-2">Order Items</h3>
-            <ul className="space-y-2">
-              {items.map((item, index) => (
-                <li key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded-md">
-                  <div>
-                    <p>{
-                      item.type === 'jerseyOnly' ? 'Jersey Only' :
-                      item.type === 'jerseyShorts' ? 'Jersey + Shorts' :
-                      item.type === 'fullKit' ? 'Full Kit' : 
-                      'Kit Package'
-                    }</p>
-                    <p className="text-xs text-gray-500">
-                      {item.gender} size {item.size} × {item.quantity}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p>${(item.price / 100).toFixed(2)}</p>
+      </div>
+      
+      {/* Size Chart Display */}
+      <Card>
+        <CardContent className="p-4">
+          <Tabs defaultValue="sizes">
+            <TabsList className="mb-4">
+              <TabsTrigger value="sizes">Size Selection</TabsTrigger>
+              <TabsTrigger value="chart">Size Chart</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="sizes" className="space-y-4">
+              <div className="grid grid-cols-3 gap-2">
+                {AVAILABLE_SIZES[gender as keyof typeof AVAILABLE_SIZES].map((availableSize) => (
+                  <Button
+                    key={availableSize}
+                    variant={availableSize === size ? "default" : "outline"}
+                    onClick={() => setSize(availableSize)}
+                    className="flex-1"
+                  >
+                    {availableSize}
+                  </Button>
+                ))}
+              </div>
+              
+              <div className="flex items-end gap-4 mt-4">
+                <div className="flex-1">
+                  <Label htmlFor="quantity-input">Quantity</Label>
+                  <div className="flex items-center gap-2">
                     <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="h-6 text-gray-500"
-                      onClick={() => useOrderStore.getState().removeItem(index)}
+                      variant="outline" 
+                      size="icon"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     >
-                      Remove
+                      -
+                    </Button>
+                    <Input
+                      id="quantity-input"
+                      type="number"
+                      min="1"
+                      value={quantity}
+                      onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-20 text-center"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      onClick={() => setQuantity(quantity + 1)}
+                    >
+                      +
                     </Button>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                </div>
+                
+                <Button className="px-8" onClick={handleAddToCart}>
+                  {existingItem ? 'Update Cart' : 'Add to Cart'}
+                </Button>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="chart">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border p-2 text-left">Size</th>
+                      {Object.keys(Object.values(sizeChart)[0] || {}).map((measurement) => (
+                        <th key={measurement} className="border p-2 text-left capitalize">
+                          {measurement}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(sizeChart).map(([sizeName, measurements]) => (
+                      <tr key={sizeName} className="hover:bg-gray-50">
+                        <td className="border p-2 font-medium">{sizeName}</td>
+                        {Object.values(measurements).map((value, index) => (
+                          <td key={index} className="border p-2">{value}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <p className="text-sm text-gray-500 mt-4">
+                Measurements are approximate. For best fit, please measure yourself and compare to the chart.
+              </p>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+      
+      {/* Current Selection */}
+      {items.length > 0 && (
+        <div className="p-4 bg-gray-50 rounded-md">
+          <h3 className="font-medium mb-2">Current Selection</h3>
+          <ul className="space-y-2">
+            {items.map((item) => (
+              <li key={item.id} className="flex justify-between items-center">
+                <span>
+                  {item.name} - {item.size} ({item.quantity})
+                </span>
+                <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }

@@ -82,11 +82,12 @@ export async function apiRequest(
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
-export const getQueryFn: <T>(options: {
+export const getQueryFn = <TData = any,>(options: {
   on401: UnauthorizedBehavior;
-}) => QueryFunction<T> =
-  ({ on401: unauthorizedBehavior }) =>
-  async ({ queryKey }) => {
+}): QueryFunction<TData> => {
+  const { on401: unauthorizedBehavior } = options;
+  
+  return async ({ queryKey }) => {
     // Add logs for debugging
     const url = queryKey[0] as string;
     console.log(`Making query request to:`, url);
@@ -104,7 +105,7 @@ export const getQueryFn: <T>(options: {
     let retryCount = 0;
     const MAX_RETRIES = 2;
     
-    const executeQuery = async (): Promise<T> => {
+    const executeQuery = async (): Promise<any> => {
       try {
         const res = await fetch(normalizedUrl, {
           credentials: "include",
@@ -116,7 +117,7 @@ export const getQueryFn: <T>(options: {
         console.log(`Response from ${url}:`, res.status);
         
         if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-          return null as unknown as T;
+          return null as any;
         }
   
         // Check for server errors that might benefit from retry
@@ -150,6 +151,7 @@ export const getQueryFn: <T>(options: {
     
     return executeQuery();
   };
+};
 
 export const queryClient = new QueryClient({
   defaultOptions: {

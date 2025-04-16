@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { orderService } from "@/lib/order-service";
 import { Loader2, FileText, ShoppingBag, CreditCard } from "lucide-react";
-import OrderSummary from "@/components/order-summary";
+// Lazy load components that might cause issues
+const OrderSummary = React.lazy(() => import("@/components/order-summary"));
 import type { ShippingAddress } from "@shared/schema";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Helmet } from "react-helmet";
@@ -585,7 +586,14 @@ export default function CheckoutPage() {
 
         {/* Order Summary (shown in both steps) */}
         <div>
-          <OrderSummary showDetailed />
+          <Suspense fallback={
+            <div className="p-6 bg-gray-50 rounded-md flex flex-col items-center justify-center min-h-[400px]">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+              <p className="text-sm text-gray-500">Loading order summary...</p>
+            </div>
+          }>
+            <OrderSummary showDetailed />
+          </Suspense>
         </div>
       </div>
     </div>

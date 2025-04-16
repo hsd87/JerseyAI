@@ -1,253 +1,249 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { PlusCircle, Trash2, FileText } from "lucide-react";
 import { useOrderStore } from "@/hooks/use-order-store";
-import { TeamMember } from "@/hooks/use-order-types";
-import { v4 as uuidv4 } from "uuid";
-import { PlusCircle, Trash2, Edit, Save, X } from "lucide-react";
-import { 
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
+
+// Size options for different sports
+const SIZE_OPTIONS = {
+  soccer: ['Youth S', 'Youth M', 'Youth L', 'S', 'M', 'L', 'XL', '2XL', '3XL'],
+  basketball: ['Youth S', 'Youth M', 'Youth L', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'],
+  default: ['S', 'M', 'L', 'XL', '2XL']
+};
+
+interface TeamMember {
+  id: string;
+  name: string;
+  number: string;
+  size: string;
+  gender: 'male' | 'female' | 'unisex';
+}
 
 export default function RosterBuilder() {
-  const { teamName, setTeamName, teamMembers, addTeamMember, updateTeamMember, removeTeamMember } = useOrderStore();
+  const { teamMembers, updateTeamMembers } = useOrderStore();
+  const [teamName, setTeamName] = useState<string>('');
+  const [members, setMembers] = useState<TeamMember[]>(teamMembers || []);
+  const [sport, setSport] = useState<string>('soccer');
   
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [newSize, setNewSize] = useState("M");
-  const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<Partial<TeamMember>>({});
+  // Generate a random ID for new members
+  const generateId = () => `member-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
   
-  // Add a new team member
-  const handleAddMember = () => {
-    if (!newName || !newNumber) return;
+  // Add a new team member with default values
+  const addTeamMember = () => {
+    const newMember: TeamMember = {
+      id: generateId(),
+      name: '',
+      number: '',
+      size: 'M',
+      gender: 'unisex',
+    };
     
-    addTeamMember({
-      id: uuidv4(),
-      name: newName,
-      number: newNumber,
-      size: newSize,
-      quantity: 1
+    const updatedMembers = [...members, newMember];
+    setMembers(updatedMembers);
+    updateTeamMembers(updatedMembers);
+  };
+  
+  // Update a specific team member's data
+  const updateMember = (id: string, field: keyof TeamMember, value: string) => {
+    const updatedMembers = members.map(member => {
+      if (member.id === id) {
+        return { 
+          ...member, 
+          [field]: field === 'gender' 
+            ? (value as 'male' | 'female' | 'unisex') 
+            : value 
+        };
+      }
+      return member;
     });
     
-    // Reset form
-    setNewName("");
-    setNewNumber("");
-    setNewSize("M");
+    setMembers(updatedMembers);
+    updateTeamMembers(updatedMembers);
   };
   
-  // Start editing a team member
-  const handleEdit = (member: TeamMember) => {
-    setEditingMemberId(member.id);
-    setEditValues({
-      name: member.name,
-      number: member.number,
-      size: member.size,
-      quantity: member.quantity
-    });
+  // Remove a team member from the roster
+  const removeMember = (id: string) => {
+    const updatedMembers = members.filter(member => member.id !== id);
+    setMembers(updatedMembers);
+    updateTeamMembers(updatedMembers);
   };
   
-  // Save edits
-  const handleSaveEdit = (id: string) => {
-    updateTeamMember(id, editValues);
-    setEditingMemberId(null);
-    setEditValues({});
-  };
-  
-  // Cancel editing
-  const handleCancelEdit = () => {
-    setEditingMemberId(null);
-    setEditValues({});
+  // Get the appropriate size options based on selected sport
+  const getSizeOptions = () => {
+    return SIZE_OPTIONS[sport as keyof typeof SIZE_OPTIONS] || SIZE_OPTIONS.default;
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card>
-        <CardContent className="pt-6">
-          <div className="mb-4">
-            <Label htmlFor="team-name">Team Name</Label>
-            <Input
-              id="team-name"
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              placeholder="Enter your team name"
-              className="mt-1"
-            />
-          </div>
-          
-          <div className="border-t pt-4 mt-6">
-            <h3 className="font-medium mb-3">Team Members</h3>
+        <CardContent className="pt-4">
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <Label htmlFor="team-name">Team Name</Label>
+              <Input
+                id="team-name"
+                placeholder="Enter team name"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+              />
+            </div>
             
-            {teamMembers.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Number</TableHead>
-                    <TableHead>Size</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {teamMembers.map((member) => (
-                    <TableRow key={member.id}>
-                      {editingMemberId === member.id ? (
-                        // Editing row
-                        <>
-                          <TableCell>
-                            <Input 
-                              value={editValues.name || ""}
-                              onChange={(e) => setEditValues({...editValues, name: e.target.value})}
-                              className="w-full"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input 
-                              value={editValues.number || ""}
-                              onChange={(e) => setEditValues({...editValues, number: e.target.value})}
-                              className="w-full"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Select 
-                              value={editValues.size || member.size}
-                              onValueChange={(val) => setEditValues({...editValues, size: val})}
-                            >
-                              <SelectTrigger className="w-[80px]">
-                                <SelectValue placeholder="Size" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectItem value="XS">XS</SelectItem>
-                                  <SelectItem value="S">S</SelectItem>
-                                  <SelectItem value="M">M</SelectItem>
-                                  <SelectItem value="L">L</SelectItem>
-                                  <SelectItem value="XL">XL</SelectItem>
-                                  <SelectItem value="XXL">XXL</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Input 
-                              type="number"
-                              min="1"
-                              value={editValues.quantity || 1}
-                              onChange={(e) => setEditValues({
-                                ...editValues, 
-                                quantity: parseInt(e.target.value) || 1
-                              })}
-                              className="w-16"
-                            />
-                          </TableCell>
-                          <TableCell className="text-right space-x-2">
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleSaveEdit(member.id)}
-                            >
-                              <Save className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={handleCancelEdit}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </>
-                      ) : (
-                        // Display row
-                        <>
-                          <TableCell>{member.name}</TableCell>
-                          <TableCell>{member.number}</TableCell>
-                          <TableCell>{member.size}</TableCell>
-                          <TableCell>{member.quantity}</TableCell>
-                          <TableCell className="text-right space-x-2">
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleEdit(member)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => removeTeamMember(member.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="text-center py-8 border rounded-md text-gray-500">
-                No team members added yet
-              </div>
-            )}
-            
-            {/* Add new member form */}
-            <div className="grid grid-cols-12 gap-2 mt-4">
-              <div className="col-span-4">
-                <Input 
-                  placeholder="Name"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                />
-              </div>
-              <div className="col-span-2">
-                <Input 
-                  placeholder="Number"
-                  value={newNumber}
-                  onChange={(e) => setNewNumber(e.target.value)}
-                />
-              </div>
-              <div className="col-span-3">
-                <Select value={newSize} onValueChange={setNewSize}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="XS">XS</SelectItem>
-                      <SelectItem value="S">S</SelectItem>
-                      <SelectItem value="M">M</SelectItem>
-                      <SelectItem value="L">L</SelectItem>
-                      <SelectItem value="XL">XL</SelectItem>
-                      <SelectItem value="XXL">XXL</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="col-span-3">
-                <Button 
-                  className="w-full"
-                  onClick={handleAddMember}
-                  disabled={!newName || !newNumber}
-                >
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Add
-                </Button>
-              </div>
+            <div>
+              <Label htmlFor="sport-select">Sport</Label>
+              <Select 
+                value={sport} 
+                onValueChange={(value) => setSport(value)}
+              >
+                <SelectTrigger id="sport-select">
+                  <SelectValue placeholder="Select sport" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="soccer">Soccer</SelectItem>
+                  <SelectItem value="basketball">Basketball</SelectItem>
+                  <SelectItem value="volleyball">Volleyball</SelectItem>
+                  <SelectItem value="baseball">Baseball</SelectItem>
+                  <SelectItem value="hockey">Hockey</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
       </Card>
+      
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-medium">Team Roster</h3>
+          
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addTeamMember}
+            >
+              <PlusCircle className="h-4 w-4 mr-1" />
+              Add Player
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Create a CSV download of roster
+                const header = "Name,Number,Size,Gender\\n";
+                const csvContent = members.reduce((acc, member) => {
+                  return acc + `${member.name},${member.number},${member.size},${member.gender}\\n`;
+                }, header);
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${teamName || 'team'}-roster.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+            >
+              <FileText className="h-4 w-4 mr-1" />
+              Export
+            </Button>
+          </div>
+        </div>
+        
+        {members.length === 0 ? (
+          <div className="text-center py-8 bg-gray-50 rounded-md border border-dashed">
+            <p className="text-gray-500">No team members added yet.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={addTeamMember}
+            >
+              <PlusCircle className="h-4 w-4 mr-1" />
+              Add First Player
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {members.map((member, index) => (
+              <Card key={member.id} className="p-4">
+                <div className="grid grid-cols-12 gap-2">
+                  <div className="col-span-1 flex items-center justify-center">
+                    <span className="text-gray-500 font-medium">{index + 1}</span>
+                  </div>
+                  
+                  <div className="col-span-3">
+                    <Label className="text-xs">Name</Label>
+                    <Input
+                      placeholder="Player name"
+                      value={member.name}
+                      onChange={(e) => updateMember(member.id, 'name', e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="col-span-2">
+                    <Label className="text-xs">Number</Label>
+                    <Input
+                      placeholder="#"
+                      value={member.number}
+                      onChange={(e) => updateMember(member.id, 'number', e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="col-span-2">
+                    <Label className="text-xs">Size</Label>
+                    <Select
+                      value={member.size}
+                      onValueChange={(value) => updateMember(member.id, 'size', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getSizeOptions().map((size) => (
+                          <SelectItem key={size} value={size}>
+                            {size}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="col-span-3">
+                    <Label className="text-xs">Gender</Label>
+                    <Select
+                      value={member.gender}
+                      onValueChange={(value) => updateMember(member.id, 'gender', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Men's</SelectItem>
+                        <SelectItem value="female">Women's</SelectItem>
+                        <SelectItem value="unisex">Unisex</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="col-span-1 flex items-center justify-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeMember(member.id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
