@@ -56,7 +56,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, AlertCircle, HelpCircle, RotateCw } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { AlertCircle, Copy, RotateCw, Loader2, HelpCircle } from "lucide-react";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 
 interface DesignFormProps {
@@ -74,6 +83,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   } = useDesignStore();
   const { generateDesign, isGenerating } = useReplicate();
   const subscription = useSubscription();
+  const { toast } = useToast();
   
   const [awayKit, setAwayKit] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -201,6 +211,10 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
     }
   };
 
+  // State for diagnostic modal
+  const [showDiagnosticInfo, setShowDiagnosticInfo] = useState(false);
+  const [diagnosticData, setDiagnosticData] = useState<any>(null);
+  
   const handleRetry = async () => {
     setRetryAttempt(prevAttempt => prevAttempt + 1);
     setShowRetryDialog(false);
@@ -209,6 +223,21 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
       console.log(`Retry attempt ${retryAttempt + 1} for design generation`);
       // Get the current form values
       const data = form.getValues();
+      
+      // Collect diagnostic info
+      const diagnosticInfo = {
+        retryAttempt: retryAttempt + 1,
+        formData: { ...data },
+        timestamp: new Date().toISOString(),
+        browser: navigator.userAgent,
+        viewport: {
+          width: window.innerWidth,
+          height: window.innerHeight
+        }
+      };
+      
+      // Log diagnostic info for troubleshooting
+      console.info("Design generation retry diagnostic info:", diagnosticInfo);
       
       // Generate design again using the same data
       const result = await generateDesign();
@@ -219,11 +248,29 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
         } else if (result.frontImageUrl) {
           setGeneratedImage(result.frontImageUrl);
         }
-        // Clear any previous errors
+        // Reset error states
         setGenerationError(null);
+        setRetryAttempt(0); // Reset retry counter on success
+        
+        // Success notification
+        toast({
+          title: "Design generated successfully",
+          description: "Your jersey design has been created after retry.",
+        });
       }
     } catch (error) {
       console.error(`Retry failed (attempt ${retryAttempt + 1}):`, error);
+      
+      // Build diagnostic data
+      const errorDetail = error instanceof Error ? error.message : String(error);
+      const diagnosticInfo = {
+        retryAttempt: retryAttempt + 1,
+        errorDetail,
+        timestamp: new Date().toISOString(),
+        formValues: form.getValues()
+      };
+      
+      setDiagnosticData(diagnosticInfo);
       
       // If this was the third retry, show a more detailed error message
       if (retryAttempt >= 2) {
@@ -713,6 +760,47 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        
+        {/* Diagnostic Modal for Errors - Only shown to admins for troubleshooting */}
+        {user?.role === 'admin' && (
+          <Dialog open={showDiagnosticInfo} onOpenChange={setShowDiagnosticInfo}>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Technical Diagnostic Information</DialogTitle>
+                <DialogDescription>
+                  This information can help our team troubleshoot design generation issues.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 max-h-[400px] overflow-y-auto">
+                <div className="text-xs font-mono bg-gray-100 p-4 rounded-md">
+                  {diagnosticData && (
+                    <pre>{JSON.stringify(diagnosticData, null, 2)}</pre>
+                  )}
+                </div>
+              </div>
+              <DialogFooter>
+                <Button onClick={() => setShowDiagnosticInfo(false)}>Close</Button>
+                {diagnosticData && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      // Copy to clipboard
+                      navigator.clipboard.writeText(JSON.stringify(diagnosticData, null, 2))
+                        .then(() => {
+                          toast({
+                            title: "Copied to clipboard",
+                            description: "Diagnostic data has been copied to clipboard"
+                          });
+                        });
+                    }}
+                  >
+                    <Copy className="h-4 w-4 mr-2" /> Copy JSON
+                  </Button>
+                )}
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </Form>
     </div>
   );
