@@ -304,6 +304,7 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     const modelVersion = "hsd87/pfai01:a55a5b66a5bdee91c0ad3af6a013c81741aad48dfaf4291f2d9a28a35e0a79c3";
     
     // Create input parameters with proper types
+    // IMPORTANT: The API expects extra_lora to be a string and extra_lora_scale to be a number
     const input = {
       prompt: prompt,
       aspect_ratio: aspectRatio,
@@ -314,9 +315,9 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
       guidance_scale: 2.9,
       output_format: "jpg",
       disable_safety_checker: false,
-      lora_scale: 0.8, // Changed from 1.05 to 0.8 as requested
-      extra_lora: "", // Must be a string as per API error
-      extra_lora_scale: 0.69 // Must be a number as per API error
+      lora_scale: 0.8,
+      extra_lora: "",  // String type
+      extra_lora_scale: 0.69  // Number type
     };
     
     // Run the model prediction

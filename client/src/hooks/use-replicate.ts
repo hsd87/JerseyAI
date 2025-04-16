@@ -18,30 +18,58 @@ export function useReplicate() {
 
   const generateDesignMutation = useMutation({
     mutationFn: async () => {
-      // First, create a design record
-      let designRecord: Design;
-      if (!designId) {
-        const createRes = await apiRequest("POST", "/api/designs", formData);
-        designRecord = await createRes.json();
-        setDesignId(designRecord.id);
-      } else {
-        // Use existing design
-        designRecord = { id: designId } as Design;
+      try {
+        // First, create a design record
+        let designRecord: Design;
+        if (!designId) {
+          const createRes = await apiRequest("POST", "/api/designs", formData);
+          designRecord = await createRes.json();
+          setDesignId(designRecord.id);
+        } else {
+          // Use existing design
+          designRecord = { id: designId } as Design;
+        }
+
+        toast({
+          title: "Generating design...",
+          description: "This may take up to 30-60 seconds while we create your jersey design.",
+        });
+
+        // Then, generate images for it - pass form data to ensure it has the latest values
+        console.log("Sending form data to generate API:", formData);
+        
+        // Add retry mechanism with exponential backoff
+        let attempt = 0;
+        const maxAttempts = 3;
+        let generateRes;
+        
+        while (attempt < maxAttempts) {
+          try {
+            generateRes = await apiRequest(
+              "POST", 
+              `/api/designs/${designRecord.id}/generate`, 
+              { formData }
+            );
+            break; // Success, exit retry loop
+          } catch (err) {
+            attempt++;
+            if (attempt >= maxAttempts) {
+              throw err; // Rethrow if all attempts failed
+            }
+            console.warn(`Network error, retrying in ${Math.pow(2, attempt) * 1000}ms (attempt ${attempt})`);
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000)); // Exponential backoff
+          }
+        }
+        
+        if (!generateRes) {
+          throw new Error("Failed to generate design after multiple attempts");
+        }
+        
+        return await generateRes.json();
+      } catch (error) {
+        console.error("Error in image generation:", error);
+        throw error;
       }
-
-      toast({
-        title: "Generating design...",
-        description: "This may take up to 30-60 seconds while we create your jersey design.",
-      });
-
-      // Then, generate images for it - pass form data to ensure it has the latest values
-      console.log("Sending form data to generate API:", formData);
-      const generateRes = await apiRequest(
-        "POST", 
-        `/api/designs/${designRecord.id}/generate`, 
-        { formData }
-      );
-      return await generateRes.json();
     },
     onMutate: () => {
       setGenerating(true);
