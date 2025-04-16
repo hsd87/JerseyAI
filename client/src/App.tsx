@@ -24,6 +24,7 @@ const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
 const JerseyEditorPage = React.lazy(() => import('./pages/jersey-editor-page'));
 const PricingCalculatorPage = React.lazy(() => import('./pages/pricing-calculator-page'));
 const TestPage = React.lazy(() => import('./pages/test-page'));
+const OrderDemoPage = React.lazy(() => import('./pages/order-demo-page'));
 
 // Main application component that handles routing and subscription updates
 function AppContent() {
@@ -76,6 +77,10 @@ function AppContent() {
           
           <Route path="/pricing">
             <PricingCalculatorPage />
+          </Route>
+
+          <Route path="/order-demo">
+            <OrderDemoPage />
           </Route>
           
           {/* Protected routes */}
