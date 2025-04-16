@@ -318,41 +318,19 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     extra_lora_scale: 0.69  // Number type
   };
   
-  // Add retry logic for Replicate API
-  const maxRetries = 2;
-  let attempt = 0;
-  let output = null;
-  let lastError = null;
-  
+  // Remove retry logic - we want to handle retries in the frontend
+  // This prevents duplicate API calls and gives more control to the user
   try {
-    // STEP 1: Generate image with Replicate API (with retries)
-    while (attempt <= maxRetries) {
-      try {
-        console.log(`Replicate API attempt ${attempt + 1}/${maxRetries + 1} with parameters:`, JSON.stringify(input, null, 2));
-        
-        const startTime = Date.now();
-        output = await replicate.run(modelVersion, { input });
-        const generationTime = Date.now() - startTime;
-        
-        console.log(`Image generated in ${generationTime}ms on attempt ${attempt + 1}`);
-        break; // Success, exit retry loop
-      } catch (error) {
-        lastError = error;
-        attempt++;
-        
-        console.error(`Replicate API error on attempt ${attempt}/${maxRetries + 1}:`, error);
-        
-        if (attempt <= maxRetries) {
-          // Wait with exponential backoff before retrying
-          const delay = Math.pow(2, attempt) * 1000;
-          console.log(`Retrying in ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        } else {
-          // All retries failed
-          console.error(`All ${maxRetries + 1} attempts to generate image failed`);
-          throw error;
-        }
-      }
+    console.log(`Replicate API call with parameters:`, JSON.stringify(input, null, 2));
+    
+    const startTime = Date.now();
+    const output = await replicate.run(modelVersion, { input });
+    const generationTime = Date.now() - startTime;
+    
+    console.log(`Image generated in ${generationTime}ms`);
+    
+    if (!output) {
+      throw new Error("No output received from Replicate API");
     }
     
     // Get the image URL or data from the output
@@ -410,36 +388,18 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     // Case 2: Handle URL response
     console.log("Processing image from URL:", typeof imageUrl === 'string' ? imageUrl : 'Non-string URL');
     
-    // Re-initialize attempt counter for download retries
-    attempt = 0;
+    // Simple image download without retries, matching our no-retry strategy
     let imageResponse = null;
-    
-    // Download the image with retries
-    while (attempt <= maxRetries) {
-      try {
-        console.log(`Downloading image attempt ${attempt + 1}/${maxRetries + 1}`);
-        imageResponse = await fetch(imageUrl.toString());
-        
-        if (!imageResponse.ok) {
-          throw new Error(`Download failed with status: ${imageResponse.status}`);
-        }
-        
-        break; // Success, exit retry loop
-      } catch (error) {
-        lastError = error;
-        attempt++;
-        
-        console.error(`Image download error on attempt ${attempt}/${maxRetries + 1}:`, error);
-        
-        if (attempt <= maxRetries) {
-          const delay = Math.pow(2, attempt) * 1000;
-          console.log(`Retrying download in ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        } else {
-          console.error(`All ${maxRetries + 1} attempts to download image failed`);
-          throw new Error(`Failed to download image: ${lastError instanceof Error ? lastError.message : 'Unknown error'}`);
-        }
+    try {
+      console.log(`Downloading image from URL`);
+      imageResponse = await fetch(imageUrl.toString());
+      
+      if (!imageResponse.ok) {
+        throw new Error(`Download failed with status: ${imageResponse.status}`);
       }
+    } catch (error) {
+      console.error(`Image download error:`, error);
+      throw new Error(`Failed to download image: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
     
     if (!imageResponse) {
