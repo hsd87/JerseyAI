@@ -1,36 +1,115 @@
 import { Link } from 'wouter';
-import { ShirtIcon } from 'lucide-react';
+import { Container } from '@/components/ui/container';
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-  
   return (
-    <footer className="border-t py-6 md:py-0">
-      <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-        <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-          <Link href="/" className="flex items-center space-x-2">
-            <ShirtIcon className="h-5 w-5 text-primary" />
-            <span className="font-medium">ProJersey</span>
-          </Link>
-          <p className="text-center text-sm text-muted-foreground md:text-left">
-            &copy; {currentYear} ProJersey. All rights reserved.
+    <footer className="border-t bg-background">
+      <Container>
+        <div className="grid gap-8 py-10 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <Link to="/" className="font-bold text-xl">
+              ProJersey
+            </Link>
+            <p className="mt-4 text-sm text-muted-foreground">
+              AI-powered sports kit design platform for teams and athletes.
+              Create, customize, and order your personalized jerseys quickly and easily.
+            </p>
+          </div>
+          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:col-span-8 lg:grid-cols-3">
+            <div>
+              <h3 className="text-base font-medium">Design</h3>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li>
+                  <Link to="/kit-designer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Design Kit
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+                    My Designs
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/gallery" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Design Gallery
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/custom-teams" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Team Orders
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-base font-medium">Company</h3>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li>
+                  <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/partner" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Partner With Us
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Pricing
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-base font-medium">Legal</h3>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li>
+                  <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Terms
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/cookies" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Cookies
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/licenses" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Licenses
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col justify-between border-t py-6 md:flex-row">
+          <p className="text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} ProJersey Inc. All rights reserved.
           </p>
+          <div className="mt-4 flex items-center space-x-4 md:mt-0">
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Twitter
+            </a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Instagram
+            </a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              GitHub
+            </a>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <Link
-            href="/terms"
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-          >
-            Terms of Service
-          </Link>
-          <Link
-            href="/privacy"
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-          >
-            Privacy
-          </Link>
-        </div>
-      </div>
+      </Container>
     </footer>
   );
 }

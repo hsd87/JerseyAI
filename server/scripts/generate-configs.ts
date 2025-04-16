@@ -64,7 +64,6 @@ export function generateConfigs() {
   }
 }
 
-// If script is run directly
-if (require.main === module) {
-  generateConfigs();
-}
+// If script is run directly (ES module version)
+// This is automatically called when imported by config service
+// No need for direct execution check in ES modules

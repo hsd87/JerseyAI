@@ -66,11 +66,25 @@ export function processAIDesignerConfig(data: any[]) {
   const sports: string[] = [];
   const kitTypes: Record<string, string[]> = {};
 
+  // Debug information
+  console.log('AI Designer CSV data (first row):', data.length > 0 ? JSON.stringify(data[0]) : 'No data');
+  
   data.forEach(row => {
-    const sport = row.sport.toLowerCase();
-    const kitType = row.kitType;
+    // CSV column names in the file might have spaces
+    const sportField = row['sports '] || row['sports'] || row['sport'];
+    const kitTypeField = row['kit components '] || row['kit components'] || row['kitType'];
+    
+    // Skip rows with missing sport field
+    if (!sportField) {
+      console.log('Skipping row with missing sport field', row);
+      return;
+    }
+    
+    const sport = sportField.trim().toLowerCase();
+    const kitType = kitTypeField ? kitTypeField.trim() : null;
     
     if (sport && !sports.includes(sport)) {
+      console.log(`Adding sport: ${sport}`);
       sports.push(sport);
     }
     
@@ -80,23 +94,38 @@ export function processAIDesignerConfig(data: any[]) {
       }
       
       if (!kitTypes[sport].includes(kitType)) {
+        console.log(`Adding kit type: ${kitType} for sport: ${sport}`);
         kitTypes[sport].push(kitType);
       }
     }
   });
 
+  console.log('Processed sports:', sports);
+  console.log('Processed kit types:', kitTypes);
+  
   return { sports, kitTypes };
 }
 
 // Process order form config
 export function processOrderFormConfig(data: any[]) {
   const schemas: Record<string, Record<string, KitSchema>> = {};
+  
+  // Debug information
+  console.log('Order Form CSV data (first row):', data.length > 0 ? JSON.stringify(data[0]) : 'No data');
 
   data.forEach(row => {
-    const sport = row.sport.toLowerCase();
-    const kitType = row.kitType;
+    // CSV column names in the file might have spaces
+    const sportField = row['sport'] || row['sports '] || row['sports'];
+    const kitTypeField = row['kitType'] || row['kit components '] || row['kit components'];
     
-    if (!sport || !kitType) return;
+    // Skip rows with missing sport field
+    if (!sportField || !kitTypeField) {
+      console.log('Skipping row with missing sport/kitType field', row);
+      return;
+    }
+    
+    const sport = sportField.trim().toLowerCase();
+    const kitType = kitTypeField.trim();
     
     if (!schemas[sport]) {
       schemas[sport] = {};
@@ -178,11 +207,25 @@ export function processPriceConfig(data: any[]) {
     { threshold: 20, discountPercentage: 10 },
     { threshold: 50, discountPercentage: 15 }
   ];
+  
+  // Debug information
+  console.log('Price Config CSV data (first row):', data.length > 0 ? JSON.stringify(data[0]) : 'No data');
 
   data.forEach(row => {
-    const sport = row.sport?.toLowerCase();
-    const kitType = row.kitType;
-    const sku = row.sku;
+    // CSV column names in the file might have spaces
+    const sportField = row['sport'] || row['sports '] || row['sports'];
+    const kitTypeField = row['kitType'] || row['kit components '] || row['kit components'];
+    const skuField = row['sku'] || row['SKU'];
+    
+    // Skip rows with missing fields
+    if (!sportField || !kitTypeField || !skuField) {
+      console.log('Skipping row with missing fields', row);
+      return;
+    }
+    
+    const sport = sportField.trim().toLowerCase();
+    const kitType = kitTypeField.trim();
+    const sku = skuField.trim();
     
     if (!sport || !kitType || !sku) return;
     
@@ -331,3 +374,60 @@ export let sports: string[] = [];
 export let kitTypes: Record<string, string[]> = {};
 export let schemas: Record<string, Record<string, KitSchema>> = {};
 export let pricing: Record<string, Record<string, PricingConfig>> = {};
+
+// Generate configuration files function
+export async function generateConfigFiles() {
+  console.log('Generating configuration files...');
+  
+  // CSV file paths
+  const dataDir = path.join(process.cwd(), 'attached_assets');
+  const outputDir = path.join(process.cwd(), 'data');
+  
+  // Ensure output directory exists
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+  
+  // CSV file paths
+  const aiDesignerPath = path.join(dataDir, 'ai designer form config - Sheet1.csv');
+  const orderFormPath = path.join(dataDir, 'order form config  - Sheet1.csv');
+  const pricingPath = path.join(dataDir, 'sku and price config  - Sheet1.csv');
+  
+  try {
+    // Generate the full configuration
+    const config = generateFullConfig(aiDesignerPath, orderFormPath, pricingPath);
+    
+    // Update global variables
+    Object.assign(sports, config.sports);
+    Object.assign(kitTypes, config.kitTypes);
+    Object.assign(schemas, config.schemas);
+    Object.assign(pricing, config.pricing);
+    
+    // Write configuration files
+    fs.writeFileSync(
+      path.join(outputDir, 'sports.json'),
+      JSON.stringify(config.sports, null, 2)
+    );
+    
+    fs.writeFileSync(
+      path.join(outputDir, 'kit-types.json'),
+      JSON.stringify(config.kitTypes, null, 2)
+    );
+    
+    fs.writeFileSync(
+      path.join(outputDir, 'schemas.json'),
+      JSON.stringify(config.schemas, null, 2)
+    );
+    
+    fs.writeFileSync(
+      path.join(outputDir, 'pricing.json'),
+      JSON.stringify(config.pricing, null, 2)
+    );
+    
+    console.log('All configuration files generated successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error generating configuration files:', error);
+    return false;
+  }
+}

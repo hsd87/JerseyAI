@@ -1,6 +1,6 @@
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/use-auth';
+import { Container } from '@/components/ui/container';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,145 +9,122 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ShirtIcon, LogOut, User, ShoppingCart, PanelLeft, Menu } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useAuth } from '@/hooks/use-auth';
+import { useQuery } from '@tanstack/react-query';
+import { LogOut, Menu, ShoppingCart, User } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logoutMutation } = useAuth();
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
-
-  const getInitials = (name: string) => {
-    return name.charAt(0).toUpperCase();
-  };
-
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6 md:gap-8 lg:gap-10">
-          <Link href="/" className="flex items-center space-x-2">
-            <ShirtIcon className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">ProJersey</span>
-          </Link>
-          
-          <nav className="hidden md:flex gap-6">
-            <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
-              Home
+    <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <Container>
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center gap-6 md:gap-10">
+            <Link to="/" className="flex items-center space-x-2">
+              <span className="text-xl font-bold">ProJersey</span>
             </Link>
-            <Link href="/designer" className="text-sm font-medium transition-colors hover:text-primary">
-              Design
-            </Link>
-            <Link href="/kit-designer" className="text-sm font-medium transition-colors hover:text-primary">
-              Kit Designer
-            </Link>
-            <Link href="/partner" className="text-sm font-medium transition-colors hover:text-primary">
-              Partner
-            </Link>
-          </nav>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>{getInitials(user.username)}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/checkout">
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      <span>Cart</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  {user.role === 'admin' && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin">
-                        <PanelLeft className="mr-2 h-4 w-4" />
-                        <span>Admin</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button asChild>
-                <Link href="/auth">Sign In</Link>
-              </Button>
-            )}
+            <nav className="hidden gap-6 md:flex">
+              <Link to="/" className="text-sm font-medium transition-colors hover:text-primary">
+                Home
+              </Link>
+              <Link to="/kit-designer" className="text-sm font-medium transition-colors hover:text-primary">
+                Design Kit
+              </Link>
+              <Link to="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
+                My Designs
+              </Link>
+              <Link to="/custom-teams" className="text-sm font-medium transition-colors hover:text-primary">
+                Team Orders
+              </Link>
+              <Link to="/partner" className="text-sm font-medium transition-colors hover:text-primary">
+                Partner With Us
+              </Link>
+            </nav>
           </div>
-          
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="pr-0">
-              <nav className="grid gap-6 text-lg font-medium">
-                <Link href="/" className="flex w-full items-center py-3 border-b">
-                  Home
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <Link to="/cart">
+                  <Button variant="ghost" size="icon" className="relative">
+                    <ShoppingCart className="h-5 w-5" />
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                      0
+                    </span>
+                  </Button>
                 </Link>
-                <Link href="/designer" className="flex w-full items-center py-3 border-b">
-                  Design
-                </Link>
-                <Link href="/kit-designer" className="flex w-full items-center py-3 border-b">
-                  Kit Designer
-                </Link>
-                <Link href="/partner" className="flex w-full items-center py-3 border-b">
-                  Partner
-                </Link>
-                {user ? (
-                  <>
-                    <Link href="/dashboard" className="flex w-full items-center py-3 border-b">
-                      Dashboard
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <Link to="/dashboard">
+                      <DropdownMenuItem>Dashboard</DropdownMenuItem>
                     </Link>
-                    <Link href="/checkout" className="flex w-full items-center py-3 border-b">
-                      Cart
+                    <Link to="/orders">
+                      <DropdownMenuItem>Orders</DropdownMenuItem>
+                    </Link>
+                    <Link to="/subscription">
+                      <DropdownMenuItem>Subscription</DropdownMenuItem>
                     </Link>
                     {user.role === 'admin' && (
-                      <Link href="/admin" className="flex w-full items-center py-3 border-b">
-                        Admin
+                      <Link to="/admin">
+                        <DropdownMenuItem>Admin</DropdownMenuItem>
                       </Link>
                     )}
-                    <button 
-                      onClick={handleLogout}
-                      className="flex w-full items-center py-3 border-b text-left text-red-500"
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => logoutMutation.mutate()}
+                      disabled={logoutMutation.isPending}
                     >
-                      Log out
-                    </button>
-                  </>
-                ) : (
-                  <Link href="/auth" className="flex w-full items-center py-3 border-b text-primary">
-                    Sign In
-                  </Link>
-                )}
-              </nav>
-            </SheetContent>
-          </Sheet>
+                      {logoutMutation.isPending ? (
+                        'Signing out...'
+                      ) : (
+                        <div className="flex items-center">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Sign out
+                        </div>
+                      )}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button variant="default">Sign In</Button>
+              </Link>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild className="md:hidden">
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <Link to="/">
+                  <DropdownMenuItem>Home</DropdownMenuItem>
+                </Link>
+                <Link to="/kit-designer">
+                  <DropdownMenuItem>Design Kit</DropdownMenuItem>
+                </Link>
+                <Link to="/dashboard">
+                  <DropdownMenuItem>My Designs</DropdownMenuItem>
+                </Link>
+                <Link to="/custom-teams">
+                  <DropdownMenuItem>Team Orders</DropdownMenuItem>
+                </Link>
+                <Link to="/partner">
+                  <DropdownMenuItem>Partner With Us</DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
-    </header>
+      </Container>
+    </div>
   );
 }

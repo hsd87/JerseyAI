@@ -242,6 +242,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error('Error registering admin routes:', error);
   }
 
+  // Kit configuration routes - dynamic form configuration and pricing system
+  try {
+    registerKitConfigRoutes(app);
+    console.log('Kit configuration routes registered successfully');
+  } catch (error) {
+    console.error('Error registering kit configuration routes:', error);
+  }
+
   // Subscription endpoints
   app.post("/api/subscribe", async (req, res, next) => {
     try {
@@ -525,69 +533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Kit Configuration Routes
-  // Generate configuration files on startup
-  try {
-    const { generateConfigFiles } = await import('./utils/config-parser');
-    console.log('Generating configuration files...');
-    await generateConfigFiles();
-    console.log('Configuration files generated successfully!');
-  } catch (error) {
-    console.error('Error generating configuration files:', error);
-  }
-
-  // Get all available sports
-  app.get('/api/kit-config/sports', (req, res) => {
-    try {
-      const sports = getSports();
-      res.json(sports);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Get all kit types for a sport
-  app.get('/api/kit-config/kit-types/:sport', (req, res) => {
-    try {
-      const { sport } = req.params;
-      const kitTypes = getKitTypes(sport);
-      res.json(kitTypes);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Get schema for a specific sport and kit type
-  app.get('/api/kit-config/schema/:sport/:kitType', (req, res) => {
-    try {
-      const { sport, kitType } = req.params;
-      const schema = getKitSchema(sport, kitType);
-      res.json(schema);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Configure a kit and calculate pricing
-  app.post('/api/kit-config/configure', (req, res) => {
-    try {
-      const configResponse = configureKit(req.body);
-      res.json(configResponse);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Get recommended products for a sport and kit type
-  app.get('/api/kit-config/recommendations/:sport/:kitType', (req, res) => {
-    try {
-      const { sport, kitType } = req.params;
-      const recommendations = getRecommendedProducts(sport, kitType);
-      res.json(recommendations);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+  // Kit configuration routes were registered earlier using registerKitConfigRoutes()
 
   const httpServer = createServer(app);
 
