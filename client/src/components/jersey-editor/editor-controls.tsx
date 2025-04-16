@@ -336,6 +336,78 @@ const EditorControls = ({ selectedItemId, jerseyZones }: EditorControlsProps) =>
         </>
       )}
       
+      {selectedItem.type === 'image' && (
+        <>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="maintain-aspect-ratio">Maintain Aspect Ratio</Label>
+              <input
+                type="checkbox"
+                id="maintain-aspect-ratio"
+                checked={maintainAspectRatio}
+                onChange={(e) => {
+                  setMaintainAspectRatio(e.target.checked);
+                }}
+                className="h-4 w-4"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="image-width">Width: {imageWidth}px</Label>
+            <Slider
+              id="image-width"
+              value={[imageWidth]}
+              max={500}
+              min={20}
+              step={1}
+              onValueChange={handleWidthChange}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="image-height">Height: {imageHeight}px</Label>
+            <Slider
+              id="image-height"
+              value={[imageHeight]}
+              max={500}
+              min={20}
+              step={1}
+              onValueChange={handleHeightChange}
+            />
+          </div>
+          
+          <div className="space-y-2 pt-2 border-t border-gray-100">
+            <Label>Scale</Label>
+            <div className="space-y-2">
+              <Label htmlFor="scale-x">Horizontal Scale: {scaleX.toFixed(1)}x</Label>
+              <Slider
+                id="scale-x"
+                value={[scaleX]}
+                max={3}
+                min={0.1}
+                step={0.1}
+                onValueChange={(value) => handleScaleChange('x', value)}
+              />
+            </div>
+            
+            {!maintainAspectRatio && (
+              <div className="space-y-2">
+                <Label htmlFor="scale-y">Vertical Scale: {scaleY.toFixed(1)}x</Label>
+                <Slider
+                  id="scale-y"
+                  value={[scaleY]}
+                  max={3}
+                  min={0.1}
+                  step={0.1}
+                  onValueChange={(value) => handleScaleChange('y', value)}
+                />
+              </div>
+            )}
+          </div>
+        </>
+      )}
+      
       <div className="space-y-2">
         <Label htmlFor="rotation-control">Rotation: {rotation}°</Label>
         <Slider
