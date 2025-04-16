@@ -185,8 +185,15 @@ export const kitTypeOptions = [
   "esportshoodie"
 ] as const;
 
+// Export the types for use in other files
+export type SportType = typeof sportOptions[number];
+export type KitType = typeof kitTypeOptions[number];
+export type SleeveStyle = typeof sleeveOptions[number];
+export type CollarType = typeof collarOptions[number];
+export type PatternType = typeof patternOptions[number];
+
 // Sport-specific kit type mapping
-export const sportKitTypeMapping: Record<string, string[]> = {
+export const sportKitTypeMapping: Record<SportType, KitType[]> = {
   soccer: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
   basketball: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
   rugby: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
@@ -201,7 +208,7 @@ export const sleeveOptions = [
 ] as const;
 
 // Sport-specific collar type mapping
-export const sportCollarMapping: Record<string, string[]> = {
+export const sportCollarMapping: Record<SportType, CollarType[]> = {
   soccer: ["crew", "v", "mandarin", "polo"],
   basketball: ["crew", "v", "roundzip"],
   rugby: ["v", "polo", "roundzip"],
@@ -218,7 +225,7 @@ export const collarOptions = [
 ] as const;
 
 // Sport-specific pattern type mapping
-export const sportPatternMapping: Record<string, string[]> = {
+export const sportPatternMapping: Record<SportType, PatternType[]> = {
   soccer: ["gradient", "slash", "panel", "striped", "digital", "minimal"],
   basketball: ["gradient", "slash", "panel", "digital"],
   rugby: ["panel", "striped", "digital"],
@@ -236,8 +243,16 @@ export const patternOptions = [
   "solid"
 ] as const;
 
+// Add-on product options
+export const addonProductOptions = [
+  "socks", "headwear", "kitbag", "cap", 
+  "tracksuitFull", "tracksuitHalf", "tracksuitHooded"
+] as const;
+
+export type AddonProduct = typeof addonProductOptions[number];
+
 // Add-on products by sport
-export const addonOptions: Record<string, string[]> = {
+export const addonOptions: Record<SportType, AddonProduct[]> = {
   soccer: ["socks", "headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
   basketball: ["socks", "headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
   rugby: ["socks", "headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
