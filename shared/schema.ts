@@ -185,7 +185,10 @@ export const sportOptions = [
   "basketball",
   "cricket",
   "rugby",
-  "esports"
+  "esports",
+  "feild hockey", // Note: Typo in CSV, keeping as-is for consistency
+  "volleyball",
+  "handball"
 ] as const;
 
 // Common kit types across sports
@@ -220,7 +223,9 @@ export const sportKitTypeMapping: Record<SportType, KitType[]> = {
 export const sleeveOptions = [
   "sleeveless",
   "short",
-  "long"
+  "long",
+  "sleeveless/short",
+  "sleeveless/short/long"
 ] as const;
 
 // Sport-specific collar type mapping
