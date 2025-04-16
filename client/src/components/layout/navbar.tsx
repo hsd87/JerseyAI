@@ -159,6 +159,9 @@ export default function Navbar() {
           <Link href="/designer" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/designer' ? 'text-primary' : 'text-gray-700'}`}>
             AI Designer
           </Link>
+          <Link href="/jersey-editor" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/jersey-editor' ? 'text-primary' : 'text-gray-700'}`}>
+            Jersey Editor
+          </Link>
           <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700">
             Gallery
           </Link>
