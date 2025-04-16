@@ -206,10 +206,11 @@ List these (even if the image will not include actual text or logos):
 
 SPECIFIC REQUIREMENTS FOR THIS JERSEY:
 - Sport: ${sport} jersey
-- Kit components: ${kitType === "jersey" ? "Jersey only" : 
-                 kitType === "jerseyShorts" ? "Jersey and shorts" : 
+- Kit components: ${kitType === "jersey" || kitType === "jerseyOnly" ? "Jersey only" : 
+                 kitType === "jerseyShorts" || kitType === "jerseyTrousers" ? "Jersey and shorts" : 
                  kitType === "fullKit" ? "Full kit with socks" : 
-                 kitType === "completeKit" ? "Complete kit with headwear" : "Jersey"}
+                 kitType === "completeKit" ? "Complete kit with headwear" : 
+                 kitType === "esportsjacket" ? "Esports jacket" : "Jersey"}
 ${sleeveStyle ? `- Sleeve style: ${sleeveStyle}` : ''}
 ${collarType ? `- Collar type: ${collarType}` : ''}
 ${patternStyle ? `- Pattern style: ${patternStyle}` : ''}
@@ -279,10 +280,11 @@ async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<s
   const formattedAccentColor2 = accentColor2 && accentColor2.startsWith('#') ? hexToRgb(accentColor2) : accentColor2;
   
   // Create a simple prompt format
-  const kitDescription = kitType === "jersey" ? "jersey only" :
-                       kitType === "jerseyShorts" ? "jersey and shorts" :
+  const kitDescription = kitType === "jersey" || kitType === "jerseyOnly" ? "jersey only" :
+                       kitType === "jerseyShorts" || kitType === "jerseyTrousers" ? "jersey and shorts" :
                        kitType === "fullKit" ? "full kit with socks" :
-                       kitType === "completeKit" ? "complete kit with headwear" : "jersey";
+                       kitType === "completeKit" ? "complete kit with headwear" : 
+                       kitType === "esportsjacket" ? "esports jacket" : "jersey";
   
   return `A pfsoccerkit for ${sport} (${kitDescription}), displayed in two cleanly aligned angles: front view (left) and back view (right), against a clean white studio background. The ${sport} ${kitDescription} is presented in a floating, mannequin-free layout, suitable for high-end product catalog visuals.
 
@@ -300,8 +302,8 @@ Front body has sport-appropriate design in ${formattedPrimaryColor} with ${forma
 
 Front and back designs are cohesive in terms of sleeves, trims, elements, design, and construction, ensuring a unified and professional look from all angles.
 
-${kitType?.includes("Shorts") || kitType?.includes("Kit") ? 
-`• Shorts details: Matching ${sport} shorts in ${formattedPrimaryColor} with ${formattedSecondaryColor} accents${formattedAccentColor1 ? ` and ${formattedAccentColor1} trim` : ''}${formattedAccentColor2 ? `, plus ${formattedAccentColor2} details` : ''}, designed to complement the jersey style.` : ''}`;
+${kitType?.includes("Shorts") || kitType?.includes("Trousers") || kitType?.includes("Kit") ? 
+`• ${kitType?.includes("Trousers") ? "Trousers" : "Shorts"} details: Matching ${sport} ${kitType?.includes("Trousers") ? "trousers" : "shorts"} in ${formattedPrimaryColor} with ${formattedSecondaryColor} accents${formattedAccentColor1 ? ` and ${formattedAccentColor1} trim` : ''}${formattedAccentColor2 ? `, plus ${formattedAccentColor2} details` : ''}, designed to complement the jersey style and maintain design cohesiveness.` : ''}`;
 }
 
 // Define a type for the image generation result
@@ -321,8 +323,8 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     auth: process.env.REPLICATE_API_TOKEN,
   });
   
-  // Set aspect ratio based on kit type - 1:1 for jerseyShorts, 3:2 for others
-  const aspectRatio = kitType === "jerseyShorts" ? "1:1" : "3:2";
+  // Set aspect ratio based on kit type - 1:1 for jerseyShorts/jerseyTrousers, 3:2 for others
+  const aspectRatio = kitType === "jerseyShorts" || kitType === "jerseyTrousers" ? "1:1" : "3:2";
   console.log(`Using aspect ratio ${aspectRatio} for kit type: ${kitType || "default"}`);
   
   // Define model and parameters
