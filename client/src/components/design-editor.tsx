@@ -419,8 +419,15 @@ export default function DesignEditor() {
                     border: activeElement === element.id ? '2px dashed #39FF14' : '2px dashed transparent',
                     borderRadius: '0.25rem',
                     color: element.color,
-                    fontSize: element.size === 'small' ? '1rem' : element.size === 'medium' ? '1.5rem' : '2rem',
-                    fontFamily: element.font
+                    fontSize: element.fontSize ? `${element.fontSize}px` : (element.size === 'small' ? '1rem' : element.size === 'medium' ? '1.5rem' : '2rem'),
+                    fontFamily: element.font,
+                    textShadow: element.outline ? `
+                      -${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      ${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      -${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      ${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}
+                    ` : 'none',
+                    fontWeight: element.size === 'large' ? 'bold' : 'normal'
                   }}
                   onMouseDown={(e) => handleDragStart(e, element.id)}
                   onTouchStart={(e) => handleDragStart(e, element.id)}
@@ -437,10 +444,10 @@ export default function DesignEditor() {
                   style={{
                     top: `${logo.position.y}%`,
                     left: `${logo.position.x}%`,
-                    transform: 'translate(-50%, -50%)',
+                    transform: `translate(-50%, -50%) rotate(${logo.rotation || 0}deg)`,
                     border: activeElement === logo.id ? '2px dashed #39FF14' : '2px dashed transparent',
                     width: `${logo.size.width}px`,
-                    height: 'auto',
+                    height: logo.maintainAspectRatio ? 'auto' : `${logo.size.height}px`,
                     borderRadius: '0.25rem'
                   }}
                   onMouseDown={(e) => handleDragStart(e, logo.id)}
@@ -450,7 +457,10 @@ export default function DesignEditor() {
                     src={logo.url} 
                     alt="Uploaded logo" 
                     className="w-full h-auto object-contain"
-                    style={{ maxWidth: '100%', maxHeight: '100%' }}
+                    style={{ 
+                      maxWidth: '100%', 
+                      maxHeight: '100%'
+                    }}
                   />
                 </div>
               ))}
@@ -680,11 +690,134 @@ export default function DesignEditor() {
                     </div>
                     
                     {activeElement && activeElement.startsWith('logo-') && (
-                      <div className="mt-2">
+                      <div className="mt-2 space-y-3">
+                        {/* Logo Size Controls */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="block text-xs text-gray-600">Width</label>
+                            <span className="text-xs text-gray-500">
+                              {logoElements.find(logo => logo.id === activeElement)?.size.width}px
+                            </span>
+                          </div>
+                          <Slider 
+                            value={[logoElements.find(logo => logo.id === activeElement)?.size.width || 100]} 
+                            min={20} 
+                            max={300} 
+                            step={5}
+                            onValueChange={(value) => {
+                              setLogoElements(prev => prev.map(logo => {
+                                if (logo.id === activeElement) {
+                                  const aspectRatio = logo.size.height / logo.size.width;
+                                  const newWidth = value[0];
+                                  const newHeight = logo.maintainAspectRatio ? Math.round(newWidth * aspectRatio) : logo.size.height;
+                                  
+                                  return {
+                                    ...logo,
+                                    size: {
+                                      width: newWidth,
+                                      height: newHeight
+                                    }
+                                  };
+                                }
+                                return logo;
+                              }));
+                            }}
+                            className="py-1"
+                          />
+                        </div>
+                        
+                        {/* Height control (only visible if not maintaining aspect ratio) */}
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-xs text-gray-600">Maintain Aspect Ratio</label>
+                            <Switch 
+                              checked={logoElements.find(logo => logo.id === activeElement)?.maintainAspectRatio || true}
+                              onCheckedChange={(checked) => {
+                                setLogoElements(prev => prev.map(logo => {
+                                  if (logo.id === activeElement) {
+                                    return {
+                                      ...logo,
+                                      maintainAspectRatio: checked
+                                    };
+                                  }
+                                  return logo;
+                                }));
+                              }}
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Rotation Control */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="block text-xs text-gray-600">Rotation</label>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => {
+                                  setLogoElements(prev => prev.map(logo => {
+                                    if (logo.id === activeElement) {
+                                      return {
+                                        ...logo,
+                                        rotation: ((logo.rotation || 0) - 90) % 360
+                                      };
+                                    }
+                                    return logo;
+                                  }));
+                                }}
+                              >
+                                <RotateCcw className="h-3 w-3" />
+                              </Button>
+                              <span className="text-xs text-gray-500">
+                                {logoElements.find(logo => logo.id === activeElement)?.rotation || 0}°
+                              </span>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => {
+                                  setLogoElements(prev => prev.map(logo => {
+                                    if (logo.id === activeElement) {
+                                      return {
+                                        ...logo,
+                                        rotation: ((logo.rotation || 0) + 90) % 360
+                                      };
+                                    }
+                                    return logo;
+                                  }));
+                                }}
+                              >
+                                <RotateCw className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          <Slider 
+                            value={[logoElements.find(logo => logo.id === activeElement)?.rotation || 0]} 
+                            min={0} 
+                            max={360} 
+                            step={5}
+                            onValueChange={(value) => {
+                              setLogoElements(prev => prev.map(logo => {
+                                if (logo.id === activeElement) {
+                                  return {
+                                    ...logo,
+                                    rotation: value[0]
+                                  };
+                                }
+                                return logo;
+                              }));
+                            }}
+                            className="py-1"
+                          />
+                        </div>
+                        
+                        {/* Delete Button */}
                         <Button 
                           variant="destructive"
                           size="sm"
-                          className="text-xs h-8 w-full"
+                          className="text-xs h-8 w-full mt-2"
                           onClick={() => {
                             const newLogoElements = logoElements.filter(logo => logo.id !== activeElement);
                             setLogoElements(newLogoElements);
@@ -693,7 +826,9 @@ export default function DesignEditor() {
                             const updatedLogos = newLogoElements.map(el => ({
                               url: el.url,
                               position: el.position,
-                              size: el.size
+                              size: el.size,
+                              rotation: el.rotation || 0,
+                              maintainAspectRatio: el.maintainAspectRatio || true
                             }));
                             
                             updateCustomizations({
