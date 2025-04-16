@@ -44,6 +44,8 @@ export const designs = pgTable("designs", {
   designNotes: text("design_notes"),
   frontImageUrl: text("front_image_url"),
   backImageUrl: text("back_image_url"),
+  frontImageData: text("front_image_data"), // Base64 encoded image data
+  backImageData: text("back_image_data"), // Base64 encoded image data
   customizations: json("customizations").$type<CustomizationData>(),
   isFavorite: boolean("is_favorite").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull()

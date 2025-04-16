@@ -378,7 +378,14 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
         fs.writeFileSync(outputPath, buffer);
         console.log(`Successfully saved image from ReadableStream to ${outputPath}`);
         
-        return `/output/${filename}`;
+        // Convert buffer to base64 for database storage
+        const base64Data = buffer.toString('base64');
+        
+        // Return both the file path and the base64 data
+        return {
+          imageUrl: `/output/${filename}`,
+          imageData: base64Data
+        };
       } catch (streamError) {
         console.error("Error processing ReadableStream:", streamError);
         throw new Error(`Failed to process image stream: ${streamError instanceof Error ? streamError.message : String(streamError)}`);
