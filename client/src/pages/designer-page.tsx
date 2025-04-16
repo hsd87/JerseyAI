@@ -10,12 +10,14 @@ import OrderConfig from "@/components/order-config";
 import TeamRoster from "@/components/team-roster";
 import OrderSummary from "@/components/order-summary";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ShoppingCart } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function DesignerPage() {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const { hasGenerated, isEditorOpen } = useDesignStore();
+  const [, navigate] = useLocation();
 
   // Update current step based on design state
   useEffect(() => {
@@ -121,7 +123,15 @@ export default function DesignerPage() {
               
               {/* Continue button - shown only when design has been generated */}
               {hasGenerated && (
-                <div className="mt-6 text-right">
+                <div className="mt-6 flex justify-end space-x-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate('/order-config')}
+                    className="flex items-center"
+                  >
+                    <ShoppingCart className="mr-2 h-4 w-4" /> 
+                    Order Configuration
+                  </Button>
                   <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
                     Customize Design <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -136,13 +146,23 @@ export default function DesignerPage() {
           <div>
             <DesignEditor />
             
-            <div className="mt-6 flex justify-between">
+            <div className="mt-6 flex justify-between items-center">
               <Button variant="outline" onClick={prevStep}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Design
               </Button>
-              <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
-                Continue to Order Details <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <div className="flex space-x-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/order-config')}
+                  className="flex items-center"
+                >
+                  <ShoppingCart className="mr-2 h-4 w-4" /> 
+                  Order Configuration
+                </Button>
+                <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
+                  Continue to Order Details <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         )}

@@ -84,6 +84,10 @@ function AppContent() {
             <OrderDemoPage />
           </Route>
           
+          <Route path="/order-config">
+            <OrderConfigurationPage />
+          </Route>
+          
           {/* Protected routes */}
           <Route path="/dashboard">
             <ProtectedRoute path="/dashboard" component={DashboardPage} />
