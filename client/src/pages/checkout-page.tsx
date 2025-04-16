@@ -134,10 +134,10 @@ export default function CheckoutPage() {
         priceBreakdown.grandTotal : 
         Math.round(items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 100);
 
-      // Design URLs from store or defaults
+      // Design URLs from store or defaults - using front-view only approach
       const designUrlsToUse = designUrls || {
         front: "https://placehold.co/600x800/0071e3/ffffff.png?text=Front",
-        back: "https://placehold.co/600x800/0071e3/ffffff.png?text=Back"
+        back: "" // Empty string for back view as per front-view-only approach
       };
 
       // Create order in the database

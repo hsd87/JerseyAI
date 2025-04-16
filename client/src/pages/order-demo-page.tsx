@@ -10,10 +10,10 @@ export default function OrderDemoPage() {
   const [sport, setSport] = useState<string>("soccer");
   const [kitType, setKitType] = useState<string>("jersey");
   
-  // Mock design images for demo purposes
+  // Mock design images - using front-view only approach
   const designUrls = {
     front: "https://placehold.co/600x800/0071e3/ffffff.png?text=Front",
-    back: "https://placehold.co/600x800/0071e3/ffffff.png?text=Back"
+    back: "" // Empty string for back view as per front-view-only approach
   };
   
   return (

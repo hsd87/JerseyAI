@@ -309,15 +309,15 @@ export default function OrderDetailPage() {
               </Card>
             )}
 
-            {/* Design Preview - Single Image */}
-            {order.designUrls && (order.designUrls.front || order.designUrls.back) && (
+            {/* Design Preview - Front View Only */}
+            {order.designUrls && order.designUrls.front && (
               <Card>
                 <CardHeader>
                   <CardTitle>Jersey Design</CardTitle>
                 </CardHeader>
                 <CardContent className="flex justify-center">
                   <img
-                    src={order.designUrls.front || order.designUrls.back}
+                    src={order.designUrls.front}
                     alt="Jersey Design"
                     className="max-h-[550px] object-contain border border-gray-200 rounded"
                   />
