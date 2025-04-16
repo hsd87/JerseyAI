@@ -38,6 +38,8 @@ export const designs = pgTable("designs", {
   kitType: text("kit_type").notNull(),
   primaryColor: text("primary_color").notNull(),
   secondaryColor: text("secondary_color").notNull(),
+  accentColor1: text("accent_color1"),     // New accent color field
+  accentColor2: text("accent_color2"),     // New accent color field 
   sleeveStyle: text("sleeve_style"),
   collarType: text("collar_type"),
   patternStyle: text("pattern_style"),

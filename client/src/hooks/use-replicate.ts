@@ -62,8 +62,8 @@ export function useReplicate() {
           description: "This may take up to 30-60 seconds while we create your jersey design.",
         });
 
-        // Prepare data payload for generation
-        const cleanedFormData = {
+        // Prepare data payload for generation with extended type to include accent colors
+        const cleanedFormData: Record<string, any> = {
           sport: formData.sport,
           kitType: formData.kitType,
           primaryColor: formData.primaryColor,
@@ -75,12 +75,12 @@ export function useReplicate() {
         };
         
         // Add accent colors if they exist in the form data
-        if ('accentColor1' in formData && formData.accentColor1) {
-          cleanedFormData.accentColor1 = formData.accentColor1;
+        if ('accentColor1' in formData && formData['accentColor1']) {
+          cleanedFormData.accentColor1 = formData['accentColor1'] as string;
         }
         
-        if ('accentColor2' in formData && formData.accentColor2) {
-          cleanedFormData.accentColor2 = formData.accentColor2;
+        if ('accentColor2' in formData && formData['accentColor2']) {
+          cleanedFormData.accentColor2 = formData['accentColor2'] as string;
         }
         
         console.log("Sending cleaned form data to generate API:", cleanedFormData);
