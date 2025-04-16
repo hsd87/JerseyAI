@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LoaderCircle } from 'lucide-react';
 import { useDesignStore } from '@/hooks/use-design-store';
 import { DesignFormValues } from '@shared/schema';
+import { SportType, KitType, CollarType, PatternType } from '@shared/schema';
 
 // Types for kit configuration
 interface KitOption {
@@ -76,7 +77,7 @@ interface PricingResult {
 
 export default function DynamicKitForm() {
   const { toast } = useToast();
-  const { updateDesignForm, designFormValues } = useDesignStore();
+  const { updateFormData, formData } = useDesignStore();
   
   const [sport, setSport] = useState<string>('');
   const [kitType, setKitType] = useState<string>('');
@@ -164,12 +165,12 @@ export default function DynamicKitForm() {
   useEffect(() => {
     if (sport && kitType) {
       const newDesignValues: Partial<DesignFormValues> = {
-        sport: sport as any,
-        kitType: kitType as any
+        sport: sport as SportType,
+        kitType: kitType as KitType
       };
-      updateDesignForm(newDesignValues);
+      updateFormData(newDesignValues);
     }
-  }, [sport, kitType, updateDesignForm]);
+  }, [sport, kitType, updateFormData]);
 
   // Handle option changes
   const handleOptionChange = (optionType: string, value: string) => {
@@ -183,11 +184,11 @@ export default function DynamicKitForm() {
 
     // Update design form values
     if (optionType === 'sleeve') {
-      updateDesignForm({ sleeveStyle: value as any });
+      updateFormData({ sleeveStyle: value as any });
     } else if (optionType === 'collar') {
-      updateDesignForm({ collarType: value as any });
+      updateFormData({ collarType: value as any });
     } else if (optionType === 'pattern') {
-      updateDesignForm({ patternStyle: value as any });
+      updateFormData({ patternStyle: value as any });
     }
   };
 
