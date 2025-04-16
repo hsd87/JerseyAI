@@ -20,7 +20,17 @@ export function useReplicate() {
     mutationFn: async () => {
       try {
         // Validate form data to ensure all required fields are present
-        const requiredFields = ['sport', 'kitType', 'primaryColor', 'secondaryColor', 'collarType', 'patternStyle'] as const;
+        const baseRequiredFields = ['sport', 'kitType', 'primaryColor', 'secondaryColor', 'collarType', 'patternStyle'] as const;
+        
+        // Check if the form data includes accent colors
+        let requiredFields: string[] = [...baseRequiredFields];
+        if ('accentColor1' in formData) {
+          requiredFields.push('accentColor1');
+        }
+        if ('accentColor2' in formData) {
+          requiredFields.push('accentColor2');
+        }
+        
         const missingFields = requiredFields.filter(
           field => !formData[field as keyof typeof formData]
         );
@@ -63,6 +73,15 @@ export function useReplicate() {
           sleeveStyle: formData.sleeveStyle,
           designNotes: formData.designNotes || ""
         };
+        
+        // Add accent colors if they exist in the form data
+        if ('accentColor1' in formData && formData.accentColor1) {
+          cleanedFormData.accentColor1 = formData.accentColor1;
+        }
+        
+        if ('accentColor2' in formData && formData.accentColor2) {
+          cleanedFormData.accentColor2 = formData.accentColor2;
+        }
         
         console.log("Sending cleaned form data to generate API:", cleanedFormData);
         

@@ -313,6 +313,15 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
       
       // Validate all required fields are present
       const requiredFields = ['sport', 'kitType', 'primaryColor', 'secondaryColor', 'collarType', 'patternStyle'];
+      
+      // Add accent colors if they are configured for this sport/kit combination
+      if (formConfig?.colors?.includes('accent1')) {
+        requiredFields.push('accentColor1');
+      }
+      if (formConfig?.colors?.includes('accent2')) {
+        requiredFields.push('accentColor2');
+      }
+      
       const missingFields = requiredFields.filter(field => !data[field as keyof DesignFormValues]);
       
       if (missingFields.length > 0) {
@@ -409,10 +418,12 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                       // Update all form values from the store with proper typing
                       const newFormData = formData;
                       
-                      // Update form values while maintaining primaryColor and secondaryColor
+                      // Update form values while maintaining color values
                       // These are preserved to avoid UI flicker when switching sports
                       const currentPrimaryColor = form.getValues('primaryColor');
                       const currentSecondaryColor = form.getValues('secondaryColor');
+                      const currentAccentColor1 = form.getValues('accentColor1');
+                      const currentAccentColor2 = form.getValues('accentColor2');
                       
                       form.setValue('kitType', newFormData.kitType);
                       form.setValue('collarType', newFormData.collarType);
@@ -426,6 +437,14 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                       
                       if (currentSecondaryColor !== newFormData.secondaryColor) {
                         form.setValue('secondaryColor', newFormData.secondaryColor);
+                      }
+                      
+                      if (currentAccentColor1 !== newFormData.accentColor1) {
+                        form.setValue('accentColor1', newFormData.accentColor1);
+                      }
+                      
+                      if (currentAccentColor2 !== newFormData.accentColor2) {
+                        form.setValue('accentColor2', newFormData.accentColor2);
                       }
                     }, 0);
                   }} 
