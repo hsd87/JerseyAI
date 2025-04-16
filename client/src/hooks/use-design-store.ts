@@ -40,10 +40,6 @@ interface DesignStore {
   // Design ID (from saved design)
   designId: number | null;
   setDesignId: (id: number | null) => void;
-  
-  // Away kit state
-  isAwayKit: boolean;
-  toggleAwayKit: () => void;
 }
 
 // Using types imported from shared/schema.ts
@@ -126,19 +122,5 @@ export const useDesignStore = create<DesignStore>((set) => ({
   
   // Design ID (from saved design)
   designId: null,
-  setDesignId: (designId) => set({ designId }),
-  
-  // Away kit state
-  isAwayKit: false,
-  toggleAwayKit: () => set((state) => {
-    const { primaryColor, secondaryColor } = state.formData;
-    return { 
-      isAwayKit: !state.isAwayKit,
-      formData: { 
-        ...state.formData, 
-        primaryColor: secondaryColor,
-        secondaryColor: primaryColor 
-      }
-    };
-  })
+  setDesignId: (designId) => set({ designId })
 }));

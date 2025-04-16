@@ -305,8 +305,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
       const trackingData = {
         sport_type: data.sport,
         product_type_selected: data.kitType,
-        form_payload_hash: formPayloadHash,
-        is_away_kit: awayKit
+        form_payload_hash: formPayloadHash
       };
       
       console.log("Submitting design with tracking data:", trackingData);
