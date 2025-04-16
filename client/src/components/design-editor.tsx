@@ -4,8 +4,14 @@ import { useReplicate } from "@/hooks/use-replicate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomizationData } from "@shared/schema";
-import { X, Save, ShoppingCart, Undo, Download, Image, Type, Hash, Move, Plus } from "lucide-react";
+import { 
+  X, Save, ShoppingCart, Undo, Download, Image, Type, Hash, Move, Plus, 
+  RotateCcw, RotateCw, Maximize, Minimize, Circle, TextCursorInput
+} from "lucide-react";
 import { useLocation } from "wouter";
 
 type TextElement = {
@@ -15,6 +21,10 @@ type TextElement = {
   color: string;
   size: string;
   font: string;
+  fontSize: number;
+  outline: boolean;
+  outlineColor: string;
+  outlineWidth: number;
 };
 
 export default function DesignEditor() {
@@ -36,8 +46,12 @@ export default function DesignEditor() {
   const [currentColor, setCurrentColor] = useState("#FFFFFF");
   const [currentSize, setCurrentSize] = useState("medium");
   const [currentFont, setCurrentFont] = useState("Arial");
+  const [currentFontSize, setCurrentFontSize] = useState(24);
+  const [currentOutline, setCurrentOutline] = useState(false);
+  const [currentOutlineColor, setCurrentOutlineColor] = useState("#000000");
+  const [currentOutlineWidth, setCurrentOutlineWidth] = useState(1);
   const [logoUrl, setLogoUrl] = useState("");
-  const [logoElements, setLogoElements] = useState<{id: string, url: string, position: {x: number, y: number}, size: {width: number, height: number}}[]>([]);
+  const [logoElements, setLogoElements] = useState<{id: string, url: string, position: {x: number, y: number}, size: {width: number, height: number}, rotation: number, maintainAspectRatio: boolean}[]>([]);
   
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -58,7 +72,11 @@ export default function DesignEditor() {
       position: { x: 50, y: 50 }, // Center of the canvas
       color: currentColor,
       size: currentSize,
-      font: currentFont
+      font: currentFont,
+      fontSize: currentFontSize,
+      outline: currentOutline,
+      outlineColor: currentOutlineColor,
+      outlineWidth: currentOutlineWidth
     };
     
     setTextElements([...textElements, newElement]);
@@ -72,7 +90,11 @@ export default function DesignEditor() {
         position: newElement.position,
         color: newElement.color,
         size: newElement.size,
-        font: newElement.font
+        font: newElement.font,
+        fontSize: newElement.fontSize,
+        outline: newElement.outline,
+        outlineColor: newElement.outlineColor,
+        outlineWidth: newElement.outlineWidth
       }]
     };
     
@@ -100,7 +122,9 @@ export default function DesignEditor() {
         id: `logo-${Date.now()}`,
         url: logoImageUrl,
         position: { x: 50, y: 50 }, // Center of the canvas
-        size: { width: 100, height: 100 } // Default size
+        size: { width: 100, height: 100 }, // Default size
+        rotation: 0,
+        maintainAspectRatio: true
       };
       
       setLogoElements([...logoElements, newLogo]);
@@ -111,7 +135,9 @@ export default function DesignEditor() {
         logos: [...(customizations.logos || []), {
           url: newLogo.url,
           position: newLogo.position,
-          size: newLogo.size
+          size: newLogo.size,
+          rotation: newLogo.rotation,
+          maintainAspectRatio: newLogo.maintainAspectRatio
         }]
       };
       
@@ -195,7 +221,9 @@ export default function DesignEditor() {
         const updatedLogos = logoElements.map(el => ({
           url: el.url,
           position: el.position,
-          size: el.size
+          size: el.size,
+          rotation: el.rotation || 0,
+          maintainAspectRatio: el.maintainAspectRatio || true
         }));
         
         updateCustomizations({
@@ -209,7 +237,11 @@ export default function DesignEditor() {
           position: el.position,
           color: el.color,
           size: el.size,
-          font: el.font
+          font: el.font,
+          fontSize: el.fontSize || 24,
+          outline: el.outline || false,
+          outlineColor: el.outlineColor || "#000000",
+          outlineWidth: el.outlineWidth || 1
         }));
         
         updateCustomizations({
@@ -499,10 +531,27 @@ export default function DesignEditor() {
                     <SelectTrigger className="w-full text-xs h-9">
                       <SelectValue placeholder="Select font" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100]">
+                    <SelectContent className="z-[100] max-h-[300px] overflow-y-auto">
                       <SelectItem value="Arial">Arial</SelectItem>
                       <SelectItem value="Impact">Impact</SelectItem>
                       <SelectItem value="Helvetica">Helvetica</SelectItem>
+                      <SelectItem value="Roboto">Roboto</SelectItem>
+                      <SelectItem value="Montserrat">Montserrat</SelectItem>
+                      <SelectItem value="Oswald">Oswald</SelectItem>
+                      <SelectItem value="Lato">Lato</SelectItem>
+                      <SelectItem value="Open Sans">Open Sans</SelectItem>
+                      <SelectItem value="Raleway">Raleway</SelectItem>
+                      <SelectItem value="Poppins">Poppins</SelectItem>
+                      <SelectItem value="Bebas Neue">Bebas Neue</SelectItem>
+                      <SelectItem value="Teko">Teko</SelectItem>
+                      <SelectItem value="Anton">Anton</SelectItem>
+                      <SelectItem value="Barlow">Barlow</SelectItem>
+                      <SelectItem value="Russo One">Russo One</SelectItem>
+                      <SelectItem value="Graduate">Graduate</SelectItem>
+                      <SelectItem value="Jost">Jost</SelectItem>
+                      <SelectItem value="Orbitron">Orbitron</SelectItem>
+                      <SelectItem value="Staatliches">Staatliches</SelectItem>
+                      <SelectItem value="Racing Sans One">Racing Sans One</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -530,9 +579,65 @@ export default function DesignEditor() {
                     </Select>
                   </div>
                 </div>
+                
+                {/* Font Size Slider */}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-xs text-gray-600">Font Size</label>
+                    <span className="text-xs text-gray-500">{currentFontSize}px</span>
+                  </div>
+                  <Slider 
+                    value={[currentFontSize]} 
+                    min={12} 
+                    max={72} 
+                    step={1}
+                    onValueChange={(value) => setCurrentFontSize(value[0])}
+                    className="py-1"
+                  />
+                </div>
+                
+                {/* Text Outline Controls */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-gray-600">Text Outline</label>
+                    <Switch 
+                      checked={currentOutline}
+                      onCheckedChange={setCurrentOutline}
+                    />
+                  </div>
+                  
+                  {currentOutline && (
+                    <>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">Outline Color</label>
+                        <Input 
+                          type="color" 
+                          className="w-full h-9 px-1 border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
+                          value={currentOutlineColor}
+                          onChange={(e) => setCurrentOutlineColor(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="block text-xs text-gray-600">Outline Width</label>
+                          <span className="text-xs text-gray-500">{currentOutlineWidth}px</span>
+                        </div>
+                        <Slider 
+                          value={[currentOutlineWidth]} 
+                          min={1} 
+                          max={5} 
+                          step={0.5}
+                          onValueChange={(value) => setCurrentOutlineWidth(value[0])}
+                          className="py-1"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+                
                 <Button 
                   size="sm"
-                  className="w-full bg-primary text-white px-4 py-2 rounded-full text-sm h-9"
+                  className="w-full bg-primary text-white px-4 py-2 rounded-full text-sm h-9 mt-3"
                   onClick={handleAddText}
                 >
                   Add Text to Jersey
