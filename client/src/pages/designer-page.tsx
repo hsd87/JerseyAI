@@ -170,7 +170,7 @@ export default function DesignerPage() {
             
             {/* Preview panel */}
             <div className="lg:col-span-1">
-              <OrderSummary showCheckoutButton={false} />
+              <OrderSummary showDetailed={false} />
             </div>
           </div>
         )}
@@ -199,7 +199,7 @@ export default function DesignerPage() {
             </div>
             
             <div className="lg:col-span-1">
-              <OrderSummary showCheckoutButton={true} />
+              <OrderSummary showDetailed={true} />
             </div>
           </div>
         )}
