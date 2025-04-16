@@ -1,0 +1,211 @@
+[
+  {
+    "productName": "PFJS01",
+    "sku": "Jersey",
+    "orderFormInputs": [
+      "QTY",
+      "SIZE",
+      "FABRIC",
+      "FIT TYPE",
+      "MAKING PREFRENCES",
+      "ADD ONS"
+    ],
+    "quantity": "USER INPUT",
+    "size": "USER INPUT",
+    "fabric": [
+      "POLYDRY",
+      "POLYDRY MESH"
+    ],
+    "style": [
+      "-"
+    ],
+    "fitType": [
+      "ATHLETIC FIT",
+      "COMFORT FIT"
+    ],
+    "makingPreferences": "USER INPUT",
+    "addOns": "ALL THE PRODUCTS."
+  },
+  {
+    "productName": "PFSS02",
+    "sku": "SHORTS",
+    "orderFormInputs": [
+      "QTY",
+      "SIZE",
+      "FABRIC",
+      "FIT TYPE",
+      "MAKING PREFRENCES",
+      "ADD ONS"
+    ],
+    "quantity": "USER INPUT",
+    "size": "USER INPUT",
+    "fabric": [
+      "POLYDRY",
+      "POLYDRY MESH"
+    ],
+    "style": [
+      "-"
+    ],
+    "fitType": [
+      "ATHLETIC FIT",
+      "COMFORT FIT"
+    ],
+    "makingPreferences": "USER INPUT",
+    "addOns": "ALL THE PRODUCTS."
+  },
+  {
+    "productName": "PFJKT03",
+    "sku": "TRAINING JACKET",
+    "orderFormInputs": [
+      "QTY",
+      "SIZE",
+      "FABRIC",
+      "FIT TYPE",
+      "STYLE",
+      "MAKING PREFRENCES",
+      "ADD ONS"
+    ],
+    "quantity": "USER INPUT",
+    "size": "USER INPUT",
+    "fabric": [
+      "POLYDRY ACTIVE",
+      "POLYDRY WARM"
+    ],
+    "style": [
+      "FULL ZIP. HALF ZIP, HOODED"
+    ],
+    "fitType": [
+      "ATHLETIC FIT",
+      "COMFORT FIT"
+    ],
+    "makingPreferences": "USER INPUT",
+    "addOns": "ALL THE PRODUCTS."
+  },
+  {
+    "productName": "PFTR04",
+    "sku": "TRAINING TROUSER",
+    "orderFormInputs": [
+      "QTY",
+      "SIZE",
+      "FABRIC",
+      "FIT TYPE",
+      "MAKING PREFRENCES",
+      "ADD ONS"
+    ],
+    "quantity": "USER INPUT",
+    "size": "USER INPUT",
+    "fabric": [
+      "POLYDRY ACTIVE",
+      "POLYDRY WARM"
+    ],
+    "style": [
+      "-"
+    ],
+    "fitType": [
+      "ATHLETIC FIT",
+      "COMFORT FIT"
+    ],
+    "makingPreferences": "USER INPUT",
+    "addOns": "ALL THE PRODUCTS."
+  },
+  {
+    "productName": "PFKB05",
+    "sku": "KITBAG",
+    "orderFormInputs": [
+      "NO FORM NEEDED ONLY QTY"
+    ],
+    "quantity": "USER INPUT",
+    "size": "-",
+    "fabric": [
+      "-"
+    ],
+    "style": [
+      "-"
+    ],
+    "fitType": [
+      "-"
+    ],
+    "makingPreferences": "-",
+    "addOns": "-"
+  },
+  {
+    "productName": "PFBP06",
+    "sku": "BAGPACK",
+    "orderFormInputs": [
+      "NO FORM NEEDED ONLY QTY"
+    ],
+    "quantity": "USER INPUT",
+    "size": "-",
+    "fabric": [
+      "-"
+    ],
+    "style": [
+      "-"
+    ],
+    "fitType": [
+      "-"
+    ],
+    "makingPreferences": "-",
+    "addOns": "-"
+  },
+  {
+    "productName": "PFSK07",
+    "sku": "SOCKS",
+    "orderFormInputs": [
+      "NO FORM NEEDED ONLY QTY AND SIZE"
+    ],
+    "quantity": "USER INPUT",
+    "size": "USER INPUT",
+    "fabric": [
+      "-"
+    ],
+    "style": [
+      "-"
+    ],
+    "fitType": [
+      "-"
+    ],
+    "makingPreferences": "-",
+    "addOns": "-"
+  },
+  {
+    "productName": "PFBN08",
+    "sku": "BEANIE",
+    "orderFormInputs": [
+      "NO FORM NEEDED ONLY QTY"
+    ],
+    "quantity": "USER INPUT",
+    "size": "-",
+    "fabric": [
+      "-"
+    ],
+    "style": [
+      "-"
+    ],
+    "fitType": [
+      "-"
+    ],
+    "makingPreferences": "-",
+    "addOns": "-"
+  },
+  {
+    "productName": "PFSC09",
+    "sku": "SPORTS CAP",
+    "orderFormInputs": [
+      "NO FORM NEEDED ONLY QTY"
+    ],
+    "quantity": "USER INPUT",
+    "size": "-",
+    "fabric": [
+      "-"
+    ],
+    "style": [
+      "-"
+    ],
+    "fitType": [
+      "-"
+    ],
+    "makingPreferences": "-",
+    "addOns": "-"
+  }
+]
