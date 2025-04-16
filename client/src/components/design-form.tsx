@@ -188,6 +188,22 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
 
   const onSubmit = async (data: DesignFormValues) => {
     try {
+      // Validate all required fields are present
+      const requiredFields = ['sport', 'kitType', 'primaryColor', 'secondaryColor', 'collarType', 'patternStyle'];
+      const missingFields = requiredFields.filter(field => !data[field as keyof DesignFormValues]);
+      
+      if (missingFields.length > 0) {
+        console.error(`Missing required fields: ${missingFields.join(', ')}`);
+        // Mark fields as touched to show validation errors
+        missingFields.forEach(field => {
+          form.setError(field as any, {
+            type: 'required',
+            message: 'This field is required'
+          });
+        });
+        return;
+      }
+      
       // Add pfsportskit token to the designNotes
       const dataWithToken = {
         ...data,
@@ -204,7 +220,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
       
       console.log("Submitting design with tracking data:", trackingData);
       
-      // Generate design using the data
+      // Generate design using the data (passing the complete form data)
       const result = await generateDesign();
       if (result) {
         // Extract the image URL from the result if needed
@@ -216,6 +232,11 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
       }
     } catch (error) {
       console.error("Error generating design:", error);
+      // Set form error to display to user
+      form.setError('root', {
+        type: 'server',
+        message: 'An error occurred while generating the design. Please try again.'
+      });
     }
   };
 
@@ -225,6 +246,12 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Form Errors Display */}
+          {form.formState.errors.root && (
+            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
+              <p className="text-sm">{form.formState.errors.root.message}</p>
+            </div>
+          )}
           {/* Sport Selection */}
           <FormField
             control={form.control}
@@ -436,16 +463,27 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                 size="sm"
                 className="flex items-center gap-2"
                 onClick={() => {
-                  // Use the store's toggle function which will also swap colors
+                  // First, save current colors
+                  const currentPrimary = form.getValues('primaryColor');
+                  const currentSecondary = form.getValues('secondaryColor');
+                  
+                  // Toggle away kit in state 
+                  const newAwayKitState = !awayKit;
+                  setAwayKit(newAwayKitState);
+                  
+                  // Use the store's toggle function
                   toggleAwayKit();
                   
-                  // Update local state
-                  setAwayKit(!awayKit);
-                  
-                  // Update form values from store
-                  const newFormData = formData;
-                  form.setValue("primaryColor", newFormData.primaryColor);
-                  form.setValue("secondaryColor", newFormData.secondaryColor);
+                  // Update form colors with swapped values if toggling to away kit
+                  if (newAwayKitState) {
+                    // Swap colors for away kit
+                    form.setValue("primaryColor", currentSecondary);
+                    form.setValue("secondaryColor", currentPrimary);
+                  } else {
+                    // Use store values for home kit
+                    form.setValue("primaryColor", formData.primaryColor);
+                    form.setValue("secondaryColor", formData.secondaryColor);
+                  }
                 }}
               >
                 <RotateCw className="h-4 w-4" />
@@ -499,12 +537,15 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             >
               {isGenerating ? (
                 <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                  AI Generating Design...
+                  <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  <span className="animate-pulse">AI Generating Design...</span>
                 </>
               ) : (
                 <>
-                  <i className="fas fa-magic mr-2"></i> Generate Kit Design
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
+                  </svg>
+                  Generate Kit Design
                 </>
               )}
             </Button>
