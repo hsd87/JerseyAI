@@ -54,8 +54,10 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
   // Convert colors to RGB format
   const formattedPrimaryColor = primaryColor.startsWith('#') ? hexToRgb(primaryColor) : primaryColor;
   const formattedSecondaryColor = secondaryColor.startsWith('#') ? hexToRgb(secondaryColor) : secondaryColor;
+  const formattedAccentColor1 = accentColor1 && accentColor1.startsWith('#') ? hexToRgb(accentColor1) : accentColor1;
+  const formattedAccentColor2 = accentColor2 && accentColor2.startsWith('#') ? hexToRgb(accentColor2) : accentColor2;
   
-  console.log(`Processing design for ${sport} with colors: ${formattedPrimaryColor}, ${formattedSecondaryColor}`);
+  console.log(`Processing design for ${sport} with colors: ${formattedPrimaryColor}, ${formattedSecondaryColor}${formattedAccentColor1 ? ', ' + formattedAccentColor1 : ''}${formattedAccentColor2 ? ', ' + formattedAccentColor2 : ''}`);
   
   // Comprehensive instructions for OpenAI
   const promptGenerationInstruction = `
@@ -118,7 +120,9 @@ floating, mannequin-free layout, ideal for product catalog, mockups, or ecommerc
         •       List:
         •       Primary color: ${formattedPrimaryColor}
         •       Secondary color: ${formattedSecondaryColor}
-        •       Highlight/trim/accent colors
+        ${formattedAccentColor1 ? `•       Accent color 1: ${formattedAccentColor1}` : ''}
+        ${formattedAccentColor2 ? `•       Accent color 2: ${formattedAccentColor2}` : ''}
+        •       Highlight/trim colors
         •       Use rich, descriptive names (e.g., obsidian black, pulse red, glitch white)
 
 ⸻
@@ -250,7 +254,7 @@ Return ONLY a JSON object: { "prompt": "your detailed jersey description" }
 
 // Fallback prompt generation if OpenAI call fails
 async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<string> {
-  const { sport, primaryColor, secondaryColor, kitType } = options;
+  const { sport, primaryColor, secondaryColor, accentColor1, accentColor2, kitType } = options;
   
   // Convert hex colors to RGB format
   function hexToRgb(hex: string) {
@@ -268,6 +272,8 @@ async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<s
   // Convert colors to RGB format
   const formattedPrimaryColor = primaryColor.startsWith('#') ? hexToRgb(primaryColor) : primaryColor;
   const formattedSecondaryColor = secondaryColor.startsWith('#') ? hexToRgb(secondaryColor) : secondaryColor;
+  const formattedAccentColor1 = accentColor1 && accentColor1.startsWith('#') ? hexToRgb(accentColor1) : accentColor1;
+  const formattedAccentColor2 = accentColor2 && accentColor2.startsWith('#') ? hexToRgb(accentColor2) : accentColor2;
   
   // Create a simple prompt format
   const kitDescription = kitType === "jersey" ? "jersey only" :
@@ -280,12 +286,17 @@ async function generateBasicPrompt(options: GenerateKitPromptOptions): Promise<s
 🎨 Color Scheme:
 • Primary Color: ${formattedPrimaryColor}
 • Secondary Color: ${formattedSecondaryColor}
-• Accent: White trim and dark contours
+${formattedAccentColor1 ? `• Accent Color 1: ${formattedAccentColor1}` : ''}
+${formattedAccentColor2 ? `• Accent Color 2: ${formattedAccentColor2}` : ''}
+• Trim: White trim and dark contours
 
-The jersey features a modern, sport-authentic design with the ${formattedPrimaryColor} as the base and ${formattedSecondaryColor} accents placed according to ${sport} traditions. Front body has sport-appropriate design in ${formattedPrimaryColor} with ${formattedSecondaryColor} detailing. Back body has clean player name and number placement with ${formattedSecondaryColor} numerals.
+The jersey features a modern, sport-authentic design with the ${formattedPrimaryColor} as the base and ${formattedSecondaryColor} accents placed according to ${sport} traditions. 
+${formattedAccentColor1 ? `Details and trim are highlighted with ${formattedAccentColor1} for contrast.` : ''}
+${formattedAccentColor2 ? `Additional accents in ${formattedAccentColor2} for depth and visual appeal.` : ''}
+Front body has sport-appropriate design in ${formattedPrimaryColor} with ${formattedSecondaryColor} detailing. Back body has clean player name and number placement with ${formattedSecondaryColor} numerals.
 
 ${kitType?.includes("Shorts") || kitType?.includes("Kit") ? 
-`• Shorts details: Matching ${sport} shorts in ${formattedPrimaryColor} with ${formattedSecondaryColor} accents, designed to complement the jersey style.` : ''}`;
+`• Shorts details: Matching ${sport} shorts in ${formattedPrimaryColor} with ${formattedSecondaryColor} accents${formattedAccentColor1 ? ` and ${formattedAccentColor1} trim` : ''}${formattedAccentColor2 ? `, plus ${formattedAccentColor2} details` : ''}, designed to complement the jersey style.` : ''}`;
 }
 
 // Define a type for the image generation result
