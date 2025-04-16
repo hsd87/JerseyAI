@@ -43,7 +43,7 @@ export default function OrderConfig() {
     quantity = 1,
     setQuantity = () => {},
     isTeamOrder,
-    setIsTeamOrder,
+    setTeamOrder,
     addOns = [], // This should be addOns not addons to match the store
     addAddOn,
     removeAddOn
@@ -84,7 +84,7 @@ export default function OrderConfig() {
 
   const handleTeamOrderChange = (checked: boolean) => {
     form.setValue('isTeamOrder', checked);
-    setIsTeamOrder(checked);
+    setTeamOrder(checked);
     
     // When switching to team order mode, if there are no items in the cart,
     // we need to make sure there's at least one item for pricing calculations
@@ -96,6 +96,7 @@ export default function OrderConfig() {
         const price = PACKAGE_PRICES[packageType] || 59.99;
         
         addItem({
+          id: Date.now().toString(), // Add id for new item
           type: packageType,
           size: form.getValues('size') || 'M',
           quantity: 1,
