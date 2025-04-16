@@ -26,19 +26,24 @@ export async function apiRequest(
   // Ensure the URL is properly normalized for the current environment
   const normalizedUrl = url.replace(/\/+/g, '/');
   
-  // Track retry attempts for this request
+  // Set longer timeout for design generation endpoints
+  const isDesignGenerateRequest = normalizedUrl.includes('/generate');
+  const timeout = isDesignGenerateRequest ? 180000 : 30000; // 3 minutes for generation, 30 seconds for others
+  
+  // Disable retries for design generation to prevent duplicate API calls
   let retryCount = 0;
-  const MAX_RETRIES = 2;
+  const MAX_RETRIES = isDesignGenerateRequest ? 0 : 2; // No retries for generation
   
   const executeRequest = async (): Promise<Response> => {
     try {
+      console.log(`Request timeout set to ${timeout/1000} seconds`);
+      
       const res = await fetch(normalizedUrl, {
         method,
         headers: data ? { "Content-Type": "application/json" } : {},
         body: data ? JSON.stringify(data) : undefined,
         credentials: "include",
-        // Add a longer timeout for slower connections
-        signal: AbortSignal.timeout(10000), // 10 second timeout
+        signal: AbortSignal.timeout(timeout)
       });
   
       // Check for non-ok responses and handle them appropriately
@@ -50,8 +55,8 @@ export async function apiRequest(
           body: errorText
         });
         
-        // For certain status codes, we can attempt retry
-        if ((res.status >= 500 || res.status === 408) && retryCount < MAX_RETRIES) {
+        // For certain status codes, we can attempt retry if retries are allowed
+        if (!isDesignGenerateRequest && (res.status >= 500 || res.status === 408) && retryCount < MAX_RETRIES) {
           retryCount++;
           console.log(`Retrying ${method} request to ${normalizedUrl} (attempt ${retryCount})`);
           return executeRequest();
@@ -63,8 +68,8 @@ export async function apiRequest(
     } catch (error) {
       console.error(`Fetch error for ${method} ${normalizedUrl}:`, error);
       
-      // Network errors or timeouts can be retried
-      if ((error instanceof TypeError || error instanceof DOMException) && retryCount < MAX_RETRIES) {
+      // Only retry network errors for non-generation requests
+      if (!isDesignGenerateRequest && (error instanceof TypeError || error instanceof DOMException) && retryCount < MAX_RETRIES) {
         retryCount++;
         const delay = 1000 * retryCount; // Exponential backoff
         console.log(`Network error, retrying in ${delay}ms (attempt ${retryCount})`);
@@ -101,16 +106,21 @@ export const getQueryFn = <TData = any,>(options: {
     // Normalize URL to prevent double slashes
     const normalizedUrl = fullUrl.replace(/\/+/g, '/');
     
-    // Track retry attempts
+    // Set longer timeout for design endpoints
+    const isDesignRelatedRequest = normalizedUrl.includes('/designs') || normalizedUrl.includes('/generate');
+    const timeout = isDesignRelatedRequest ? 180000 : 30000; // 3 minutes for design, 30 seconds for others
+  
+    // Disable retries for design generation to prevent duplicate API calls
     let retryCount = 0;
-    const MAX_RETRIES = 2;
+    const MAX_RETRIES = isDesignRelatedRequest ? 0 : 2; // No retries for design-related endpoints
     
     const executeQuery = async (): Promise<any> => {
       try {
+        console.log(`Query timeout set to ${timeout/1000} seconds`);
+        
         const res = await fetch(normalizedUrl, {
           credentials: "include",
-          // Add a longer timeout for slower connections
-          signal: AbortSignal.timeout(10000), // 10 second timeout
+          signal: AbortSignal.timeout(timeout)
         });
   
         // Log response status
@@ -120,8 +130,8 @@ export const getQueryFn = <TData = any,>(options: {
           return null as any;
         }
   
-        // Check for server errors that might benefit from retry
-        if ((res.status >= 500 || res.status === 408) && retryCount < MAX_RETRIES) {
+        // Check for server errors that might benefit from retry - only for non-design requests
+        if (!isDesignRelatedRequest && (res.status >= 500 || res.status === 408) && retryCount < MAX_RETRIES) {
           retryCount++;
           const delay = 1000 * retryCount;
           console.log(`Server error ${res.status}, retrying query in ${delay}ms (attempt ${retryCount})`);
@@ -135,8 +145,8 @@ export const getQueryFn = <TData = any,>(options: {
       } catch (error) {
         console.error(`Fetch error for query ${url}:`, error);
         
-        // Network errors or timeouts can be retried
-        if ((error instanceof TypeError || error instanceof DOMException) && retryCount < MAX_RETRIES) {
+        // Network errors or timeouts can be retried, but only for non-design requests
+        if (!isDesignRelatedRequest && (error instanceof TypeError || error instanceof DOMException) && retryCount < MAX_RETRIES) {
           retryCount++;
           const delay = 1000 * retryCount; // Exponential backoff
           console.log(`Network error, retrying query in ${delay}ms (attempt ${retryCount})`);
