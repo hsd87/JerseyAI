@@ -637,6 +637,26 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             )}
           </div>
           
+          {/* Generation Error Message */}
+          {generationError && (
+            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mt-6 flex items-start">
+              <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h4 className="font-medium text-sm">Design Generation Error</h4>
+                <p className="text-xs mt-1">{generationError}</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => setShowRetryDialog(true)}
+                >
+                  <RotateCw className="h-4 w-4 mr-1" />
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          )}
+          
           {/* Subscription Upsell */}
           {user && !subscription.isSubscribed && (
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 mt-6">
@@ -664,6 +684,35 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             </div>
           )}
         </form>
+        
+        {/* Retry Dialog */}
+        <AlertDialog open={showRetryDialog} onOpenChange={setShowRetryDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Design Generation Failed</AlertDialogTitle>
+              <AlertDialogDescription>
+                {retryAttempt < 2 ? (
+                  <>
+                    We encountered an issue while generating your jersey design. 
+                    This may be due to temporary server load or connection issues.
+                  </>
+                ) : (
+                  <>
+                    Multiple attempts to generate your design have failed. This could be due to 
+                    a server issue or problem with the design parameters.
+                  </>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleRetry}>
+                <RotateCw className="mr-2 h-4 w-4" />
+                Retry Generation
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </Form>
     </div>
   );

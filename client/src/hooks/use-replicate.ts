@@ -19,14 +19,31 @@ export function useReplicate() {
   const generateDesignMutation = useMutation({
     mutationFn: async () => {
       try {
-        // First, create a design record
+        // Validate form data to ensure all required fields are present
+        const requiredFields = ['sport', 'kitType', 'primaryColor', 'secondaryColor', 'collarType', 'patternStyle'] as const;
+        const missingFields = requiredFields.filter(
+          field => !formData[field as keyof typeof formData]
+        );
+        
+        if (missingFields.length > 0) {
+          throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+        }
+        
+        // First, create a design record or use existing
         let designRecord: Design;
         if (!designId) {
-          const createRes = await apiRequest("POST", "/api/designs", formData);
-          designRecord = await createRes.json();
-          setDesignId(designRecord.id);
+          console.log("Creating new design record with form data:", formData);
+          try {
+            const createRes = await apiRequest("POST", "/api/designs", formData);
+            designRecord = await createRes.json();
+            setDesignId(designRecord.id);
+            console.log("Design record created with ID:", designRecord.id);
+          } catch (createError) {
+            console.error("Failed to create design record:", createError);
+            throw new Error(`Failed to create design: ${createError instanceof Error ? createError.message : 'Unknown error'}`);
+          }
         } else {
-          // Use existing design
+          console.log("Using existing design ID:", designId);
           designRecord = { id: designId } as Design;
         }
 
@@ -35,39 +52,84 @@ export function useReplicate() {
           description: "This may take up to 30-60 seconds while we create your jersey design.",
         });
 
-        // Then, generate images for it - pass form data to ensure it has the latest values
-        console.log("Sending form data to generate API:", formData);
+        // Prepare data payload for generation
+        const cleanedFormData = {
+          sport: formData.sport,
+          kitType: formData.kitType,
+          primaryColor: formData.primaryColor,
+          secondaryColor: formData.secondaryColor,
+          collarType: formData.collarType,
+          patternStyle: formData.patternStyle,
+          sleeveStyle: formData.sleeveStyle,
+          designNotes: formData.designNotes || ""
+        };
+        
+        console.log("Sending cleaned form data to generate API:", cleanedFormData);
         
         // Add retry mechanism with exponential backoff
         let attempt = 0;
         const maxAttempts = 3;
         let generateRes;
+        let lastError = null;
         
         while (attempt < maxAttempts) {
           try {
+            console.log(`Generation attempt ${attempt + 1}/${maxAttempts}`);
+            
+            // Track generation start time for performance metrics
+            const startTime = Date.now();
+            
             generateRes = await apiRequest(
               "POST", 
               `/api/designs/${designRecord.id}/generate`, 
-              { formData }
+              { formData: cleanedFormData }
             );
+            
+            const duration = Date.now() - startTime;
+            console.log(`Generation request completed in ${duration}ms`);
+            
             break; // Success, exit retry loop
           } catch (err) {
+            lastError = err;
             attempt++;
+            
+            // Log details about the error
+            console.error(
+              `Generation attempt ${attempt} failed:`, 
+              err instanceof Error ? err.message : err
+            );
+            
             if (attempt >= maxAttempts) {
-              throw err; // Rethrow if all attempts failed
+              console.error("All retry attempts failed, giving up.");
+              throw new Error(`Failed after ${maxAttempts} attempts: ${lastError instanceof Error ? lastError.message : 'API error'}`);
             }
-            console.warn(`Network error, retrying in ${Math.pow(2, attempt) * 1000}ms (attempt ${attempt})`);
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000)); // Exponential backoff
+            
+            const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
+            console.warn(`Retrying in ${delay}ms (attempt ${attempt}/${maxAttempts})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
           }
         }
         
         if (!generateRes) {
-          throw new Error("Failed to generate design after multiple attempts");
+          throw new Error("Failed to generate design: No response received");
         }
         
-        return await generateRes.json();
+        try {
+          const responseData = await generateRes.json();
+          console.log("Generation response:", responseData);
+          
+          // Validate response - ensure images are present
+          if (!responseData.frontImageUrl || !responseData.backImageUrl) {
+            throw new Error("Generated design is missing one or more images");
+          }
+          
+          return responseData;
+        } catch (parseError) {
+          console.error("Failed to parse generation response:", parseError);
+          throw new Error("Failed to parse design response");
+        }
       } catch (error) {
-        console.error("Error in image generation:", error);
+        console.error("Error in design generation process:", error);
         throw error;
       }
     },
