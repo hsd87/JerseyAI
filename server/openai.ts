@@ -13,6 +13,8 @@ export interface GenerateKitPromptOptions {
   kitType: string;
   primaryColor: string;
   secondaryColor: string;
+  accentColor1?: string;
+  accentColor2?: string;
   sleeveStyle?: string;
   collarType?: string;
   patternStyle?: string;
@@ -28,6 +30,8 @@ export async function generateKitPrompt(options: GenerateKitPromptOptions): Prom
     kitType, 
     primaryColor, 
     secondaryColor,
+    accentColor1,
+    accentColor2,
     sleeveStyle,
     collarType,
     patternStyle,
