@@ -1,0 +1,48 @@
+Objective:
+Audit and refine the existing dynamic jersey design form and logic to ensure it performs reliably, responds instantly, and displays all configured UI behaviors correctly — strictly improving what has already been implemented.
+
+Scope:
+🛠 Do NOT add new features yet. Only focus on enhancing existing architecture, removing errors, and polishing UX based on what has been already built.
+
+Tasks:
+
+1. ✅ Dynamic Form Stability
+- Review `design-form.tsx` and `schema.ts` to ensure sport-specific options (kit type, collars, patterns) are rendering correctly based on the selected sport.
+- Fix any flickering, incorrect default states, or delay in dropdown re-renders when sport/kit type changes.
+- Ensure that when switching sports, appropriate default values are preserved or updated gracefully without wiping unrelated fields.
+
+2. ✅ Form State Optimization
+- Use `useMemo` to prevent unnecessary recomputation of kit options based on selected sport.
+- Use sensible fallback defaults for kit type, collar type, and pattern for each sport if user hasn’t selected them explicitly.
+- Ensure state is persisted correctly when toggling “Away Kit”.
+
+3. ✅ Image Generation & UX Flow
+- Review the flow of `generateKitPrompt` → OpenAI prompt → Replicate image → image display.
+- Add clear and polished loading feedback (existing loading state should show a better visual or animation).
+- Fix any edge cases where image doesn’t render or loading doesn’t end properly.
+- Ensure successful image loads into state and is visible in UI without broken layout.
+
+4. ✅ Fix Known Errors or Console Warnings
+- Address any console warnings or LSP errors from `design-form.tsx` or `schema.ts` including:
+  - Type mismatches
+  - `key` props
+  - Controlled vs uncontrolled inputs
+  - Dropdown resets
+- Optimize useEffect/useState placement to avoid re-renders that break the form experience.
+
+5. ✅ Polish Layout and UX Consistency
+- Ensure all dropdowns and inputs are vertically aligned and visually clean on both desktop and mobile.
+- Form elements should not overlap, and spacing should follow a consistent layout grid.
+- Add consistent label formatting, capitalize labels where needed (e.g., “Collar Style”, “Sleeve Type”).
+- Prevent design button from submitting if form is incomplete or prompt fails to build.
+
+Instructions:
+You are not allowed to implement new components like OrderDetails, CanvasEditor, PriceCalculator, etc. yet. This prompt is only focused on refining and fixing the already present structure, logic, and design form flow. Once verified and stable, new modules will be added separately.
+
+Begin by reviewing the following files:
+- `client/src/components/design-form.tsx`
+- `shared/schema.ts`
+- `server/openai.ts` and prompt integration logic
+- Any image rendering modules or states involved
+
+After making these fixes, please provide a summary of what was corrected and what’s now stable.

@@ -16,7 +16,7 @@ interface DesignStore {
   formData: DesignFormValues;
   updateFormData: (data: Partial<DesignFormValues>) => void;
   resetFormData: () => void;
-  resetFormDataForSport: (sport: string) => void;
+  resetFormDataForSport: (sport: SportType | string) => void;
   
   // Design generation state
   isGenerating: boolean;
@@ -58,17 +58,22 @@ const sportColorPalettes: Record<SportType, { primary: string, secondary: string
 };
 
 // Function to get default values for a sport
-const getDefaultValuesForSport = (sportInput: string): DesignFormValues => {
-  // Validate sport type
-  const validSports = ['soccer', 'basketball', 'cricket', 'rugby', 'esports'];
-  const sport = validSports.includes(sportInput) ? sportInput as SportType : 'soccer';
+const getDefaultValuesForSport = (sportInput: SportType | string): DesignFormValues => {
+  // Validate sport type with proper error handling
+  const validSports = ['soccer', 'basketball', 'cricket', 'rugby', 'esports'] as const;
   
-  // Get sport-specific options with fallbacks
+  if (!validSports.includes(sportInput as any)) {
+    console.warn(`Invalid sport type: "${sportInput}". Defaulting to "soccer".`);
+  }
+  
+  const sport = validSports.includes(sportInput as any) ? sportInput as SportType : 'soccer';
+  
+  // Get sport-specific options with proper fallbacks
   const kitTypeOptions = sportKitTypeMapping[sport] || ['jersey'];
   const collarTypeOptions = sportCollarMapping[sport] || ['crew'];
   const patternStyleOptions = sportPatternMapping[sport] || ['solid'];
   
-  // Cast first option to appropriate type with fallbacks if the lists are empty
+  // Cast options to the appropriate types with proper validation
   const kitType = (kitTypeOptions[0] || 'jersey') as KitType;
   const collarType = (collarTypeOptions[0] || 'crew') as CollarType;
   const patternStyle = (patternStyleOptions[0] || 'solid') as PatternType;
