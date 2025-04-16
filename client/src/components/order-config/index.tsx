@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PackageSelection from "./package-selection";
 import SizingOptions from "./sizing-options";
 import AddOns, { AddOn } from "./add-ons";
@@ -49,7 +48,6 @@ export default function OrderConfig({
   kitType,
   onBackToCustomization
 }: OrderConfigProps) {
-  const [activeTab, setActiveTab] = useState("design");
   const [selectedPackage, setSelectedPackage] = useState("jersey-only");
   const [gender, setGender] = useState("mens");
   const [size, setSize] = useState("M");
@@ -94,89 +92,21 @@ export default function OrderConfig({
     navigate("/checkout");
   };
   
-  const nextTab = () => {
-    if (activeTab === "design") setActiveTab("package");
-    else if (activeTab === "package") setActiveTab("addons");
-    else if (activeTab === "addons") setActiveTab("details");
-  };
-  
-  const prevTab = () => {
-    if (activeTab === "package") setActiveTab("design");
-    else if (activeTab === "addons") setActiveTab("package");
-    else if (activeTab === "details") setActiveTab("addons");
-  };
-  
   const availableFabrics = fabricOptions[sport as keyof typeof fabricOptions] || fabricOptions.soccer;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Create Your Package</h1>
-        <p className="text-gray-600">Build a custom package around your design</p>
+        <h1 className="text-3xl font-bold mb-2">Configure Your Order</h1>
+        <p className="text-gray-600">Choose your package type, size and add-ons</p>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <TabsList className="w-full p-0 h-auto bg-gray-100 rounded-md">
-              <TabsTrigger 
-                value="design" 
-                className="flex-1 py-3 data-[state=active]:bg-white rounded-md"
-              >
-                Your Design
-              </TabsTrigger>
-              <TabsTrigger 
-                value="package" 
-                className="flex-1 py-3 data-[state=active]:bg-white rounded-md"
-              >
-                Package Options
-              </TabsTrigger>
-              <TabsTrigger 
-                value="addons" 
-                className="flex-1 py-3 data-[state=active]:bg-white rounded-md"
-              >
-                Add-Ons
-              </TabsTrigger>
-              <TabsTrigger 
-                value="details" 
-                className="flex-1 py-3 data-[state=active]:bg-white rounded-md"
-              >
-                Package Details
-              </TabsTrigger>
-            </TabsList>
-            
-            {/* Design Tab - Show the generated design */}
-            <TabsContent value="design" className="pt-6">
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Your {sport.charAt(0).toUpperCase() + sport.slice(1)} Kit Design</CardTitle>
-                  <CardDescription>This is the design you created with our AI designer</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-gray-50 p-4 rounded-md">
-                    <div className="aspect-square max-w-md mx-auto relative">
-                      <img 
-                        src={designUrls.front || ""}
-                        alt={`${sport} ${kitType} front view`}
-                        className="w-full h-full object-contain"
-                      />
-                      <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 text-xs rounded">
-                        Design #{designId}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <div className="mt-6 flex justify-end">
-                <Button onClick={nextTab} className="bg-primary hover:bg-primary/90">
-                  Create Package
-                </Button>
-              </div>
-            </TabsContent>
-            
-            {/* Package Tab - Select the package type */}
-            <TabsContent value="package" className="pt-6">
+          <div className="space-y-8">
+            {/* Package Selection */}
+            <div>
+              <h2 className="text-xl font-medium mb-4">Package</h2>
               <PackageSelection 
                 selectedPackage={selectedPackage}
                 onSelectPackage={handleSelectPackage}
@@ -209,7 +139,7 @@ export default function OrderConfig({
               
               <div className="mt-6">
                 <div className="flex items-center">
-                  <h3 className="text-lg font-medium mr-4">Base Quantity:</h3>
+                  <h3 className="text-lg font-medium mr-4">Quantity:</h3>
                   <div className="flex items-center">
                     <button
                       type="button"
@@ -229,118 +159,95 @@ export default function OrderConfig({
                   </div>
                 </div>
               </div>
-              
-              <div className="mt-8 flex justify-between">
-                <Button variant="outline" onClick={prevTab}>
-                  <ChevronLeft className="mr-2 h-4 w-4" />
-                  Back to Design
-                </Button>
-                <Button onClick={nextTab}>
-                  Continue to Add-Ons
-                </Button>
-              </div>
-            </TabsContent>
+            </div>
             
-            {/* Add-ons Tab */}
-            <TabsContent value="addons" className="pt-6">
+            {/* Add-ons */}
+            <div className="pt-6 border-t border-gray-200">
+              <h2 className="text-xl font-medium mb-4">Add-Ons</h2>
               <AddOns 
                 addOns={addOns}
                 onUpdateQuantity={handleUpdateAddOnQuantity}
               />
-              
-              <div className="mt-8 flex justify-between">
-                <Button variant="outline" onClick={prevTab}>
-                  <ChevronLeft className="mr-2 h-4 w-4" />
-                  Back to Package
-                </Button>
-                <Button onClick={nextTab}>
-                  Continue to Package Details
-                </Button>
-              </div>
-            </TabsContent>
+            </div>
             
-            {/* Details Tab - Sizing, Fabric, etc. */}
-            <TabsContent value="details" className="pt-6">
+            {/* Sizing & Fabric */}
+            <div className="pt-6 border-t border-gray-200">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-medium">Sizing & Fabric Details</h2>
+                <Dialog open={showSizeChart} onOpenChange={setShowSizeChart}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">Size Chart</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl">
+                    <div className="p-4">
+                      <h3 className="text-xl font-bold mb-4">Size Chart for {sport.charAt(0).toUpperCase() + sport.slice(1)}</h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="bg-gray-100">
+                              <th className="border p-2">Size</th>
+                              <th className="border p-2">Chest (in)</th>
+                              <th className="border p-2">Waist (in)</th>
+                              <th className="border p-2">Hip (in)</th>
+                              <th className="border p-2">Recommended Height</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="border p-2">XS</td>
+                              <td className="border p-2">32-34</td>
+                              <td className="border p-2">26-28</td>
+                              <td className="border p-2">34-36</td>
+                              <td className="border p-2">5'1" - 5'5"</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-2">S</td>
+                              <td className="border p-2">34-36</td>
+                              <td className="border p-2">28-30</td>
+                              <td className="border p-2">36-38</td>
+                              <td className="border p-2">5'3" - 5'7"</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-2">M</td>
+                              <td className="border p-2">36-38</td>
+                              <td className="border p-2">30-32</td>
+                              <td className="border p-2">38-40</td>
+                              <td className="border p-2">5'5" - 5'9"</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-2">L</td>
+                              <td className="border p-2">38-40</td>
+                              <td className="border p-2">32-34</td>
+                              <td className="border p-2">40-42</td>
+                              <td className="border p-2">5'7" - 6'0"</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-2">XL</td>
+                              <td className="border p-2">40-42</td>
+                              <td className="border p-2">34-36</td>
+                              <td className="border p-2">42-44</td>
+                              <td className="border p-2">5'9" - 6'2"</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-2">XXL</td>
+                              <td className="border p-2">42-44</td>
+                              <td className="border p-2">36-38</td>
+                              <td className="border p-2">44-46</td>
+                              <td className="border p-2">5'11" - 6'4"</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="mt-4 text-sm text-gray-600">
+                        Note: Size charts are approximate. For team orders, we recommend collecting accurate measurements.
+                      </p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
               <Card className="mb-6">
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <CardTitle>Sizing & Fabric Details</CardTitle>
-                    <Dialog open={showSizeChart} onOpenChange={setShowSizeChart}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">Size Chart</Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-3xl">
-                        <div className="p-4">
-                          <h3 className="text-xl font-bold mb-4">Size Chart for {sport.charAt(0).toUpperCase() + sport.slice(1)}</h3>
-                          <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
-                              <thead>
-                                <tr className="bg-gray-100">
-                                  <th className="border p-2">Size</th>
-                                  <th className="border p-2">Chest (in)</th>
-                                  <th className="border p-2">Waist (in)</th>
-                                  <th className="border p-2">Hip (in)</th>
-                                  <th className="border p-2">Recommended Height</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td className="border p-2">XS</td>
-                                  <td className="border p-2">32-34</td>
-                                  <td className="border p-2">26-28</td>
-                                  <td className="border p-2">34-36</td>
-                                  <td className="border p-2">5'1" - 5'5"</td>
-                                </tr>
-                                <tr>
-                                  <td className="border p-2">S</td>
-                                  <td className="border p-2">34-36</td>
-                                  <td className="border p-2">28-30</td>
-                                  <td className="border p-2">36-38</td>
-                                  <td className="border p-2">5'3" - 5'7"</td>
-                                </tr>
-                                <tr>
-                                  <td className="border p-2">M</td>
-                                  <td className="border p-2">36-38</td>
-                                  <td className="border p-2">30-32</td>
-                                  <td className="border p-2">38-40</td>
-                                  <td className="border p-2">5'5" - 5'9"</td>
-                                </tr>
-                                <tr>
-                                  <td className="border p-2">L</td>
-                                  <td className="border p-2">38-40</td>
-                                  <td className="border p-2">32-34</td>
-                                  <td className="border p-2">40-42</td>
-                                  <td className="border p-2">5'7" - 6'0"</td>
-                                </tr>
-                                <tr>
-                                  <td className="border p-2">XL</td>
-                                  <td className="border p-2">40-42</td>
-                                  <td className="border p-2">34-36</td>
-                                  <td className="border p-2">42-44</td>
-                                  <td className="border p-2">5'9" - 6'2"</td>
-                                </tr>
-                                <tr>
-                                  <td className="border p-2">XXL</td>
-                                  <td className="border p-2">42-44</td>
-                                  <td className="border p-2">36-38</td>
-                                  <td className="border p-2">44-46</td>
-                                  <td className="border p-2">5'11" - 6'4"</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                          <p className="mt-4 text-sm text-gray-600">
-                            Note: Size charts are approximate. For team orders, we recommend collecting accurate measurements.
-                          </p>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                  <CardDescription>
-                    Specify the sizing and fabric options for your order
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="pt-6 space-y-6">
                   {/* Fabric Options */}
                   <div className="mb-4">
                     <Label htmlFor="fabric-type" className="mb-2 block font-medium">
@@ -379,29 +286,25 @@ export default function OrderConfig({
                   />
                 </CardContent>
               </Card>
-              
-              <div className="mt-8 flex justify-between">
-                <Button variant="outline" onClick={prevTab}>
+            </div>
+            
+            <div className="flex justify-between pt-4">
+              {onBackToCustomization && (
+                <Button 
+                  variant="outline" 
+                  onClick={onBackToCustomization}
+                >
                   <ChevronLeft className="mr-2 h-4 w-4" />
-                  Back to Add-Ons
+                  Back to Customization
                 </Button>
+              )}
+              <div className="ml-auto">
                 <Button onClick={() => handleProceedToCheckout()}>
-                  Review Order
+                  Proceed to Checkout
                 </Button>
               </div>
-            </TabsContent>
-          </Tabs>
-          
-          {onBackToCustomization && (
-            <Button 
-              variant="outline" 
-              onClick={onBackToCustomization}
-              className="mt-6"
-            >
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Back to Customization
-            </Button>
-          )}
+            </div>
+          </div>
         </div>
         
         <div className="lg:col-span-1">
