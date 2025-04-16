@@ -1,211 +1,134 @@
-import { useState, useEffect } from "react";
-import Navbar from "@/components/layout/navbar";
-import Footer from "@/components/layout/footer";
+import { useState } from "react";
 import DesignForm from "@/components/design-form";
-import DesignEditor from "@/components/design-editor";
 import DesignResults from "@/components/design-results";
-import { useAuth } from "@/hooks/use-auth";
 import { useDesignStore } from "@/hooks/use-design-store";
-import OrderConfig from "@/components/order-config";
-import TeamRoster from "@/components/team-roster";
-import OrderSummary from "@/components/order-summary";
+import { useSubscriptionStatus } from "@/hooks/use-subscription-status";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, ShoppingCart } from "lucide-react";
-import { useLocation } from "wouter";
+import { Loader2, ChevronRight } from "lucide-react";
+import OrderConfig from "@/components/order-config";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function DesignerPage() {
-  const { user } = useAuth();
-  const [currentStep, setCurrentStep] = useState(1);
-  const { hasGenerated, isEditorOpen } = useDesignStore();
-  const [, navigate] = useLocation();
-
-  // Update current step based on design state
-  useEffect(() => {
-    if (hasGenerated && !isEditorOpen) {
-      setCurrentStep(1); // Generated but not customizing
-    } else if (hasGenerated && isEditorOpen) {
-      setCurrentStep(2); // Customizing
-    }
-  }, [hasGenerated, isEditorOpen]);
-
-  // Go to next step in the process
-  const nextStep = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
-    }
+  const [currentTab, setCurrentTab] = useState<"customize" | "order">("customize");
+  const {
+    designData,
+    isGenerating,
+    generatedDesign
+  } = useDesignStore();
+  
+  const { data: subscription } = useSubscriptionStatus();
+  const isSubscribed = subscription?.isSubscribed || false;
+  
+  const handleShowOrderConfig = () => {
+    setCurrentTab("order");
   };
-
-  // Go to previous step in the process
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
+  
+  const handleBackToCustomization = () => {
+    setCurrentTab("customize");
   };
-
+  
   return (
-    <div className="font-inter bg-white text-gray-900 min-h-screen">
-      <Navbar />
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Design Process Steps */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
-            <h1 className="font-sora font-bold text-3xl mb-4 sm:mb-0">AI Jersey Designer</h1>
-            {user && (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Designs left this month:</span>
-                <div className="flex items-center space-x-1">
-                  {Array.from({ length: Math.min(user.remainingDesigns || 0, 6) }).map((_, i) => (
-                    <div key={i} className="w-3 h-6 bg-[#39FF14] rounded"></div>
-                  ))}
-                  {Array.from({ length: Math.max(0, 6 - (user.remainingDesigns || 0)) }).map((_, i) => (
-                    <div key={i} className="w-3 h-6 bg-gray-200 rounded"></div>
-                  ))}
-                </div>
-                <span className="text-sm font-medium">
-                  {user.subscriptionTier === 'pro' ? 'Unlimited' : `${user.remainingDesigns || 0}/6`}
-                </span>
-              </div>
+    <div className="flex flex-col min-h-screen px-4 sm:px-6">
+      <div className="container mx-auto py-6">
+        <Tabs 
+          value={currentTab} 
+          onValueChange={(value) => setCurrentTab(value as "customize" | "order")}
+          className="w-full"
+        >
+          <TabsList className="w-full mb-8">
+            <TabsTrigger value="customize" className="text-base flex-1">
+              Design Kit
+            </TabsTrigger>
+            {generatedDesign && (
+              <TabsTrigger value="order" className="text-base flex-1">
+                Order Configuration
+              </TabsTrigger>
             )}
-          </div>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-between">
-              {/* Step 1 */}
-              <div className="flex flex-col items-center">
-                <div 
-                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 1 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 1 ? 'text-white' : 'text-gray-600'} font-bold cursor-pointer`}
-                  onClick={() => hasGenerated && setCurrentStep(1)}
-                >1</div>
-                <p className={`mt-2 text-xs font-medium ${currentStep >= 1 ? 'text-gray-900' : 'text-gray-500'}`}>Design</p>
-              </div>
-              {/* Step 2 */}
-              <div className="flex flex-col items-center">
-                <div 
-                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 2 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 2 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
-                  onClick={() => hasGenerated && setCurrentStep(2)}
-                >2</div>
-                <p className={`mt-2 text-xs font-medium ${currentStep >= 2 ? 'text-gray-900' : 'text-gray-500'}`}>Customize</p>
-              </div>
-              {/* Step 3 */}
-              <div className="flex flex-col items-center">
-                <div 
-                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 3 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 3 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
-                  onClick={() => hasGenerated && setCurrentStep(3)}
-                >3</div>
-                <p className={`mt-2 text-xs font-medium ${currentStep >= 3 ? 'text-gray-900' : 'text-gray-500'}`}>Order Details</p>
-              </div>
-              {/* Step 4 */}
-              <div className="flex flex-col items-center">
-                <div 
-                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 4 ? 'bg-[#39FF14]' : 'bg-gray-200'} rounded-full ${currentStep >= 4 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
-                  onClick={() => hasGenerated && setCurrentStep(4)}
-                >4</div>
-                <p className={`mt-2 text-xs font-medium ${currentStep >= 4 ? 'text-gray-900' : 'text-gray-500'}`}>Checkout</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Area - Displays based on current step */}
-        {currentStep === 1 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Design Form */}
-            <div className="lg:col-span-1">
-              <DesignForm remainingDesigns={user?.remainingDesigns} />
-            </div>
-
-            {/* Right Column - Design Results */}
-            <div className="lg:col-span-2">
-              <DesignResults />
-              
-              {/* Buttons removed as per client request */}
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Customization */}
-        {currentStep === 2 && (
-          <div>
-            <DesignEditor />
-            
-            <div className="mt-6 flex justify-between items-center">
-              <Button variant="outline" onClick={prevStep}>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Design
-              </Button>
-              {/* Buttons removed as per client request */}
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Order Configuration */}
-        {currentStep === 3 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <div className="space-y-8">
-                <OrderConfig 
-                  designId={useDesignStore.getState().designId || 0}
-                  designUrls={{
-                    front: useDesignStore.getState().frontImage || '',
-                    back: '' // No back view as per requirement
-                  }}
-                  sport={useDesignStore.getState().formData.sport}
-                  kitType={useDesignStore.getState().formData.kitType}
-                  onBackToCustomization={prevStep}
-                />
-                <TeamRoster />
+          </TabsList>
+          
+          <TabsContent value="customize" className="flex-1">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+              <div className="lg:col-span-2">
+                <DesignForm isSubscribed={isSubscribed} />
               </div>
               
-              <div className="mt-6 flex justify-between">
-                <Button variant="outline" onClick={prevStep}>
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Back to Customization
-                </Button>
-                <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
-                  Review Order <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            
-            {/* Preview panel */}
-            <div className="lg:col-span-1">
-              <OrderSummary showCheckoutButton={false} />
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Checkout */}
-        {currentStep === 4 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold mb-6">Complete Your Order</h2>
-                
-                {/* Shipping form will go here - to be built later */}
-                <div className="space-y-4">
-                  {/* Placeholder for shipping form */}
-                  <div className="border border-dashed border-gray-300 rounded-md p-6 text-center text-gray-500">
-                    Shipping form will be integrated here
+              <div className="lg:col-span-3">
+                {isGenerating ? (
+                  <div className="h-full flex flex-col items-center justify-center p-8 border rounded-lg">
+                    <Loader2 className="h-12 w-12 animate-spin mb-4 text-primary/70" />
+                    <h3 className="text-xl font-semibold mb-2">
+                      Designing your kit...
+                    </h3>
+                    <p className="text-center text-muted-foreground">
+                      Our AI is hard at work creating your custom design.
+                      This may take up to 30 seconds.
+                    </p>
                   </div>
-                </div>
-                
-                <div className="mt-8 flex justify-between">
-                  <Button variant="outline" onClick={prevStep}>
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Order Details
-                  </Button>
-                </div>
+                ) : generatedDesign ? (
+                  <div className="space-y-6">
+                    <DesignResults
+                      urls={generatedDesign.urls}
+                      designId={generatedDesign.id}
+                    />
+                    <div className="flex justify-center">
+                      <Button 
+                        onClick={handleShowOrderConfig} 
+                        size="lg" 
+                        className="mt-4"
+                      >
+                        Next: Configure Your Order
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center p-8 border rounded-lg">
+                    <div className="text-center max-w-md">
+                      <h3 className="text-xl font-semibold mb-4">
+                        Ready to create your custom kit?
+                      </h3>
+                      <p className="text-muted-foreground mb-6">
+                        Fill out the form to generate your custom design. 
+                        Our AI will create a unique kit based on your preferences.
+                      </p>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-start">
+                          <span className="bg-primary/10 text-primary font-semibold rounded-full w-5 h-5 flex items-center justify-center mr-2">1</span>
+                          <p className="text-left">Choose sport type and colors</p>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="bg-primary/10 text-primary font-semibold rounded-full w-5 h-5 flex items-center justify-center mr-2">2</span>
+                          <p className="text-left">Specify design style and preferences</p>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="bg-primary/10 text-primary font-semibold rounded-full w-5 h-5 flex items-center justify-center mr-2">3</span>
+                          <p className="text-left">Generate and customize your design</p>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="bg-primary/10 text-primary font-semibold rounded-full w-5 h-5 flex items-center justify-center mr-2">4</span>
+                          <p className="text-left">Order your custom kit</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-            
-            <div className="lg:col-span-1">
-              <OrderSummary showCheckoutButton={true} />
-            </div>
-          </div>
-        )}
-      </main>
-      
-      <Footer />
+          </TabsContent>
+          
+          {generatedDesign && (
+            <TabsContent value="order" className="flex-1">
+              <OrderConfig
+                designId={generatedDesign.id}
+                designUrls={generatedDesign.urls}
+                sport={designData.sport as any}
+                kitType={designData.kitType as any}
+                onBackToCustomization={handleBackToCustomization}
+              />
+            </TabsContent>
+          )}
+        </Tabs>
+      </div>
     </div>
   );
 }

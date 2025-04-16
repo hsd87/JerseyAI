@@ -11,6 +11,15 @@ import {
   PatternType
 } from '@shared/schema';
 
+// Generated design type
+interface GeneratedDesign {
+  id: number;
+  urls: {
+    front: string;
+    back: string;
+  };
+}
+
 interface DesignStore {
   // Design form state
   formData: DesignFormValues;
@@ -40,6 +49,15 @@ interface DesignStore {
   // Design ID (from saved design)
   designId: number | null;
   setDesignId: (id: number | null) => void;
+  
+  // New properties for updated design flow
+  generatedDesign: GeneratedDesign | null;
+  
+  // For page flow
+  designData?: {
+    sport: string;
+    kitType: string;
+  };
 }
 
 // Using types imported from shared/schema.ts
@@ -98,7 +116,25 @@ const getDefaultValuesForSport = (sportInput: SportType | string): DesignFormVal
 
 const initialFormValues = getDefaultValuesForSport('soccer');
 
-export const useDesignStore = create<DesignStore>((set) => ({
+// Generated design type
+interface GeneratedDesign {
+  id: number;
+  urls: {
+    front: string;
+    back: string;
+  };
+}
+
+// Testing preset design
+const sampleDesign: GeneratedDesign = {
+  id: 12345,
+  urls: {
+    front: 'https://images.unsplash.com/photo-1516567727245-ad8c68f3ec93?q=80&w=900&auto=format&fit=crop',
+    back: 'https://images.unsplash.com/photo-1516567727245-ad8c68f3ec93?q=80&w=900&auto=format&fit=crop'
+  }
+};
+
+export const useDesignStore = create<DesignStore>((set, get) => ({
   // Design form state
   formData: initialFormValues,
   updateFormData: (data) => set((state) => ({ 
@@ -112,13 +148,31 @@ export const useDesignStore = create<DesignStore>((set) => ({
   // Design generation state
   isGenerating: false,
   setGenerating: (isGenerating) => set({ isGenerating }),
-  hasGenerated: false,
+  hasGenerated: true, // For testing
   setHasGenerated: (hasGenerated) => set({ hasGenerated }),
   
   // Design images
-  frontImage: null,
-  backImage: null,
-  setImages: (frontImage, backImage) => set({ frontImage, backImage }),
+  frontImage: sampleDesign.urls.front, // For testing
+  backImage: sampleDesign.urls.back, // For testing
+  setImages: (frontImage, backImage) => {
+    set({ 
+      frontImage, 
+      backImage,
+      hasGenerated: true
+    });
+    
+    // Update the generatedDesign as well
+    const { designId } = get();
+    if (designId) {
+      // @ts-ignore - Adding generatedDesign property
+      set({
+        generatedDesign: {
+          id: designId,
+          urls: { front: frontImage, back: backImage }
+        }
+      });
+    }
+  },
   
   // Editor state
   customizations: {},
@@ -131,6 +185,9 @@ export const useDesignStore = create<DesignStore>((set) => ({
   setCurrentView: (view) => set({ currentView: view }),
   
   // Design ID (from saved design)
-  designId: null,
-  setDesignId: (designId) => set({ designId })
+  designId: sampleDesign.id, // For testing
+  setDesignId: (designId) => set({ designId }),
+  
+  // @ts-ignore - Adding generatedDesign property for our new component flow
+  generatedDesign: sampleDesign // For testing
 }));
