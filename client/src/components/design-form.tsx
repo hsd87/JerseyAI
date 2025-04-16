@@ -513,81 +513,93 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           {/* Dynamic Sport-Specific Options */}
           <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="sleeveStyle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Sleeve Style</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select sleeve style" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="z-[100]">
-                        {sleeveOptions.map((sleeve) => (
-                          <SelectItem key={sleeve} value={sleeve}>
-                            {sleeve.charAt(0).toUpperCase() + sleeve.slice(1)} {sleeve !== "sleeveless" ? "Sleeves" : ""}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="collarType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Collar Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select collar type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="z-[100]">
-                        {availableCollarTypes.map((collar) => (
-                          <SelectItem key={collar} value={collar as any}>
-                            {formatCollarTypeLabel(collar)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Only show sleeve style if included in form config */}
+              {(!formConfig || formConfig.showFields.includes('sleeveLength')) && (
+                <FormField
+                  control={form.control}
+                  name="sleeveStyle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Sleeve Style</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select sleeve style" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="z-[100]">
+                          {availableSleeveOptions.map((sleeve) => (
+                            <SelectItem key={sleeve} value={sleeve}>
+                              {sleeve.includes('/') 
+                                ? sleeve.split('/').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('/')
+                                : sleeve.charAt(0).toUpperCase() + sleeve.slice(1)} 
+                              {!sleeve.includes('/') && sleeve !== "sleeveless" ? " Sleeves" : ""}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {/* Only show collar type if included in form config */}
+              {(!formConfig || formConfig.showFields.includes('collarType')) && (
+                <FormField
+                  control={form.control}
+                  name="collarType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Collar Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select collar type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="z-[100]">
+                          {availableCollarTypes.map((collar) => (
+                            <SelectItem key={collar} value={collar as any}>
+                              {formatCollarTypeLabel(collar)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
             
             <div className="mt-4">
-              <FormField
-                control={form.control}
-                name="patternStyle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Pattern Style</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select pattern style" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="z-[100]">
-                        {availablePatternStyles.map((pattern) => (
-                          <SelectItem key={pattern} value={pattern as any}>
-                            {pattern.charAt(0).toUpperCase() + pattern.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Only show pattern style if included in form config */}
+              {(!formConfig || formConfig.showFields.includes('patternStyle')) && (
+                <FormField
+                  control={form.control}
+                  name="patternStyle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-sm font-medium text-gray-700 mb-1">Pattern Style</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select pattern style" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="z-[100]">
+                          {availablePatternStyles.map((pattern) => (
+                            <SelectItem key={pattern} value={pattern as any}>
+                              {pattern.charAt(0).toUpperCase() + pattern.slice(1).replace(/-/g, ' ')}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </div>
           

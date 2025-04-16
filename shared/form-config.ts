@@ -94,6 +94,30 @@ export const formConfig: Record<string, FormOptionConfig> = {
     sleeveLength: ['sleeveless', 'short', 'long'],
     collarStyle: ['V-neck', 'crew neck', 'mandarin', 'polo collar', 'polo collar without button'],
     patternStyle: ['Gradient', 'Slash', 'Panel', 'Striped', 'Digital', 'Minimal', 'electric', 'multicolor', 'geometric', 'micro geometric', 'geometric plus gradient', 'front heavy', 'tech']
+  },
+  
+  // Esports configurations
+  'esports-jersey': {
+    showFields: ['gender', 'colors', 'sleeveLength', 'collarType', 'patternStyle', 'designInspiration'],
+    gender: ['male', 'female', 'unisex'],
+    colors: ['primary', 'secondary', 'accent1', 'accent2'],
+    sleeveLength: ['short', 'long'],
+    collarStyle: ['V-neck', 'crew neck', 'mandarin', 'polo collar', 'polo collar without button'],
+    patternStyle: ['Gradient', 'Digital', 'Minimal', 'electric', 'multicolor', 'geometric', 'micro geometric', 'geometric plus gradient', 'front heavy', 'tech']
+  },
+  'esports-esportsjacket': {
+    showFields: ['gender', 'colors', 'sleeveLength', 'collarType', 'patternStyle', 'designInspiration'],
+    gender: ['male', 'female', 'unisex'],
+    colors: ['primary', 'secondary', 'accent1', 'accent2'],
+    sleeveLength: ['long', 'sleeveless'],
+    collarStyle: ['full zip', 'hooded', 'half zip'],
+    patternStyle: ['Gradient', 'Digital', 'Minimal', 'electric', 'tech', 'geometric', 'front heavy']
+  },
+  'esports-esportsTrouser': {
+    showFields: ['gender', 'colors', 'patternStyle', 'designInspiration'],
+    gender: ['male', 'female', 'unisex'],
+    colors: ['primary', 'secondary', 'accent1', 'accent2'],
+    patternStyle: ['Gradient', 'Digital', 'Minimal', 'electric', 'geometric', 'tech']
   }
 
   // Additional sport/kit combinations can be added here as needed
