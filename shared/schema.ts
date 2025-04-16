@@ -42,10 +42,12 @@ export const designs = pgTable("designs", {
   collarType: text("collar_type"),
   patternStyle: text("pattern_style"),
   designNotes: text("design_notes"),
+  // We use a front-view-only approach in the UI, showing only frontImageUrl
+  // backImageUrl is kept for backward compatibility but will be empty in new designs
   frontImageUrl: text("front_image_url"),
   backImageUrl: text("back_image_url"),
   frontImageData: text("front_image_data"), // Base64 encoded image data
-  backImageData: text("back_image_data"), // Base64 encoded image data
+  backImageData: text("back_image_data"),   // Base64 encoded image data (not used in front-view-only approach)
   customizations: json("customizations").$type<CustomizationData>(),
   isFavorite: boolean("is_favorite").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull()
@@ -79,6 +81,8 @@ export const orders = pgTable("orders", {
   // Note: uuid column exists in schema but not in DB - we'll handle this in the code
   // uuid: text("uuid").notNull().unique(),
   prompt: text("prompt"),
+  // We use front-view-only approach but keep the back field for compatibility
+  // In new designs, front will contain the image and back will be empty or same as front
   designUrls: json("design_urls").$type<{front: string, back: string}>(),
   sport: text("sport").notNull(),
   totalAmount: integer("total_amount").notNull(),
@@ -122,17 +126,27 @@ export type CustomizationData = {
     color: string;
     size: string;
     font: string;
+    fontSize?: number;            // Added for font size slider (12-72px)
+    outline?: boolean;            // Toggle for text outline
+    outlineColor?: string;        // Color for text outline
+    outlineWidth?: number;        // Width of text outline
   }[];
   numbers?: {
     value: number;
     position: { x: number; y: number };
     color: string;
     size: string;
+    fontSize?: number;            // Added for font size slider
+    outline?: boolean;            // Toggle for number outline
+    outlineColor?: string;        // Color for number outline
+    outlineWidth?: number;        // Width of number outline
   }[];
   logos?: {
     url: string;
     position: { x: number; y: number };
     size: { width: number; height: number };
+    rotation?: number;            // Added for logo rotation (0-360 degrees)
+    maintainAspectRatio?: boolean; // Toggle to maintain aspect ratio when resizing
   }[];
 };
 
