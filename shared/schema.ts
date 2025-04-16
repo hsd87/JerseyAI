@@ -201,7 +201,9 @@ export const kitTypeOptions = [
   "trackjackethzip",
   "jerseyTrousers",
   "esportsjacket",
-  "esportshoodie"
+  "esportshoodie",
+  "esportsTrouser",
+  "trackTrouser"
 ] as const;
 
 // Export the types for use in other files
@@ -217,7 +219,10 @@ export const sportKitTypeMapping: Record<SportType, KitType[]> = {
   basketball: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
   rugby: ["jersey", "jerseyShorts", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
   cricket: ["jersey", "jerseyTrousers", "tracksuit", "trackjacket", "trackhoodie", "trackjackethzip"],
-  esports: ["jersey", "esportsjacket", "esportshoodie"]
+  esports: ["jersey", "esportsjacket", "esportshoodie", "esportsTrouser"],
+  "feild hockey": ["jersey", "jerseyShorts", "tracksuit", "trackjacket"],
+  volleyball: ["jersey", "jerseyShorts", "trackTrouser"],
+  handball: ["jersey", "jerseyShorts", "trackTrouser"]
 };
 
 export const sleeveOptions = [
@@ -230,11 +235,14 @@ export const sleeveOptions = [
 
 // Sport-specific collar type mapping
 export const sportCollarMapping: Record<SportType, CollarType[]> = {
-  soccer: ["crew", "v", "mandarin", "polo"],
-  basketball: ["crew", "v", "roundzip"],
-  rugby: ["v", "polo", "roundzip"],
+  soccer: ["crew", "v", "mandarin", "polo", "scoop", "deep"],
+  basketball: ["crew", "v", "roundzip", "scoop", "deep"],
+  rugby: ["v", "polo", "roundzip", "crew"],
   cricket: ["mandarin", "polo", "roundzip"],
-  esports: ["v", "crew", "roundzip"]
+  esports: ["v", "crew", "roundzip", "hooded", "half-zip"],
+  "feild hockey": ["crew", "v", "mandarin", "polo"],
+  volleyball: ["crew", "v", "scoop"],
+  handball: ["crew", "v", "polo"]
 };
 
 export const collarOptions = [
@@ -242,16 +250,25 @@ export const collarOptions = [
   "v",
   "polo",
   "mandarin",
-  "roundzip"
+  "roundzip",
+  "scoop",
+  "deep",
+  "polo-no-button",
+  "full-zip",
+  "hooded",
+  "half-zip"
 ] as const;
 
 // Sport-specific pattern type mapping
 export const sportPatternMapping: Record<SportType, PatternType[]> = {
-  soccer: ["gradient", "slash", "panel", "striped", "digital", "minimal"],
-  basketball: ["gradient", "slash", "panel", "digital"],
-  rugby: ["panel", "striped", "digital"],
-  cricket: ["gradient", "minimal", "striped"],
-  esports: ["digital", "minimal"]
+  soccer: ["gradient", "slash", "panel", "striped", "digital", "minimal", "geometric", "tech"],
+  basketball: ["gradient", "slash", "panel", "digital", "geometric", "tech"],
+  rugby: ["panel", "striped", "digital", "solid", "gradient"],
+  cricket: ["gradient", "minimal", "striped", "solid"],
+  esports: ["digital", "minimal", "electric", "tech", "geometric-gradient"],
+  "feild hockey": ["gradient", "slash", "panel", "striped"],
+  volleyball: ["gradient", "panel", "digital", "minimal"],
+  handball: ["gradient", "panel", "striped", "minimal"]
 };
 
 export const patternOptions = [
@@ -261,7 +278,14 @@ export const patternOptions = [
   "striped",
   "digital",
   "minimal",
-  "solid"
+  "solid",
+  "electric",
+  "multicolor",
+  "geometric",
+  "micro-geometric",
+  "geometric-gradient",
+  "front-heavy",
+  "tech"
 ] as const;
 
 // Add-on product options
@@ -278,7 +302,10 @@ export const addonOptions: Record<SportType, AddonProduct[]> = {
   basketball: ["socks", "headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
   rugby: ["socks", "headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
   cricket: ["cap", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
-  esports: ["headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"]
+  esports: ["headwear", "kitbag", "tracksuitFull", "tracksuitHalf", "tracksuitHooded"],
+  "feild hockey": ["socks", "headwear", "kitbag"],
+  volleyball: ["socks", "headwear", "kitbag"],
+  handball: ["socks", "headwear", "kitbag"]
 };
 
 export const designFormSchema = z.object({
