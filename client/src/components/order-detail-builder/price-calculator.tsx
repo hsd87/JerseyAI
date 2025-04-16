@@ -129,22 +129,31 @@ export default function PriceCalculator() {
           return;
         }
         
-        // Call pricing API
-        const response = await apiRequest('POST', '/api/price/estimate', {
-          cart: cartItems,
-          isSubscriber
-        });
+        // Log for debugging
+        console.log("Calculate price for cart items:", cartItems);
         
-        const result = await response.json();
-        
-        if (result.success && result.breakdown) {
-          setPriceBreakdown(result.breakdown);
-        } else {
-          setError('Failed to calculate price');
+        try {
+          // Call pricing API
+          const response = await apiRequest('POST', '/api/price/estimate', {
+            cart: cartItems,
+            isSubscriber: !!isSubscriber
+          });
+          
+          const result = await response.json();
+          
+          if (result.success && result.breakdown) {
+            setPriceBreakdown(result.breakdown);
+          } else {
+            console.error("Error in calculate price result:", result);
+            setError('Failed to calculate price: ' + (result.message || 'Unknown error'));
+          }
+        } catch (apiError: any) {
+          console.error("Error in calculate price mutation:", apiError);
+          setError(`API error: ${apiError.message || 'Failed to connect to pricing service'}`);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error calculating price:', err);
-        setError('Error calculating price. Please try again.');
+        setError(`Error calculating price: ${err.message || 'Please try again.'}`);
       } finally {
         setIsCalculating(false);
       }
