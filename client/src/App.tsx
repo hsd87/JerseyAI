@@ -8,7 +8,7 @@ import { useSubscription } from "@/hooks/use-subscription-store";
 import { OrderInitializer } from "@/components/order-initializer";
 
 import LandingPage from "@/pages/landing-page";
-import DesignerPage from "@/pages/designer-page-simplified";
+import DesignerPage from "@/pages/designer-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import OrderDetailPage from "@/pages/order-detail-page";

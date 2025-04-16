@@ -1,76 +1,134 @@
+/**
+ * Pricing calculation utilities
+ */
+import { CartItem, PriceBreakdown } from '../types';
 import { 
   BASE_PRICES, 
   TIER_DISCOUNTS, 
+  SUBSCRIPTION_DISCOUNT, 
   SHIPPING_RULES,
-  TAX_RATE,
-  SUBSCRIPTION_DISCOUNT,
-  PriceBreakdown
+  TAX_RATE
 } from '@shared/pricing';
 
-export interface CartItem {
-  productId: string;
-  productType: string;
-  basePrice: number;
-  quantity: number;
+/**
+ * Calculate the price for a cart of items with applicable discounts
+ */
+export function calculatePrice(
+  cartItems: CartItem[], 
+  isSubscriber: boolean = false
+): { success: boolean, breakdown: PriceBreakdown } {
+  try {
+    // Calculate base total from all items
+    const baseTotal = cartItems.reduce((total, item) => {
+      return total + (item.basePrice * item.quantity);
+    }, 0);
+    
+    // Calculate total quantity of items (for tier discounts)
+    const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Determine tier discount (if applicable)
+    let tierDiscountRate = 0;
+    let tierDiscountAmount = 0;
+    
+    // Find applicable tier discount
+    for (const tier of TIER_DISCOUNTS) {
+      if (totalQuantity >= tier.threshold) {
+        tierDiscountRate = tier.discount;
+        break;
+      }
+    }
+    
+    // Calculate tier discount amount
+    if (tierDiscountRate > 0) {
+      tierDiscountAmount = Math.round(baseTotal * tierDiscountRate);
+    }
+    
+    // Determine subscription discount (if applicable)
+    let subscriptionDiscountAmount = 0;
+    
+    if (isSubscriber) {
+      // Apply subscription discount after tier discount
+      const amountAfterTierDiscount = baseTotal - tierDiscountAmount;
+      subscriptionDiscountAmount = Math.round(amountAfterTierDiscount * SUBSCRIPTION_DISCOUNT);
+    }
+    
+    // Calculate subtotal after all discounts
+    const subtotalAfterDiscounts = baseTotal - tierDiscountAmount - subscriptionDiscountAmount;
+    
+    // Calculate shipping cost based on order amount
+    let shippingCost = 0;
+    
+    // Find the applicable shipping rule based on order subtotal
+    for (const rule of SHIPPING_RULES) {
+      if (subtotalAfterDiscounts >= rule.threshold) {
+        shippingCost = rule.cost;
+        break;
+      }
+    }
+    
+    // Calculate tax
+    const taxAmount = Math.round((subtotalAfterDiscounts + shippingCost) * TAX_RATE);
+    
+    // Calculate grand total
+    const grandTotal = subtotalAfterDiscounts + shippingCost + taxAmount;
+    
+    // Format discount percentages for display
+    const tierDiscountApplied = tierDiscountRate > 0 ? `${tierDiscountRate * 100}%` : '0%';
+    const subscriptionDiscountApplied = isSubscriber ? `${SUBSCRIPTION_DISCOUNT * 100}%` : '0%';
+    
+    // Prepare the full price breakdown
+    const breakdown: PriceBreakdown = {
+      baseTotal,
+      tierDiscountRate,
+      tierDiscountApplied,
+      tierDiscountAmount,
+      subscriptionDiscountRate: isSubscriber ? SUBSCRIPTION_DISCOUNT : 0,
+      subscriptionDiscountApplied,
+      subscriptionDiscountAmount,
+      subtotalAfterDiscounts,
+      shippingCost,
+      taxAmount,
+      grandTotal
+    };
+    
+    return {
+      success: true,
+      breakdown
+    };
+  } catch (error) {
+    console.error('Error calculating price:', error);
+    
+    // Return default values in case of error
+    return {
+      success: false,
+      breakdown: {
+        baseTotal: 0,
+        tierDiscountRate: 0,
+        tierDiscountApplied: '0%',
+        tierDiscountAmount: 0,
+        subscriptionDiscountRate: 0,
+        subscriptionDiscountApplied: '0%',
+        subscriptionDiscountAmount: 0,
+        subtotalAfterDiscounts: 0,
+        shippingCost: 0,
+        taxAmount: 0,
+        grandTotal: 0
+      }
+    };
+  }
 }
 
 /**
- * Calculate price breakdown for a cart of items
- * 
- * @param items Array of items in cart with product ID and quantity
- * @param isSubscriber Whether the user has a subscription
- * @returns Price breakdown object with all calculated values
+ * Get the current pricing rules
  */
-export function calculatePrice(items: CartItem[], isSubscriber: boolean = false): PriceBreakdown {
-  // Calculate base total
-  const baseTotal = items.reduce((total, item) => {
-    return total + (item.basePrice * item.quantity);
-  }, 0);
-  
-  // Calculate total quantity for tier discount
-  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-  
-  // Apply tier discount
-  let tierDiscountRate = 0;
-  for (const tier of TIER_DISCOUNTS) {
-    if (totalQuantity >= tier.threshold) {
-      tierDiscountRate = tier.discount;
-      break;
-    }
-  }
-  const tierDiscount = Math.round(baseTotal * tierDiscountRate * 100) / 100;
-  
-  // Apply subscription discount if applicable
-  const subscriptionDiscountRate = isSubscriber ? SUBSCRIPTION_DISCOUNT : 0;
-  const subscriptionDiscount = Math.round(baseTotal * subscriptionDiscountRate * 100) / 100;
-  
-  // Calculate subtotal after discounts
-  const subtotal = baseTotal - tierDiscount - subscriptionDiscount;
-  
-  // Calculate shipping
-  let shipping = SHIPPING_RULES[SHIPPING_RULES.length - 1].cost; // Default to highest cost
-  for (const rule of SHIPPING_RULES) {
-    if (subtotal >= rule.threshold) {
-      shipping = rule.cost;
-      break;
-    }
-  }
-  
-  // Calculate tax
-  const tax = Math.round((subtotal + shipping) * TAX_RATE * 100) / 100;
-  
-  // Calculate grand total
-  const grandTotal = subtotal + shipping + tax;
-  
+export function getPricingRules() {
   return {
-    baseTotal,
-    tierDiscount,
-    tierDiscountRate,
-    subscriptionDiscount,
-    subscriptionDiscountRate,
-    shipping,
-    tax,
-    subtotal,
-    grandTotal
+    tierDiscounts: TIER_DISCOUNTS.map(tier => ({
+      threshold: tier.threshold,
+      discount: `${tier.discount * 100}%`
+    })),
+    subscriptionDiscount: `${SUBSCRIPTION_DISCOUNT * 100}%`,
+    shipping: SHIPPING_RULES,
+    tax: TAX_RATE
   };
 }

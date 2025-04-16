@@ -1,89 +1,88 @@
-import { useState } from "react";
-import { Check } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Minus, Plus } from "lucide-react";
 
-interface AddOnsProps {
-  value: string[];
-  onChange: (value: string[]) => void;
+export interface AddOn {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
 }
 
-// Mock add-on options
-const addOnOptions = [
+interface AddOnsProps {
+  addOns: AddOn[];
+  onUpdateQuantity: (id: string, quantity: number) => void;
+}
+
+const addOnsData: Omit<AddOn, 'quantity'>[] = [
   {
-    id: "name",
-    title: "Name Printing",
-    description: "Add your name to the back of the jersey",
-    price: 15,
-    image: "/assets/addon-name.jpg"
+    id: "matching-socks",
+    name: "Matching Socks",
+    price: 12.99
   },
   {
-    id: "number",
-    title: "Number Printing",
-    description: "Add your number to the back of the jersey",
-    price: 15,
-    image: "/assets/addon-number.jpg"
+    id: "beanie-headband",
+    name: "Beanie/Headband",
+    price: 14.99
   },
   {
-    id: "badge",
-    title: "Team Badge",
-    description: "Add a custom team badge to the front of the jersey",
-    price: 15,
-    image: "/assets/addon-badge.jpg"
+    id: "tracksuit",
+    name: "Matching Tracksuit",
+    price: 79.99
   },
   {
-    id: "patch",
-    title: "League Patch",
-    description: "Add official league patches to the sleeves",
-    price: 15,
-    image: "/assets/addon-patch.jpg"
+    id: "kit-bag",
+    name: "Kit Bag / Backpack",
+    price: 24.99
   }
 ];
 
-export default function AddOns({ value, onChange }: AddOnsProps) {
-  const toggleAddOn = (id: string) => {
-    if (value.includes(id)) {
-      onChange(value.filter(item => item !== id));
-    } else {
-      onChange([...value, id]);
+export default function AddOns({ addOns, onUpdateQuantity }: AddOnsProps) {
+  const handleDecrease = (id: string, currentQuantity: number) => {
+    if (currentQuantity > 0) {
+      onUpdateQuantity(id, currentQuantity - 1);
     }
   };
-  
+
+  const handleIncrease = (id: string, currentQuantity: number) => {
+    onUpdateQuantity(id, currentQuantity + 1);
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {addOnOptions.map((addon) => (
-        <Card 
-          key={addon.id}
-          className={`cursor-pointer transition-all ${
-            value.includes(addon.id) 
-              ? "border-primary ring-2 ring-primary ring-opacity-50" 
-              : "hover:border-primary/50"
-          }`}
-          onClick={() => toggleAddOn(addon.id)}
-        >
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center justify-between">
-              {addon.title}
-              {value.includes(addon.id) && (
-                <span className="bg-primary text-white rounded-full p-1">
-                  <Check className="h-4 w-4" />
-                </span>
-              )}
-            </CardTitle>
-            <CardDescription className="text-xs">
-              ${addon.price.toFixed(2)}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-24 bg-muted flex items-center justify-center text-sm text-muted-foreground">
-              {/* Placeholder for actual images */}
-              {addon.title}
+      {addOnsData.map((addon) => {
+        const currentAddOn = addOns.find(a => a.id === addon.id) || 
+          { ...addon, quantity: 0 };
+        
+        return (
+          <Card key={addon.id} className="p-4 flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">{addon.name}</h3>
+              <p className="text-primary font-bold">${addon.price.toFixed(2)}</p>
             </div>
-          </CardContent>
-          <CardFooter className="pt-2 pb-3">
-            <p className="text-xs">{addon.description}</p>
-          </CardFooter>
-        </Card>
-      ))}
+            <div className="flex items-center">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-9 w-9 rounded-md p-0"
+                onClick={() => handleDecrease(addon.id, currentAddOn.quantity)}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="w-9 text-center">{currentAddOn.quantity}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-9 w-9 rounded-md p-0"
+                onClick={() => handleIncrease(addon.id, currentAddOn.quantity)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </Card>
+        );
+      })}
     </div>
   );
 }

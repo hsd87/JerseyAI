@@ -3,21 +3,40 @@
  */
 
 /**
- * Base prices for all products - using SKU system
+ * Base prices for all products
  */
 export const BASE_PRICES: Record<string, number> = {
-  // Main products
-  'PFJS01': 40, // Jersey
-  'PFSS02': 15, // Shorts
-  'PFJKT03': 50, // Training Jacket
-  'PFTR04': 20, // Training Trouser
+  // Soccer products
+  'soccer_jersey': 20,
+  'soccer_shorts': 15,
+  'soccer_jersey_short': 35, // Bundle price
+  'soccer_full_kit': 49, // Full kit bundle (jersey, shorts, socks)
+  
+  // Cricket products
+  'cricket_jersey': 22,
+  'cricket_trouser': 18,
+  'cricket_jersey_trouser': 39, // Bundle price
+  
+  // Basketball products
+  'basketball_jersey': 22,
+  'basketball_shorts': 18,
+  'basketball_jersey_shorts': 38, // Bundle price
+  
+  // Rugby products
+  'rugby_jersey': 25,
+  'rugby_shorts': 20,
+  'rugby_jersey_shorts': 42, // Bundle price
+  
+  // Training/Team wear
+  'tracksuit': 45,
+  'hoodie': 42,
+  'halfzip': 38,
+  'fullzip': 40,
   
   // Accessories
-  'PFKB05': 35, // Kitbag
-  'PFBP06': 30, // Bagpack
-  'PFSK07': 10, // Socks
-  'PFBN08': 10, // Beanie
-  'PFSC09': 10, // Sports Cap
+  'matching_socks': 8,
+  'matching_kitbag': 15,
+  'matching_beanie': 12
 };
 
 /**
