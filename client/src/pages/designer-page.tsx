@@ -126,7 +126,7 @@ export default function DesignerPage() {
                 <div className="mt-6 flex justify-end space-x-4">
                   <Button 
                     variant="outline" 
-                    onClick={() => navigate('/order-config')}
+                    onClick={nextStep}
                     className="flex items-center"
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" /> 
@@ -153,7 +153,7 @@ export default function DesignerPage() {
               <div className="flex space-x-3">
                 <Button 
                   variant="outline" 
-                  onClick={() => navigate('/order-config')}
+                  onClick={nextStep}
                   className="flex items-center"
                 >
                   <ShoppingCart className="mr-2 h-4 w-4" /> 
@@ -172,7 +172,16 @@ export default function DesignerPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="space-y-8">
-                <OrderConfig />
+                <OrderConfig 
+                  designId={useDesignStore.getState().designId || 0}
+                  designUrls={{
+                    front: useDesignStore.getState().frontImage || '',
+                    back: '' // No back view as per requirement
+                  }}
+                  sport={useDesignStore.getState().formData.sport}
+                  kitType={useDesignStore.getState().formData.kitType}
+                  onBackToCustomization={prevStep}
+                />
                 <TeamRoster />
               </div>
               
