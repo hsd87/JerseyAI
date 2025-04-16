@@ -378,17 +378,23 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
       
       // Convert the ReadableStream to a buffer and save it directly
       try {
-        // Convert ReadableStream to Buffer
-        const reader = imageUrl.getReader();
-        const chunks = [];
-        
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-        }
-        
-        const buffer = Buffer.concat(chunks);
+        // Convert ReadableStream to Buffer - with proper error handling
+        try {
+          const reader = imageUrl.getReader();
+          const chunks = [];
+          
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (value) chunks.push(Buffer.from(value));
+          }
+          
+          // If no chunks were read, throw an error
+          if (chunks.length === 0) {
+            throw new Error("No data received from Replicate stream");
+          }
+          
+          const buffer = Buffer.concat(chunks);
         fs.writeFileSync(outputPath, buffer);
         console.log(`Successfully saved image directly from ReadableStream to ${outputPath}`);
         

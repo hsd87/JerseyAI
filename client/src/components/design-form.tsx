@@ -77,15 +77,11 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   const { 
     formData, 
     updateFormData, 
-    resetFormDataForSport, 
-    toggleAwayKit, 
-    isAwayKit: storeAwayKit 
+    resetFormDataForSport
   } = useDesignStore();
   const { generateDesign, isGenerating } = useReplicate();
   const subscription = useSubscription();
   const { toast } = useToast();
-  
-  const [awayKit, setAwayKit] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [formPayloadHash, setFormPayloadHash] = useState<string>('');
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -144,14 +140,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
     }
   }, [selectedSport, form]);
 
-  // Handle away kit toggle - invert primary and secondary colors
-  useEffect(() => {
-    if (awayKit) {
-      const temp = primaryColor;
-      form.setValue("primaryColor", secondaryColor);
-      form.setValue("secondaryColor", temp);
-    }
-  }, [awayKit]);
+  // No longer need away kit toggle functionality
 
   // Generate form payload hash for tracking
   useEffect(() => {
@@ -570,56 +559,6 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                   </FormItem>
                 )}
               />
-            </div>
-            
-            {/* Away Kit Option */}
-            <div className="mt-4 flex items-center space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-                onClick={() => {
-                  // First, save current colors
-                  const currentPrimary = form.getValues('primaryColor');
-                  const currentSecondary = form.getValues('secondaryColor');
-                  
-                  // Toggle away kit in state 
-                  const newAwayKitState = !awayKit;
-                  setAwayKit(newAwayKitState);
-                  
-                  // Use the store's toggle function
-                  toggleAwayKit();
-                  
-                  // Update form colors with swapped values if toggling to away kit
-                  if (newAwayKitState) {
-                    // Swap colors for away kit
-                    form.setValue("primaryColor", currentSecondary);
-                    form.setValue("secondaryColor", currentPrimary);
-                  } else {
-                    // Use store values for home kit
-                    form.setValue("primaryColor", formData.primaryColor);
-                    form.setValue("secondaryColor", formData.secondaryColor);
-                  }
-                }}
-              >
-                <RotateCw className="h-4 w-4" />
-                {awayKit ? "Show Home Kit Colors" : "Show Away Kit Colors"}
-              </Button>
-              
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full p-0">
-                      <span className="sr-only">Info</span>
-                      <HelpCircle className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="w-[200px] text-xs">Away kits typically invert the primary and secondary colors</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
             </div>
           </div>
           
