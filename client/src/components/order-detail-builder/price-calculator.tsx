@@ -6,18 +6,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, CheckCircle2, AlertCircle, InfoIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-// Price breakdown interface based on the pricing module response
-interface PriceBreakdown {
-  baseTotal: number;
-  tierDiscountApplied: string;
-  tierDiscountAmount: number;
-  subscriptionDiscountApplied: string;
-  subscriptionDiscountAmount: number;
-  subtotalAfterDiscounts: number;
-  shippingCost: number;
-  grandTotal: number;
-}
+import { PriceBreakdown, CartItem } from "@/hooks/use-order-types";
 
 export default function PriceCalculator() {
   const { user } = useAuth();

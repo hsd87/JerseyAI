@@ -1,207 +1,253 @@
-import { useEffect, useState } from "react";
-import { PlusCircle, Trash2, Save, Upload } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { useOrderStore, TeamMember } from "@/hooks/use-order-store";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useOrderStore } from "@/hooks/use-order-store";
+import { TeamMember } from "@/hooks/use-order-types";
 import { v4 as uuidv4 } from "uuid";
+import { PlusCircle, Trash2, Edit, Save, X } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 export default function RosterBuilder() {
-  const { toast } = useToast();
-  const { teamMembers, addTeamMember, updateTeamMember, removeTeamMember, setTeamName, teamName } = useOrderStore();
-  const [newRow, setNewRow] = useState<Partial<TeamMember>>({
-    name: "",
-    number: "",
-    size: "M",
-    quantity: 1
-  });
+  const { teamName, setTeamName, teamMembers, addTeamMember, updateTeamMember, removeTeamMember } = useOrderStore();
   
-  // Total roster count
-  const [totalQuantity, setTotalQuantity] = useState<number>(0);
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [newSize, setNewSize] = useState("M");
+  const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<Partial<TeamMember>>({});
   
-  // Calculate total quantity whenever team members change
-  useEffect(() => {
-    const total = teamMembers.reduce((sum, member) => sum + member.quantity, 0);
-    setTotalQuantity(total);
-  }, [teamMembers]);
-  
-  // Handle adding a new member
+  // Add a new team member
   const handleAddMember = () => {
-    if (!newRow.name || !newRow.number) {
-      toast({
-        title: "Missing information",
-        description: "Name and number are required",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!newName || !newNumber) return;
     
     addTeamMember({
       id: uuidv4(),
-      name: newRow.name || "",
-      number: newRow.number || "",
-      size: newRow.size || "M",
-      quantity: newRow.quantity || 1
+      name: newName,
+      number: newNumber,
+      size: newSize,
+      quantity: 1
     });
     
     // Reset form
-    setNewRow({
-      name: "",
-      number: "",
-      size: "M",
-      quantity: 1
+    setNewName("");
+    setNewNumber("");
+    setNewSize("M");
+  };
+  
+  // Start editing a team member
+  const handleEdit = (member: TeamMember) => {
+    setEditingMemberId(member.id);
+    setEditValues({
+      name: member.name,
+      number: member.number,
+      size: member.size,
+      quantity: member.quantity
     });
   };
-
+  
+  // Save edits
+  const handleSaveEdit = (id: string) => {
+    updateTeamMember(id, editValues);
+    setEditingMemberId(null);
+    setEditValues({});
+  };
+  
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingMemberId(null);
+    setEditValues({});
+  };
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">Team Order Details</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Team Name Input */}
-        <div className="flex flex-col space-y-2">
-          <label htmlFor="team-name" className="text-sm font-medium">
-            Team Name
-          </label>
-          <Input
-            id="team-name"
-            placeholder="Enter team name"
-            value={teamName}
-            onChange={(e) => setTeamName(e.target.value)}
-          />
-        </div>
-        
-        {/* Roster Table */}
-        <div className="border rounded-md overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[200px]">Player Name</TableHead>
-                <TableHead className="w-[80px]">Number</TableHead>
-                <TableHead className="w-[100px]">Size</TableHead>
-                <TableHead className="w-[100px]">Quantity</TableHead>
-                <TableHead className="w-[60px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {/* New Member Row */}
-              <TableRow>
-                <TableCell>
-                  <Input
-                    placeholder="Enter name"
-                    value={newRow.name}
-                    onChange={(e) => setNewRow({ ...newRow, name: e.target.value })}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    placeholder="#"
-                    value={newRow.number}
-                    onChange={(e) => setNewRow({ ...newRow, number: e.target.value })}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Select
-                    value={newRow.size || "M"}
-                    onValueChange={(value) => setNewRow({ ...newRow, size: value })}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Size" />
-                    </SelectTrigger>
-                    <SelectContent>
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="pt-6">
+          <div className="mb-4">
+            <Label htmlFor="team-name">Team Name</Label>
+            <Input
+              id="team-name"
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+              placeholder="Enter your team name"
+              className="mt-1"
+            />
+          </div>
+          
+          <div className="border-t pt-4 mt-6">
+            <h3 className="font-medium mb-3">Team Members</h3>
+            
+            {teamMembers.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Number</TableHead>
+                    <TableHead>Size</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {teamMembers.map((member) => (
+                    <TableRow key={member.id}>
+                      {editingMemberId === member.id ? (
+                        // Editing row
+                        <>
+                          <TableCell>
+                            <Input 
+                              value={editValues.name || ""}
+                              onChange={(e) => setEditValues({...editValues, name: e.target.value})}
+                              className="w-full"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input 
+                              value={editValues.number || ""}
+                              onChange={(e) => setEditValues({...editValues, number: e.target.value})}
+                              className="w-full"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Select 
+                              value={editValues.size || member.size}
+                              onValueChange={(val) => setEditValues({...editValues, size: val})}
+                            >
+                              <SelectTrigger className="w-[80px]">
+                                <SelectValue placeholder="Size" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectItem value="XS">XS</SelectItem>
+                                  <SelectItem value="S">S</SelectItem>
+                                  <SelectItem value="M">M</SelectItem>
+                                  <SelectItem value="L">L</SelectItem>
+                                  <SelectItem value="XL">XL</SelectItem>
+                                  <SelectItem value="XXL">XXL</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell>
+                            <Input 
+                              type="number"
+                              min="1"
+                              value={editValues.quantity || 1}
+                              onChange={(e) => setEditValues({
+                                ...editValues, 
+                                quantity: parseInt(e.target.value) || 1
+                              })}
+                              className="w-16"
+                            />
+                          </TableCell>
+                          <TableCell className="text-right space-x-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleSaveEdit(member.id)}
+                            >
+                              <Save className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={handleCancelEdit}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </>
+                      ) : (
+                        // Display row
+                        <>
+                          <TableCell>{member.name}</TableCell>
+                          <TableCell>{member.number}</TableCell>
+                          <TableCell>{member.size}</TableCell>
+                          <TableCell>{member.quantity}</TableCell>
+                          <TableCell className="text-right space-x-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleEdit(member)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => removeTeamMember(member.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center py-8 border rounded-md text-gray-500">
+                No team members added yet
+              </div>
+            )}
+            
+            {/* Add new member form */}
+            <div className="grid grid-cols-12 gap-2 mt-4">
+              <div className="col-span-4">
+                <Input 
+                  placeholder="Name"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                />
+              </div>
+              <div className="col-span-2">
+                <Input 
+                  placeholder="Number"
+                  value={newNumber}
+                  onChange={(e) => setNewNumber(e.target.value)}
+                />
+              </div>
+              <div className="col-span-3">
+                <Select value={newSize} onValueChange={setNewSize}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
                       <SelectItem value="XS">XS</SelectItem>
                       <SelectItem value="S">S</SelectItem>
                       <SelectItem value="M">M</SelectItem>
                       <SelectItem value="L">L</SelectItem>
                       <SelectItem value="XL">XL</SelectItem>
                       <SelectItem value="XXL">XXL</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    min={1}
-                    placeholder="Qty"
-                    value={newRow.quantity || 1}
-                    onChange={(e) => setNewRow({ ...newRow, quantity: parseInt(e.target.value) || 1 })}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm" onClick={handleAddMember}>
-                    <PlusCircle className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-              
-              {/* Existing Members */}
-              {teamMembers.map((member) => (
-                <TableRow key={member.id}>
-                  <TableCell>{member.name}</TableCell>
-                  <TableCell>{member.number}</TableCell>
-                  <TableCell>
-                    <Select
-                      value={member.size}
-                      onValueChange={(value) => updateTeamMember(member.id, { size: value })}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="XS">XS</SelectItem>
-                        <SelectItem value="S">S</SelectItem>
-                        <SelectItem value="M">M</SelectItem>
-                        <SelectItem value="L">L</SelectItem>
-                        <SelectItem value="XL">XL</SelectItem>
-                        <SelectItem value="XXL">XXL</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      min={1}
-                      value={member.quantity}
-                      onChange={(e) => 
-                        updateTeamMember(member.id, { quantity: parseInt(e.target.value) || 1 })
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => removeTeamMember(member.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-      
-      <CardFooter className="flex justify-between border-t p-4">
-        <div className="text-sm text-gray-600">
-          Total Items: <span className="font-medium">{totalQuantity}</span>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="outline" size="sm" disabled>
-            <Upload className="h-4 w-4 mr-1" /> 
-            Import CSV
-          </Button>
-          <Button variant="outline" size="sm" disabled>
-            <Save className="h-4 w-4 mr-1" /> 
-            Save Roster
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-3">
+                <Button 
+                  className="w-full"
+                  onClick={handleAddMember}
+                  disabled={!newName || !newNumber}
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Add
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

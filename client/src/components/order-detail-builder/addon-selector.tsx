@@ -1,233 +1,151 @@
 import { useState, useEffect } from "react";
-import { Check, Plus, Minus, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
 import { useOrderStore } from "@/hooks/use-order-store";
-
-interface Addon {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  availableSports: string[];
-  kitTypes: string[];
-}
+import { AddOn } from "@/hooks/use-order-types";
+import { v4 as uuidv4 } from "uuid";
+import { Badge } from "@/components/ui/badge";
 
 interface AddonSelectorProps {
-  sport: string;
-  kitType: string;
+  sport?: string;
+  kitType?: string;
 }
 
-export default function AddonSelector({ sport, kitType }: AddonSelectorProps) {
+export default function AddonSelector({ sport = "soccer", kitType = "jersey" }: AddonSelectorProps) {
   const { addOns, addAddOn, removeAddOn } = useOrderStore();
-  const [availableAddons, setAvailableAddons] = useState<Addon[]>([]);
+  const [availableAddons, setAvailableAddons] = useState<AddOn[]>([]);
   
-  // Load addons from pricing CSV
+  // Load available add-ons based on sport and kit type
   useEffect(() => {
-    // For now, using the hardcoded values from pricing CSV
-    // In a production app, these would come from an API call
-    const allAddons: Addon[] = [
-      {
-        id: "addon_socks",
-        name: "Matching Socks",
-        price: 1999,
-        description: "Team-matched socks with your kit design",
-        availableSports: ["soccer", "basketball", "rugby"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers"]
-      },
-      {
-        id: "addon_trackpants",
-        name: "Matching Track Pants",
-        price: 5999,
-        description: "Team-matched track pants with your kit design",
-        availableSports: ["soccer", "basketball", "rugby", "cricket", "esports"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers", "tracksuit", "trackjacket", "trackhoodie"]
-      },
-      {
-        id: "addon_kitbag",
-        name: "Matching Kitbag",
-        price: 3999,
-        description: "Team-matched gear bag with your design",
-        availableSports: ["soccer", "basketball", "rugby", "cricket", "esports"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers", "tracksuit", "trackjacket", "trackhoodie"]
-      },
-      {
-        id: "addon_cap",
-        name: "Matching Cap",
-        price: 2499,
-        description: "Team-matched cap with your design",
-        availableSports: ["cricket", "esports"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers", "tracksuit", "trackjacket", "trackhoodie"]
-      },
-      {
-        id: "addon_beanie",
-        name: "Matching Beanie",
-        price: 2499,
-        description: "Team-matched beanie with your design",
-        availableSports: ["soccer", "rugby", "basketball"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers", "tracksuit", "trackjacket", "trackhoodie"]
-      },
-      {
-        id: "addon_jacket",
-        name: "Matching Track Jacket",
-        price: 8999,
-        description: "Team-matched track jacket with your design",
-        availableSports: ["soccer", "basketball", "rugby", "cricket", "esports"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers"]
-      },
-      {
-        id: "addon_hoodie",
-        name: "Matching Track Hoodie",
-        price: 9499,
-        description: "Team-matched hoodie with your design",
-        availableSports: ["soccer", "basketball", "rugby", "cricket", "esports"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers"]
-      },
-      {
-        id: "addon_halfzip",
-        name: "Matching Half-Zip Jacket",
-        price: 8499,
-        description: "Team-matched half-zip jacket with your design",
-        availableSports: ["soccer", "basketball", "rugby", "cricket", "esports"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers"]
-      },
-      {
-        id: "addon_away",
-        name: "Away Kit (Alternate Colors)",
-        price: 6999,
-        description: "Alternate colorway jersey with inverted colors",
-        availableSports: ["soccer", "basketball", "rugby", "cricket", "esports"],
-        kitTypes: ["jersey", "jerseyShorts", "jerseyTrousers"]
-      }
-    ];
+    // In a real app, this would fetch from an API
+    // For now, we'll just provide static data
+    const sportSpecificAddons: Record<string, AddOn[]> = {
+      soccer: [
+        { 
+          id: "name-print", 
+          name: "Name Printing", 
+          price: 999, 
+          quantity: 1 
+        },
+        { 
+          id: "number-print", 
+          name: "Number Printing", 
+          price: 799, 
+          quantity: 1 
+        },
+        { 
+          id: "badge", 
+          name: "Team Badge", 
+          price: 1499, 
+          quantity: 1 
+        },
+        { 
+          id: "captain-armband", 
+          name: "Captain's Armband", 
+          price: 799, 
+          quantity: 1 
+        }
+      ],
+      basketball: [
+        { 
+          id: "name-print", 
+          name: "Name Printing", 
+          price: 999, 
+          quantity: 1 
+        },
+        { 
+          id: "number-print", 
+          name: "Number Printing", 
+          price: 799, 
+          quantity: 1 
+        },
+        { 
+          id: "logo-print", 
+          name: "Team Logo", 
+          price: 1499, 
+          quantity: 1 
+        }
+      ],
+      default: [
+        { 
+          id: "name-print", 
+          name: "Name Printing", 
+          price: 999, 
+          quantity: 1 
+        },
+        { 
+          id: "number-print", 
+          name: "Number Printing", 
+          price: 799, 
+          quantity: 1 
+        }
+      ]
+    };
     
-    // Filter addons based on selected sport and kitType
-    const filtered = allAddons.filter(addon => 
-      addon.availableSports.includes(sport) && 
-      addon.kitTypes.includes(kitType)
-    );
-    
-    setAvailableAddons(filtered);
+    // Set available add-ons based on sport
+    setAvailableAddons(sportSpecificAddons[sport] || sportSpecificAddons.default);
   }, [sport, kitType]);
   
-  // Check if addon is in cart
-  const isAddonSelected = (addonId: string): boolean => {
-    return addOns.some(addon => addon.id === addonId);
+  // Check if an add-on is selected
+  const isSelected = (id: string): boolean => {
+    return addOns.some(addon => addon.id === id);
   };
   
-  // Toggle addon selection
-  const toggleAddon = (addon: Addon) => {
-    if (isAddonSelected(addon.id)) {
-      removeAddOn(addOns.findIndex(item => item.id === addon.id));
-    } else {
+  // Handle add-on selection
+  const handleAddonToggle = (addon: AddOn, checked: boolean) => {
+    if (checked) {
+      // Add the add-on with a unique ID
       addAddOn({
-        id: addon.id,
-        name: addon.name,
-        price: addon.price,
-        quantity: 1
+        ...addon,
+        id: `${addon.id}-${uuidv4().slice(0, 8)}`
       });
+    } else {
+      // Find and remove the specific add-on
+      const addonIndex = addOns.findIndex(a => a.id.startsWith(addon.id));
+      if (addonIndex !== -1) {
+        removeAddOn(addonIndex);
+      }
     }
   };
   
-  // Format price to display in dollars
-  const formatPrice = (price: number): string => {
-    return `$${(price / 100).toFixed(2)}`;
-  };
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center">
-          Add-on Products
-          <Badge variant="outline" className="ml-2">Optional</Badge>
-        </CardTitle>
+        <CardTitle className="text-lg font-semibold">Customization Add-ons</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {availableAddons.map((addon) => (
             <div 
-              key={addon.id}
-              className={`flex items-start space-x-3 p-3 rounded-md border transition-colors
-                ${isAddonSelected(addon.id) ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+              key={addon.id} 
+              className="flex items-center space-x-2 border p-3 rounded-md hover:bg-gray-50"
             >
-              <Checkbox
-                id={`addon-${addon.id}`}
-                checked={isAddonSelected(addon.id)}
-                onCheckedChange={() => toggleAddon(addon)}
-                className="mt-1"
+              <Checkbox 
+                id={`addon-${addon.id}`} 
+                checked={isSelected(addon.id)}
+                onCheckedChange={(checked) => handleAddonToggle(addon, checked as boolean)}
               />
-              <div className="flex-1">
+              <div className="flex justify-between w-full items-center">
                 <Label 
                   htmlFor={`addon-${addon.id}`}
-                  className="font-medium cursor-pointer flex items-center"
+                  className="font-medium cursor-pointer"
                 >
                   {addon.name}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="h-4 w-4 ml-1 text-gray-400" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="w-[200px] text-xs">{addon.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
                 </Label>
-                <p className="text-sm text-gray-600 mt-1">{formatPrice(addon.price)}</p>
+                <Badge variant="outline" className="ml-auto">
+                  ${(addon.price / 100).toFixed(2)}
+                </Badge>
               </div>
-              {isAddonSelected(addon.id) && (
-                <div className="flex items-center space-x-2 border rounded-md">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="px-2 h-8"
-                    onClick={() => {
-                      // Find the addon in the cart
-                      const index = addOns.findIndex(item => item.id === addon.id);
-                      if (index !== -1) {
-                        // Remove if quantity would become 0
-                        if (addOns[index].quantity <= 1) {
-                          removeAddOn(index);
-                        } else {
-                          // Otherwise update quantity
-                          const updated = [...addOns];
-                          updated[index] = { ...updated[index], quantity: updated[index].quantity - 1 };
-                          useOrderStore.getState().setAddOns(updated);
-                        }
-                      }
-                    }}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="text-sm w-6 text-center">
-                    {addOns.find(item => item.id === addon.id)?.quantity || 1}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="px-2 h-8"
-                    onClick={() => {
-                      // Find the addon in the cart
-                      const index = addOns.findIndex(item => item.id === addon.id);
-                      if (index !== -1) {
-                        // Update quantity
-                        const updated = [...addOns];
-                        updated[index] = { ...updated[index], quantity: updated[index].quantity + 1 };
-                        useOrderStore.getState().setAddOns(updated);
-                      }
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
             </div>
           ))}
         </div>
+        
+        {availableAddons.length === 0 && (
+          <div className="text-center py-4 text-gray-500">
+            No add-ons available for this kit type
+          </div>
+        )}
       </CardContent>
     </Card>
   );

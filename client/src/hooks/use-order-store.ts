@@ -1,55 +1,12 @@
 import { create } from 'zustand';
-// Define types locally for now
-export interface CartItem {
-  productId: string;
-  productType: "jersey" | "jersey_shorts" | "kit";
-  basePrice: number;
-  quantity: number;
-}
-
-export interface PriceBreakdown {
-  baseTotal: number;
-  tierDiscountApplied: string;
-  tierDiscountAmount: number;
-  subscriptionDiscountApplied: string;
-  subscriptionDiscountAmount: number;
-  subtotalAfterDiscounts: number;
-  shippingCost: number;
-  grandTotal: number;
-}
-
-export interface TeamMember {
-  id: string;
-  name: string;
-  number: string;
-  size: string;
-  quantity: number;
-}
-
-interface OrderItem {
-  type: string; // jersey, shorts, etc.
-  size: string;
-  quantity: number;
-  gender: string; // Male, Female, Youth
-  price: number;
-}
-
-interface AddOn {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
-interface ShippingAddress {
-  name: string;
-  street: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
-  phone: string;
-}
+import { 
+  CartItem, 
+  PriceBreakdown, 
+  TeamMember, 
+  OrderItem, 
+  AddOn, 
+  ShippingAddress 
+} from './use-order-types';
 
 interface OrderState {
   // Order Items Management
