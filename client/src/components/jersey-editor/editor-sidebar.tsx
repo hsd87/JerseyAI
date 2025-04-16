@@ -11,6 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { useEditorStore } from './editor-store';
+import { ColorPicker } from '@/components/ui/color-picker';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 interface EditorSidebarProps {
   onExport: () => void;
@@ -22,6 +25,9 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
   const [textInput, setTextInput] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [fontSize, setFontSize] = useState(24);
+  const [fontOutline, setFontOutline] = useState(false);
+  const [outlineWidth, setOutlineWidth] = useState(1);
+  const [outlineColor, setOutlineColor] = useState('#000000');
   const { addTextItem, addImageItem } = useEditorStore();
   
   const handleTextSubmit = (e: React.FormEvent) => {
@@ -92,10 +98,46 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
             </div>
             
             <div className="space-y-2">
+              <Label htmlFor="font-family">Font Style</Label>
+              <Select 
+                defaultValue="Arial"
+                onValueChange={(value) => {
+                  // Font family will be applied when text is added
+                }}
+              >
+                <SelectTrigger id="font-family">
+                  <SelectValue placeholder="Select font" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Arial">Arial</SelectItem>
+                  <SelectItem value="Verdana">Verdana</SelectItem>
+                  <SelectItem value="Helvetica">Helvetica</SelectItem>
+                  <SelectItem value="Tahoma">Tahoma</SelectItem>
+                  <SelectItem value="Times New Roman">Times New Roman</SelectItem>
+                  <SelectItem value="Georgia">Georgia</SelectItem>
+                  <SelectItem value="Impact">Impact</SelectItem>
+                  <SelectItem value="Courier New">Courier New</SelectItem>
+                  <SelectItem value="Trebuchet MS">Trebuchet MS</SelectItem>
+                  <SelectItem value="Arial Black">Arial Black</SelectItem>
+                  <SelectItem value="Comic Sans MS">Comic Sans MS</SelectItem>
+                  <SelectItem value="Lucida Sans">Lucida Sans</SelectItem>
+                  <SelectItem value="Palatino Linotype">Palatino Linotype</SelectItem>
+                  <SelectItem value="Book Antiqua">Book Antiqua</SelectItem>
+                  <SelectItem value="Garamond">Garamond</SelectItem>
+                  <SelectItem value="Lucida Console">Lucida Console</SelectItem>
+                  <SelectItem value="Franklin Gothic Medium">Franklin Gothic</SelectItem>
+                  <SelectItem value="Century Gothic">Century Gothic</SelectItem>
+                  <SelectItem value="Copperplate">Copperplate</SelectItem>
+                  <SelectItem value="Optima">Optima</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
               <Label htmlFor="font-size">Font Size: {fontSize}px</Label>
               <Slider
                 id="font-size"
-                defaultValue={[fontSize]}
+                value={[fontSize]}
                 max={72}
                 min={10}
                 step={1}
@@ -103,7 +145,52 @@ const EditorSidebar = ({ onExport, currentView, onToggleView }: EditorSidebarPro
               />
             </div>
             
-            <Button type="submit" className="w-full">Add Text</Button>
+            <div className="space-y-2">
+              <Label htmlFor="text-color">Text Color</Label>
+              <ColorPicker 
+                color="#000000" 
+                onChange={(color) => {
+                  // Text color will be applied when text is added
+                }}
+              />
+            </div>
+            
+            <div className="space-y-3 pt-3 border-t border-gray-100">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="font-outline">Text Outline</Label>
+                <Switch 
+                  id="font-outline"
+                  checked={fontOutline}
+                  onCheckedChange={setFontOutline}
+                />
+              </div>
+              
+              {fontOutline && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="outline-color">Outline Color</Label>
+                    <ColorPicker 
+                      color={outlineColor}
+                      onChange={setOutlineColor}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="outline-width">Outline Width: {outlineWidth}px</Label>
+                    <Slider
+                      id="outline-width"
+                      value={[outlineWidth]}
+                      max={5}
+                      min={0.5}
+                      step={0.5}
+                      onValueChange={(value) => setOutlineWidth(value[0])}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+            
+            <Button type="submit" className="w-full mt-2">Add Text</Button>
           </form>
         </TabsContent>
         

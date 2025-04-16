@@ -68,6 +68,8 @@ export const useEditorStoreBase = create<EditorState>((set) => ({
       fontSize: 24,
       fontFamily: 'Arial',
       fill: '#000000',
+      stroke: options.stroke || undefined,
+      strokeWidth: options.strokeWidth || 0,
       ...options
     };
     
