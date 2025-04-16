@@ -387,7 +387,7 @@ export default function DynamicKitForm() {
                     <SelectValue placeholder="Select a sport" />
                   </SelectTrigger>
                   <SelectContent>
-                    {sports?.map((sport: string) => (
+                    {Array.isArray(sports) && sports.map((sport: string) => (
                       <SelectItem key={sport} value={sport}>
                         {sport.charAt(0).toUpperCase() + sport.slice(1)}
                       </SelectItem>
@@ -414,7 +414,7 @@ export default function DynamicKitForm() {
                       <SelectValue placeholder="Select a kit type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {kitTypes?.map((type: string) => (
+                      {Array.isArray(kitTypes) && kitTypes.map((type: string) => (
                         <SelectItem key={type} value={type}>
                           {type.replace(/([A-Z])/g, ' $1').trim()}
                         </SelectItem>

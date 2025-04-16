@@ -8,13 +8,7 @@ import { designFormSchema, insertOrderSchema } from "@shared/schema";
 import path from "path";
 import fs from "fs";
 import { z } from "zod";
-import { 
-  getSports, 
-  getKitTypes, 
-  getKitSchema, 
-  configureKit, 
-  getRecommendedProducts 
-} from "./services/kit-config-service";
+import { registerKitConfigRoutes } from "./services/kit-config-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Authentication Routes

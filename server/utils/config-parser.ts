@@ -2,311 +2,332 @@ import fs from 'fs';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
 
-// Define types for our configuration data
-interface FormConfig {
-  sport: string;
-  kitComponent: string;
+// Types for configuration data
+export interface KitOptionValue {
+  value: string;
+  label: string;
+}
+
+export interface KitSchema {
   formOptions: string[];
-  gender: string[];
-  colors: string[];
+  skus: string[];
   sleeveLength: string[];
   collarStyle: string[];
-  patternStyle: string[];
-  designInspiration: string[];
-}
-
-interface SkuDetails {
-  productName: string;
-  sku: string;
-  orderFormInputs: string[];
-  quantity: string;
-  size: string;
   fabric: string[];
-  style: string[];
   fitType: string[];
-  makingPreferences: string;
-  addOns: string;
-}
-
-interface SkuPrice {
-  skuId: string;
-  productName: string;
-  productType: string;
-  sports: string;
+  style: string[];
   basePrice: number;
-  allowedAiDesigner: boolean;
-  addOnsAllowed: string;
-  sizesAvailable: string;
-  gender: string;
-  quantityTiers: string;
-  currency: string;
+  commonOptions: {
+    gender: string[];
+    colors: string[];
+    patternStyles: string[];
+    designInspiration: string[];
+  };
 }
 
-// Helper function to parse CSV files
-function parseCsvFile(filePath: string): any[] {
+export interface PricingConfig {
+  skus: Record<string, number>;
+  addons: Record<string, number>;
+  quantityDiscounts: {
+    threshold: number;
+    discountPercentage: number;
+  }[];
+}
+
+export interface ConfigData {
+  sports: string[];
+  kitTypes: Record<string, string[]>;
+  schemas: Record<string, Record<string, KitSchema>>;
+  pricing: Record<string, Record<string, PricingConfig>>;
+}
+
+// Parse CSV file content
+export function parseCSV(content: string) {
+  return parse(content, {
+    columns: true,
+    skip_empty_lines: true,
+    trim: true
+  });
+}
+
+// Read CSV file and parse
+export function readCSVFile(filePath: string) {
   try {
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const records = parse(fileContent, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true
-    });
-    return records;
+    const content = fs.readFileSync(filePath, 'utf8');
+    return parseCSV(content);
   } catch (error) {
-    console.error(`Error parsing CSV file ${filePath}:`, error);
+    console.error(`Error reading CSV file ${filePath}:`, error);
     return [];
   }
 }
 
-// Helper function to clean data and split comma-separated values
-function cleanField(field: string): string[] {
-  if (!field) return [];
-  return field.split('/').map(item => item.trim()).filter(Boolean);
-}
+// Process AI designer form config
+export function processAIDesignerConfig(data: any[]) {
+  const sports: string[] = [];
+  const kitTypes: Record<string, string[]> = {};
 
-// Function to convert designer form config CSV to JSON
-function parseDesignerFormConfig(filePath: string): FormConfig[] {
-  const records = parseCsvFile(filePath);
-  
-  return records.map(record => ({
-    sport: record.sports?.trim() || '',
-    kitComponent: record['kit components']?.trim() || '',
-    formOptions: cleanField(record['form options']),
-    gender: cleanField(record.gender),
-    colors: record.colors ? record.colors.split(',').map((c: string) => c.trim()) : [],
-    sleeveLength: cleanField(record['sleeve lenght']),
-    collarStyle: cleanField(record['collar style']),
-    patternStyle: cleanField(record['pattern style']),
-    designInspiration: cleanField(record['design inspiration'])
-  }));
-}
-
-// Function to convert SKU details CSV to JSON
-function parseSkuDetails(filePath: string): SkuDetails[] {
-  const records = parseCsvFile(filePath);
-  
-  return records.map(record => ({
-    productName: record['PRODUCT NAME']?.trim() || '',
-    sku: record.SKU?.trim() || '',
-    orderFormInputs: cleanField(record['ORDER FORM INPUTS']),
-    quantity: record.QTY?.trim() || '',
-    size: record.SIZE?.trim() || '',
-    fabric: cleanField(record.FABRIC),
-    style: cleanField(record.STYLE),
-    fitType: cleanField(record['FIT TYPE']),
-    makingPreferences: record['MAKING PREFRENCES']?.trim() || '',
-    addOns: record['ADD ON']?.trim() || ''
-  }));
-}
-
-// Function to convert SKU price config CSV to JSON
-function parseSkuPrices(filePath: string): SkuPrice[] {
-  const records = parseCsvFile(filePath);
-  
-  return records.map(record => ({
-    skuId: record['sku id']?.trim() || '',
-    productName: record['Product name']?.trim() || '',
-    productType: record['product type']?.trim() || '',
-    sports: record.sports?.trim() || '',
-    basePrice: Number(record['Base Price']) || 0,
-    allowedAiDesigner: record['allowed  ai designer']?.trim().toLowerCase() === 'yes',
-    addOnsAllowed: record['Add-Ons Allowed']?.trim() || '',
-    sizesAvailable: record['Sizes Available']?.trim() || '',
-    gender: record.Gender?.trim() || '',
-    quantityTiers: record['Quantity Tiers']?.trim() || '',
-    currency: record.Currency?.trim() || 'USD'
-  }));
-}
-
-// Main function to generate all config files
-export async function generateConfigFiles() {
-  try {
-    // Path to the CSV files
-    const designerFormConfigPath = path.resolve('attached_assets/ai designer form config - Sheet1.csv');
-    const skuDetailsPath = path.resolve('attached_assets/order form config  - Sheet1.csv');
-    const skuPricesPath = path.resolve('attached_assets/sku and price config  - Sheet1.csv');
+  data.forEach(row => {
+    const sport = row.sport.toLowerCase();
+    const kitType = row.kitType;
     
-    // Parse the CSV files
-    const designerFormConfig = parseDesignerFormConfig(designerFormConfigPath);
-    const skuDetails = parseSkuDetails(skuDetailsPath);
-    const skuPrices = parseSkuPrices(skuPricesPath);
-    
-    // Create the config directory if it doesn't exist
-    const configDir = path.resolve('data/config');
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
+    if (sport && !sports.includes(sport)) {
+      sports.push(sport);
     }
     
-    // Write the JSON files
-    fs.writeFileSync(
-      path.join(configDir, 'designer-form-config.json'),
-      JSON.stringify(designerFormConfig, null, 2)
-    );
-    
-    fs.writeFileSync(
-      path.join(configDir, 'sku-details.json'),
-      JSON.stringify(skuDetails, null, 2)
-    );
-    
-    fs.writeFileSync(
-      path.join(configDir, 'sku-prices.json'),
-      JSON.stringify(skuPrices, null, 2)
-    );
-    
-    // Generate a unified product schema
-    const productSchema = generateProductSchema(designerFormConfig, skuDetails, skuPrices);
-    fs.writeFileSync(
-      path.join(configDir, 'product-schema.json'),
-      JSON.stringify(productSchema, null, 2)
-    );
-    
-    // Generate kit mappings
-    const kitMappings = generateKitMappings(designerFormConfig, skuDetails);
-    fs.writeFileSync(
-      path.join(configDir, 'kit-mappings.json'),
-      JSON.stringify(kitMappings, null, 2)
-    );
-    
-    console.log('All configuration files generated successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error generating configuration files:', error);
-    return false;
-  }
-}
-
-// Function to generate unified product schema
-function generateProductSchema(
-  designerFormConfig: FormConfig[], 
-  skuDetails: SkuDetails[], 
-  skuPrices: SkuPrice[]
-) {
-  const schema: any = {};
-  
-  // Group by sport
-  const sportGroups: Record<string, FormConfig[]> = {};
-  designerFormConfig.forEach(config => {
-    if (!sportGroups[config.sport]) {
-      sportGroups[config.sport] = [];
+    if (sport && kitType) {
+      if (!kitTypes[sport]) {
+        kitTypes[sport] = [];
+      }
+      
+      if (!kitTypes[sport].includes(kitType)) {
+        kitTypes[sport].push(kitType);
+      }
     }
-    sportGroups[config.sport].push(config);
   });
-  
-  // Generate schema for each sport
-  Object.entries(sportGroups).forEach(([sport, configs]) => {
-    if (!schema[sport]) {
-      schema[sport] = {
-        kitTypes: {},
+
+  return { sports, kitTypes };
+}
+
+// Process order form config
+export function processOrderFormConfig(data: any[]) {
+  const schemas: Record<string, Record<string, KitSchema>> = {};
+
+  data.forEach(row => {
+    const sport = row.sport.toLowerCase();
+    const kitType = row.kitType;
+    
+    if (!sport || !kitType) return;
+    
+    if (!schemas[sport]) {
+      schemas[sport] = {};
+    }
+    
+    if (!schemas[sport][kitType]) {
+      schemas[sport][kitType] = {
+        formOptions: [],
+        skus: [],
+        sleeveLength: [],
+        collarStyle: [],
+        fabric: [],
+        fitType: [],
+        style: [],
+        basePrice: parseFloat(row.basePrice) || 29.99,
         commonOptions: {
-          gender: Array.from(new Set(configs.flatMap(c => c.gender))),
-          colors: Array.from(new Set(configs.flatMap(c => c.colors))),
-          patternStyles: Array.from(new Set(configs.flatMap(c => c.patternStyle))),
-          designInspiration: Array.from(new Set(configs.flatMap(c => c.designInspiration)))
+          gender: [],
+          colors: [],
+          patternStyles: [],
+          designInspiration: []
         }
       };
     }
     
-    // Add kit types for this sport
-    configs.forEach(config => {
-      const kitType = config.kitComponent;
-      if (!kitType) return;
-      
-      // Find matching SKUs
-      const matchingSku = findMatchingSku(kitType, skuDetails, skuPrices);
-      
-      schema[sport].kitTypes[kitType] = {
-        formOptions: config.formOptions,
-        skus: matchingSku ? [matchingSku.sku] : [],
-        sleeveLength: config.sleeveLength,
-        collarStyle: config.collarStyle,
-        fabric: matchingSku ? matchingSku.fabric : [],
-        fitType: matchingSku ? matchingSku.fitType : [],
-        style: matchingSku ? matchingSku.style : [],
-        basePrice: matchingSku && getSkuPrice(matchingSku.sku, skuPrices) ? 
-          getSkuPrice(matchingSku.sku, skuPrices)?.basePrice : 0
+    // Parse form options
+    const schema = schemas[sport][kitType];
+    const formOptions = row.formOptions?.split(',').map((option: string) => option.trim()) || [];
+    schema.formOptions = Array.from(new Set([...schema.formOptions, ...formOptions])).filter(Boolean);
+    
+    // Process specific options
+    if (row.sleeveLength && !schema.sleeveLength.includes(row.sleeveLength)) {
+      schema.sleeveLength.push(row.sleeveLength);
+    }
+    
+    if (row.collarStyle && !schema.collarStyle.includes(row.collarStyle)) {
+      schema.collarStyle.push(row.collarStyle);
+    }
+    
+    if (row.fabric && !schema.fabric.includes(row.fabric)) {
+      schema.fabric.push(row.fabric);
+    }
+    
+    if (row.fitType && !schema.fitType.includes(row.fitType)) {
+      schema.fitType.push(row.fitType);
+    }
+    
+    if (row.style && !schema.style.includes(row.style)) {
+      schema.style.push(row.style);
+    }
+    
+    if (row.sku && !schema.skus.includes(row.sku)) {
+      schema.skus.push(row.sku);
+    }
+    
+    // Process common options
+    if (row.gender && !schema.commonOptions.gender.includes(row.gender)) {
+      schema.commonOptions.gender.push(row.gender);
+    }
+    
+    if (row.patternStyle && !schema.commonOptions.patternStyles.includes(row.patternStyle)) {
+      schema.commonOptions.patternStyles.push(row.patternStyle);
+    }
+    
+    const colors = row.colors?.split(',').map((color: string) => color.trim()) || [];
+    schema.commonOptions.colors = Array.from(new Set([...schema.commonOptions.colors, ...colors])).filter(Boolean);
+    
+    const designInspirations = row.designInspiration?.split(',').map((insp: string) => insp.trim()) || [];
+    schema.commonOptions.designInspiration = Array.from(new Set([...schema.commonOptions.designInspiration, ...designInspirations])).filter(Boolean);
+  });
+
+  return schemas;
+}
+
+// Process price config
+export function processPriceConfig(data: any[]) {
+  const pricing: Record<string, Record<string, PricingConfig>> = {};
+  const quantityDiscounts = [
+    { threshold: 10, discountPercentage: 5 },
+    { threshold: 20, discountPercentage: 10 },
+    { threshold: 50, discountPercentage: 15 }
+  ];
+
+  data.forEach(row => {
+    const sport = row.sport?.toLowerCase();
+    const kitType = row.kitType;
+    const sku = row.sku;
+    
+    if (!sport || !kitType || !sku) return;
+    
+    if (!pricing[sport]) {
+      pricing[sport] = {};
+    }
+    
+    if (!pricing[sport][kitType]) {
+      pricing[sport][kitType] = {
+        skus: {},
+        addons: {},
+        quantityDiscounts
       };
+    }
+    
+    const price = parseFloat(row.price);
+    if (!isNaN(price)) {
+      pricing[sport][kitType].skus[sku] = price;
+    }
+    
+    // Process addons
+    const addons = row.addons?.split(',') || [];
+    addons.forEach((addon: string) => {
+      const [addonName, addonPrice] = addon.split(':').map((part: string) => part.trim());
+      if (addonName && addonPrice) {
+        const parsedPrice = parseFloat(addonPrice);
+        if (!isNaN(parsedPrice)) {
+          pricing[sport][kitType].addons[addonName] = parsedPrice;
+        }
+      }
     });
   });
-  
-  return schema;
+
+  return pricing;
 }
 
-// Helper function to find a matching SKU for a kit type
-function findMatchingSku(
-  kitType: string, 
-  skuDetails: SkuDetails[], 
-  skuPrices: SkuPrice[]
-): SkuDetails | null {
-  // Map kit types to product types
-  const kitToProductMap: Record<string, string> = {
-    'jersey only': 'Jersey',
-    'jersey + shorts': 'Jersey',
-    'training track suit': 'TRAINING JACKET',
-    'training track jacket': 'TRAINING JACKET',
-    'track trouser': 'TRAINING TROUSER',
-    'jersey + trousers': 'Jersey',
-    'epsorts jacket': 'TRAINING JACKET',
-    'esports trouser': 'TRAINING TROUSER'
+// Generate full configuration
+export function generateFullConfig(aiDesignerPath: string, orderFormPath: string, pricingPath: string): ConfigData {
+  const aiDesignerData = readCSVFile(aiDesignerPath);
+  const orderFormData = readCSVFile(orderFormPath);
+  const pricingData = readCSVFile(pricingPath);
+  
+  const { sports, kitTypes } = processAIDesignerConfig(aiDesignerData);
+  const schemas = processOrderFormConfig(orderFormData);
+  const pricing = processPriceConfig(pricingData);
+  
+  return { sports, kitTypes, schemas, pricing };
+}
+
+// Calculate pricing for a kit configuration
+export function calculatePricing(
+  config: ConfigData,
+  kitConfig: {
+    sport: string;
+    kitType: string;
+    quantity: number;
+    options: Record<string, any>;
+    selectedAddons?: string[];
+  }
+): {
+  matchedSkus: string[];
+  itemPrices: Record<string, number>;
+  addonPrices: Record<string, number>;
+  quantityDiscount: number;
+  discountedPercentage: number;
+  totalPrice: number;
+  currency: string;
+} {
+  const { sport, kitType, quantity, options, selectedAddons = [] } = kitConfig;
+  
+  // Default response
+  const defaultResponse = {
+    matchedSkus: [],
+    itemPrices: {},
+    addonPrices: {},
+    quantityDiscount: 0,
+    discountedPercentage: 0,
+    totalPrice: 0,
+    currency: 'USD'
   };
   
-  const productName = kitToProductMap[kitType.toLowerCase()];
-  if (!productName) return null;
+  // Validate sport and kitType
+  if (!sport || !kitType || !pricing[sport] || !pricing[sport][kitType]) {
+    return defaultResponse;
+  }
   
-  return skuDetails.find(sku => 
-    sku.productName.toLowerCase() === productName.toLowerCase()
-  ) || null;
-}
-
-// Helper function to get the price for a SKU
-function getSkuPrice(sku: string, skuPrices: SkuPrice[]): SkuPrice | null {
-  return skuPrices.find(price => price.skuId === sku) || null;
-}
-
-// Function to generate kit mappings
-function generateKitMappings(
-  designerFormConfig: FormConfig[], 
-  skuDetails: SkuDetails[]
-) {
-  const kitMappings: Record<string, string[]> = {};
+  const pricingConfig = pricing[sport][kitType];
+  const schema = schemas[sport][kitType];
   
-  // Map kit names to SKUs
-  const kitNameToSku: Record<string, string> = {};
-  skuDetails.forEach(detail => {
-    const productName = detail.productName.trim().toLowerCase();
-    if (productName === 'jersey') {
-      kitNameToSku['jersey'] = detail.sku;
-    } else if (productName === 'shorts') {
-      kitNameToSku['shorts'] = detail.sku;
-    } else if (productName === 'training jacket') {
-      kitNameToSku['jacket'] = detail.sku;
-    } else if (productName === 'training trouser') {
-      kitNameToSku['trouser'] = detail.sku;
+  // Find matching SKUs based on options
+  const matchedSkus: string[] = [];
+  let basePrice = schema.basePrice;
+  
+  // Simple SKU matching logic (in reality would be more complex)
+  for (const sku of schema.skus) {
+    // For demo purposes, match any SKU
+    matchedSkus.push(sku);
+    // In a real system, we'd have more complex matching rules
+    break;
+  }
+  
+  // Calculate item prices
+  const itemPrices: Record<string, number> = {};
+  matchedSkus.forEach(sku => {
+    const price = pricingConfig.skus[sku] || basePrice;
+    itemPrices[sku] = price;
+  });
+  
+  // Calculate addon prices
+  const addonPrices: Record<string, number> = {};
+  selectedAddons.forEach(addon => {
+    if (pricingConfig.addons[addon]) {
+      addonPrices[addon] = pricingConfig.addons[addon];
     }
   });
   
-  // Create mappings
-  designerFormConfig.forEach(config => {
-    const kitType = config.kitComponent.trim().toLowerCase();
-    const skus: string[] = [];
-    
-    if (kitType === 'jersey only') {
-      if (kitNameToSku['jersey']) skus.push(kitNameToSku['jersey']);
-    } else if (kitType === 'jersey + shorts') {
-      if (kitNameToSku['jersey']) skus.push(kitNameToSku['jersey']);
-      if (kitNameToSku['shorts']) skus.push(kitNameToSku['shorts']);
-    } else if (kitType === 'training track suit') {
-      if (kitNameToSku['jacket']) skus.push(kitNameToSku['jacket']);
-      if (kitNameToSku['trouser']) skus.push(kitNameToSku['trouser']);
-    } else if (kitType === 'training track jacket') {
-      if (kitNameToSku['jacket']) skus.push(kitNameToSku['jacket']);
-    } else if (kitType === 'track trouser') {
-      if (kitNameToSku['trouser']) skus.push(kitNameToSku['trouser']);
-    }
-    
-    if (skus.length > 0) {
-      kitMappings[kitType] = skus;
-    }
-  });
+  // Calculate subtotal
+  const itemSubtotal = Object.values(itemPrices).reduce((sum, price) => sum + price, 0);
+  const addonSubtotal = Object.values(addonPrices).reduce((sum, price) => sum + price, 0);
+  const subtotal = (itemSubtotal + addonSubtotal) * quantity;
   
-  return kitMappings;
+  // Apply quantity discount
+  let discountPercentage = 0;
+  for (const discount of pricingConfig.quantityDiscounts) {
+    if (quantity >= discount.threshold) {
+      discountPercentage = discount.discountPercentage;
+    }
+  }
+  
+  const quantityDiscount = subtotal * (discountPercentage / 100);
+  const totalPrice = subtotal - quantityDiscount;
+  
+  return {
+    matchedSkus,
+    itemPrices,
+    addonPrices,
+    quantityDiscount,
+    discountedPercentage: discountPercentage,
+    totalPrice,
+    currency: 'USD'
+  };
 }
+
+// Global configuration data
+export let sports: string[] = [];
+export let kitTypes: Record<string, string[]> = {};
+export let schemas: Record<string, Record<string, KitSchema>> = {};
+export let pricing: Record<string, Record<string, PricingConfig>> = {};
