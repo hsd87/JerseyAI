@@ -1,0 +1,10 @@
+sku id ,Product name ,product type ,sports ,Base Price,allowed  ai designer ,Add-Ons Allowed,Sizes Available,Gender,Quantity Tiers,Currency,,,,,,Currency
+PFJS01,Jersey ,JERSEY ,ALL,40,yes,ALL ,all,all,,USD,,,,,,
+PFSS02,SHORTS ,SHORTS ,ALL,15,yes,ALL ,all,all,,USD,,,,,,
+PFJKT03,TRAINING JACKET ,JACKET ,ALL,50,yes,ALL ,all,all,,USD,,,,,,
+PFTR04,TRAINING TROUSER,TROUSER,ALL,20,yes,ALL ,all,all,,USD,,,,,,
+PFKB05,KITBAG ,KITBAG,ALL,35,NO,ALL ,STANDARD,ALL,,USD,,,,,,
+PFBP06,BAGPACK,BAGPACK ,ALL,30,NO,ALL ,STANDARD,ALL,,USD,,,,,,
+PFSK07,SOCKS,SOCKS ,ALL,10,NO,ALL ,ALL,ALL,,USD,,,,,,
+PFBN08,BEANIE,BEANIE,ALL,10,NO,ALL ,ALL,ALL,,USD,,,,,,
+PFSC09,SPORTS CAP ,CAPS,ALL,10,NO,ALL ,ALL,ALL,,USD,,,,,,
