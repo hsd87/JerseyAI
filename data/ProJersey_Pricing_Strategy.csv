@@ -1,0 +1,32 @@
+Product,Type,Sport,Base Price,Description
+Jersey,jersey,All,6999,Base jersey product
+Jersey + Shorts,jerseyShorts,Soccer/Basketball,8999,Jersey with matching shorts
+Jersey + Trousers,jerseyTrousers,Cricket,9499,Jersey with matching trousers
+Track Suit,tracksuit,All,14999,Full tracksuit (jacket and pants)
+Track Jacket,trackjacket,All,8999,Track jacket only
+Track Hoodie,trackhoodie,All,9499,Hooded track jacket
+Track Jacket Half Zip,trackjackethzip,All,8499,Half-zip track jacket
+Esports Jacket,esportsjacket,Esports,9999,Esports branded jacket
+Esports Hoodie,esportshoodie,Esports,8999,Esports branded hoodie
+
+# Add-on Products
+Matching Socks,addon_socks,Soccer/Basketball/Rugby,1999,Team-matched socks
+Matching Track Pants,addon_trackpants,All,5999,Team-matched track pants
+Matching Kitbag,addon_kitbag,All,3999,Team-matched gear bag
+Matching Cap,addon_cap,Cricket/Esports,2499,Team-matched cap
+Matching Beanie,addon_beanie,Soccer/Rugby/Basketball,2499,Team-matched beanie
+Matching Track Jacket,addon_jacket,All,8999,Team-matched track jacket
+Matching Track Hoodie,addon_hoodie,All,9499,Team-matched hoodie
+Matching Track Half-Zip,addon_halfzip,All,8499,Team-matched half-zip jacket
+Away Kit,addon_away,All,6999,Alternate colorway jersey
+
+# Discount Tiers
+# 10+ items: 5% discount
+# 20+ items: 10% discount
+# 50+ items: 15% discount
+# Subscriber: 10% additional discount
+
+# Shipping Costs
+# Order under $200: $30 shipping
+# Order $200-$500: $20 shipping
+# Order over $500: Free shipping

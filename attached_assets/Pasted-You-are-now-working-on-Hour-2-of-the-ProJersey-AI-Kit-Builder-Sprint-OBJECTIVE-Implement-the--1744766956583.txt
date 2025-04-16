@@ -1,0 +1,82 @@
+You are now working on Hour 2 of the ProJersey AI Kit Builder Sprint.
+
+🎯 OBJECTIVE:
+Implement the **Order Detail Builder** section that follows image generation and canvas editing. This section allows users to configure their full product order, including size selection, complementary items, and price breakdown.
+
+---
+
+🔧 BACKEND & LOGIC REQUIREMENTS:
+
+1. **Add-on Selector Module**  
+   Add a component to let users add complementary products based on selected sport and base kit type.  
+   → Reference: `/data/ProJersey_Pricing_Strategy.csv` for all available complementary products and pricing  
+   → Render matching add-ons dynamically:
+   - Matching Socks
+   - Matching Track Pants
+   - Matching Kitbag
+   - Matching Beanie / Cap
+   - Matching Track Jacket (hood, full zip, half zip)
+   - Alternate (away) kit
+
+2. **Team & Individual Order Roster Input**  
+   Add a tab-style switcher (Individual / Team Order)  
+   → If “Team Order” is selected:
+   - Render a form with table input (Name, Number, Size, Qty per row)
+   - Add total quantity summation logic
+   - Optionally allow CSV upload (bonus for later)
+
+3. **Size Chart Display**  
+   Add a section with toggles for:
+   - Men
+   - Women
+   - Youth  
+   Each should display a responsive table or image embedded below
+
+4. **Dynamic Price Calculation Engine**  
+   Implement pricing logic with following rules:
+   - Base product price from strategy table
+   - Add-on prices from CSV
+   - Apply tiered quantity discounts:
+     - 10+ = 5%
+     - 20+ = 10%
+     - 50+ = 15%
+   - Apply 10% discount if subscription is active
+   - Shipping cost logic:
+     - Below $200 → $30 shipping
+     - $200–$500 → $20 shipping
+     - $500+ → Free shipping
+
+5. **Real-time Price Summary Display**  
+   Show calculated total price dynamically as user adds items & names  
+   → Display:
+   - Base Kit Price
+   - Add-on Total
+   - Quantity Discount %
+   - Subscription Discount
+   - Shipping Fee
+   - Final Total
+
+---
+
+🧩 FRONTEND INSTRUCTIONS:
+
+1. Render this section **below the canvas editor** and before checkout
+2. Modularize the following:
+   - `AddonSelector.tsx`
+   - `RosterBuilder.tsx`
+   - `SizeChartDisplay.tsx`
+   - `PriceCalculator.tsx`
+
+3. Ensure **form state is synced** to global order state using Zustand or equivalent
+4. Save user inputs in state to be used in:
+   - Final checkout summary
+   - PDF generation
+   - API post to backend
+
+---
+
+📎 NOTE:
+Do **not** build checkout logic yet. Just focus on order config section.  
+Ensure all prices and logic match the latest `ProJersey_Pricing_Strategy.csv` from the `/data/` directory.
+
+Once done, confirm the modules are fully functional and we’ll proceed to checkout integration in Hour 3.
