@@ -287,12 +287,13 @@ export default function OrderConfig() {
     setGender(value);
     
     // Update all package items with new gender
-    setPackageItems(items => 
-      items.map(item => ({
-        ...item,
-        gender: value
-      }))
-    );
+    // Make sure we're handling an array, or use an empty array as fallback
+    const updatedItems = packageItems?.map(item => ({
+      ...item,
+      gender: value
+    })) || [];
+    
+    setPackageItems(updatedItems);
   };
 
   // Handle size change for individual order
@@ -301,17 +302,18 @@ export default function OrderConfig() {
     setSize(value);
     
     // Update all package items with new default size
-    setPackageItems(items => 
-      items.map(item => {
-        if (item.type !== 'socks') {
-          return {
-            ...item,
-            sizes: [{ size: value, quantity: watchedQuantity }]
-          };
-        }
-        return item;
-      })
-    );
+    // Use safe mapping on packageItems to handle if it's undefined
+    const updatedItems = packageItems?.map(item => {
+      if (item.type !== 'socks') {
+        return {
+          ...item,
+          sizes: [{ size: value, quantity: watchedQuantity }]
+        };
+      }
+      return item;
+    }) || [];
+    
+    setPackageItems(updatedItems);
   };
 
   // Handle team order toggle
@@ -327,22 +329,26 @@ export default function OrderConfig() {
     setQuantity(qty);
     
     // Update all package items with new quantity
-    setPackageItems(items => 
-      items.map(item => ({
-        ...item,
-        sizes: item.sizes.map(s => ({ ...s, quantity: qty }))
-      }))
-    );
+    // Safely update packageItems with null checks
+    const updatedItems = packageItems?.map(item => ({
+      ...item,
+      sizes: item.sizes?.map(s => ({ ...s, quantity: qty })) || []
+    })) || [];
+    
+    setPackageItems(updatedItems);
   };
 
   // Handle product selection for custom package
   const handleProductSelect = (product: Product) => {
     // Check if the product is already in the package
-    const isSelected = packageItems.some(item => item.sku === product.sku);
+    // Always handle as an array, even if packageItems is undefined
+    const currentItems = packageItems || [];
+    const isSelected = currentItems.some(item => item.sku === product.sku);
     
     if (isSelected) {
       // Remove the product from the package
-      setPackageItems(items => items.filter(item => item.sku !== product.sku));
+      const updatedItems = currentItems.filter(item => item.sku !== product.sku);
+      setPackageItems(updatedItems);
     } else {
       // Add the product to the package
       const newItem: PackageItem = {
@@ -355,28 +361,31 @@ export default function OrderConfig() {
         sku: product.sku
       };
       
-      setPackageItems(items => [...items, newItem]);
+      setPackageItems([...currentItems, newItem]);
     }
   };
 
   // Handle package item quantity change
   const handlePackageItemQuantityChange = (itemId: string, size: string, change: number) => {
-    setPackageItems(items => 
-      items.map(item => {
-        if (item.id === itemId) {
-          return {
-            ...item,
-            sizes: item.sizes.map(s => {
-              if (s.size === size) {
-                return { ...s, quantity: Math.max(0, s.quantity + change) };
-              }
-              return s;
-            })
-          };
-        }
-        return item;
-      })
-    );
+    // Make a safe copy of the current items and ensure we have a valid array
+    const currentItems = packageItems || [];
+    
+    const updatedItems = currentItems.map(item => {
+      if (item.id === itemId) {
+        return {
+          ...item,
+          sizes: (item.sizes || []).map(s => {
+            if (s.size === size) {
+              return { ...s, quantity: Math.max(0, s.quantity + change) };
+            }
+            return s;
+          })
+        };
+      }
+      return item;
+    });
+    
+    setPackageItems(updatedItems);
   };
 
   // Handle add-on quantity changes
@@ -619,8 +628,10 @@ export default function OrderConfig() {
                 product.productType === 'TROUSER' || 
                 product.productType === 'SOCKS'
               ).map((product) => {
-                const isSelected = packageItems.some(item => item.sku === product.sku);
-                const currentItem = packageItems.find(item => item.sku === product.sku);
+                // Safely handle packageItems which might be undefined/null 
+                const safePackageItems = packageItems || [];
+                const isSelected = safePackageItems.some(item => item.sku === product.sku);
+                const currentItem = safePackageItems.find(item => item.sku === product.sku);
                 const currentQty = currentItem?.sizes[0]?.quantity || 0;
                 
                 return (
@@ -661,8 +672,9 @@ export default function OrderConfig() {
                               // Use the handleProductSelect function to add the product
                               handleProductSelect(product);
                             } else if (currentQty === 1) {
-                              // Remove item from package
-                              setPackageItems(packageItems.filter(item => item.sku !== product.sku));
+                              // Remove item from package - safely handle packageItems
+                              const safeItems = packageItems || [];
+                              setPackageItems(safeItems.filter(item => item.sku !== product.sku));
                             } else {
                               // Decrease quantity
                               handlePackageItemQuantityChange(
