@@ -75,9 +75,21 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
       let itemCount = 0;
       let baseTotal = 0;
       let itemSubtotal = 0;
+      let bundleSavings = 0;
+      let bundleApplied = false;
 
       // Calculate package items price
       if (packageItems.length > 0) {
+        // First check if this is a complete bundle that qualifies for bundle pricing
+        const jerseyItem = packageItems.find(item => item && item.type === 'jersey');
+        const shortsItem = packageItems.find(item => item && item.type === 'shorts');
+        const socksItem = packageItems.find(item => item && item.type === 'socks');
+        
+        // Determine if a bundle price should be applied
+        const isFullKit = jerseyItem && shortsItem && socksItem;
+        const isJerseyShorts = jerseyItem && shortsItem;
+        
+        // Handle regular pricing first
         packageItems.forEach((item: PackageItem) => {
           // Skip invalid items to prevent errors
           if (!item || !item.sizes) return;
@@ -85,11 +97,63 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
           try {
             const totalQuantity = item.sizes.reduce((sum, size) => sum + (size.quantity || 0), 0);
             itemCount += totalQuantity;
-            baseTotal += (item.price || 0) * totalQuantity;
+            
+            // We'll add prices later after checking for bundles
+            const itemTotal = (item.price || 0) * totalQuantity;
+            baseTotal += itemTotal;
           } catch (err) {
             console.warn(`Error processing package item: ${item?.id || 'unknown'}`, err);
           }
         });
+        
+        // Apply bundle pricing if applicable
+        // This is done for efficiency by first calculating all individual prices,
+        // then applying bundle discounts as needed
+        if (isFullKit && sport) {
+          const individualPrice = baseTotal;
+          const bundleKey = `${sport}_full_kit`;
+          
+          if (BASE_PRICES[bundleKey]) {
+            const bundleUnitPrice = BASE_PRICES[bundleKey];
+            // Determine how many full kits we have (based on jersey quantity)
+            const jerseyQuantity = jerseyItem.sizes.reduce((sum, size) => sum + (size.quantity || 0), 0);
+            
+            // Calculate bundle total (jerseyQuantity is our multiplier for number of kits)
+            const bundleTotal = bundleUnitPrice * jerseyQuantity;
+            
+            if (bundleTotal < individualPrice) {
+              bundleSavings = individualPrice - bundleTotal;
+              baseTotal = bundleTotal;
+              bundleApplied = true;
+              console.log(`Bundle pricing applied: ${bundleSavings.toFixed(2)} saved with ${sport}_full_kit bundle`);
+            }
+          }
+        } else if (isJerseyShorts && sport) {
+          // Similar logic for jersey+shorts bundle
+          const bundleKey = `${sport}_jersey_shorts`;
+          if (BASE_PRICES[bundleKey]) {
+            const jerseyQuantity = jerseyItem.sizes.reduce((sum, size) => sum + (size.quantity || 0), 0);
+            const shortsQuantity = shortsItem.sizes.reduce((sum, size) => sum + (size.quantity || 0), 0);
+            const bundleCount = Math.min(jerseyQuantity, shortsQuantity);
+            
+            // Calculate price for bundle items
+            const bundleTotal = BASE_PRICES[bundleKey] * bundleCount;
+            
+            // Calculate price for individual items without bundle
+            const jerseyPrice = (jerseyItem.price || 0) * bundleCount;
+            const shortsPrice = (shortsItem.price || 0) * bundleCount;
+            const individualBundledItems = jerseyPrice + shortsPrice;
+            
+            // Apply bundle if it's cheaper
+            if (bundleTotal < individualBundledItems) {
+              const savingsAmount = individualBundledItems - bundleTotal;
+              baseTotal -= savingsAmount;
+              bundleSavings = savingsAmount;
+              bundleApplied = true;
+              console.log(`Bundle pricing applied: ${bundleSavings.toFixed(2)} saved with ${sport}_jersey_shorts bundle`);
+            }
+          }
+        }
       }
 
       // Calculate add-ons price
@@ -129,16 +193,27 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
         }
       }
 
+      // Calculate tier discount based on quantity
+      let tierDiscountRate = 0;
+      
+      // Sort TIER_DISCOUNTS in descending order to apply highest discount first
+      for (const tier of [...TIER_DISCOUNTS].sort((a, b) => b.threshold - a.threshold)) {
+        if (itemCount >= tier.threshold) {
+          tierDiscountRate = tier.discount;
+          break;
+        }
+      }
+      
       // Ensure we have positive values to prevent NaN errors
       itemCount = Math.max(0, itemCount);
       baseTotal = Math.max(0, baseTotal);
       
-      // Calculate tier discount based on quantity
-      const tierDiscountRate = calculateQuantityDiscount(itemCount);
+      // Apply tiered quantity discount
       const tierDiscountAmount = baseTotal * tierDiscountRate;
       const tierDiscountApplied = tierDiscountRate > 0;
+      console.log(`Tier discount: ${(tierDiscountRate * 100).toFixed(0)}% (${tierDiscountAmount.toFixed(2)}) for ${itemCount} items`);
       
-      // Apply discount
+      // Apply quantity discount
       itemSubtotal = baseTotal - tierDiscountAmount;
       
       // Apply subscription discount if user is subscribed
@@ -149,13 +224,14 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
         subscriptionDiscountAmount = itemSubtotal * SUBSCRIPTION_DISCOUNT;
         itemSubtotal -= subscriptionDiscountAmount;
         subscriptionDiscountApplied = true;
+        console.log(`Subscription discount: ${(SUBSCRIPTION_DISCOUNT * 100).toFixed(0)}% (${subscriptionDiscountAmount.toFixed(2)})`);
       }
       
       // Calculate shipping using the rules from the shared pricing module
       let shippingCost = SHIPPING_RULES[SHIPPING_RULES.length - 1].cost; // Default to highest cost
       let shippingFreeThresholdApplied = false;
       
-      // Find the applicable shipping rule
+      // Find the applicable shipping rule (rules are pre-sorted by threshold)
       for (const rule of SHIPPING_RULES) {
         if (itemSubtotal >= rule.threshold) {
           shippingCost = rule.cost;
@@ -163,21 +239,26 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
           break;
         }
       }
+      
+      console.log(`Shipping cost: $${shippingCost.toFixed(2)} (Free shipping threshold applied: ${shippingFreeThresholdApplied})`);
 
       // Calculate tax using the centralized tax rate
       const priceBeforeTax = itemSubtotal + shippingCost;
       const taxAmount = itemSubtotal * TAX_RATE;
       const grandTotal = priceBeforeTax + taxAmount;
       
+      console.log(`Tax (${(TAX_RATE * 100).toFixed(0)}%): $${taxAmount.toFixed(2)}`);
+      console.log(`Total: $${grandTotal.toFixed(2)}`);
+      
       // Check for potential division by zero or NaN
       const discountPercentage = baseTotal > 0 
-        ? (tierDiscountAmount + subscriptionDiscountAmount) / baseTotal
+        ? (tierDiscountAmount + subscriptionDiscountAmount + bundleSavings) / baseTotal
         : 0;
         
       // Build final price breakdown with guaranteed safe values
       const breakdown: PriceBreakdown = {
         subtotal: Number(itemSubtotal.toFixed(2)) || 0,
-        discount: Number((tierDiscountAmount + subscriptionDiscountAmount).toFixed(2)) || 0,
+        discount: Number((tierDiscountAmount + subscriptionDiscountAmount + bundleSavings).toFixed(2)) || 0,
         discountPercentage: Number(discountPercentage.toFixed(4)) || 0,
         shipping: Number(shippingCost.toFixed(2)) || 0,
         tax: Number(taxAmount.toFixed(2)) || 0,
@@ -189,7 +270,9 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
         subscriptionDiscountApplied: subscriptionDiscountApplied || false,
         subscriptionDiscountAmount: Number(subscriptionDiscountAmount.toFixed(2)) || 0,
         shippingFreeThresholdApplied: shippingFreeThresholdApplied || false,
-        priceBeforeTax: Number(priceBeforeTax.toFixed(2)) || 0
+        priceBeforeTax: Number(priceBeforeTax.toFixed(2)) || 0,
+        bundleSavings: Number(bundleSavings.toFixed(2)) || 0,
+        bundleApplied: bundleApplied || false
       };
       
       // Update local state
@@ -222,7 +305,9 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
         subscriptionDiscountApplied: false,
         subscriptionDiscountAmount: 0,
         shippingFreeThresholdApplied: false,
-        priceBeforeTax: basePrice + 15
+        priceBeforeTax: basePrice + 15,
+        bundleSavings: 0,
+        bundleApplied: false
       };
       
       // Update local state with fallback
@@ -249,7 +334,7 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
         teamMembersCount: teamMembers?.length || 0
       });
     }
-  }, [packageItems, addOns, isTeamOrder, teamMembers, packageType, isSubscribed, setPriceBreakdown]);
+  }, [packageItems, addOns, isTeamOrder, teamMembers, packageType, isSubscribed, setPriceBreakdown, sport]);
 
   return (
     <Card className={className}>

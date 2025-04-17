@@ -9,6 +9,15 @@ import path from "path";
 import fs from "fs";
 import { z } from "zod";
 
+// Import order controller functions
+import { 
+  createOrder, 
+  getUserOrders,
+  getOrderById,
+  updateOrderStatus,
+  getAllOrders
+} from './controllers/order-controller';
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Authentication Routes
   setupAuth(app);

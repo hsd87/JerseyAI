@@ -66,6 +66,8 @@ export interface PriceBreakdown {
   subscriptionDiscountAmount: number;
   shippingFreeThresholdApplied: boolean;
   priceBeforeTax: number;
+  bundleSavings?: number;
+  bundleApplied?: boolean;
 }
 
 export interface OrderDetails {

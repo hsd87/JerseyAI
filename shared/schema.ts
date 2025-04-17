@@ -177,9 +177,9 @@ export type ShippingAddress = {
   street: string;
   city: string;
   state: string;
-  zip: string;
+  postalCode: string;
   country: string;
-  phone: string;
+  phone?: string;
 };
 
 export const sportOptions = [
