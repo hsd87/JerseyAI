@@ -845,7 +845,7 @@ export default function OrderConfig() {
                         <Select
                           value={item.sizes[0]?.size || 'M'}
                           onValueChange={(value) => {
-                            setPackageItems((items: PackageItem[] = []) => items.map((i: PackageItem) => {
+                            const updatedItems = (packageItems || []).map((i: PackageItem) => {
                               if (i.id === item.id) {
                                 return { 
                                   ...i, 
@@ -853,7 +853,8 @@ export default function OrderConfig() {
                                 };
                               }
                               return i;
-                            }));
+                            });
+                            setPackageItems(updatedItems);
                           }}
                         >
                           <SelectTrigger id={`${item.id}-size`} className="mt-1">
