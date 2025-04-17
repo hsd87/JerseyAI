@@ -859,7 +859,7 @@ export default function DesignEditor() {
           className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-full text-sm font-medium"
           onClick={handleProceedToOrder}
         >
-          <ShoppingCart className="mr-2 h-4 w-4" /> Proceed to Order
+          <ShoppingCart className="mr-2 h-4 w-4" /> Configure Order
         </Button>
       </div>
     </div>

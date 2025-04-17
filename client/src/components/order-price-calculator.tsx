@@ -32,7 +32,7 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
     staleTime: Infinity 
   });
   
-  const { data: subscriptionData } = useQuery({
+  const { data: subscriptionData } = useQuery<{ isSubscribed: boolean }>({
     queryKey: ['/api/subscription/status'],
     staleTime: Infinity
   });
