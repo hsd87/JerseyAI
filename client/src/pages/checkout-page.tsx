@@ -59,9 +59,30 @@ const CheckoutPage: React.FC = () => {
         description: 'Your cart is empty. Add items before checkout.',
         variant: 'destructive',
       });
-      setLocation('/designer');
+      
+      // Allow animations to complete before redirecting
+      setTimeout(() => {
+        setLocation('/designer');
+      }, 500);
+      
+      return; // Skip the rest of the initialization
     }
-  }, [cart]);
+    
+    // Validate that we have valid price data
+    if (!priceBreakdown || priceBreakdown.grandTotal <= 0) {
+      console.warn('Invalid price breakdown detected:', priceBreakdown);
+      toast({
+        title: 'Price Calculation Error',
+        description: 'Unable to calculate price. Please try again or contact support.',
+        variant: 'destructive',
+      });
+      
+      // Allow animations to complete before redirecting
+      setTimeout(() => {
+        setLocation('/designer');
+      }, 500);
+    }
+  }, [cart, priceBreakdown]);
 
   // Create payment intent when page loads
   useEffect(() => {
