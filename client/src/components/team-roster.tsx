@@ -11,15 +11,15 @@ import { PlusCircle, Trash2, Download } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function TeamRoster() {
-  const orderStore = useOrderStore();
   const { 
     isTeamOrder,
     teamMembers = [],
-    gender,
-    size
-  } = orderStore;
+    setTeamMembers,
+    gender = 'Male',
+    size = 'M'
+  } = useOrderStore();
   
-  // Local state for team name since it might not be in OrderState
+  // Local state for team name since it's not in OrderState
   const [teamName, setTeamName] = useState('');
   
   const [playerName, setPlayerName] = useState('');
@@ -40,13 +40,8 @@ export default function TeamRoster() {
       items: [] // Initialize with empty items array
     };
     
-    // Get the current state of teamMembers and add the new member
-    const updatedTeamMembers = [...(teamMembers || []), newTeamMember];
-    
-    // Use setTeamMembers directly
-    if (useOrderStore.getState().setTeamMembers) {
-      useOrderStore.getState().setTeamMembers(updatedTeamMembers);
-    }
+    // Use setTeamMembers directly from the store hook
+    setTeamMembers([...teamMembers, newTeamMember]);
     
     // Reset form
     setPlayerName('');
@@ -73,7 +68,7 @@ export default function TeamRoster() {
       const startIndex = lines[0].includes('Name,Number,Size') ? 1 : 0;
       
       // Get the current team members
-      let updatedTeamMembers = [...(teamMembers || [])];
+      let updatedTeamMembers = [...teamMembers];
       
       // Process each line
       for (let i = startIndex; i < lines.length; i++) {
@@ -97,10 +92,8 @@ export default function TeamRoster() {
         }
       }
       
-      // Update the team members in the store
-      if (useOrderStore.getState().setTeamMembers) {
-        useOrderStore.getState().setTeamMembers(updatedTeamMembers);
-      }
+      // Update the team members in the store using the hook
+      setTeamMembers(updatedTeamMembers);
     };
     
     reader.readAsText(file);
@@ -274,7 +267,7 @@ export default function TeamRoster() {
                                   ? { ...member, name: e.target.value }
                                   : member
                               );
-                              useOrderStore.getState().setTeamMembers(updatedMembers);
+                              setTeamMembers(updatedMembers);
                             }}
                             className="h-8"
                           />
@@ -288,7 +281,7 @@ export default function TeamRoster() {
                                   ? { ...member, number: e.target.value }
                                   : member
                               );
-                              useOrderStore.getState().setTeamMembers(updatedMembers);
+                              setTeamMembers(updatedMembers);
                             }}
                             className="h-8 w-16"
                           />
@@ -302,7 +295,7 @@ export default function TeamRoster() {
                                   ? { ...member, size: value }
                                   : member
                               );
-                              useOrderStore.getState().setTeamMembers(updatedMembers);
+                              setTeamMembers(updatedMembers);
                             }}
                           >
                             <SelectTrigger className="h-8 w-16">
@@ -333,7 +326,7 @@ export default function TeamRoster() {
                             size="icon"
                             onClick={() => {
                               const updatedMembers = teamMembers.filter(member => member.id !== player.id);
-                              useOrderStore.getState().setTeamMembers(updatedMembers);
+                              setTeamMembers(updatedMembers);
                             }}
                             className="h-8 w-8"
                           >
