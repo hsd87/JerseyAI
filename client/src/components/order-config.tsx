@@ -561,7 +561,7 @@ export default function OrderConfig() {
                 onClick={() => handlePackageTypeChange('jerseyOnly')}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <TShirt className="h-8 w-8 text-primary" />
+                  <Shirt className="h-8 w-8 text-primary" />
                   {watchedPackageType === 'jerseyOnly' && <CheckCircle className="h-5 w-5 text-green-500" />}
                 </div>
                 <h3 className="font-semibold">Jersey Only</h3>
@@ -579,7 +579,7 @@ export default function OrderConfig() {
                 onClick={() => handlePackageTypeChange('jerseyShorts')}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <TShirt className="h-8 w-8 text-primary" />
+                  <Shirt className="h-8 w-8 text-primary" />
                   {watchedPackageType === 'jerseyShorts' && <CheckCircle className="h-5 w-5 text-green-500" />}
                 </div>
                 <h3 className="font-semibold">Jersey + Shorts</h3>
@@ -638,7 +638,7 @@ export default function OrderConfig() {
               {packageItems.map((item, index) => (
                 <div key={item.id} className="border rounded-lg p-4">
                   <h3 className="font-medium text-lg mb-4 flex items-center">
-                    {item.type === 'jersey' && <TShirt className="h-5 w-5 mr-2 text-primary" />}
+                    {item.type === 'jersey' && <Shirt className="h-5 w-5 mr-2 text-primary" />}
                     {item.type === 'shorts' && <Shirt className="h-5 w-5 mr-2 text-primary" />}
                     {item.type === 'socks' && <Shirt className="h-5 w-5 mr-2 text-primary" />}
                     {item.name}
