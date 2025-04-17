@@ -13,6 +13,7 @@ import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import OrderDetailPage from "@/pages/order-detail-page";
 import PartnerPage from "@/pages/partner-page";
+import HowItWorksPage from "@/pages/how-it-works-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import AdminDashboard from "@/pages/admin-dashboard";
@@ -75,6 +76,10 @@ function AppContent() {
           
           <Route path="/partner">
             <PartnerPage />
+          </Route>
+          
+          <Route path="/how-it-works">
+            <HowItWorksPage />
           </Route>
           
           <Route path="/pricing">
