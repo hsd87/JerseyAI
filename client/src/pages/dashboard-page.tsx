@@ -259,7 +259,7 @@ export default function DashboardPage() {
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No designs yet</h3>
                   <p className="text-gray-500 mb-6">Create your first custom jersey design</p>
-                  <Link href="/">
+                  <Link href="/designer">
                     <Button className="bg-black hover:bg-gray-800">
                       <i className="fas fa-plus mr-2"></i> Create Design
                     </Button>
@@ -552,7 +552,7 @@ export default function DashboardPage() {
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No favorites yet</h3>
                   <p className="text-gray-500 mb-6">Save designs to your favorites for quick access</p>
-                  <Link href="/">
+                  <Link href="/designer">
                     <Button className="bg-black hover:bg-gray-800">
                       <i className="fas fa-plus mr-2"></i> Create Design
                     </Button>
