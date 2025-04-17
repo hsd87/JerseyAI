@@ -344,17 +344,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Stripe is not configured" });
       }
 
-      const { items } = req.body;
+      const { items, amount } = req.body;
       
-      if (!items || !Array.isArray(items) || items.length === 0) {
-        return res.status(400).json({ message: "No items provided" });
+      // Allow either direct amount or items-based calculation
+      if ((!items || !Array.isArray(items) || items.length === 0) && !amount) {
+        return res.status(400).json({ message: "Either items or amount must be provided" });
       }
 
       try {
         const { calculateOrderAmount, createPaymentIntent } = await import('./stripe');
-        
-        // Calculate amount based on items
-        const amount = await calculateOrderAmount(items);
         
         // Get or create customer ID
         const user = req.user;
@@ -363,9 +361,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await createCustomer(user);
         }
         
-        // Create payment intent
-        const clientSecret = await createPaymentIntent(amount, user.stripeCustomerId!);
+        // Calculate amount from items or use provided amount
+        let finalAmount = amount;
+        if (!finalAmount && items && items.length > 0) {
+          finalAmount = await calculateOrderAmount(items);
+        }
         
+        // Convert to cents if needed
+        if (finalAmount < 50) { // Assuming anything below 50 cents is actually in dollars
+          finalAmount = Math.round(finalAmount * 100);
+        }
+        
+        // Ensure minimum amount (Stripe requires at least 50 cents)
+        finalAmount = Math.max(50, finalAmount);
+        
+        // Create payment intent
+        const clientSecret = await createPaymentIntent(finalAmount, user.stripeCustomerId!);
+        
+        console.log(`Created payment intent for amount: ${finalAmount} cents`);
         res.json({ clientSecret });
       } catch (err: any) {
         console.error('Stripe payment error:', err);
