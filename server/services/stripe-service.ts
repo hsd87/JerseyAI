@@ -1,239 +1,129 @@
 import Stripe from 'stripe';
-import { InsertOrder, Order } from '@shared/schema';
 
-// Will be initialized once the secret key is available
-let stripe: Stripe | null = null;
+// Get the Stripe instance from the main file
+import { stripeInstance } from '../stripe';
 
-export const initStripe = () => {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    console.warn('STRIPE_SECRET_KEY is not set, Stripe functionality will be limited');
-    return null;
-  }
-  
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2023-10-16' // Latest available version
-  });
-  
-  return stripe;
-};
+export function getStripe(): Stripe | null {
+  return stripeInstance;
+}
 
-export const getStripe = (): Stripe | null => {
-  if (!stripe) {
-    return initStripe();
-  }
-  return stripe;
-};
+export async function checkStripeApiKey(): Promise<{ valid: boolean, message: string }> {
+  try {
+    // Validate STRIPE_SECRET_KEY is present
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return { 
+        valid: false, 
+        message: "STRIPE_SECRET_KEY is not configured in the environment variables." 
+      };
+    }
 
-/**
- * Create a Stripe Checkout Session for the given order
- * @param order The order to create a checkout session for
- * @param successUrl Success redirect URL
- * @param cancelUrl Cancel redirect URL
- * @returns Checkout session
- */
-export const createCheckoutSession = async (
-  order: Order,
-  successUrl: string,
-  cancelUrl: string
-): Promise<Stripe.Checkout.Session> => {
-  const stripeInstance = getStripe();
-  
-  if (!stripeInstance) {
-    throw new Error('Stripe is not initialized');
-  }
-  
-  // Calculate metadata including discounts from order.metadata
-  let priceBreakdown: any = null;
-  if (order.metadata && typeof order.metadata === 'string') {
-    try {
-      const metadata = JSON.parse(order.metadata);
-      priceBreakdown = metadata.priceBreakdown;
-    } catch (e) {
-      console.error("Error parsing order metadata:", e);
+    // Check if the instance was initialized properly
+    if (!stripeInstance) {
+      return { 
+        valid: false, 
+        message: "Stripe instance failed to initialize." 
+      };
+    }
+
+    // Attempt to make a test API call to verify the key is working
+    const balance = await stripeInstance.balance.retrieve();
+    
+    return { 
+      valid: true, 
+      message: "Stripe API key is valid and working." 
+    };
+  } catch (error: any) {
+    console.error("Error validating Stripe API key:", error);
+    
+    // Return specific error messages based on error type
+    if (error.type === 'StripeAuthenticationError') {
+      return {
+        valid: false,
+        message: "Invalid API key provided. Please check your STRIPE_SECRET_KEY environment variable."
+      };
+    } else if (error.type === 'StripeConnectionError') {
+      return {
+        valid: false,
+        message: "Could not connect to Stripe API. Please check your internet connection."
+      };
+    } else {
+      return {
+        valid: false,
+        message: `Stripe API key validation failed: ${error.message}`
+      };
     }
   }
+}
+
+export async function createCheckoutSession(order: any, successUrl: string, cancelUrl: string) {
+  // Create a checkout session using the Stripe API
+  if (!stripeInstance) throw new Error('Stripe is not configured');
   
-  // Create line items from order details
-  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-  
-  // Add main items
-  if (order.orderDetails && order.orderDetails.items) {
-    order.orderDetails.items.forEach(item => {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `${item.type} (${item.gender}, Size: ${item.size})`,
-            description: `${order.sport} ${item.type}`,
-            images: [order.designUrls?.front || ''] // Include image if available
-          },
-          unit_amount: Math.round(item.price * 100), // Convert to cents
-        },
-        quantity: item.quantity,
-      });
-    });
-  }
-  
-  // Add add-ons
-  if (order.orderDetails && order.orderDetails.addOns) {
-    order.orderDetails.addOns.forEach(addon => {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `${addon.name} (Add-on)`,
-            description: `Additional item: ${addon.name}`,
-          },
-          unit_amount: Math.round(addon.price * 100), // Convert to cents
-        },
-        quantity: addon.quantity,
-      });
-    });
-  }
-  
-  // Add shipping cost if applicable
-  if (priceBreakdown && priceBreakdown.shippingCost > 0) {
-    lineItems.push({
+  // Format the line items for the session
+  const lineItems = order.items.map((item: any) => {
+    return {
       price_data: {
         currency: 'usd',
         product_data: {
-          name: 'Shipping',
-          description: 'Shipping and handling',
+          name: item.name || `${item.productType} - ${item.size}`,
+          description: item.description || `${item.sport} ${item.productType}`,
+          metadata: {
+            productId: item.productId || item.id
+          }
         },
-        unit_amount: priceBreakdown.shippingCost,
+        unit_amount: Math.round(item.price * 100), // Convert to cents
       },
-      quantity: 1,
-    });
-  }
+      quantity: item.quantity,
+    };
+  });
   
-  // Apply discounts
-  const discounts: Stripe.Checkout.SessionCreateParams.Discount[] = [];
-  
-  // If we have tier discount or subscription discount, create a coupon
-  if (priceBreakdown && 
-      (priceBreakdown.tierDiscountAmount > 0 || 
-       priceBreakdown.subscriptionDiscountAmount > 0)
-  ) {
-    const totalDiscount = (priceBreakdown.tierDiscountAmount || 0) + 
-                         (priceBreakdown.subscriptionDiscountAmount || 0);
-    const discountPercentage = Math.round(
-      (totalDiscount / priceBreakdown.baseTotal) * 100
-    );
-    
-    if (discountPercentage > 0) {
-      // Create a one-time coupon for this checkout
-      const coupon = await stripeInstance.coupons.create({
-        percent_off: discountPercentage,
-        duration: 'once',
-        name: `Order #${order.id} Discount`,
-      });
-      
-      discounts.push({ coupon: coupon.id });
-    }
-  }
-  
-  // Create the session
+  // Create session with line items
   const session = await stripeInstance.checkout.sessions.create({
     payment_method_types: ['card'],
-    line_items: lineItems,
-    discounts,
     mode: 'payment',
-    success_url: `${successUrl}?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: successUrl,
     cancel_url: cancelUrl,
     client_reference_id: order.id.toString(),
-    // Get customer email from storage if needed
-    // customer_email will be populated on the server side
-    shipping_address_collection: {
-      allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'ES', 'IT', 'JP'],
-    },
-    shipping_options: [
-      {
-        shipping_rate_data: {
-          type: 'fixed_amount',
-          fixed_amount: {
-            amount: 0,
-            currency: 'usd',
-          },
-          display_name: 'Standard Shipping',
-          delivery_estimate: {
-            minimum: {
-              unit: 'business_day',
-              value: 5,
-            },
-            maximum: {
-              unit: 'business_day',
-              value: 10,
-            },
-          },
-        },
-      },
-    ],
+    customer_email: order.customerEmail,
+    line_items: lineItems,
     metadata: {
-      order_id: order.id.toString(),
-      user_id: order.userId.toString(),
-      sport: order.sport,
-    },
+      orderId: order.id.toString()
+    }
   });
   
   return session;
-};
+}
 
-/**
- * Verify a checkout session's payment status
- * @param sessionId Stripe session ID
- * @returns Boolean indicating success and session data
- */
-export const verifyCheckoutSession = async (sessionId: string): Promise<{
-  success: boolean;
-  session: Stripe.Checkout.Session;
-}> => {
-  const stripeInstance = getStripe();
+export async function verifyCheckoutSession(sessionId: string) {
+  if (!stripeInstance) throw new Error('Stripe is not configured');
   
-  if (!stripeInstance) {
-    throw new Error('Stripe is not initialized');
-  }
-  
-  const session = await stripeInstance.checkout.sessions.retrieve(sessionId, {
-    expand: ['payment_intent', 'line_items'],
-  });
-  
-  // Check if payment is complete
-  const isComplete = session.payment_status === 'paid';
+  const session = await stripeInstance.checkout.sessions.retrieve(sessionId);
   
   return {
-    success: isComplete,
-    session,
+    success: session.payment_status === 'paid',
+    session
   };
-};
+}
 
-/**
- * Get a receipt URL for a successful payment
- * @param sessionId Stripe session ID
- * @returns Receipt URL or null if not available
- */
-export const getReceiptUrl = async (sessionId: string): Promise<string | null> => {
-  const stripeInstance = getStripe();
-  
-  if (!stripeInstance) {
-    throw new Error('Stripe is not initialized');
-  }
+export async function getReceiptUrl(sessionId: string): Promise<string | null> {
+  if (!stripeInstance) throw new Error('Stripe is not configured');
   
   const session = await stripeInstance.checkout.sessions.retrieve(sessionId, {
-    expand: ['payment_intent'],
+    expand: ['payment_intent']
   });
   
-  if (!session.payment_intent || typeof session.payment_intent === 'string') {
-    return null;
+  const paymentIntent = session.payment_intent as Stripe.PaymentIntent;
+  
+  // Since the Stripe types may not fully capture the expanded properties,
+  // we need to cast with care. Expanded payment intents can have charges.
+  const paymentIntentWithCharges = paymentIntent as any;
+  
+  if (paymentIntentWithCharges && 
+      paymentIntentWithCharges.charges && 
+      paymentIntentWithCharges.charges.data && 
+      paymentIntentWithCharges.charges.data.length) {
+    return paymentIntentWithCharges.charges.data[0].receipt_url;
   }
   
-  // Get charge to find receipt URL
-  const charges = await stripeInstance.charges.list({
-    payment_intent: session.payment_intent.id,
-  });
-  
-  if (charges.data.length === 0) {
-    return null;
-  }
-  
-  return charges.data[0].receipt_url;
-};
+  return null;
+}

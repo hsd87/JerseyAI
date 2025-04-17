@@ -647,6 +647,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   } catch (error) {
     console.error('Error registering payment routes:', error);
   }
+  
+  // Stripe health check endpoint
+  app.get('/api/payment/health', async (req, res) => {
+    try {
+      const { checkStripeApiKey } = await import('./services/stripe-service');
+      const result = await checkStripeApiKey();
+      
+      console.log('Stripe health check result:', result);
+      
+      if (result.valid) {
+        res.json({
+          status: 'ok',
+          message: result.message,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        res.status(503).json({
+          status: 'error',
+          message: result.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch (error: any) {
+      console.error('Error checking Stripe health:', error);
+      res.status(500).json({
+        status: 'error',
+        message: error.message || 'Unknown error checking Stripe health',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
 
   // Serve images from the output directory
   app.get('/output/:filename', (req, res, next) => {

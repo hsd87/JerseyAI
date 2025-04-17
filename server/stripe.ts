@@ -18,8 +18,8 @@ declare module 'stripe' {
 }
 
 // Define the global variables
-let stripeInstance: Stripe | null = null;
-const SUBSCRIPTION_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1P5fLVCjzXg59EQpTjGcjjZM';
+export let stripeInstance: Stripe | null = null;
+export const SUBSCRIPTION_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1P5fLVCjzXg59EQpTjGcjjZM';
 
 // Initialize Stripe
 function initializeStripe(): Stripe | null {
@@ -38,7 +38,7 @@ function initializeStripe(): Stripe | null {
     
     // Create Stripe instance
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2022-11-15' // Use a stable API version
+      apiVersion: '2022-11-15' as any // Use a stable API version
     });
     
     console.log('Stripe initialized successfully');
