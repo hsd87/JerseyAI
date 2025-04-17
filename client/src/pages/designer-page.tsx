@@ -179,11 +179,6 @@ export default function DesignerPage() {
                 </Button>
               </div>
             </div>
-            
-            {/* Preview panel */}
-            <div className="lg:col-span-1">
-              <OrderSummary showDetailed={false} />
-            </div>
           </div>
         )}
 
