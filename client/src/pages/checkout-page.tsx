@@ -1,63 +1,242 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { StripePaymentWrapper } from '@/components/payment/stripe-payment-wrapper';
 import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
 import { useOrderStore } from '@/hooks/use-order-store';
-import { Button } from '@/components/ui/button';
-import { 
+import { useToast } from '@/hooks/use-toast';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe, Stripe, StripeElementsOptions } from '@stripe/stripe-js';
+import { StripePaymentForm } from '@/components/payment/stripe-payment-form';
+import { orderService } from '@/lib/order-service';
+
+// UI Components
+import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, ArrowLeft, ShoppingCart, Check } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+  Loader2,
+  ShoppingCart,
+  CreditCard,
+  Package,
+  Truck,
+  ShieldCheck,
+  ArrowLeft,
+  Check,
+} from 'lucide-react';
+
+// Make sure to call loadStripe outside of a component's render to avoid recreation on each render
+let stripePromise: Promise<Stripe | null> | null = null;
+const getStripePromise = () => {
+  if (!stripePromise && import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  }
+  return stripePromise;
+};
 
 const CheckoutPage: React.FC = () => {
   const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentStep, setPaymentStep] = useState<'review' | 'payment' | 'confirmation'>('review');
+  const orderStore = useOrderStore();
+  const { cart, priceBreakdown, orderDetails, clearCart, setOrderCompleted } = orderStore;
   
-  // Get order data from the store
-  const { 
-    cart, 
-    orderDetails, 
-    teamMembers, 
-    priceBreakdown,
-    clearCart,
-    setOrderCompleted 
-  } = useOrderStore();
-  
-  // Calculate the total amount in cents (for Stripe)
-  const totalAmount = priceBreakdown?.grandTotal ? Math.round(priceBreakdown.grandTotal * 100) : 0;
-  
+  const [loading, setLoading] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [orderProcessing, setOrderProcessing] = useState(false);
+
+  // Redirect if cart is empty
   useEffect(() => {
-    // If no items in cart, redirect back to design page
     if (!cart || cart.length === 0) {
       toast({
         title: 'Empty Cart',
-        description: 'Your cart is empty. Please add items before checkout.',
-        variant: 'destructive'
+        description: 'Your cart is empty. Add items before checkout.',
+        variant: 'destructive',
       });
       setLocation('/designer');
     }
-  }, [cart, setLocation, toast]);
-  
+  }, [cart]);
+
+  // Create payment intent when page loads
+  useEffect(() => {
+    if (!priceBreakdown) return;
+    
+    const createPaymentIntent = async () => {
+      setLoading(true);
+      
+      try {
+        const { clientSecret } = await orderService.createPaymentIntent({
+          amount: priceBreakdown.grandTotal,
+          orderItems: cart || [],
+        });
+        
+        setClientSecret(clientSecret);
+      } catch (error: any) {
+        console.error('Payment intent creation failed:', error);
+        toast({
+          title: 'Checkout Error',
+          description: error.message || 'Failed to initialize payment',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    createPaymentIntent();
+  }, [priceBreakdown]);
+
+  const handlePaymentSuccess = async () => {
+    setOrderProcessing(true);
+    
+    try {
+      // Create the order in the backend
+      await orderService.createOrder({
+        items: cart?.map(item => ({
+          id: item.id,
+          type: item.type,
+          name: item.name || `${item.type}`,
+          price: item.price,
+          quantity: item.quantity,
+          size: item.size,
+          gender: item.gender,
+        })) || [],
+        orderDetails: orderDetails || {
+          items: [],
+          addOns: [],
+          isTeamOrder: false,
+          packageType: '',
+        },
+        totalAmount: priceBreakdown?.grandTotal || 0,
+        paymentMethod: 'stripe',
+      });
+      
+      // Update order status
+      setOrderCompleted(true);
+      
+      // Clear the cart
+      clearCart();
+      
+      // Toast success
+      toast({
+        title: 'Order Successful!',
+        description: 'Your order has been placed and is being processed.',
+      });
+      
+      // Redirect to confirmation page
+      setLocation('/order-confirmation');
+    } catch (error: any) {
+      console.error('Order creation failed:', error);
+      toast({
+        title: 'Order Error',
+        description: error.message || 'Failed to create your order',
+        variant: 'destructive',
+      });
+    } finally {
+      setOrderProcessing(false);
+    }
+  };
+
+  const handlePaymentCancel = () => {
+    toast({
+      title: 'Payment Cancelled',
+      description: 'Your payment was cancelled. Your cart items are still available.',
+    });
+  };
+
+  // Render cart items
+  const renderCartItems = () => {
+    if (!cart || cart.length === 0) return <p>No items in cart</p>;
+    
+    return (
+      <div className="space-y-4">
+        {cart.map((item, index) => (
+          <div key={index} className="flex justify-between items-center py-2 border-b">
+            <div className="flex items-center gap-3">
+              <div className="bg-muted w-12 h-12 rounded-md flex items-center justify-center">
+                <Package className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="font-medium">{item.name || `${item.type}`}</p>
+                <p className="text-sm text-muted-foreground">
+                  {item.gender} / {item.size} / Qty: {item.quantity}
+                </p>
+              </div>
+            </div>
+            <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Render order summary
+  const renderOrderSummary = () => {
+    if (!priceBreakdown) return null;
+    
+    return (
+      <div className="space-y-3">
+        <div className="flex justify-between">
+          <span>Subtotal</span>
+          <span>${priceBreakdown.subtotal.toFixed(2)}</span>
+        </div>
+        
+        {priceBreakdown.subscriptionDiscountApplied && (
+          <div className="flex justify-between text-green-600">
+            <span>Subscription Discount</span>
+            <span>-${priceBreakdown.subscriptionDiscountAmount.toFixed(2)}</span>
+          </div>
+        )}
+        
+        {priceBreakdown.tierDiscountApplied && (
+          <div className="flex justify-between text-green-600">
+            <span>Quantity Discount</span>
+            <span>-${priceBreakdown.tierDiscountAmount.toFixed(2)}</span>
+          </div>
+        )}
+        
+        <div className="flex justify-between">
+          <span>Shipping</span>
+          <span>
+            {priceBreakdown.shippingFreeThresholdApplied ? (
+              <span className="text-green-600">Free</span>
+            ) : (
+              `$${priceBreakdown.shipping.toFixed(2)}`
+            )}
+          </span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span>Tax</span>
+          <span>${priceBreakdown.tax.toFixed(2)}</span>
+        </div>
+        
+        <Separator />
+        
+        <div className="flex justify-between font-bold text-lg">
+          <span>Total</span>
+          <span>${priceBreakdown.grandTotal.toFixed(2)}</span>
+        </div>
+      </div>
+    );
+  };
+
   if (!user) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <Card>
+      <div className="container max-w-lg mx-auto py-12">
+        <Card className="mt-6">
           <CardHeader>
             <CardTitle>Login Required</CardTitle>
-            <CardDescription>Please log in to continue with checkout</CardDescription>
+            <CardDescription>Please login to complete your purchase</CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button onClick={() => setLocation('/auth')}>
+            <Button onClick={() => setLocation('/auth')} className="w-full">
               Login or Register
             </Button>
           </CardFooter>
@@ -65,263 +244,111 @@ const CheckoutPage: React.FC = () => {
       </div>
     );
   }
-  
-  if (isProcessing) {
+
+  if (loading || !clientSecret) {
     return (
-      <div className="container max-w-4xl mx-auto py-8 flex flex-col items-center justify-center min-h-[60vh]">
+      <div className="container max-w-4xl mx-auto py-12 flex flex-col items-center justify-center min-h-[60vh]">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <h2 className="text-xl font-semibold">Processing Your Order</h2>
-        <p className="text-muted-foreground">Please wait while we process your payment...</p>
+        <h2 className="text-xl font-semibold">Preparing Your Order</h2>
+        <p className="text-muted-foreground">Please wait while we set up your payment</p>
       </div>
     );
   }
-  
-  const handlePaymentSuccess = () => {
-    setIsProcessing(true);
-    
-    // Simulate order completion and processing delay
-    setTimeout(() => {
-      // Mark order as completed in the store
-      setOrderCompleted(true);
-      
-      // Clear cart
-      clearCart();
-      
-      // Update UI
-      setPaymentStep('confirmation');
-      setIsProcessing(false);
-      
-      // Show success toast
-      toast({
-        title: 'Order Successful!',
-        description: 'Your order has been placed successfully',
-        variant: 'default'
-      });
-    }, 2000);
-  };
-  
-  const handlePaymentCancel = () => {
-    setPaymentStep('review');
-    
-    toast({
-      title: 'Payment Cancelled',
-      description: 'You can continue shopping or try again',
-      variant: 'default'
-    });
-  };
-  
-  const renderOrderSummary = () => {
-    return (
-      <div className="space-y-4">
-        <h3 className="font-medium text-lg">Order Summary</h3>
-        
-        {cart.map((item, index) => (
-          <div key={index} className="flex justify-between items-start py-2">
-            <div>
-              <p className="font-medium">{item.name || item.kitType}</p>
-              <p className="text-sm text-muted-foreground">
-                {item.sport} - {item.kitType} x{item.quantity}
-              </p>
-            </div>
-            <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
-          </div>
-        ))}
-        
-        <Separator />
-        
-        {priceBreakdown && (
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span>${priceBreakdown.subtotal.toFixed(2)}</span>
-            </div>
-            
-            {priceBreakdown.discount > 0 && (
-              <div className="flex justify-between text-green-600">
-                <span>Discount:</span>
-                <span>-${priceBreakdown.discount.toFixed(2)}</span>
-              </div>
-            )}
-            
-            <div className="flex justify-between">
-              <span>Shipping:</span>
-              <span>${priceBreakdown.shipping.toFixed(2)}</span>
-            </div>
-            
-            <div className="flex justify-between">
-              <span>Tax:</span>
-              <span>${priceBreakdown.tax.toFixed(2)}</span>
-            </div>
-            
-            <Separator />
-            
-            <div className="flex justify-between font-bold">
-              <span>Total:</span>
-              <span>${priceBreakdown.grandTotal.toFixed(2)}</span>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-  
-  const renderOrderDetails = () => {
-    return (
-      <div className="space-y-4">
-        <h3 className="font-medium text-lg">Order Details</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Contact Information</p>
-            <p>{orderDetails.contactName}</p>
-            <p>{orderDetails.contactEmail}</p>
-            <p>{orderDetails.contactPhone}</p>
-          </div>
-          
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Shipping Address</p>
-            <p>{orderDetails.shippingAddress}</p>
-            <p>{orderDetails.shippingCity}, {orderDetails.shippingState} {orderDetails.shippingZip}</p>
-            <p>{orderDetails.shippingCountry}</p>
-          </div>
-        </div>
-        
-        {teamMembers && teamMembers.length > 0 && (
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Team Members</p>
-            <p className="text-sm">{teamMembers.length} team members included</p>
-          </div>
-        )}
-        
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">Additional Information</p>
-          <p className="text-sm">{orderDetails.orderNotes || 'No additional notes'}</p>
-        </div>
-      </div>
-    );
-  };
-  
-  if (paymentStep === 'confirmation') {
-    return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-              <Check className="h-8 w-8 text-primary" />
-            </div>
-            <CardTitle className="text-2xl">Order Confirmed!</CardTitle>
-            <CardDescription>Thank you for your purchase</CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            <div className="text-center">
-              <p className="text-lg">Your order has been successfully placed.</p>
-              <p className="text-muted-foreground">
-                A confirmation email has been sent to {user.email || orderDetails.contactEmail}
-              </p>
-            </div>
-            
-            <div className="border rounded-lg p-4 bg-muted/30">
-              <h3 className="font-medium text-lg mb-2">Order Summary</h3>
-              <p className="text-sm">Order ID: ORDER-{Date.now().toString().substring(5)}</p>
-              <p className="text-sm">Date: {new Date().toLocaleDateString()}</p>
-              <p className="text-sm">Total Amount: ${priceBreakdown?.grandTotal.toFixed(2) || '0.00'}</p>
-            </div>
-          </CardContent>
-          
-          <CardFooter className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={() => setLocation('/account/orders')}>
-              View Your Orders
-            </Button>
-            <Button variant="outline" onClick={() => setLocation('/designer')}>
-              Design Another Kit
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-  
+
   return (
-    <div className="container max-w-6xl mx-auto py-8">
+    <div className="container max-w-6xl mx-auto py-8 px-4">
       <div className="mb-6">
-        <Button variant="ghost" onClick={() => setLocation('/cart')} className="flex items-center">
+        <Button
+          variant="ghost"
+          onClick={() => window.history.back()}
+          className="mb-4"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Cart
+          Back
         </Button>
-        
-        <h1 className="text-3xl font-bold mt-2">Checkout</h1>
+        <h1 className="text-3xl font-bold">Checkout</h1>
+        <p className="text-muted-foreground">Complete your purchase to get your custom jersey</p>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Order summary and cart items */}
+        <div className="lg:col-span-1 order-2 lg:order-1">
           <Card>
             <CardHeader>
-              <CardTitle>
-                {paymentStep === 'review' ? 'Order Review' : 'Payment Details'}
+              <CardTitle className="flex items-center">
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                Order Summary
               </CardTitle>
-              <CardDescription>
-                {paymentStep === 'review' 
-                  ? 'Review your order before proceeding to payment' 
-                  : 'Enter your payment information to complete your order'}
-              </CardDescription>
             </CardHeader>
-            
-            <CardContent>
-              {paymentStep === 'review' ? (
-                <div className="space-y-6">
-                  {renderOrderDetails()}
-                  
-                  <div className="md:hidden">
-                    {renderOrderSummary()}
-                  </div>
-                </div>
-              ) : (
-                <StripePaymentWrapper 
-                  items={cart}
-                  onSuccess={handlePaymentSuccess}
-                  onCancel={handlePaymentCancel}
-                  amount={totalAmount}
-                />
-              )}
-            </CardContent>
-            
-            {paymentStep === 'review' && (
-              <CardFooter>
-                <Button 
-                  className="w-full" 
-                  onClick={() => setPaymentStep('payment')}
-                  disabled={isProcessing}
-                >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Proceed to Payment
-                </Button>
-              </CardFooter>
-            )}
-          </Card>
-        </div>
-        
-        <div className="hidden md:block">
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-            </CardHeader>
-            
-            <CardContent>
+            <CardContent className="space-y-6">
+              {renderCartItems()}
+              
+              <Separator />
+              
               {renderOrderSummary()}
             </CardContent>
+          </Card>
+          
+          <div className="mt-6 space-y-4">
+            <div className="flex items-start gap-3 p-4 bg-muted/40 rounded-lg">
+              <ShieldCheck className="h-5 w-5 text-primary mt-0.5" />
+              <div>
+                <h3 className="font-medium">Secure Checkout</h3>
+                <p className="text-sm text-muted-foreground">
+                  All payment information is encrypted and secure
+                </p>
+              </div>
+            </div>
             
-            {paymentStep === 'review' && (
-              <CardFooter>
-                <Button 
-                  className="w-full" 
-                  onClick={() => setPaymentStep('payment')}
-                  disabled={isProcessing}
+            <div className="flex items-start gap-3 p-4 bg-muted/40 rounded-lg">
+              <Truck className="h-5 w-5 text-primary mt-0.5" />
+              <div>
+                <h3 className="font-medium">Fast Shipping</h3>
+                <p className="text-sm text-muted-foreground">
+                  Standard delivery in 2-4 weeks after design approval
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment form */}
+        <div className="lg:col-span-2 order-1 lg:order-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CreditCard className="mr-2 h-5 w-5" />
+                Payment Details
+              </CardTitle>
+              <CardDescription>
+                Enter your card information to complete your purchase
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {clientSecret ? (
+                <Elements
+                  options={{
+                    clientSecret,
+                    appearance: {
+                      theme: 'stripe',
+                      labels: 'floating',
+                    },
+                  }}
+                  stripe={getStripePromise()}
                 >
-                  Proceed to Payment
-                </Button>
-              </CardFooter>
-            )}
+                  <StripePaymentForm
+                    onSuccess={handlePaymentSuccess}
+                    onCancel={handlePaymentCancel}
+                    amount={priceBreakdown?.grandTotal || 0}
+                    isProcessing={orderProcessing}
+                  />
+                </Elements>
+              ) : (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              )}
+            </CardContent>
           </Card>
         </div>
       </div>

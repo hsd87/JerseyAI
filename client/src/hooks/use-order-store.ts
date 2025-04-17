@@ -101,6 +101,16 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   
   clearItems: () => set({ items: [], addOns: [] }),
   
+  clearCart: () => set({ 
+    items: [], 
+    addOns: [], 
+    teamMembers: [],
+    orderDetails: null,
+    priceBreakdown: null
+  }),
+  
+  setOrderCompleted: (completed: boolean) => set({ orderCompleted: completed }),
+  
   setTeamOrder: (isTeam: boolean) => set({ isTeamOrder: isTeam }),
   
   setTeamMembers: (members: TeamMember[] | (() => TeamMember[])) => set((state) => ({

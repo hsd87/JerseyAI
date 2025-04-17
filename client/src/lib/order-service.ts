@@ -1,147 +1,152 @@
 import { apiRequest } from './queryClient';
+import { OrderItem, OrderDetails } from '@/hooks/use-order-types';
+
+interface CreatePaymentIntentRequest {
+  amount: number;
+  orderItems: OrderItem[];
+}
+
+interface CreatePaymentIntentResponse {
+  clientSecret: string;
+}
+
+interface CreateOrderRequest {
+  items: OrderItem[];
+  orderDetails: OrderDetails;
+  totalAmount: number;
+  paymentMethod: string;
+}
+
+interface CreateSubscriptionResponse {
+  clientSecret: string;
+  subscriptionId: string;
+}
+
+interface Order {
+  id: number;
+  userId: number;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  items: any[];
+}
 
 class OrderService {
-  
   /**
-   * Creates a payment intent for the given cart items
-   * @param items Cart items to create payment for
-   * @returns Promise with client secret
+   * Create a payment intent with Stripe
    */
-  async createPaymentIntent(items: any[]): Promise<{ clientSecret: string }> {
+  async createPaymentIntent(request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> {
     try {
-      const response = await apiRequest('POST', '/api/create-payment-intent', { items });
-      const data = await response.json();
+      const response = await apiRequest('POST', '/api/create-payment-intent', {
+        amount: request.amount,
+        items: request.orderItems,
+      });
       
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create payment intent');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create payment intent');
       }
       
-      return data;
+      return await response.json();
     } catch (error: any) {
-      console.error('Error creating payment intent:', error);
-      throw error;
+      console.error('Payment intent creation error:', error);
+      throw new Error(error.message || 'Payment initialization failed');
     }
   }
 
   /**
-   * Creates a subscription payment intent
-   * @returns Promise with client secret and subscription ID
+   * Create a new subscription with Stripe
    */
-  async createSubscription(): Promise<{ clientSecret: string, subscriptionId: string }> {
+  async createSubscription(): Promise<CreateSubscriptionResponse> {
     try {
       const response = await apiRequest('POST', '/api/get-or-create-subscription');
-      const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create subscription');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create subscription');
       }
       
-      return data;
+      return await response.json();
     } catch (error: any) {
-      console.error('Error creating subscription:', error);
-      throw error;
+      console.error('Subscription creation error:', error);
+      throw new Error(error.message || 'Subscription initialization failed');
     }
   }
 
   /**
-   * Checks current subscription status
-   * @returns Promise with subscription status
-   */
-  async getSubscriptionStatus(): Promise<{ isActive: boolean, endDate: Date | null, tier: string }> {
-    try {
-      const response = await apiRequest('GET', '/api/subscription/status');
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to check subscription status');
-      }
-      
-      return data;
-    } catch (error: any) {
-      console.error('Error checking subscription status:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Cancels a subscription
-   * @returns Promise with success status
+   * Cancel an existing subscription
    */
   async cancelSubscription(): Promise<{ success: boolean }> {
     try {
       const response = await apiRequest('POST', '/api/cancel-subscription');
-      const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to cancel subscription');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to cancel subscription');
       }
       
-      return data;
+      return await response.json();
     } catch (error: any) {
-      console.error('Error canceling subscription:', error);
-      throw error;
+      console.error('Subscription cancellation error:', error);
+      throw new Error(error.message || 'Failed to cancel subscription');
     }
   }
 
   /**
-   * Creates a new order in the system
-   * @param orderData Order data to save
-   * @returns Promise with the created order
+   * Create a new order in the database
    */
-  async createOrder(orderData: any): Promise<any> {
+  async createOrder(request: CreateOrderRequest): Promise<Order> {
     try {
-      const response = await apiRequest('POST', '/api/orders', orderData);
-      const data = await response.json();
+      const response = await apiRequest('POST', '/api/orders', request);
       
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create order');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create order');
       }
       
-      return data;
+      return await response.json();
     } catch (error: any) {
-      console.error('Error creating order:', error);
-      throw error;
+      console.error('Order creation error:', error);
+      throw new Error(error.message || 'Order creation failed');
     }
   }
 
   /**
-   * Gets all orders for the current user
-   * @returns Promise with list of orders
+   * Get all orders for the current user
    */
-  async getOrders(): Promise<any[]> {
+  async getOrders(): Promise<Order[]> {
     try {
       const response = await apiRequest('GET', '/api/orders');
-      const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to get orders');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to fetch orders');
       }
       
-      return data;
+      return await response.json();
     } catch (error: any) {
-      console.error('Error fetching orders:', error);
-      throw error;
+      console.error('Order fetch error:', error);
+      throw new Error(error.message || 'Failed to fetch orders');
     }
   }
 
   /**
-   * Gets a specific order by ID
-   * @param orderId Order ID to fetch
-   * @returns Promise with order details
+   * Get a specific order by ID
    */
-  async getOrderById(orderId: string): Promise<any> {
+  async getOrderById(orderId: number): Promise<Order> {
     try {
       const response = await apiRequest('GET', `/api/orders/${orderId}`);
-      const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to get order');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to fetch order');
       }
       
-      return data;
+      return await response.json();
     } catch (error: any) {
-      console.error(`Error fetching order ${orderId}:`, error);
-      throw error;
+      console.error('Order fetch error:', error);
+      throw new Error(error.message || 'Failed to fetch order details');
     }
   }
 }
