@@ -33,7 +33,7 @@ import {
   Package,
   ClipboardList
 } from 'lucide-react';
-import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice, PRODUCTS } from '@shared/product-configs';
+import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice, PRODUCTS, Product } from '@shared/product-configs';
 import { TeamMember, AddOn, OrderItem } from '@/hooks/use-order-types';
 
 // Form schema
@@ -650,24 +650,15 @@ export default function OrderConfig() {
                           size="icon"
                           className="h-7 w-7"
                           onClick={() => {
-                            if (currentQty === 0) {
-                              // Add item to package
-                              const newItem = {
-                                id: `item-${Date.now()}`,
-                                sku: product.sku,
-                                name: product.name,
-                                type: product.productType.toLowerCase(),
-                                price: product.basePrice,
-                                gender: 'Male',
-                                sizes: [{ size: 'M', quantity: 1 }]
-                              };
-                              setPackageItems([...packageItems, newItem]);
+                            // Set package type to custom if it's not already
+                            if (watchedPackageType !== 'custom') {
+                              setPackageType('custom');
+                              form.setValue('packageType', 'custom');
+                            }
                               
-                              // Set package type to custom if it's not already
-                              if (watchedPackageType !== 'custom') {
-                                setPackageType('custom');
-                                form.setValue('packageType', 'custom');
-                              }
+                            if (currentQty === 0) {
+                              // Use the handleProductSelect function to add the product
+                              handleProductSelect(product);
                             } else if (currentQty === 1) {
                               // Remove item from package
                               setPackageItems(packageItems.filter(item => item.sku !== product.sku));
