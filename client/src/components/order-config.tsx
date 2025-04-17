@@ -342,6 +342,14 @@ export default function OrderConfig({
     })) || [];
     
     setPackageItems(updatedItems);
+    
+    // Sync with the store if store functions are available
+    if (setStoreGender) {
+      setStoreGender(value);
+    }
+    if (setStorePackageItems) {
+      setStorePackageItems(updatedItems);
+    }
   };
 
   // Handle size change for individual order
