@@ -66,18 +66,9 @@ export default function Navbar() {
               <Link href="/designer" className={`nav-item ${location === '/designer' ? 'text-voro-red' : ''}`}>
                 AI Designer
               </Link>
-              <Link href="/jersey-editor" className={`nav-item ${location === '/jersey-editor' ? 'text-voro-red' : ''}`}>
-                Jersey Editor
-              </Link>
               <Link href="/products" className={`nav-item ${location === '/products' ? 'text-voro-red' : ''}`}>
                 Shop
               </Link>
-              <button className="nav-item">
-                Gallery
-              </button>
-              <button className="nav-item">
-                Pricing
-              </button>
               <button className="nav-item">
                 How It Works
               </button>
@@ -171,17 +162,11 @@ export default function Navbar() {
           <Link href="/designer" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/designer' ? 'text-voro-red' : 'text-voro-white'}`}>
             AI Designer
           </Link>
-          <Link href="/jersey-editor" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/jersey-editor' ? 'text-voro-red' : 'text-voro-white'}`}>
-            Jersey Editor
-          </Link>
           <Link href="/products" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/products' ? 'text-voro-red' : 'text-voro-white'}`}>
             Shop
           </Link>
-          <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-voro-white">
-            Gallery
-          </Link>
-          <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-voro-white">
-            Pricing
+          <Link href="#how-it-works" className="block px-3 py-2 rounded-md text-base font-medium text-voro-white">
+            How It Works
           </Link>
           <Link href="/partner" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/partner' ? 'text-voro-red' : 'text-voro-white'}`}>
             Partner With Us

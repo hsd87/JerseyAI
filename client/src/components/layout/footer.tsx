@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="footer bg-voro-grey text-white mt-8 sm:mt-12">
       <div className="container-custom mx-auto py-12 md:py-16">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
           <div className="col-span-2">
             <Link href="/" className="flex items-center">
               <span className="font-heading font-semibold text-xl">Pro<span className="text-voro-red">Jersey</span></span>
@@ -30,23 +30,13 @@ export default function Footer() {
           </div>
           
           <div className="col-span-1">
-            <h3 className="text-sm font-medium text-gray-100 uppercase tracking-wider">Products</h3>
-            <ul className="mt-4 space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Soccer Kits</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Basketball Uniforms</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Cricket Kits</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Rugby Jerseys</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Esports Jerseys</a></li>
-            </ul>
-          </div>
-          
-          <div className="col-span-1">
             <h3 className="text-sm font-medium text-gray-100 uppercase tracking-wider">Company</h3>
             <ul className="mt-4 space-y-3">
               <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">About</a></li>
               <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Careers</a></li>
               <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Contact</a></li>
-              <li><Link href="/pricing" className="text-gray-300 hover:text-voro-red transition-colors">Pricing Calculator</Link></li>
+              <li><Link href="/partner" className="text-gray-300 hover:text-voro-red transition-colors">Partner With Us</Link></li>
+              <li><Link href="/products" className="text-gray-300 hover:text-voro-red transition-colors">Shop</Link></li>
               <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Privacy Policy</a></li>
             </ul>
           </div>

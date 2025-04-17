@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle, ArrowDown, PlayCircle, Users, Building } from "lucide-react";
+import { ArrowRight, CheckCircle, ArrowDown, PlayCircle, Users, Building, ChevronLeft, ChevronRight } from "lucide-react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
+import { apiRequest } from "@/lib/queryClient";
 
 // Feature cards for the "How It Works" section
 const processSteps = [
@@ -75,6 +77,86 @@ const testimonials = [
 
 export default function LandingPage() {
   const { user } = useAuth();
+  
+  // Define the design interface
+  interface Design {
+    id: string;
+    urls: {
+      front: string;
+      back?: string;
+    };
+    createdAt?: string;
+  }
+  
+  // State for designs and navigation
+  const [designs, setDesigns] = useState<Design[]>([]);
+  const [currentDesignIndex, setCurrentDesignIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Fetch previously generated designs
+  useEffect(() => {
+    const fetchDesigns = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiRequest('GET', '/api/designs/recent');
+        const data = await res.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          setDesigns(data as Design[]);
+        } else {
+          // Fallback to sample data if no designs are available
+          const sampleDesigns: Design[] = [
+            {
+              id: "sample-1",
+              urls: {
+                front: "https://via.placeholder.com/300x400/f8f9fa/e6e6e6?text=Jersey+Preview"
+              }
+            },
+            {
+              id: "sample-2",
+              urls: {
+                front: "https://via.placeholder.com/300x400/f8f9fa/e6e6e6?text=Jersey+Preview+2"
+              }
+            }
+          ];
+          setDesigns(sampleDesigns);
+        }
+      } catch (error) {
+        console.error('Error fetching designs:', error);
+        // Fallback to sample designs on error
+        const sampleDesigns: Design[] = [
+          {
+            id: "sample-1",
+            urls: {
+              front: "https://via.placeholder.com/300x400/f8f9fa/e6e6e6?text=Jersey+Preview"
+            }
+          },
+          {
+            id: "sample-2",
+            urls: {
+              front: "https://via.placeholder.com/300x400/f8f9fa/e6e6e6?text=Jersey+Preview+2"
+            }
+          }
+        ];
+        setDesigns(sampleDesigns);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchDesigns();
+  }, []);
+  
+  // Navigation functions
+  const showNextDesign = () => {
+    if (designs.length === 0) return;
+    setCurrentDesignIndex((prev) => (prev === designs.length - 1 ? 0 : prev + 1));
+  };
+  
+  const showPreviousDesign = () => {
+    if (designs.length === 0) return;
+    setCurrentDesignIndex((prev) => (prev === 0 ? designs.length - 1 : prev - 1));
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,15 +191,43 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-br from-[#39FF14]/20 to-blue-500/20 flex items-center justify-center">
                 <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md transform rotate-3">
                   <div className="text-center mb-6">
-                    <span className="font-sora font-bold text-xl">Pro<span className="text-[#39FF14]">Jersey</span> Designer</span>
+                    <span className="font-heading font-bold text-xl">Pro<span className="text-voro-red">Jersey</span> Designer</span>
                   </div>
-                  <div className="bg-gray-100 h-40 rounded-lg mb-6 flex items-center justify-center">
-                    <span className="text-gray-400">Jersey preview</span>
+                  <div className="relative bg-gray-50 h-48 rounded-lg mb-6 flex items-center justify-center overflow-hidden border border-gray-200">
+                    {designs.length > 0 ? (
+                      <img 
+                        src={designs[currentDesignIndex]?.urls?.front || ''} 
+                        alt="Jersey preview" 
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      <span className="text-gray-400">Jersey preview</span>
+                    )}
                   </div>
-                  <div className="flex justify-between">
-                    <Button variant="outline" size="sm">Previous</Button>
-                    <Button className="bg-[#39FF14] hover:bg-[#39FF14]/80 text-black" size="sm">Generate</Button>
-                    <Button variant="outline" size="sm">Next</Button>
+                  <div className="flex justify-between items-center">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={showPreviousDesign}
+                      disabled={designs.length === 0}
+                      className="text-voro-black border-gray-300"
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Previous
+                    </Button>
+                    <span className="text-sm text-gray-500">
+                      {designs.length > 0 ? `${currentDesignIndex + 1}/${designs.length}` : '0/0'}
+                    </span>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={showNextDesign}
+                      disabled={designs.length === 0}
+                      className="text-voro-black border-gray-300"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
                   </div>
                 </div>
               </div>
