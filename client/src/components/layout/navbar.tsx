@@ -70,6 +70,9 @@ export default function Navbar() {
               <Link href="/how-it-works" className={`nav-item ${location === '/how-it-works' ? 'text-voro-red' : ''}`}>
                 How It Works
               </Link>
+              <Link href="/about" className={`nav-item ${location === '/about' ? 'text-voro-red' : ''}`}>
+                About VORO
+              </Link>
               <Link href="/partner" className={`nav-item ${location === '/partner' ? 'text-voro-red' : ''}`}>
                 Partner With Us
               </Link>
@@ -162,6 +165,9 @@ export default function Navbar() {
           </Link>
           <Link href="/how-it-works" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/how-it-works' ? 'text-voro-red' : 'text-voro-white'}`}>
             How It Works
+          </Link>
+          <Link href="/about" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/about' ? 'text-voro-red' : 'text-voro-white'}`}>
+            About VORO
           </Link>
           <Link href="/partner" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/partner' ? 'text-voro-red' : 'text-voro-white'}`}>
             Partner With Us
