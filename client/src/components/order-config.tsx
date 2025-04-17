@@ -112,8 +112,8 @@ export default function OrderConfig() {
   const stepTitles = [
     "Selected Kit",
     "Package Options",
-    "Create Package",
     "Order Type",
+    "Package Details",
     "Order Details",
     "Pricing",
     "Summary"
@@ -788,14 +788,115 @@ export default function OrderConfig() {
                 onClick={goToNextStep}
                 disabled={!packageItems || packageItems.length === 0}
               >
-                Continue <ChevronRight className="ml-2 h-4 w-4" />
+                Continue to Order Type <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
         )}
 
-        {/* Step 3: Create Package */}
+        {/* Step 3: Order Type */}
         {currentStep === 3 && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div 
+                className={`border rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${!watchedIsTeamOrder ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                onClick={() => handleTeamOrderChange(false)}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <ShoppingBag className="h-8 w-8 text-primary" />
+                  {!watchedIsTeamOrder && <CheckCircle className="h-5 w-5 text-green-500" />}
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Individual Order</h3>
+                <p className="text-gray-600 mb-4">
+                  Order for yourself or a single person
+                </p>
+                <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/10">
+                  Simplest option
+                </Badge>
+              </div>
+              
+              <div 
+                className={`border rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${watchedIsTeamOrder ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                onClick={() => handleTeamOrderChange(true)}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <Users className="h-8 w-8 text-primary" />
+                  {watchedIsTeamOrder && <CheckCircle className="h-5 w-5 text-green-500" />}
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Team Order</h3>
+                <p className="text-gray-600 mb-4">
+                  Order for a team with custom names and numbers
+                </p>
+                <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/10">
+                  Quantity discounts available
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="border rounded-lg p-4 bg-slate-50 mt-6">
+              <h3 className="font-medium">Order Type Details</h3>
+              <div className="mt-2">
+                {watchedIsTeamOrder ? (
+                  <div className="space-y-2">
+                    <p className="text-sm">
+                      Team orders allow you to create a roster with each player's name, number, and size.
+                      This makes it easy to manage orders for sports teams, clubs, or group events.
+                    </p>
+                    <p className="text-sm font-medium">Benefits:</p>
+                    <ul className="text-sm space-y-1">
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
+                        Manage all players in one order
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
+                        Each player can have a custom name and number
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
+                        Quantity discounts for teams of 10+ players
+                      </li>
+                    </ul>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-sm">
+                      Individual orders are perfect for personal use or when ordering for a single person.
+                      You can still order multiple quantities of the same item.
+                    </p>
+                    <p className="text-sm font-medium">Benefits:</p>
+                    <ul className="text-sm space-y-1">
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
+                        Simplest ordering process
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
+                        Quick checkout experience
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
+                        Option to add multiple quantities of the same size
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex justify-between mt-6">
+              <Button variant="outline" onClick={goToPreviousStep}>
+                Back
+              </Button>
+              <Button onClick={goToNextStep}>
+                Continue to Package Details <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Package Details */}
+        {currentStep === 4 && (
           <div className="space-y-6">
             <div className="bg-slate-50 p-4 rounded-md border mb-6">
               <h3 className="font-medium mb-2">Selected Package: {kitTypeDisplayNames[watchedPackageType]}</h3>
@@ -912,107 +1013,6 @@ export default function OrderConfig() {
                   </div>
                 </div>
               ))}
-            </div>
-            
-            <div className="flex justify-between mt-6">
-              <Button variant="outline" onClick={goToPreviousStep}>
-                Back
-              </Button>
-              <Button onClick={goToNextStep}>
-                Continue to Order Type <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Order Type */}
-        {currentStep === 4 && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div 
-                className={`border rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${!watchedIsTeamOrder ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
-                onClick={() => handleTeamOrderChange(false)}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <ShoppingBag className="h-8 w-8 text-primary" />
-                  {!watchedIsTeamOrder && <CheckCircle className="h-5 w-5 text-green-500" />}
-                </div>
-                <h3 className="font-semibold text-lg mb-2">Individual Order</h3>
-                <p className="text-gray-600 mb-4">
-                  Order for yourself or a single person
-                </p>
-                <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/10">
-                  Simplest option
-                </Badge>
-              </div>
-              
-              <div 
-                className={`border rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${watchedIsTeamOrder ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
-                onClick={() => handleTeamOrderChange(true)}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <Users className="h-8 w-8 text-primary" />
-                  {watchedIsTeamOrder && <CheckCircle className="h-5 w-5 text-green-500" />}
-                </div>
-                <h3 className="font-semibold text-lg mb-2">Team Order</h3>
-                <p className="text-gray-600 mb-4">
-                  Order for a team with custom names and numbers
-                </p>
-                <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/10">
-                  Quantity discounts available
-                </Badge>
-              </div>
-            </div>
-            
-            <div className="border rounded-lg p-4 bg-slate-50 mt-6">
-              <h3 className="font-medium">Order Type Details</h3>
-              <div className="mt-2">
-                {watchedIsTeamOrder ? (
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      Team orders allow you to create a roster with each player's name, number, and size.
-                      This makes it easy to manage orders for sports teams, clubs, or group events.
-                    </p>
-                    <p className="text-sm font-medium">Benefits:</p>
-                    <ul className="text-sm space-y-1">
-                      <li className="flex items-start">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
-                        Manage all players in one order
-                      </li>
-                      <li className="flex items-start">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
-                        Each player can have a custom name and number
-                      </li>
-                      <li className="flex items-start">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
-                        Quantity discounts for teams of 10+ players
-                      </li>
-                    </ul>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      Individual orders are perfect for personal use or when ordering for a single person.
-                      You can still order multiple quantities of the same item.
-                    </p>
-                    <p className="text-sm font-medium">Benefits:</p>
-                    <ul className="text-sm space-y-1">
-                      <li className="flex items-start">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
-                        Simplest ordering process
-                      </li>
-                      <li className="flex items-start">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
-                        Quick checkout experience
-                      </li>
-                      <li className="flex items-start">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" /> 
-                        Option to add multiple quantities of the same size
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              </div>
             </div>
             
             <div className="flex justify-between mt-6">
