@@ -10,10 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomizationData } from "@shared/schema";
 import { 
   X, Save, ShoppingCart, Undo, Download, Image, Type, Hash, Move, Plus, 
-  RotateCcw, RotateCw, Maximize, Minimize, Circle, TextCursorInput, Edit, Trash
+  RotateCcw, RotateCw, Maximize, Minimize, Circle, TextCursorInput
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { useToast } from "@/hooks/use-toast";
 
 type TextElement = {
   id: string;
@@ -28,91 +27,38 @@ type TextElement = {
   outlineWidth: number;
 };
 
-type LogoElement = {
-  id: string;
-  url: string;
-  position: { x: number; y: number };
-  size: { width: number; height: number };
-  rotation?: number;
-  maintainAspectRatio?: boolean;
-};
-
 export default function DesignEditor() {
-  const { toast } = useToast();
   const { 
-    formData, 
-    designUrls, 
-    customizations, 
-    updateCustomizations, 
-    saveCustomizations
+    isGenerating, 
+    hasGenerated, 
+    frontImage, 
+    backImage,
+    customizations,
+    updateCustomizations,
+    formData
   } = useDesignStore();
+  const { saveCustomizations, isSaving } = useReplicate();
+  const [_, navigate] = useLocation();
   
-  const { isGenerating, hasGenerated, handleGenerateDesigns } = useReplicate();
-  const canvasRef = useRef<HTMLDivElement>(null);
-  
-  // State for customization elements
-  const [textElements, setTextElements] = useState<TextElement[]>([]);
-  const [logoElements, setLogoElements] = useState<LogoElement[]>([]);
   const [activeElement, setActiveElement] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  
-  // State for text customization
+  const [textElements, setTextElements] = useState<TextElement[]>([]);
   const [currentText, setCurrentText] = useState("");
-  const [currentColor, setCurrentColor] = useState("#ffffff");
+  const [currentColor, setCurrentColor] = useState("#FFFFFF");
   const [currentSize, setCurrentSize] = useState("medium");
   const [currentFont, setCurrentFont] = useState("Arial");
   const [currentFontSize, setCurrentFontSize] = useState(24);
   const [currentOutline, setCurrentOutline] = useState(false);
   const [currentOutlineColor, setCurrentOutlineColor] = useState("#000000");
   const [currentOutlineWidth, setCurrentOutlineWidth] = useState(1);
+  const [logoUrl, setLogoUrl] = useState("");
+  const [logoElements, setLogoElements] = useState<{id: string, url: string, position: {x: number, y: number}, size: {width: number, height: number}, rotation: number, maintainAspectRatio: boolean}[]>([]);
   
-  // State for editing text
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingElementId, setEditingElementId] = useState<string | null>(null);
-  
-  // Initialize from customizations if available
-  useEffect(() => {
-    if (customizations?.text?.length) {
-      const initialTextElements = customizations.text.map((text, index) => ({
-        id: `text-${Date.now()}-${index}`,
-        content: text.content,
-        position: text.position,
-        color: text.color,
-        size: text.size,
-        font: text.font,
-        fontSize: text.fontSize || 24,
-        outline: text.outline || false,
-        outlineColor: text.outlineColor || "#000000",
-        outlineWidth: text.outlineWidth || 1
-      }));
-      setTextElements(initialTextElements);
-    }
-    
-    if (customizations?.logos?.length) {
-      const initialLogoElements = customizations.logos.map((logo, index) => ({
-        id: `logo-${Date.now()}-${index}`,
-        url: logo.url,
-        position: logo.position,
-        size: logo.size,
-        rotation: logo.rotation || 0,
-        maintainAspectRatio: logo.maintainAspectRatio || true
-      }));
-      setLogoElements(initialLogoElements);
-    }
-  }, []);
-  
-  // Get design URLs
-  const frontImage = designUrls?.front;
-  const backImage = designUrls?.back;
-  
-  // Set appropriate aspect ratio based on sport
-  let aspectRatio = "3/4"; // Default for most jerseys
-  if (formData.sport === "soccer" || formData.sport === "rugby") {
-    aspectRatio = "3/4";
-  } else if (formData.sport === "basketball") {
-    aspectRatio = "3/4";
-  } else if (formData.sport === "cricket") {
-    aspectRatio = "3/4";
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Determine aspect ratio based on sport
+  let aspectRatio = "1/1";
+  if (formData.sport === "soccer" || formData.sport === "basketball") {
+    aspectRatio = "3/4"; // Taller jerseys
   } else if (formData.sport === "esports") {
     aspectRatio = "4/3"; // Wider jerseys
   }
@@ -153,133 +99,6 @@ export default function DesignEditor() {
     };
     
     updateCustomizations(updatedCustomizations);
-  };
-  
-  // Function to start editing a text element
-  const handleEditText = (elementId: string) => {
-    const textElement = textElements.find(el => el.id === elementId);
-    if (!textElement) return;
-    
-    // Load the text element properties into the form
-    setCurrentText(textElement.content);
-    setCurrentColor(textElement.color);
-    setCurrentSize(textElement.size);
-    setCurrentFont(textElement.font);
-    setCurrentFontSize(textElement.fontSize);
-    setCurrentOutline(textElement.outline);
-    setCurrentOutlineColor(textElement.outlineColor);
-    setCurrentOutlineWidth(textElement.outlineWidth);
-    
-    // Set editing state
-    setIsEditing(true);
-    setEditingElementId(elementId);
-    setActiveElement(elementId);
-    
-    toast({
-      title: "Editing Text",
-      description: "Edit the text properties and click 'Update Text' when done.",
-      duration: 3000,
-    });
-  };
-  
-  // Function to update an existing text element
-  const handleUpdateText = () => {
-    if (!editingElementId) return;
-    
-    // Update the text element with new properties
-    setTextElements(prev => prev.map(el => {
-      if (el.id === editingElementId) {
-        return {
-          ...el,
-          content: currentText,
-          color: currentColor,
-          size: currentSize,
-          font: currentFont,
-          fontSize: currentFontSize,
-          outline: currentOutline,
-          outlineColor: currentOutlineColor,
-          outlineWidth: currentOutlineWidth
-        };
-      }
-      return el;
-    }));
-    
-    // Update customizations store
-    const updatedText = textElements.map(el => {
-      if (el.id === editingElementId) {
-        return {
-          content: currentText,
-          position: el.position,
-          color: currentColor,
-          size: currentSize,
-          font: currentFont,
-          fontSize: currentFontSize,
-          outline: currentOutline,
-          outlineColor: currentOutlineColor,
-          outlineWidth: currentOutlineWidth
-        };
-      }
-      return {
-        content: el.content,
-        position: el.position,
-        color: el.color,
-        size: el.size,
-        font: el.font,
-        fontSize: el.fontSize || 24,
-        outline: el.outline || false,
-        outlineColor: el.outlineColor || "#000000",
-        outlineWidth: el.outlineWidth || 1
-      };
-    });
-    
-    updateCustomizations({
-      ...customizations,
-      text: updatedText
-    });
-    
-    // Reset editing state
-    setIsEditing(false);
-    setEditingElementId(null);
-    setCurrentText("");
-    
-    toast({
-      title: "Text Updated",
-      description: "Your text has been updated successfully.",
-      duration: 3000,
-    });
-  };
-  
-  // Function to delete a text element
-  const handleDeleteText = (elementId: string) => {
-    // Remove the text element
-    const newTextElements = textElements.filter(el => el.id !== elementId);
-    setTextElements(newTextElements);
-    
-    // Update customizations store
-    const updatedText = newTextElements.map(el => ({
-      content: el.content,
-      position: el.position,
-      color: el.color,
-      size: el.size,
-      font: el.font,
-      fontSize: el.fontSize || 24,
-      outline: el.outline || false,
-      outlineColor: el.outlineColor || "#000000",
-      outlineWidth: el.outlineWidth || 1
-    }));
-    
-    updateCustomizations({
-      ...customizations,
-      text: updatedText
-    });
-    
-    setActiveElement(null);
-    
-    if (editingElementId === elementId) {
-      setIsEditing(false);
-      setEditingElementId(null);
-      setCurrentText("");
-    }
   };
   
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -557,10 +376,116 @@ export default function DesignEditor() {
       </div>
       
       {/* Editor Body */}
-      <div className="flex flex-col md:flex-row">
-        {/* Tools Panel - On left for desktop, hidden on mobile */}
-        <div className="hidden md:block w-80 p-3 sm:p-4 border-r border-gray-200">
-          <div>
+      <div className="flex flex-col gap-4 sm:gap-6">
+        {/* Canvas Area - Combined View */}
+        <div className="p-3 sm:p-4 flex items-center justify-center bg-gray-50">
+          <div className="w-full max-w-2xl">
+            <div 
+              ref={canvasRef}
+              className="editor-container w-full relative rounded-lg overflow-hidden bg-white shadow-sm border border-gray-300"
+              style={{ 
+                aspectRatio: aspectRatio,
+                maxHeight: '600px' 
+              }}
+            >
+              {/* Combined Jersey Image */}
+              {frontImage && (
+                <div className="relative w-full h-full">
+                  <img 
+                    src={frontImage} 
+                    alt={`${formData.sport} jersey front view`}
+                    className="absolute top-0 left-0 w-full h-full object-contain"
+                  />
+                  <div className="absolute text-center w-full bottom-2">
+                    <span className="inline-flex items-center gap-1 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                      <Move className="h-3 w-3" /> Drag elements to position
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              {/* Draggable Text Elements */}
+              {textElements.map((element) => (
+                <div 
+                  key={element.id}
+                  className={`absolute cursor-grab ${activeElement === element.id ? 'cursor-grabbing z-30' : 'z-20'}`}
+                  style={{
+                    top: `${element.position.y}%`,
+                    left: `${element.position.x}%`,
+                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    padding: '0.25rem 0.5rem',
+                    border: activeElement === element.id ? '2px dashed #39FF14' : '2px dashed transparent',
+                    borderRadius: '0.25rem',
+                    color: element.color,
+                    fontSize: element.fontSize ? `${element.fontSize}px` : (element.size === 'small' ? '1rem' : element.size === 'medium' ? '1.5rem' : '2rem'),
+                    fontFamily: element.font,
+                    textShadow: element.outline ? `
+                      -${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      ${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      -${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      ${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}
+                    ` : 'none',
+                    fontWeight: element.size === 'large' ? 'bold' : 'normal'
+                  }}
+                  onMouseDown={(e) => handleDragStart(e, element.id)}
+                  onTouchStart={(e) => handleDragStart(e, element.id)}
+                >
+                  {element.content}
+                </div>
+              ))}
+              
+              {/* Draggable Logo Elements */}
+              {logoElements.map((logo) => (
+                <div
+                  key={logo.id}
+                  className={`absolute cursor-grab ${activeElement === logo.id ? 'cursor-grabbing z-30' : 'z-20'}`}
+                  style={{
+                    top: `${logo.position.y}%`,
+                    left: `${logo.position.x}%`,
+                    transform: `translate(-50%, -50%) rotate(${logo.rotation || 0}deg)`,
+                    border: activeElement === logo.id ? '2px dashed #39FF14' : '2px dashed transparent',
+                    width: `${logo.size.width}px`,
+                    height: logo.maintainAspectRatio ? 'auto' : `${logo.size.height}px`,
+                    borderRadius: '0.25rem'
+                  }}
+                  onMouseDown={(e) => handleDragStart(e, logo.id)}
+                  onTouchStart={(e) => handleDragStart(e, logo.id)}
+                >
+                  <img 
+                    src={logo.url} 
+                    alt="Uploaded logo" 
+                    className="w-full h-auto object-contain"
+                    style={{ 
+                      maxWidth: '100%', 
+                      maxHeight: '100%'
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex flex-wrap justify-between gap-2 mt-4">
+              <div className="text-xs text-gray-500">
+                Sport: {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)}
+                {formData.patternStyle && ` • Pattern: ${formData.patternStyle}`}
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="text-xs h-8 rounded-full"
+                >
+                  <Download className="h-3 w-3 mr-1" /> Export
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Tools Panel - Now below the image as requested */}
+        <div className="p-3 sm:p-4 border-t border-gray-200">
+          <div className="max-w-2xl mx-auto">
             {/* Add Elements Section */}
             <div className="mb-5">
               <h3 className="font-medium text-sm text-gray-700 mb-2">Add Elements</h3>
@@ -722,24 +647,10 @@ export default function DesignEditor() {
                 <Button 
                   size="sm"
                   className="w-full bg-primary text-white px-4 py-2 rounded-full text-sm h-9 mt-3"
-                  onClick={isEditing ? handleUpdateText : handleAddText}
+                  onClick={handleAddText}
                 >
-                  {isEditing ? 'Update Text' : 'Add Text to Jersey'}
+                  Add Text to Jersey
                 </Button>
-                {isEditing && (
-                  <Button 
-                    size="sm"
-                    variant="outline"
-                    className="w-full px-4 py-2 rounded-full text-sm h-9 mt-2"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setEditingElementId(null);
-                      setCurrentText("");
-                    }}
-                  >
-                    Cancel Editing
-                  </Button>
-                )}
               </div>
             </div>
             
@@ -940,399 +851,6 @@ export default function DesignEditor() {
                 Click and drag elements to position them • Use pinch gestures to zoom on mobile
               </p>
             </div>
-          </div>
-        </div>
-        
-        {/* Canvas Area - Combined View */}
-        <div className="p-3 sm:p-4 flex-1 flex items-center justify-center bg-gray-50">
-          <div className="w-full max-w-2xl">
-            <div 
-              ref={canvasRef}
-              className="editor-container w-full relative rounded-lg overflow-hidden bg-white shadow-sm border border-gray-300"
-              style={{ 
-                aspectRatio: aspectRatio,
-                maxHeight: '600px' 
-              }}
-            >
-              {/* Combined Jersey Image */}
-              {frontImage && (
-                <div className="relative w-full h-full">
-                  <img 
-                    src={frontImage} 
-                    alt={`${formData.sport} jersey front view`}
-                    className="absolute top-0 left-0 w-full h-full object-contain"
-                  />
-                  
-                  {/* Draggable Text Elements */}
-                  {textElements.map((element) => (
-                    <div 
-                      key={element.id}
-                      className={`absolute cursor-grab ${activeElement === element.id ? 'cursor-grabbing z-30' : 'z-20'}`}
-                      style={{
-                        top: `${element.position.y}%`,
-                        left: `${element.position.x}%`,
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                        padding: '0.25rem 0.5rem',
-                        border: activeElement === element.id ? '2px dashed #39FF14' : '2px dashed transparent',
-                        borderRadius: '0.25rem',
-                        color: element.color,
-                        fontSize: element.fontSize ? `${element.fontSize}px` : (element.size === 'small' ? '1rem' : element.size === 'medium' ? '1.5rem' : '2rem'),
-                        fontFamily: element.font,
-                        textShadow: element.outline ? `
-                          -${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
-                          ${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
-                          -${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
-                          ${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}
-                        ` : 'none',
-                        fontWeight: element.size === 'large' ? 'bold' : 'normal'
-                      }}
-                      onMouseDown={(e) => handleDragStart(e, element.id)}
-                      onTouchStart={(e) => handleDragStart(e, element.id)}
-                      onClick={() => handleEditText(element.id)}
-                    >
-                      <div className="relative">
-                        {element.content}
-                        {activeElement === element.id && (
-                          <div className="absolute -top-6 -right-2 flex gap-1">
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              className="h-5 w-5 p-0 rounded-full bg-white shadow-sm hover:bg-gray-100"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditText(element.id);
-                              }}
-                            >
-                              <Edit className="h-3 w-3 text-gray-600" />
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              className="h-5 w-5 p-0 rounded-full bg-white shadow-sm hover:bg-gray-100"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteText(element.id);
-                              }}
-                            >
-                              <Trash className="h-3 w-3 text-red-500" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {/* Draggable Logo Elements */}
-                  {logoElements.map((logo) => (
-                    <div
-                      key={logo.id}
-                      className={`absolute cursor-grab ${activeElement === logo.id ? 'cursor-grabbing z-30' : 'z-20'}`}
-                      style={{
-                        top: `${logo.position.y}%`,
-                        left: `${logo.position.x}%`,
-                        transform: `translate(-50%, -50%) rotate(${logo.rotation || 0}deg)`,
-                        border: activeElement === logo.id ? '2px dashed #39FF14' : '2px dashed transparent',
-                        width: `${logo.size.width}px`,
-                        height: logo.maintainAspectRatio ? 'auto' : `${logo.size.height}px`,
-                        borderRadius: '0.25rem'
-                      }}
-                      onMouseDown={(e) => handleDragStart(e, logo.id)}
-                      onTouchStart={(e) => handleDragStart(e, logo.id)}
-                    >
-                      <img 
-                        src={logo.url} 
-                        alt="Uploaded logo" 
-                        className="w-full h-auto object-contain"
-                        style={{ 
-                          maxWidth: '100%', 
-                          maxHeight: '100%'
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            <div className="flex flex-wrap justify-between gap-2 mt-4">
-              <div className="text-xs text-gray-500">
-                Sport: {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)}
-                {formData.patternStyle && ` • Pattern: ${formData.patternStyle}`}
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  className="text-xs h-8 rounded-full"
-                >
-                  <Download className="h-3 w-3 mr-1" /> Export
-                </Button>
-              </div>
-            </div>
-          </div>
-        
-          {/* Mobile Tools Panel - Appears only on mobile */}
-          <div className="md:hidden mt-4 border-t border-gray-200 pt-4">
-            <div className="mb-3">
-              <h3 className="font-medium text-sm text-gray-700 mb-2">Canvas Elements</h3>
-              <div className="grid grid-cols-3 gap-2">
-                <Button 
-                  size="sm"
-                  variant="outline"
-                  className="text-xs flex items-center justify-center rounded-md h-10"
-                  onClick={() => {
-                    setCurrentText("");
-                    setIsEditing(false);
-                    setEditingElementId(null);
-                  }}
-                >
-                  <Type className="h-4 w-4 mr-1" /> Add Text
-                </Button>
-                <Button 
-                  size="sm"
-                  variant="outline"
-                  className="text-xs flex items-center justify-center rounded-md h-10"
-                  onClick={() => {
-                    setCurrentText("99");
-                    setIsEditing(false);
-                    setEditingElementId(null);
-                  }}
-                >
-                  <Hash className="h-4 w-4 mr-1" /> Add Number
-                </Button>
-                <label className="inline-block cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleLogoUpload}
-                  />
-                  <div 
-                    className="text-xs flex items-center justify-center rounded-md h-10 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium px-4 py-2"
-                  >
-                    <Image className="h-4 w-4 mr-1" /> Add Logo
-                  </div>
-                </label>
-              </div>
-            </div>
-            
-            {/* Only show editing tools when text is selected */}
-            {(isEditing || editingElementId) && (
-              <div className="space-y-3 border-t border-gray-200 pt-3">
-                <h3 className="font-medium text-sm text-gray-700 mb-2">Edit Selected Text</h3>
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Text Content</label>
-                  <Input 
-                    type="text" 
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md" 
-                    placeholder="Enter text" 
-                    value={currentText}
-                    onChange={(e) => setCurrentText(e.target.value)}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Color</label>
-                    <Input 
-                      type="color" 
-                      className="w-full h-9 px-1 border border-gray-300 rounded-md" 
-                      value={currentColor}
-                      onChange={(e) => setCurrentColor(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Font Size</label>
-                    <div className="flex items-center">
-                      <Slider 
-                        value={[currentFontSize]} 
-                        min={12} 
-                        max={72} 
-                        step={1}
-                        onValueChange={(value) => setCurrentFontSize(value[0])}
-                        className="flex-1 mr-2"
-                      />
-                      <span className="text-xs text-gray-500">{currentFontSize}px</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm"
-                    className="flex-1 bg-primary text-white px-3 py-1.5 rounded-full text-xs h-8"
-                    onClick={handleUpdateText}
-                  >
-                    Update Text
-                  </Button>
-                  <Button 
-                    size="sm"
-                    variant="outline"
-                    className="px-3 py-1.5 rounded-full text-xs h-8"
-                    onClick={() => {
-                      if (editingElementId) {
-                        handleDeleteText(editingElementId);
-                      }
-                    }}
-                  >
-                    <Trash className="h-3.5 w-3.5 text-red-500" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            {(!isEditing && !editingElementId && activeElement && activeElement.startsWith('logo-')) && (
-              <div className="space-y-3 border-t border-gray-200 pt-3">
-                <h3 className="font-medium text-sm text-gray-700 mb-2">Edit Selected Logo</h3>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="block text-xs text-gray-600 mb-1">Size</label>
-                    <Slider 
-                      value={[logoElements.find(logo => logo.id === activeElement)?.size.width || 100]} 
-                      min={20} 
-                      max={300} 
-                      step={5}
-                      onValueChange={(value) => {
-                        setLogoElements(prev => prev.map(logo => {
-                          if (logo.id === activeElement) {
-                            const aspectRatio = logo.size.height / logo.size.width;
-                            const newWidth = value[0];
-                            const newHeight = logo.maintainAspectRatio ? Math.round(newWidth * aspectRatio) : logo.size.height;
-                            
-                            return {
-                              ...logo,
-                              size: {
-                                width: newWidth,
-                                height: newHeight
-                              }
-                            };
-                          }
-                          return logo;
-                        }));
-                      }}
-                      className="flex-1"
-                    />
-                  </div>
-                  <span className="text-xs text-gray-500 self-end mb-1">
-                    {logoElements.find(logo => logo.id === activeElement)?.size.width}px
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="block text-xs text-gray-600 mb-1">Rotation</label>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => {
-                          setLogoElements(prev => prev.map(logo => {
-                            if (logo.id === activeElement) {
-                              return {
-                                ...logo,
-                                rotation: ((logo.rotation || 0) - 90) % 360
-                              };
-                            }
-                            return logo;
-                          }));
-                        }}
-                      >
-                        <RotateCcw className="h-3 w-3" />
-                      </Button>
-                      <Slider 
-                        value={[logoElements.find(logo => logo.id === activeElement)?.rotation || 0]} 
-                        min={0} 
-                        max={360} 
-                        step={5}
-                        onValueChange={(value) => {
-                          setLogoElements(prev => prev.map(logo => {
-                            if (logo.id === activeElement) {
-                              return {
-                                ...logo,
-                                rotation: value[0]
-                              };
-                            }
-                            return logo;
-                          }));
-                        }}
-                        className="flex-1"
-                      />
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => {
-                          setLogoElements(prev => prev.map(logo => {
-                            if (logo.id === activeElement) {
-                              return {
-                                ...logo,
-                                rotation: ((logo.rotation || 0) + 90) % 360
-                              };
-                            }
-                            return logo;
-                          }));
-                        }}
-                      >
-                        <RotateCw className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-500 self-end mb-1">
-                    {logoElements.find(logo => logo.id === activeElement)?.rotation || 0}°
-                  </span>
-                </div>
-                <Button 
-                  variant="destructive"
-                  size="sm"
-                  className="text-xs h-8 w-full mt-2"
-                  onClick={() => {
-                    const newLogoElements = logoElements.filter(logo => logo.id !== activeElement);
-                    setLogoElements(newLogoElements);
-                    setActiveElement(null);
-                    
-                    const updatedLogos = newLogoElements.map(el => ({
-                      url: el.url,
-                      position: el.position,
-                      size: el.size,
-                      rotation: el.rotation || 0,
-                      maintainAspectRatio: el.maintainAspectRatio || true
-                    }));
-                    
-                    updateCustomizations({
-                      ...customizations,
-                      logos: updatedLogos
-                    });
-                  }}
-                >
-                  Remove Selected Logo
-                </Button>
-              </div>
-            )}
-            
-            {/* Mobile text input when adding new text */}
-            {!isEditing && !editingElementId && !activeElement && (
-              <div className="space-y-3 border-t border-gray-200 pt-3">
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Text Content</label>
-                  <div className="flex gap-2">
-                    <Input 
-                      type="text" 
-                      className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md" 
-                      placeholder="Enter text" 
-                      value={currentText}
-                      onChange={(e) => setCurrentText(e.target.value)}
-                    />
-                    <Button 
-                      size="sm"
-                      className="bg-primary text-white px-3 py-1.5 rounded-full text-xs h-9"
-                      onClick={handleAddText}
-                      disabled={!currentText.trim()}
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
