@@ -1,26 +1,26 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useOrderStore, TeamMember } from '@/hooks/use-order-store';
+import { useOrderStore } from '@/hooks/use-order-store';
+import { TeamMember } from '@/hooks/use-order-types';
 import { PlusCircle, Trash2, Download } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function TeamRoster() {
+  const orderStore = useOrderStore();
   const { 
     isTeamOrder,
-    teamName, 
-    setTeamName,
-    teamMembers,
-    addTeamMember,
-    updateTeamMember,
-    removeTeamMember,
+    teamMembers = [],
     gender,
-    size,
-  } = useOrderStore();
+    size
+  } = orderStore;
+  
+  // Local state for team name since it might not be in OrderState
+  const [teamName, setTeamName] = useState('');
   
   const [playerName, setPlayerName] = useState('');
   const [playerNumber, setPlayerNumber] = useState('');
@@ -30,14 +30,23 @@ export default function TeamRoster() {
   const handleAddPlayer = () => {
     if (!playerName || !playerNumber) return;
     
-    // Add new team member
-    addTeamMember({
+    // Create a new team member that follows the TeamMember interface
+    const newTeamMember: TeamMember = {
       id: uuidv4(),
       name: playerName,
       number: playerNumber,
-      size: playerSize,
-      quantity: playerQuantity,
-    });
+      size: playerSize || 'M',
+      gender: gender || 'Male',
+      items: [] // Initialize with empty items array
+    };
+    
+    // Get the current state of teamMembers and add the new member
+    const updatedTeamMembers = [...(teamMembers || []), newTeamMember];
+    
+    // Use setTeamMembers directly
+    if (useOrderStore.getState().setTeamMembers) {
+      useOrderStore.getState().setTeamMembers(updatedTeamMembers);
+    }
     
     // Reset form
     setPlayerName('');
@@ -63,22 +72,34 @@ export default function TeamRoster() {
       // Skip header row if present
       const startIndex = lines[0].includes('Name,Number,Size') ? 1 : 0;
       
+      // Get the current team members
+      let updatedTeamMembers = [...(teamMembers || [])];
+      
       // Process each line
       for (let i = startIndex; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
         
-        const [name, number, size = 'M', quantity = '1'] = line.split(',');
+        const [name, number, size = 'M'] = line.split(',');
         
         if (name && number) {
-          addTeamMember({
+          // Create a new team member following the TeamMember interface
+          const newTeamMember: TeamMember = {
             id: uuidv4(),
             name: name.trim(),
             number: number.trim(),
-            size: size.trim() as any || 'M',
-            quantity: parseInt(quantity.trim()) || 1,
-          });
+            size: size.trim() || 'M',
+            gender: gender || 'Male',
+            items: [] // Initialize with empty items array
+          };
+          
+          updatedTeamMembers.push(newTeamMember);
         }
+      }
+      
+      // Update the team members in the store
+      if (useOrderStore.getState().setTeamMembers) {
+        useOrderStore.getState().setTeamMembers(updatedTeamMembers);
       }
     };
     
@@ -110,7 +131,7 @@ export default function TeamRoster() {
           Add your team members and their jersey details
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <div className="p-6">
         <div className="space-y-6">
           {/* Team Name */}
           <div className="grid gap-2">
@@ -247,21 +268,42 @@ export default function TeamRoster() {
                         <TableCell>
                           <Input
                             value={player.name}
-                            onChange={(e) => updateTeamMember(player.id, { name: e.target.value })}
+                            onChange={(e) => {
+                              const updatedMembers = teamMembers.map(member => 
+                                member.id === player.id
+                                  ? { ...member, name: e.target.value }
+                                  : member
+                              );
+                              useOrderStore.getState().setTeamMembers(updatedMembers);
+                            }}
                             className="h-8"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             value={player.number}
-                            onChange={(e) => updateTeamMember(player.id, { number: e.target.value })}
+                            onChange={(e) => {
+                              const updatedMembers = teamMembers.map(member => 
+                                member.id === player.id
+                                  ? { ...member, number: e.target.value }
+                                  : member
+                              );
+                              useOrderStore.getState().setTeamMembers(updatedMembers);
+                            }}
                             className="h-8 w-16"
                           />
                         </TableCell>
                         <TableCell>
                           <Select
                             value={player.size}
-                            onValueChange={(value) => updateTeamMember(player.id, { size: value as any })}
+                            onValueChange={(value) => {
+                              const updatedMembers = teamMembers.map(member => 
+                                member.id === player.id
+                                  ? { ...member, size: value }
+                                  : member
+                              );
+                              useOrderStore.getState().setTeamMembers(updatedMembers);
+                            }}
                           >
                             <SelectTrigger className="h-8 w-16">
                               <SelectValue />
@@ -280,8 +322,8 @@ export default function TeamRoster() {
                           <Input
                             type="number"
                             min="1"
-                            value={player.quantity}
-                            onChange={(e) => updateTeamMember(player.id, { quantity: parseInt(e.target.value) || 1 })}
+                            value="1" // Display a default quantity of 1
+                            disabled={true} // Disable since quantity is now in team member items
                             className="h-8 w-16"
                           />
                         </TableCell>
@@ -289,7 +331,10 @@ export default function TeamRoster() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => removeTeamMember(player.id)}
+                            onClick={() => {
+                              const updatedMembers = teamMembers.filter(member => member.id !== player.id);
+                              useOrderStore.getState().setTeamMembers(updatedMembers);
+                            }}
                             className="h-8 w-8"
                           >
                             <Trash2 className="h-4 w-4 text-red-500" />
@@ -303,7 +348,7 @@ export default function TeamRoster() {
             </div>
           )}
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 }

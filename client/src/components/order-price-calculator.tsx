@@ -186,34 +186,38 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
       
       // Set a safe fallback price breakdown on error
       const safeBreakdown: PriceBreakdown = {
-        subtotal: 0,
+        subtotal: packageItems?.reduce((sum, item) => sum + (item.price || 0), 0) || 0,
         discount: 0,
         discountPercentage: 0,
-        shipping: 0,
+        shipping: 15,
         tax: 0,
-        grandTotal: 0,
-        itemCount: 0,
-        baseTotal: 0,
+        grandTotal: packageItems?.reduce((sum, item) => sum + (item.price || 0), 0) || 0 + 15,
+        itemCount: packageItems?.length || 0,
+        baseTotal: packageItems?.reduce((sum, item) => sum + (item.price || 0), 0) || 0,
         tierDiscountApplied: false,
         tierDiscountAmount: 0,
         subscriptionDiscountApplied: false,
         subscriptionDiscountAmount: 0,
         shippingFreeThresholdApplied: false,
-        priceBeforeTax: 0
+        priceBeforeTax: packageItems?.reduce((sum, item) => sum + (item.price || 0), 0) || 0 + 15
       };
       
       setPriceState(safeBreakdown);
       if (setPriceBreakdown) {
-        setPriceBreakdown(safeBreakdown);
+        try {
+          setPriceBreakdown(safeBreakdown);
+        } catch (setPriceErr) {
+          console.error("Failed to set price breakdown in store:", setPriceErr);
+        }
       }
       
       // Log more debugging information
       console.log('Debug pricing info:', {
-        packageType,
-        packageItems,
-        addOns,
-        isTeamOrder,
-        teamMembers: teamMembers?.length || 0
+        packageType: packageType || 'unknown',
+        packageItemsCount: packageItems?.length || 0,
+        addOnsCount: addOns?.length || 0,
+        isTeamOrder: isTeamOrder || false,
+        teamMembersCount: teamMembers?.length || 0
       });
     }
   }, [packageItems, addOns, isTeamOrder, teamMembers, packageType, isSubscribed, setPriceBreakdown]);
