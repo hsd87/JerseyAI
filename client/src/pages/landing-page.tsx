@@ -436,14 +436,14 @@ export default function LandingPage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium">Dedicated Account Manager</span>
                     <p className="text-sm text-gray-600">Personalized support for large clients</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium">On-time Global Fulfillment</span>
                     <p className="text-sm text-gray-600">Reliable delivery for event organizers</p>
@@ -527,7 +527,7 @@ export default function LandingPage() {
             No design skills required!
           </p>
           <Link href="/designer">
-            <Button size="lg" className="bg-[#39FF14] hover:bg-[#39FF14]/90 text-black px-8 py-3 rounded-lg text-lg font-medium transition-all">
+            <Button size="lg" className="bg-[#E34234] hover:bg-[#E34234]/90 text-white px-8 py-3 rounded-lg text-lg font-medium transition-all">
               Start Designing Now
             </Button>
           </Link>
