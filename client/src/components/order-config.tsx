@@ -321,7 +321,7 @@ export default function OrderConfig({
     setPackageType(value);
   };
 
-  // Handle gender selection 
+  // Handle gender selection (now used for the default gender and size chart only)
   const handleGenderChange = (value: 'Male' | 'Female' | 'Youth') => {
     // Update form
     form.setValue('gender', value);
@@ -329,22 +329,8 @@ export default function OrderConfig({
     // Update local state
     setGender(value);
     
-    // Update package items with new gender if they exist
-    if (packageItems && packageItems.length > 0) {
-      const updatedItems = packageItems.map(item => ({
-        ...item,
-        gender: value
-      }));
-      
-      // Update local state first
-      setPackageItems(updatedItems);
-      
-      // Then update the store
-      const setPackageItemsInStore = useOrderStore.getState().setPackageItems;
-      if (typeof setPackageItemsInStore === 'function') {
-        setPackageItemsInStore(updatedItems);
-      }
-    }
+    // Note: We no longer update all package items with the same gender
+    // Instead, gender is now set individually per item in the table
   };
 
   // Handle size change for individual order
@@ -1131,29 +1117,7 @@ export default function OrderConfig({
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="genderSelect">Gender</Label>
-                    <RadioGroup 
-                      id="genderSelect"
-                      defaultValue={watchedGender} 
-                      value={watchedGender}
-                      onValueChange={(value) => handleGenderChange(value as 'Male' | 'Female' | 'Youth')}
-                      className="flex space-x-4 mt-2"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Male" id="male" />
-                        <Label htmlFor="male">Men's</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Female" id="female" />
-                        <Label htmlFor="female">Women's</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Youth" id="youth" />
-                        <Label htmlFor="youth">Youth</Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
+                  {/* Gender selection has been moved to individual products in the table below */}
                   
                   <div>
                     <Label htmlFor="quantityInput">Default Quantity</Label>
@@ -1196,7 +1160,38 @@ export default function OrderConfig({
                       {packageItems.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell className="font-medium">{item.name}</TableCell>
-                          <TableCell>{item.gender}</TableCell>
+                          <TableCell>
+                            <Select
+                              value={item.gender}
+                              onValueChange={(value) => {
+                                // Update the gender for this specific item
+                                const updatedItems = packageItems.map(i => {
+                                  if (i.id === item.id) {
+                                    return {
+                                      ...i,
+                                      gender: value
+                                    };
+                                  }
+                                  return i;
+                                });
+                                // Update both local state and store
+                                setPackageItems(updatedItems);
+                                const setPackageItemsInStore = useOrderStore.getState().setPackageItems;
+                                if (typeof setPackageItemsInStore === 'function') {
+                                  setPackageItemsInStore(updatedItems);
+                                }
+                              }}
+                            >
+                              <SelectTrigger className="w-24">
+                                <SelectValue placeholder="Gender" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Male">Male</SelectItem>
+                                <SelectItem value="Female">Female</SelectItem>
+                                <SelectItem value="Youth">Youth</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
                           <TableCell>
                             {item.type === 'socks' ? (
                               'One Size'
@@ -1299,7 +1294,22 @@ export default function OrderConfig({
                 </div>
                 
                 <div className="rounded-md border p-4 bg-gray-50">
-                  <h4 className="font-medium mb-2">Size Chart ({watchedGender})</h4>
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium">Size Chart</h4>
+                    <Select
+                      value={watchedGender}
+                      onValueChange={(value) => handleGenderChange(value as 'Male' | 'Female' | 'Youth')}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Male">Men's</SelectItem>
+                        <SelectItem value="Female">Women's</SelectItem>
+                        <SelectItem value="Youth">Youth</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-300 text-sm">
                       <thead>
