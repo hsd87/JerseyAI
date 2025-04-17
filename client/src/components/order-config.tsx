@@ -25,7 +25,8 @@ import {
   ShoppingBag, 
   Users, 
   Trash2, 
-  Plus, 
+  Plus,
+  Minus,
   CheckCircle,
   ChevronRight,
   Ruler,
@@ -37,7 +38,7 @@ import { TeamMember, AddOn, OrderItem } from '@/hooks/use-order-types';
 
 // Form schema
 const orderConfigSchema = z.object({
-  packageType: z.enum(['jerseyOnly', 'jerseyShorts', 'fullKit'], {
+  packageType: z.enum(['jerseyOnly', 'jerseyShorts', 'fullKit', 'custom'], {
     required_error: 'Please select a package type',
   }),
   gender: z.enum(['Male', 'Female', 'Youth'], {
@@ -61,6 +62,7 @@ interface PackageItem {
   sizes: { size: string; quantity: number }[];
   price: number;
   gender: string;
+  sku?: string; // Added for product identification
 }
 
 export default function OrderConfig() {
@@ -119,7 +121,8 @@ export default function OrderConfig() {
   const kitTypeDisplayNames: Record<string, string> = {
     jerseyOnly: 'Jersey Only',
     jerseyShorts: 'Jersey + Shorts',
-    fullKit: 'Full Kit'
+    fullKit: 'Full Kit',
+    custom: 'Custom Package'
   };
 
   // Add-on functions
@@ -249,7 +252,7 @@ export default function OrderConfig() {
   }, [packageItems, teamMembers, watchedPackageType, watchedQuantity, watchedIsTeamOrder, addOns, setPriceBreakdown]);
 
   // Handle package selection
-  const handlePackageTypeChange = (value: 'jerseyOnly' | 'jerseyShorts' | 'fullKit') => {
+  const handlePackageTypeChange = (value: 'jerseyOnly' | 'jerseyShorts' | 'fullKit' | 'custom') => {
     form.setValue('packageType', value);
     setPackageType(value);
   };
