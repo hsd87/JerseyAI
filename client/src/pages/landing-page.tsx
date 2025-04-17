@@ -311,7 +311,7 @@ export default function LandingPage() {
               <ul className="space-y-4">
                 {keyFeatures.map((feature, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="h-6 w-6 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="h-6 w-6 text-[#E34234] flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">{feature}</span>
                   </li>
                 ))}
@@ -368,7 +368,7 @@ export default function LandingPage() {
             {/* Teams & Organizations Section */}
             <div className="bg-gray-50 rounded-xl p-8 border border-gray-200">
               <div className="flex items-center gap-3 mb-4">
-                <Users className="h-8 w-8 text-[#39FF14]" />
+                <Users className="h-8 w-8 text-[#E34234]" />
                 <h3 className="font-sora font-bold text-2xl">Built for Teams of All Sizes</h3>
               </div>
               <p className="text-gray-700 mb-6">
@@ -376,28 +376,28 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium">Bulk edit player names/numbers</span>
                     <p className="text-sm text-gray-600">Upload a spreadsheet or enter names manually</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium">Multiple sizes in one order</span>
                     <p className="text-sm text-gray-600">Youth and adult sizes together</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium">Team Order Discounts</span>
                     <p className="text-sm text-gray-600">Automatically applied for 10+ jerseys</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium">Reorder Anytime</span>
                     <p className="text-sm text-gray-600">Save designs for future seasons</p>
@@ -414,7 +414,7 @@ export default function LandingPage() {
             {/* B2B & Resellers Section */}
             <div className="bg-gray-50 rounded-xl p-8 border border-gray-200">
               <div className="flex items-center gap-3 mb-4">
-                <Building className="h-8 w-8 text-[#39FF14]" />
+                <Building className="h-8 w-8 text-[#E34234]" />
                 <h3 className="font-sora font-bold text-2xl">Partner with ProJersey</h3>
               </div>
               <p className="text-gray-700 mb-6">
@@ -422,14 +422,14 @@ export default function LandingPage() {
               </p>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium">Wholesale Pricing</span>
                     <p className="text-sm text-gray-600">Tiered discounts for large volumes</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#39FF14] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium">White-Label Options</span>
                     <p className="text-sm text-gray-600">Ship with your branding or integrate via API</p>
