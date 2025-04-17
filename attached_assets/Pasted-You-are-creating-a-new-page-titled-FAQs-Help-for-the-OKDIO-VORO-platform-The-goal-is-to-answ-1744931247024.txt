@@ -1,0 +1,67 @@
+You are creating a new page titled **FAQs & Help** for the OKDIO/VORO platform.
+
+The goal is to answer common questions and provide quick help for new customers, bulk buyers, and anyone using the AI designer.
+
+🛠 Only generate layout and styling using Tailwind CSS or existing project styles. Do NOT modify core app logic or backend functionality.
+
+---
+
+📄 PAGE STRUCTURE:
+
+### 1. Hero Header Section
+- Heading: `FAQs & Help`
+- Subheading:  
+  “Got questions? We've got answers. Find everything you need to confidently design and order your custom kit.”
+- Layout: Centered, padding `py-16`, background `bg-gray-50`
+
+---
+
+### 2. Accordion-Based FAQ Section (Stacked or Expandable Items)
+
+#### Format:
+Each item should be collapsible. Use Tailwind’s disclosure logic or provide basic layout structure for future enhancement.
+
+**Example FAQs:**
+
+1. **How long does it take to receive my order?**  
+   “Most orders are delivered within 12–18 days depending on your location and order size.”
+
+2. **Can I change my kit design after generating it?**  
+   “You can edit your design and re-generate it as many times as you like before placing your order.”
+
+3. **Is there a minimum quantity for team orders?**  
+   “No. We support single orders and bulk orders with quantity-based pricing.”
+
+4. **What sports do you support?**  
+   “Currently: Soccer, Rugby, Basketball, Cricket, Esports, American Football. More coming soon.”
+
+5. **Do you offer refunds or revisions?**  
+   “Once your kit is confirmed and manufactured, we cannot refund. However, you can regenerate your design before confirming your order.”
+
+---
+
+### 3. Help Contact Block
+
+Simple text section at the bottom:
+
+> “Still need help? Reach out to our team at [help@vorosport.ai](mailto:help@vorosport.ai) or use the contact form below.”
+
+- Optional Button: “Contact Us” → Link to `/contact`
+- Layout: centered, `text-gray-600`, margin-top: `mt-12`
+
+---
+
+🎨 Styling Guidelines:
+- Font: `Space Grotesk` for questions, `Inter` for body
+- Headings: `text-2xl md:text-3xl`, bold
+- FAQ cards: `bg-white rounded-xl shadow-sm p-6`, with `hover:border-accent`
+- Use brand accent `#E34234` for active/open accordion highlight
+
+---
+
+✅ Ensure:
+- Responsive design
+- Clean spacing between sections (`gap-8`, `py-12`)
+- No change to backend, no dynamic logic unless part of existing framework
+
+The page is purely for visual layout and content clarity.
