@@ -377,6 +377,184 @@ export class DatabaseStorage implements IStorage {
     
     return updatedLead;
   }
+  
+  // Order Methods
+  async createOrder(data: {
+    userId: number;
+    designId: number;
+    sport: string;
+    totalAmount: number;
+    orderDetails: {
+      items: {
+        type: string;
+        size: string;
+        quantity: number;
+        gender: string;
+        price: number;
+      }[];
+      packageType: string;
+      isTeamOrder: boolean;
+      teamName?: string;
+      addOns?: {
+        name: string;
+        price: number;
+        quantity: number;
+      }[];
+      discount?: number;
+      deliveryTimeline?: string;
+    };
+    shippingAddress: {
+      name: string;
+      street: string;
+      city: string;
+      state: string;
+      country: string;
+      postalCode: string;
+      phone?: string;
+    };
+    prompt?: string;
+    designUrls?: { front: string; back: string };
+    metadata?: Record<string, any>;
+  }): Promise<any> {
+    try {
+      // Convert order data to JSON for storage
+      const orderData = {
+        userId: data.userId,
+        designId: data.designId,
+        sport: data.sport,
+        totalAmount: data.totalAmount,
+        orderDetails: JSON.stringify(data.orderDetails),
+        shippingAddress: JSON.stringify(data.shippingAddress),
+        prompt: data.prompt,
+        designUrls: data.designUrls ? JSON.stringify(data.designUrls) : null,
+        metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+        status: 'pending',
+        createdAt: new Date()
+      };
+
+      // Create the order in the database
+      const [order] = await db
+        .insert(orders)
+        .values(orderData)
+        .returning();
+
+      if (!order) {
+        throw new Error('Failed to create order');
+      }
+
+      // Parse JSON fields for return value
+      return {
+        ...order,
+        orderDetails: JSON.parse(order.orderDetails),
+        shippingAddress: JSON.parse(order.shippingAddress),
+        designUrls: order.designUrls ? JSON.parse(order.designUrls) : null,
+        metadata: order.metadata ? JSON.parse(order.metadata) : null
+      };
+    } catch (error) {
+      console.error('Error creating order:', error);
+      throw error;
+    }
+  }
+
+  async getUserOrders(userId: number): Promise<any[]> {
+    try {
+      const orderResults = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.userId, userId))
+        .orderBy(desc(orders.createdAt));
+
+      // Parse JSON fields for all orders
+      return orderResults.map(order => ({
+        ...order,
+        orderDetails: JSON.parse(order.orderDetails),
+        shippingAddress: JSON.parse(order.shippingAddress),
+        designUrls: order.designUrls ? JSON.parse(order.designUrls) : null,
+        metadata: order.metadata ? JSON.parse(order.metadata) : null
+      }));
+    } catch (error) {
+      console.error('Error fetching user orders:', error);
+      throw error;
+    }
+  }
+
+  async getOrderById(orderId: number): Promise<any | null> {
+    try {
+      const [order] = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.id, orderId));
+
+      if (!order) {
+        return null;
+      }
+
+      // Parse JSON fields
+      return {
+        ...order,
+        orderDetails: JSON.parse(order.orderDetails),
+        shippingAddress: JSON.parse(order.shippingAddress),
+        designUrls: order.designUrls ? JSON.parse(order.designUrls) : null,
+        metadata: order.metadata ? JSON.parse(order.metadata) : null
+      };
+    } catch (error) {
+      console.error('Error fetching order by id:', error);
+      throw error;
+    }
+  }
+
+  async updateOrderStatus(orderId: number, status: string, trackingId?: string): Promise<any> {
+    try {
+      const updateData: any = { status };
+      
+      if (trackingId) {
+        updateData.trackingId = trackingId;
+      }
+
+      const [updatedOrder] = await db
+        .update(orders)
+        .set(updateData)
+        .where(eq(orders.id, orderId))
+        .returning();
+
+      if (!updatedOrder) {
+        throw new Error(`Order with id ${orderId} not found`);
+      }
+
+      // Parse JSON fields
+      return {
+        ...updatedOrder,
+        orderDetails: JSON.parse(updatedOrder.orderDetails),
+        shippingAddress: JSON.parse(updatedOrder.shippingAddress),
+        designUrls: updatedOrder.designUrls ? JSON.parse(updatedOrder.designUrls) : null,
+        metadata: updatedOrder.metadata ? JSON.parse(updatedOrder.metadata) : null
+      };
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      throw error;
+    }
+  }
+
+  async getAllOrders(): Promise<any[]> {
+    try {
+      const orderResults = await db
+        .select()
+        .from(orders)
+        .orderBy(desc(orders.createdAt));
+
+      // Parse JSON fields for all orders
+      return orderResults.map(order => ({
+        ...order,
+        orderDetails: JSON.parse(order.orderDetails),
+        shippingAddress: JSON.parse(order.shippingAddress),
+        designUrls: order.designUrls ? JSON.parse(order.designUrls) : null,
+        metadata: order.metadata ? JSON.parse(order.metadata) : null
+      }));
+    } catch (error) {
+      console.error('Error fetching all orders:', error);
+      throw error;
+    }
+  }
 }
 
 // Export database storage instead of memory storage
