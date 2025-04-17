@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
-import { CrownIcon, Menu, Moon, User, UserCircle, X } from "lucide-react";
+import { CrownIcon, Menu, Moon, ShoppingCart, User, UserCircle, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useSubscription } from "@/hooks/use-subscription-store";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 
 // Simple navbar with basic mobile menu
 export default function Navbar() {
@@ -68,6 +69,9 @@ export default function Navbar() {
               <Link href="/jersey-editor" className={`text-sm font-medium ${location === '/jersey-editor' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
                 Jersey Editor
               </Link>
+              <Link href="/products" className={`text-sm font-medium ${location === '/products' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                Shop
+              </Link>
               <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
                 Gallery
               </button>
@@ -112,7 +116,11 @@ export default function Navbar() {
           </div>
           
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-2">
+            <div className="relative">
+              <CartDrawer />
+            </div>
+            
             <button 
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary transition-colors"
@@ -132,6 +140,10 @@ export default function Navbar() {
               <span className="sr-only">Dark mode</span>
               <Moon className="h-5 w-5" />
             </button>
+            
+            <div className="relative">
+              <CartDrawer />
+            </div>
             
             {user && (
               <div className="relative">
@@ -161,6 +173,9 @@ export default function Navbar() {
           </Link>
           <Link href="/jersey-editor" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/jersey-editor' ? 'text-primary' : 'text-gray-700'}`}>
             Jersey Editor
+          </Link>
+          <Link href="/products" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/products' ? 'text-primary' : 'text-gray-700'}`}>
+            Shop
           </Link>
           <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700">
             Gallery
