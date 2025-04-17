@@ -420,14 +420,23 @@ export default function OrderConfig() {
     }
   };
 
-  // Add team member
+  // Add team member with all package items
   const addTeamMember = () => {
+    // Create items array from packageItems
+    const memberItems: TeamMemberItem[] = packageItems.map(item => ({
+      itemType: item.type.toLowerCase(),
+      sku: item.sku || '',
+      size: watchedSize,
+      price: item.price
+    }));
+    
     const newMember: TeamMember = {
       id: `team-member-${Date.now()}`,
       name: '',
       number: '',
       size: watchedSize,
-      gender: watchedGender
+      gender: watchedGender,
+      items: memberItems
     };
     
     const updatedMembers = [...teamMembers, newMember];

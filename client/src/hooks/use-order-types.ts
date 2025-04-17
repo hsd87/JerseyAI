@@ -35,12 +35,20 @@ export interface AddOn extends OrderItem {
   customValue?: string;
 }
 
+export interface TeamMemberItem {
+  itemType: string;  // e.g., 'jersey', 'shorts', etc.
+  sku: string;       // Product SKU
+  size: string;      // Size of this specific item
+  price: number;     // Price of this item
+}
+
 export interface TeamMember {
   id: string;
   name: string;
   number: string;
-  size: string;
+  size: string;      // Default size for the jersey (primary item)
   gender: string;
+  items?: TeamMemberItem[]; // Each team member can have multiple items (jersey, shorts, etc.)
 }
 
 export interface PriceBreakdown {
