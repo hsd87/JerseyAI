@@ -174,26 +174,11 @@ export class DatabaseStorage implements IStorage {
 
   // Order Methods
   async createOrder(order: InsertOrder): Promise<Order> {
-    // Extract valid fields from the insert order to avoid typing issues
-    const validOrderData = {
-      userId: order.userId,
-      designId: order.designId,
-      prompt: order.prompt,
-      designUrls: order.designUrls,
-      sport: order.sport,
-      totalAmount: order.totalAmount,
-      orderDetails: order.orderDetails,
-      shippingAddress: order.shippingAddress,
-      metadata: order.metadata || {}
-    };
-    
-    // Insert with default status of "pending"
+    // Insert order with simplified approach
+    // Let database defaults handle missing values
     const [newOrder] = await db
       .insert(orders)
-      .values({
-        ...validOrderData,
-        status: "pending"
-      })
+      .values(order)
       .returning();
       
     return newOrder;
