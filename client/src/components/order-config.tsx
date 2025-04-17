@@ -343,11 +343,8 @@ export default function OrderConfig({
     
     setPackageItems(updatedItems);
     
-    // Sync with the store if store functions are available
-    if (setStoreGender) {
-      setStoreGender(value);
-    }
-    if (setStorePackageItems) {
+    // Only try to update the store if we have package items and store functions
+    if (typeof setStorePackageItems === 'function' && updatedItems.length > 0) {
       setStorePackageItems(updatedItems);
     }
   };
