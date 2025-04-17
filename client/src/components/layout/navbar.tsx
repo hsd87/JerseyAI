@@ -67,9 +67,6 @@ export default function Navbar() {
               <Link href="/designer" className={`nav-item ${location === '/designer' ? 'text-voro-red' : ''}`}>
                 AI Designer
               </Link>
-              <Link href="/products" className={`nav-item ${location === '/products' ? 'text-voro-red' : ''}`}>
-                Shop
-              </Link>
               <button className="nav-item">
                 How It Works
               </button>
@@ -162,9 +159,6 @@ export default function Navbar() {
           </Link>
           <Link href="/designer" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/designer' ? 'text-voro-red' : 'text-voro-white'}`}>
             AI Designer
-          </Link>
-          <Link href="/products" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/products' ? 'text-voro-red' : 'text-voro-white'}`}>
-            Shop
           </Link>
           <Link href="#how-it-works" className="block px-3 py-2 rounded-md text-base font-medium text-voro-white">
             How It Works
