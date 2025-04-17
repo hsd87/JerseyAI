@@ -38,9 +38,14 @@ class OrderService {
    */
   async createPaymentIntent(request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> {
     try {
+      // Ensure we have valid items to send - if no items, create a dummy item with the amount
+      const items = request.orderItems && request.orderItems.length > 0 
+        ? request.orderItems 
+        : [{ id: 'default', type: 'jersey', price: request.amount, quantity: 1, size: 'M', gender: 'unisex' }];
+      
       const response = await apiRequest('POST', '/api/create-payment-intent', {
         amount: request.amount,
-        items: request.orderItems,
+        items: items,
       });
       
       if (!response.ok) {
