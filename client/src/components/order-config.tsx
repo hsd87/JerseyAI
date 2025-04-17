@@ -1116,34 +1116,6 @@ export default function OrderConfig({
                   <p className="text-sm text-gray-600">Confirm your sizing and quantity preferences below.</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Gender selection has been moved to individual products in the table below */}
-                  
-                  <div>
-                    <Label htmlFor="quantityInput">Default Quantity</Label>
-                    <div className="flex items-center space-x-4 mt-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleQuantityChange(watchedQuantity - 1)}
-                        disabled={watchedQuantity <= 1}
-                      >
-                        <MinusCircle className="h-4 w-4" />
-                      </Button>
-                      <span className="mx-4 w-6 text-center">{watchedQuantity}</span>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleQuantityChange(watchedQuantity + 1)}
-                      >
-                        <PlusCircle className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                
                 <div>
                   <h3 className="text-lg font-medium mb-4">Order Items</h3>
                   <Table>
