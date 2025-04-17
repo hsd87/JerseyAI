@@ -340,7 +340,7 @@ const SubscribePage: React.FC = () => {
             <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
               <Award className="h-8 w-8 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Welcome to ProJersey Pro!</CardTitle>
+            <CardTitle className="text-2xl">Welcome to VORO Pro!</CardTitle>
             <CardDescription>Your subscription has been activated</CardDescription>
           </CardHeader>
           <CardContent className="pt-6">

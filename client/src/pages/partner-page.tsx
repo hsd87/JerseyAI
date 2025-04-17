@@ -107,7 +107,7 @@ export default function PartnerPage() {
         // If WhatsApp was selected as preferred contact method and phone is provided
         if (data.preferredContactMethod === 'WhatsApp' && data.phone) {
           const cleanPhone = data.phone.replace(/[^0-9+]/g, '');
-          const message = encodeURIComponent(`Hello! I just submitted a partner inquiry on ProJersey. I'm interested in ${data.partnershipType} partnership. Looking forward to discussing further!`);
+          const message = encodeURIComponent(`Hello! I just submitted a partner inquiry on VORO. I'm interested in ${data.partnershipType} partnership. Looking forward to discussing further!`);
           setWhatsAppLink(`https://wa.me/${cleanPhone}?text=${message}`);
         }
       } else {

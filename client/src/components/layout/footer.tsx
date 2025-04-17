@@ -44,7 +44,7 @@ export default function Footer() {
         
         <div className="mt-12 sm:mt-16 border-t border-gray-600 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} ProJersey. All rights reserved.
+            &copy; {new Date().getFullYear()} VORO. All rights reserved.
           </p>
           <div className="mt-4 sm:mt-0 flex flex-wrap justify-center gap-6 items-center">
             <a href="#" className="text-sm text-gray-400 hover:text-voro-red transition-colors">Privacy Policy</a>

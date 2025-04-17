@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], user);
       toast({
         title: "Account created",
-        description: `Welcome to ProJersey, ${user.username}!`,
+        description: `Welcome to VORO, ${user.username}!`,
       });
     },
     onError: (error: Error) => {

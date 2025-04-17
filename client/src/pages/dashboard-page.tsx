@@ -565,7 +565,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Your Subscription</CardTitle>
-                  <CardDescription>Manage your ProJersey subscription</CardDescription>
+                  <CardDescription>Manage your VORO subscription</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">

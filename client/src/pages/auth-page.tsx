@@ -79,7 +79,7 @@ export default function AuthPage() {
         <div className="w-full lg:w-1/2 p-8 flex items-center justify-center">
           <div className="w-full max-w-md">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold font-sora mb-2">Welcome to ProJersey</h1>
+              <h1 className="text-3xl font-bold font-sora mb-2">Welcome to VORO</h1>
               <p className="text-gray-600">Sign in or create an account to get started</p>
             </div>
             

@@ -19,7 +19,7 @@ export default function OrderDemoPage() {
   return (
     <div className="container mx-auto py-8">
       <Helmet>
-        <title>Order Demo - ProJersey</title>
+        <title>Order Demo - VORO</title>
       </Helmet>
       
       <div className="space-y-6">
