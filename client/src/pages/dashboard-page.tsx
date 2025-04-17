@@ -82,7 +82,7 @@ export default function DashboardPage() {
       title: "Design loaded",
       description: "You can now edit your design."
     });
-    navigate('/');
+    navigate('/designer');
   };
 
   const handleDeleteDesign = async (id: number) => {
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                   {user?.subscriptionTier === "pro" ? "PRO" : "FREE"}
                 </Badge>
               </div>
-              <Link href="/">
+              <Link href="/designer">
                 <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-full px-4 py-1.5 h-auto">
                   <i className="fas fa-plus mr-2"></i> New Design
                 </Button>
