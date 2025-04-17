@@ -10,7 +10,7 @@ import OrderConfig from "@/components/order-config";
 import TeamRoster from "@/components/team-roster";
 import OrderSummary from "@/components/order-summary";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, ShoppingCart } from "lucide-react";
+import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function DesignerPage() {
@@ -170,12 +170,9 @@ export default function DesignerPage() {
                 />
               </div>
               
-              <div className="mt-6 flex justify-between">
+              <div className="mt-6 flex justify-start">
                 <Button variant="outline" onClick={prevStep}>
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back to Customization
-                </Button>
-                <Button onClick={nextStep} className="bg-green-600 hover:bg-green-700">
-                  Proceed to Checkout <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
