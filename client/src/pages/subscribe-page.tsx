@@ -7,6 +7,7 @@ import { orderService } from '@/lib/order-service';
 import { loadStripe, Stripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { StripePaymentForm } from '@/components/payment/stripe-payment-form';
+import Navbar from '@/components/layout/navbar';
 import {
   Card,
   CardContent,
@@ -56,19 +57,22 @@ const SubscribePage: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Login Required</CardTitle>
-            <CardDescription>Please log in to manage your subscription</CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button onClick={() => setLocation('/auth')}>
-              Login or Register
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+      <>
+        <Navbar />
+        <div className="container max-w-4xl mx-auto py-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Login Required</CardTitle>
+              <CardDescription>Please log in to manage your subscription</CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button onClick={() => setLocation('/auth')}>
+                Login or Register
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </>
     );
   }
 
@@ -334,15 +338,17 @@ const SubscribePage: React.FC = () => {
   // Success page after subscription is activated
   if (paymentStep === 'success') {
     return (
-      <div className="container max-w-2xl mx-auto py-16 px-4">
-        <Card className="text-center">
-          <CardHeader>
-            <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-              <Award className="h-8 w-8 text-primary" />
-            </div>
-            <CardTitle className="text-2xl">Welcome to VORO Pro!</CardTitle>
-            <CardDescription>Your subscription has been activated</CardDescription>
-          </CardHeader>
+      <>
+        <Navbar />
+        <div className="container max-w-2xl mx-auto py-16 px-4">
+          <Card className="text-center">
+            <CardHeader>
+              <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
+                <Award className="h-8 w-8 text-primary" />
+              </div>
+              <CardTitle className="text-2xl">Welcome to VORO Pro!</CardTitle>
+              <CardDescription>Your subscription has been activated</CardDescription>
+            </CardHeader>
           <CardContent className="pt-6">
             <p className="mb-6">You now have access to unlimited designs and all premium features.</p>
             <div className="bg-muted p-4 rounded-lg max-w-md mx-auto">
@@ -388,79 +394,85 @@ const SubscribePage: React.FC = () => {
     };
 
     return (
-      <div className="container max-w-2xl mx-auto py-12 px-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Complete Your Subscription</CardTitle>
-            <CardDescription>Enter your payment details to activate Pro features</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Elements options={options} stripe={getStripePromise()}>
-              <StripePaymentForm 
-                onSuccess={handlePaymentSuccess} 
-                onCancel={handlePaymentCancel} 
-                amount={999} // $9.99
-              />
-            </Elements>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <Navbar />
+        <div className="container max-w-2xl mx-auto py-12 px-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Complete Your Subscription</CardTitle>
+              <CardDescription>Enter your payment details to activate Pro features</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Elements options={options} stripe={getStripePromise()}>
+                <StripePaymentForm 
+                  onSuccess={handlePaymentSuccess} 
+                  onCancel={handlePaymentCancel} 
+                  amount={999} // $9.99
+                />
+              </Elements>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   // Default view - subscription plans
   return (
-    <div className="container max-w-6xl mx-auto py-8 px-4">
-      <div className="max-w-2xl mx-auto mb-8">
-        <h1 className="text-3xl font-bold">Subscription Plans</h1>
-        <p className="text-muted-foreground mt-2">
-          Choose the right plan for your jersey design needs
-        </p>
-      </div>
+    <>
+      <Navbar />
+      <div className="container max-w-6xl mx-auto py-8 px-4">
+        <div className="max-w-2xl mx-auto mb-8">
+          <h1 className="text-3xl font-bold">Subscription Plans</h1>
+          <p className="text-muted-foreground mt-2">
+            Choose the right plan for your jersey design needs
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <div className="md:col-span-2">
-          {renderPlansComparison()}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="md:col-span-2">
+            {renderPlansComparison()}
+          </div>
+          <div className="md:col-span-1">
+            {renderCurrentSubscription()}
+          </div>
         </div>
-        <div className="md:col-span-1">
-          {renderCurrentSubscription()}
-        </div>
-      </div>
 
-      <div className="mt-16 max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
-        <div className="space-y-4">
-          <div className="border rounded-lg p-4">
-            <h3 className="font-semibold text-lg">What's included in the Pro plan?</h3>
-            <p className="mt-2 text-muted-foreground">
-              Pro plan includes unlimited jersey designs, 10% discount on all orders, priority customer support, 
-              and access to premium design templates.
-            </p>
-          </div>
-          <div className="border rounded-lg p-4">
-            <h3 className="font-semibold text-lg">Can I cancel my subscription anytime?</h3>
-            <p className="mt-2 text-muted-foreground">
-              Yes, you can cancel your subscription at any time. You'll continue to have access to Pro features 
-              until the end of your current billing period.
-            </p>
-          </div>
-          <div className="border rounded-lg p-4">
-            <h3 className="font-semibold text-lg">How does the design limit work on the free plan?</h3>
-            <p className="mt-2 text-muted-foreground">
-              Free users can create up to 6 jersey designs per month. Once you reach this limit, you'll need to 
-              wait until the next month or upgrade to Pro for unlimited designs.
-            </p>
-          </div>
-          <div className="border rounded-lg p-4">
-            <h3 className="font-semibold text-lg">Is my payment information secure?</h3>
-            <p className="mt-2 text-muted-foreground">
-              Yes, all payments are processed securely through Stripe. We never store your payment information 
-              on our servers.
-            </p>
+        <div className="mt-16 max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
+          <div className="space-y-4">
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold text-lg">What's included in the Pro plan?</h3>
+              <p className="mt-2 text-muted-foreground">
+                Pro plan includes unlimited jersey designs, 10% discount on all orders, priority customer support, 
+                and access to premium design templates.
+              </p>
+            </div>
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold text-lg">Can I cancel my subscription anytime?</h3>
+              <p className="mt-2 text-muted-foreground">
+                Yes, you can cancel your subscription at any time. You'll continue to have access to Pro features 
+                until the end of your current billing period.
+              </p>
+            </div>
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold text-lg">How does the design limit work on the free plan?</h3>
+              <p className="mt-2 text-muted-foreground">
+                Free users can create up to 6 jersey designs per month. Once you reach this limit, you'll need to 
+                wait until the next month or upgrade to Pro for unlimited designs.
+              </p>
+            </div>
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold text-lg">Is my payment information secure?</h3>
+              <p className="mt-2 text-muted-foreground">
+                Yes, all payments are processed securely through Stripe. We never store your payment information 
+                on our servers.
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
