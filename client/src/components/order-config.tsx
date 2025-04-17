@@ -32,7 +32,7 @@ import {
   Package,
   ClipboardList
 } from 'lucide-react';
-import { PACKAGE_PRICES, ADDON_OPTIONS } from '@/lib/constants';
+import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice } from '@shared/product-configs';
 import { TeamMember, AddOn, OrderItem } from '@/hooks/use-order-types';
 
 // Form schema
@@ -534,7 +534,7 @@ export default function OrderConfig() {
                     <h4 className="font-medium">Base Price</h4>
                     <div className="flex justify-between mt-2">
                       <span>{kitTypeDisplayNames[watchedPackageType]}</span>
-                      <span className="font-semibold">${PACKAGE_PRICES[watchedPackageType]}</span>
+                      <span className="font-semibold">${calculatePackageBasePrice(watchedPackageType)}</span>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">
                       This is the base price per unit. Final pricing will depend on your package options and quantity.
@@ -565,7 +565,7 @@ export default function OrderConfig() {
                   {watchedPackageType === 'jerseyOnly' && <CheckCircle className="h-5 w-5 text-green-500" />}
                 </div>
                 <h3 className="font-semibold">Jersey Only</h3>
-                <p className="text-lg font-bold">${PACKAGE_PRICES.jerseyOnly}</p>
+                <p className="text-lg font-bold">${calculatePackageBasePrice('jerseyOnly')}</p>
                 <p className="text-sm text-gray-500 mt-2">Custom jersey with your design</p>
                 <div className="mt-4 text-sm">
                   <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Premium fabric</p>
@@ -583,7 +583,7 @@ export default function OrderConfig() {
                   {watchedPackageType === 'jerseyShorts' && <CheckCircle className="h-5 w-5 text-green-500" />}
                 </div>
                 <h3 className="font-semibold">Jersey + Shorts</h3>
-                <p className="text-lg font-bold">${PACKAGE_PRICES.jerseyShorts}</p>
+                <p className="text-lg font-bold">${calculatePackageBasePrice('jerseyShorts')}</p>
                 <p className="text-sm text-gray-500 mt-2">Custom jersey with matching shorts</p>
                 <div className="mt-4 text-sm">
                   <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Premium fabric</p>

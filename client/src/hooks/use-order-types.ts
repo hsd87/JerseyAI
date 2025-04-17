@@ -1,5 +1,24 @@
 // Define the core types for our order system
 
+export interface PackageItem {
+  id: string;
+  name: string;
+  type: string;
+  sizes: { size: string; quantity: number }[];
+  price: number;
+  gender: string;
+}
+
+export interface OrderAddon {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  type: string;
+  size: string;
+  gender: string;
+}
+
 export interface OrderItem {
   id: string;
   type: string;
@@ -69,6 +88,7 @@ export interface OrderState {
   addOns: AddOn[];
   teamMembers: TeamMember[];
   isTeamOrder: boolean;
+  packageItems?: PackageItem[];
   packageType?: string;
   
   // Pricing
