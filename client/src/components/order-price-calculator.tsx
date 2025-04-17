@@ -103,7 +103,8 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
         }
       }
 
-      // Calculate tier discount based on quantity using the centralized pricing logic
+      // Calculate tier discount based on quantity using the centralized pricing logic from shared/pricing.ts
+      // (We're using the existing calculateQuantityDiscount function for backwards compatibility)
       const tierDiscountRate = calculateQuantityDiscount(itemCount);
       const tierDiscountAmount = baseTotal * tierDiscountRate;
       const tierDiscountApplied = tierDiscountRate > 0;
@@ -243,7 +244,7 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
             <div className="flex justify-between text-green-600">
               <span className="flex items-center">
                 <CreditCard className="mr-2 h-4 w-4" />
-                Pro Subscription (10%)
+                Pro Subscription ({(SUBSCRIPTION_DISCOUNT * 100).toFixed(0)}%)
               </span>
               <span>-${priceBreakdown.subscriptionDiscountAmount.toFixed(2)}</span>
             </div>
@@ -262,7 +263,7 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
           </div>
           
           <div className="flex justify-between text-muted-foreground">
-            <span>Tax (7%)</span>
+            <span>Tax ({(TAX_RATE * 100).toFixed(0)}%)</span>
             <span>${priceBreakdown.tax.toFixed(2)}</span>
           </div>
 
@@ -272,20 +273,20 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
           </div>
 
           <div className="pt-2 text-sm text-muted-foreground">
-            <p>All prices in USD. Tax calculated at 7%.</p>
-            {priceBreakdown.subtotal > 200 && (
+            <p>All prices in USD. Tax calculated at {(TAX_RATE * 100).toFixed(0)}%.</p>
+            {priceBreakdown.shippingFreeThresholdApplied && (
               <p className="mt-2 text-green-600">
-                You qualify for FREE shipping!
+                You qualify for FREE shipping on orders over ${SHIPPING_RULES[0].threshold}!
               </p>
             )}
             {isTeamOrder && (
               <p className="mt-2 text-green-600">
-                Team orders with 10+ items receive a {(calculateQuantityDiscount(10) * 100).toFixed(0)}% discount!
+                Team orders with {TIER_DISCOUNTS[2].threshold}+ items receive a {(TIER_DISCOUNTS[2].discount * 100).toFixed(0)}% discount!
               </p>
             )}
             {!priceBreakdown.subscriptionDiscountApplied && (
               <p className="mt-2">
-                Subscribe to Pro for an additional 10% off all orders.
+                Subscribe to Pro for an additional {(SUBSCRIPTION_DISCOUNT * 100).toFixed(0)}% off all orders.
               </p>
             )}
           </div>
