@@ -38,8 +38,9 @@ export interface IStorage {
   updateOrderPdfUrl(id: number, pdfUrl: string): Promise<Order>;
   
   // Subscription Methods
-  updateUserSubscription(userId: number, tier: string): Promise<User>;
+  updateUserSubscription(userId: number, tier: string, subscriptionId?: string): Promise<User>;
   updateUserStripeInfo(userId: number, info: { stripeCustomerId: string, stripeSubscriptionId: string }): Promise<User>;
+  updateUserStripeCustomerId(userId: number, customerId: string): Promise<User>;
   findUsersByStripeCustomerId(stripeCustomerId: string): Promise<User[]>;
   
   // Generation Credits
@@ -243,13 +244,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Subscription Methods
-  async updateUserSubscription(userId: number, tier: string): Promise<User> {
+  async updateUserSubscription(userId: number, tier: string, subscriptionId?: string): Promise<User> {
     const [updatedUser] = await db
       .update(users)
       .set({ 
         subscriptionTier: tier,
         // Reset remaining designs if upgrading to pro
-        ...(tier === "pro" ? { remainingDesigns: -1 } : {}) // -1 for unlimited
+        ...(tier === "pro" ? { remainingDesigns: -1 } : {}), // -1 for unlimited
+        // Update subscription ID if provided
+        ...(subscriptionId ? { stripeSubscriptionId: subscriptionId } : {})
       })
       .where(eq(users.id, userId))
       .returning();
@@ -267,6 +270,22 @@ export class DatabaseStorage implements IStorage {
       .set({
         stripeCustomerId: info.stripeCustomerId,
         stripeSubscriptionId: info.stripeSubscriptionId
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    
+    return updatedUser;
+  }
+  
+  async updateUserStripeCustomerId(userId: number, customerId: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        stripeCustomerId: customerId
       })
       .where(eq(users.id, userId))
       .returning();

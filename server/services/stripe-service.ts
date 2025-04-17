@@ -210,20 +210,21 @@ export async function createPaymentIntent(amount: number, customerId: string): P
 
 /**
  * Create a customer in Stripe
- * @param user User object with id, email, and username
+ * @param user User object from the database
  * @returns The Stripe customer ID
  */
-export async function createCustomer(user: { id: number; email?: string; username: string }): Promise<string> {
+export async function createCustomer(user: any): Promise<string> {
   if (!stripeInstance) throw new Error('Stripe is not configured');
   
-  if (!user.email && !user.username) {
+  // Check if we have either email or username
+  if ((!user.email || user.email === null) && !user.username) {
     throw new Error('User must have either an email or username');
   }
   
   try {
-    // Create a customer object in Stripe
+    // Create a customer object in Stripe with proper null handling
     const customer = await stripeInstance.customers.create({
-      email: user.email,
+      email: user.email || undefined, // Convert null to undefined for Stripe
       name: user.username,
       metadata: {
         userId: user.id.toString()
@@ -232,6 +233,16 @@ export async function createCustomer(user: { id: number; email?: string; usernam
     
     if (!customer.id) {
       throw new Error('No customer ID returned from Stripe');
+    }
+    
+    // Update the user record with the new Stripe customer ID
+    try {
+      const { storage } = await import('../storage');
+      await storage.updateUserStripeCustomerId(user.id, customer.id);
+      console.log(`Updated user ${user.id} with Stripe customer ID: ${customer.id}`);
+    } catch (storageError) {
+      console.error('Error updating user with Stripe customer ID:', storageError);
+      // Continue anyway since we have created the customer
     }
     
     console.log(`Created Stripe customer: ${customer.id} for user: ${user.id}`);
