@@ -32,7 +32,7 @@ import {
   Package,
   ClipboardList
 } from 'lucide-react';
-import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice } from '@shared/product-configs';
+import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice, PRODUCTS } from '@shared/product-configs';
 import { TeamMember, AddOn, OrderItem } from '@/hooks/use-order-types';
 
 // Form schema
@@ -552,74 +552,176 @@ export default function OrderConfig() {
           </div>
         )}
 
-        {/* Step 2: Package Options */}
+        {/* Step 2: Product Selection */}
         {currentStep === 2 && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div 
-                className={`border rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${watchedPackageType === 'jerseyOnly' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
-                onClick={() => handlePackageTypeChange('jerseyOnly')}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <Shirt className="h-8 w-8 text-primary" />
-                  {watchedPackageType === 'jerseyOnly' && <CheckCircle className="h-5 w-5 text-green-500" />}
-                </div>
-                <h3 className="font-semibold">Jersey Only</h3>
-                <p className="text-lg font-bold">${calculatePackageBasePrice('jerseyOnly')}</p>
-                <p className="text-sm text-gray-500 mt-2">Custom jersey with your design</p>
-                <div className="mt-4 text-sm">
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Premium fabric</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Custom name & number</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Your custom design</p>
-                </div>
-              </div>
-              
-              <div 
-                className={`border rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${watchedPackageType === 'jerseyShorts' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
-                onClick={() => handlePackageTypeChange('jerseyShorts')}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <Shirt className="h-8 w-8 text-primary" />
-                  {watchedPackageType === 'jerseyShorts' && <CheckCircle className="h-5 w-5 text-green-500" />}
-                </div>
-                <h3 className="font-semibold">Jersey + Shorts</h3>
-                <p className="text-lg font-bold">${calculatePackageBasePrice('jerseyShorts')}</p>
-                <p className="text-sm text-gray-500 mt-2">Custom jersey with matching shorts</p>
-                <div className="mt-4 text-sm">
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Premium fabric</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Custom name & number</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Your custom design</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Matching shorts</p>
-                </div>
-              </div>
-              
-              <div 
-                className={`border rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${watchedPackageType === 'fullKit' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
-                onClick={() => handlePackageTypeChange('fullKit')}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <Package className="h-8 w-8 text-primary" />
-                  {watchedPackageType === 'fullKit' && <CheckCircle className="h-5 w-5 text-green-500" />}
-                </div>
-                <h3 className="font-semibold">Full Kit</h3>
-                <p className="text-lg font-bold">${calculatePackageBasePrice('fullKit')}</p>
-                <p className="text-sm text-gray-500 mt-2">Jersey, shorts & accessories</p>
-                <div className="mt-4 text-sm">
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Premium fabric</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Custom name & number</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Your custom design</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Matching shorts</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Team socks</p>
-                  <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Gym bag included</p>
-                </div>
-              </div>
+            <div className="bg-slate-50 p-4 rounded-md border mb-4">
+              <h3 className="font-medium">Create Your Custom Package</h3>
+              <p className="text-sm text-gray-600 mt-1">Select the items you want to include in your order. You can add as many items as you need.</p>
             </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {PRODUCTS.filter(product => 
+                product.allowedInAiDesigner || 
+                product.productType === 'JERSEY' || 
+                product.productType === 'SHORTS' || 
+                product.productType === 'TROUSER' || 
+                product.productType === 'SOCKS'
+              ).map((product) => {
+                const isSelected = packageItems.some(item => item.sku === product.sku);
+                const currentItem = packageItems.find(item => item.sku === product.sku);
+                const currentQty = currentItem?.sizes[0]?.quantity || 0;
+                
+                return (
+                  <div 
+                    key={product.sku}
+                    className={`border rounded-lg p-4 hover:border-primary transition-colors ${isSelected ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                  >
+                    <div className="flex justify-between mb-2">
+                      {product.productType === 'JERSEY' && <Shirt className="h-6 w-6 text-primary" />}
+                      {product.productType === 'SHORTS' && <Shirt className="h-6 w-6 text-primary" />}
+                      {product.productType === 'TROUSER' && <Shirt className="h-6 w-6 text-primary" />}
+                      {product.productType === 'SOCKS' && <Shirt className="h-6 w-6 text-primary" />}
+                      {product.productType === 'KITBAG' && <Package className="h-6 w-6 text-primary" />}
+                      {product.productType === 'BAGPACK' && <Package className="h-6 w-6 text-primary" />}
+                      {product.productType === 'BEANIE' && <Shirt className="h-6 w-6 text-primary" />}
+                    </div>
+                    
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-medium">{product.name}</h3>
+                        <p className="text-base font-semibold">${product.basePrice}</p>
+                      </div>
+                      
+                      <div className="flex items-center space-x-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={() => {
+                            if (currentQty === 0) {
+                              // Add item to package
+                              const newItem = {
+                                id: `item-${Date.now()}`,
+                                sku: product.sku,
+                                name: product.name,
+                                type: product.productType.toLowerCase(),
+                                price: product.basePrice,
+                                gender: 'Male',
+                                sizes: [{ size: 'M', quantity: 1 }]
+                              };
+                              setPackageItems([...packageItems, newItem]);
+                              
+                              // Set package type to custom if it's not already
+                              if (watchedPackageType !== 'custom') {
+                                setPackageType('custom');
+                                form.setValue('packageType', 'custom');
+                              }
+                            } else if (currentQty === 1) {
+                              // Remove item from package
+                              setPackageItems(packageItems.filter(item => item.sku !== product.sku));
+                            } else {
+                              // Decrease quantity
+                              handlePackageItemQuantityChange(
+                                currentItem.id,
+                                currentItem.sizes[0]?.size || 'M',
+                                -1
+                              );
+                            }
+                          }}
+                        >
+                          {currentQty === 0 ? <Plus className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
+                        </Button>
+                        
+                        {currentQty > 0 && (
+                          <>
+                            <span className="w-5 text-center text-sm">{currentQty}</span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={() => {
+                                // Increase quantity
+                                handlePackageItemQuantityChange(
+                                  currentItem.id,
+                                  currentItem.sizes[0]?.size || 'M',
+                                  1
+                                );
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="text-xs text-gray-500">
+                      {product.productType === 'JERSEY' && (
+                        <>
+                          <p>• Premium breathable fabric</p>
+                          <p>• Custom design as shown</p>
+                        </>
+                      )}
+                      {product.productType === 'SHORTS' && (
+                        <>
+                          <p>• Matching design</p>
+                          <p>• Comfortable fit</p>
+                        </>
+                      )}
+                      {product.productType === 'TROUSER' && (
+                        <>
+                          <p>• Training trouser</p>
+                          <p>• With pockets</p>
+                        </>
+                      )}
+                      {product.productType === 'SOCKS' && (
+                        <>
+                          <p>• Team socks</p>
+                          <p>• Cushioned sole</p>
+                        </>
+                      )}
+                      {(product.productType === 'KITBAG' || product.productType === 'BAGPACK') && (
+                        <>
+                          <p>• Durable material</p>
+                          <p>• Team logo printed</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {packageItems.length > 0 && (
+              <div className="border rounded-lg p-4 bg-slate-50 mt-4">
+                <h3 className="font-medium mb-2">Your Selected Items</h3>
+                <div className="space-y-2">
+                  {packageItems.map(item => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <span>{item.name} × {item.sizes[0]?.quantity || 0}</span>
+                      <span className="font-medium">${(item.price * (item.sizes[0]?.quantity || 0)).toFixed(2)}</span>
+                    </div>
+                  ))}
+                  <div className="border-t pt-2 mt-2 font-medium flex justify-between">
+                    <span>Subtotal:</span>
+                    <span>${packageItems.reduce((total, item) => 
+                      total + (item.price * (item.sizes[0]?.quantity || 0)), 0).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="flex justify-between mt-6">
               <Button variant="outline" onClick={goToPreviousStep}>
                 Back
               </Button>
-              <Button onClick={goToNextStep}>
+              <Button 
+                onClick={goToNextStep}
+                disabled={packageItems.length === 0}
+              >
                 Continue <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
