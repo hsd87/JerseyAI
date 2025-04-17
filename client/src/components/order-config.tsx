@@ -914,50 +914,6 @@ export default function OrderConfig() {
               ))}
             </div>
             
-            {/* Add-ons section */}
-            <div>
-              <h3 className="font-medium text-lg mb-4">Add-Ons</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ADDON_OPTIONS.map((addon) => {
-                  const currentAddon = addOns.find(a => a.id === addon.id);
-                  const currentQty = currentAddon?.quantity || 0;
-                  
-                  return (
-                    <div 
-                      key={addon.id}
-                      className="border rounded-lg p-4 flex justify-between items-center"
-                    >
-                      <div>
-                        <h3 className="font-medium">{addon.name}</h3>
-                        <p className="text-sm font-bold">${addon.price}</p>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleAddonQuantityChange(addon.id, -1)}
-                          disabled={currentQty === 0}
-                        >
-                          <MinusCircle className="h-4 w-4" />
-                        </Button>
-                        <span className="w-6 text-center">{currentQty}</span>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleAddonQuantityChange(addon.id, 1)}
-                        >
-                          <PlusCircle className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            
             <div className="flex justify-between mt-6">
               <Button variant="outline" onClick={goToPreviousStep}>
                 Back
