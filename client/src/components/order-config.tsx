@@ -191,63 +191,86 @@ export default function OrderConfig() {
 
   // Calculate total price
   useEffect(() => {
-    let price = 0;
-    
-    // Add up package items
-    if (watchedIsTeamOrder) {
-      const teamTotalQty = teamMembers.reduce((total, member) => total + 1, 0);
-      price = calculatePackageBasePrice(watchedPackageType) * teamTotalQty;
-    } else {
-      // Individual order
-      packageItems.forEach(item => {
-        const itemTotal = item.price * item.sizes.reduce((total, size) => total + size.quantity, 0);
-        price += itemTotal;
-      });
-    }
-    
-    // Add add-ons
-    addOns.forEach(addon => {
-      price += addon.price * addon.quantity;
-    });
-    
-    // Apply quantity-based discounts
-    const totalQuantity = watchedIsTeamOrder 
-      ? teamMembers.length 
-      : watchedQuantity;
-    
-    let discount = 0;
-    if (totalQuantity >= 50) {
-      discount = 0.15; // 15% off
-    } else if (totalQuantity >= 20) {
-      discount = 0.10; // 10% off
-    } else if (totalQuantity >= 10) {
-      discount = 0.05; // 5% off
-    }
-    
-    if (discount > 0) {
-      price = price * (1 - discount);
-    }
-    
-    setTotalPrice(price);
-    
-    // Update price breakdown in store
-    if (setPriceBreakdown) {
-      setPriceBreakdown({
-        subtotal: price,
-        discount: discount * price,
-        discountPercentage: discount * 100,
-        shipping: 9.99,
-        tax: price * 0.07, // Assuming 7% tax rate
-        grandTotal: price * 1.07 + 9.99, // Tax + shipping
-        itemCount: totalQuantity,
-        baseTotal: price / (1 - discount),
-        tierDiscountApplied: discount > 0,
-        tierDiscountAmount: discount * price,
-        subscriptionDiscountApplied: false,
-        subscriptionDiscountAmount: 0,
-        shippingFreeThresholdApplied: false,
-        priceBeforeTax: price
-      });
+    try {
+      let price = 0;
+      
+      // Add up package items
+      if (watchedIsTeamOrder) {
+        const teamTotalQty = teamMembers.reduce((total, member) => total + 1, 0);
+        price = calculatePackageBasePrice(watchedPackageType || 'jerseyOnly') * Math.max(1, teamTotalQty);
+      } else {
+        // Individual order
+        if (packageItems && packageItems.length > 0) {
+          packageItems.forEach(item => {
+            if (item && item.sizes && item.sizes.length > 0) {
+              const itemTotal = (item.price || 0) * item.sizes.reduce((total, size) => total + (size?.quantity || 0), 0);
+              price += itemTotal;
+            }
+          });
+        } else if (watchedPackageType) {
+          // Fallback to base price if no items
+          price = calculatePackageBasePrice(watchedPackageType);
+        }
+      }
+      
+      // Add add-ons
+      if (addOns && addOns.length > 0) {
+        addOns.forEach(addon => {
+          if (addon) {
+            price += (addon.price || 0) * (addon.quantity || 0);
+          }
+        });
+      }
+      
+      // Apply quantity-based discounts
+      const totalQuantity = watchedIsTeamOrder 
+        ? Math.max(1, teamMembers.length)
+        : Math.max(1, watchedQuantity || 1);
+      
+      let discount = 0;
+      if (totalQuantity >= 50) {
+        discount = 0.15; // 15% off
+      } else if (totalQuantity >= 20) {
+        discount = 0.10; // 10% off
+      } else if (totalQuantity >= 10) {
+        discount = 0.05; // 5% off
+      }
+      
+      const discountedPrice = discount > 0 ? price * (1 - discount) : price;
+      
+      setTotalPrice(discountedPrice);
+      
+      // Update price breakdown in store
+      if (setPriceBreakdown) {
+        try {
+          const baseTotal = discount > 0 ? price : discountedPrice;
+          const discountAmount = discount > 0 ? discount * price : 0;
+          const shipping = 9.99;
+          const tax = discountedPrice * 0.07; // Assuming 7% tax rate
+          
+          setPriceBreakdown({
+            subtotal: discountedPrice,
+            discount: discountAmount,
+            discountPercentage: discount * 100,
+            shipping: shipping,
+            tax: tax,
+            grandTotal: discountedPrice * 1.07 + shipping, // Tax + shipping
+            itemCount: totalQuantity,
+            baseTotal: baseTotal,
+            tierDiscountApplied: discount > 0,
+            tierDiscountAmount: discountAmount,
+            subscriptionDiscountApplied: false,
+            subscriptionDiscountAmount: 0,
+            shippingFreeThresholdApplied: false,
+            priceBeforeTax: discountedPrice
+          });
+        } catch (err) {
+          console.error("Error setting price breakdown:", err);
+        }
+      }
+    } catch (err) {
+      console.error("Error calculating price:", err);
+      setTotalPrice(0);
     }
   }, [packageItems, teamMembers, watchedPackageType, watchedQuantity, watchedIsTeamOrder, addOns, setPriceBreakdown]);
 
@@ -309,6 +332,30 @@ export default function OrderConfig() {
         sizes: item.sizes.map(s => ({ ...s, quantity: qty }))
       }))
     );
+  };
+
+  // Handle product selection for custom package
+  const handleProductSelect = (product: Product) => {
+    // Check if the product is already in the package
+    const isSelected = packageItems.some(item => item.sku === product.sku);
+    
+    if (isSelected) {
+      // Remove the product from the package
+      setPackageItems(items => items.filter(item => item.sku !== product.sku));
+    } else {
+      // Add the product to the package
+      const newItem: PackageItem = {
+        id: product.sku,
+        name: product.name,
+        type: product.productType.toLowerCase(),
+        sizes: [{ size: watchedSize, quantity: 1 }],
+        price: product.basePrice,
+        gender: watchedGender,
+        sku: product.sku
+      };
+      
+      setPackageItems(items => [...items, newItem]);
+    }
   };
 
   // Handle package item quantity change
