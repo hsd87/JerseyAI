@@ -7,7 +7,7 @@ const head = document.getElementsByTagName("head")[0];
 
 // Add title
 const title = document.createElement("title");
-title.innerText = "ProJersey - AI-Powered Jersey Design";
+title.innerText = "VORO - AI-Powered Jersey Design";
 head.appendChild(title);
 
 // Add Sora and Inter fonts

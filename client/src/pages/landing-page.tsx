@@ -50,10 +50,10 @@ const keyFeatures = [
 
 // Comparison table data
 const comparisonData = [
-  { metric: "Design Time", proJersey: "Minutes with AI", traditional: "Days with a designer" },
-  { metric: "Order Size", proJersey: "No minimums", traditional: "10+ minimum" },
-  { metric: "Turnaround", proJersey: "1 week", traditional: "3-4 weeks" },
-  { metric: "Customization", proJersey: "Unlimited options", traditional: "Limited templates" }
+  { metric: "Design Time", voro: "Minutes with AI", traditional: "Days with a designer" },
+  { metric: "Order Size", voro: "No minimums", traditional: "10+ minimum" },
+  { metric: "Turnaround", voro: "1 week", traditional: "3-4 weeks" },
+  { metric: "Customization", voro: "Unlimited options", traditional: "Limited templates" }
 ];
 
 // Testimonial data
@@ -334,7 +334,7 @@ export default function LandingPage() {
                     {comparisonData.map((row, index) => (
                       <tr key={index}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{row.metric}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.proJersey}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.voro}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.traditional}</td>
                       </tr>
                     ))}
