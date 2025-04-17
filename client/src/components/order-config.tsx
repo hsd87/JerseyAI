@@ -465,11 +465,17 @@ export default function OrderConfig({
   // Add team member with all package items
   const addTeamMember = () => {
     // Create items array from packageItems
+    // If we're using a custom package, we'll use the package unit price divided by the number of items
+    // to ensure the total is correct
+    const totalCustomUnitPrice = packageUnitPrice > 0 ? packageUnitPrice : calculatePackageBasePrice(watchedPackageType);
+    const itemCount = packageItems.length || 1;
+    const pricePerItem = totalCustomUnitPrice / itemCount;
+    
     const memberItems: TeamMemberItem[] = packageItems.map(item => ({
       itemType: item.type.toLowerCase(),
       sku: item.sku || '',
       size: watchedSize,
-      price: item.price
+      price: watchedPackageType === 'custom' ? pricePerItem : item.price
     }));
     
     const newMember: TeamMember = {
@@ -610,7 +616,7 @@ export default function OrderConfig({
                   size: sizeInfo.size,
                   quantity: sizeInfo.quantity,
                   gender: item.gender,
-                  price: item.price
+                  price: watchedPackageType === 'custom' ? (packageUnitPrice / packageItems.length) : item.price
                 });
               }
             });
@@ -677,7 +683,7 @@ export default function OrderConfig({
                     <h4 className="font-medium">Base Price</h4>
                     <div className="flex justify-between mt-2">
                       <span>{kitTypeDisplayNames[watchedPackageType]}</span>
-                      <span className="font-semibold">${calculatePackageBasePrice(watchedPackageType)}</span>
+                      <span className="font-semibold">${packageUnitPrice > 0 ? packageUnitPrice.toFixed(2) : calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">
                       This is the base price per unit. Final pricing will depend on your package options and quantity.
@@ -841,7 +847,7 @@ export default function OrderConfig({
                     </div>
                   ))}
                   <div className="border-t border-primary/20 pt-3 mt-2 flex justify-between font-medium">
-                    <span>Subtotal:</span>
+                    <span>Custom Package Unit Price:</span>
                     <span className="text-lg">${packageItems.reduce((total, item) => 
                       total + item.price, 0).toFixed(2)}</span>
                   </div>
@@ -1462,7 +1468,7 @@ export default function OrderConfig({
                 
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-medium">Base Price Per Unit:</span>
-                  <span className="font-semibold">${calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
+                  <span className="font-semibold">${packageUnitPrice > 0 ? packageUnitPrice.toFixed(2) : calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
                 </div>
                 
                 <div className="flex justify-between border-b pb-2">
@@ -1743,7 +1749,7 @@ export default function OrderConfig({
                   <div className="space-y-3">
                     <div className="flex justify-between border-b pb-2">
                       <span>Base Package Price:</span>
-                      <span>${calculatePackageBasePrice(watchedPackageType)}</span>
+                      <span>${packageUnitPrice > 0 ? packageUnitPrice.toFixed(2) : calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
                     </div>
                     
                     <div className="flex justify-between border-b pb-2">
