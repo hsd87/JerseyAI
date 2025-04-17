@@ -111,6 +111,7 @@ export interface OrderState {
   
   // Checkout status
   orderCompleted: boolean;
+  orderCreatedAt?: string; // ISO timestamp when order was created
   
   // Cart actions
   addItem: (item: OrderItem) => void;
@@ -141,6 +142,7 @@ export interface OrderState {
   setDesign: (designId: number, designUrls: { front: string; back: string }) => void;
   setPackageItems: (items: PackageItem[]) => void;
   setOrderCompleted: (completed: boolean) => void;
+  setOrderCreatedAt?: (timestamp: string) => void;
   
   // Gender and sizing
   gender?: string;

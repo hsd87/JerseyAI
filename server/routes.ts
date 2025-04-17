@@ -170,6 +170,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Get recent designs (most recent first, limited to 10)
+  app.get("/api/designs/recent", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Get recent designs for the current user, ensure we only return valid designs
+      const allDesigns = await storage.getUserDesigns(req.user.id);
+      
+      // Sort by creation date (most recent first)
+      const sortedDesigns = allDesigns
+        .filter(design => design && design.id)  // Filter out any invalid designs
+        .sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        })
+        .slice(0, 10);  // Limit to 10 designs
+      
+      res.json(sortedDesigns);
+    } catch (error) {
+      console.error("Error fetching recent designs:", error);
+      next(error);
+    }
+  });
 
   // Get design by id
   app.get("/api/designs/:id", async (req, res, next) => {

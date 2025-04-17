@@ -137,5 +137,8 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   }),
   
   // Add method to set package items
-  setPackageItems: (items: PackageItem[]) => set({ packageItems: items })
+  setPackageItems: (items: PackageItem[]) => set({ packageItems: items }),
+  
+  // Add method to set order creation timestamp
+  setOrderCreatedAt: (timestamp: string) => set({ orderCreatedAt: timestamp })
 }));
