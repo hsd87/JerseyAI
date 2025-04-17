@@ -1404,6 +1404,269 @@ export default function DesignEditor() {
               </p>
             </div>
           </div>
+          
+          {/* Mobile Tools Panel - Appears only on mobile */}
+          <div className="md:hidden mt-4 border-t border-gray-200 pt-4">
+            <div className="mb-3">
+              <h3 className="font-medium text-sm text-gray-700 mb-2">Canvas Elements</h3>
+              <div className="grid grid-cols-3 gap-2">
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  className="text-xs flex items-center justify-center rounded-md h-10"
+                  onClick={() => {
+                    setCurrentText("");
+                    setIsEditing(false);
+                    setEditingElementId(null);
+                  }}
+                >
+                  <Type className="h-4 w-4 mr-1" /> Add Text
+                </Button>
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  className="text-xs flex items-center justify-center rounded-md h-10"
+                  onClick={() => {
+                    setCurrentText("99");
+                    setIsEditing(false);
+                    setEditingElementId(null);
+                  }}
+                >
+                  <Hash className="h-4 w-4 mr-1" /> Add Number
+                </Button>
+                <label className="inline-block cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+                  <div 
+                    className="text-xs flex items-center justify-center rounded-md h-10 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium px-4 py-2"
+                  >
+                    <Image className="h-4 w-4 mr-1" /> Add Logo
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            {/* Only show editing tools when text is selected */}
+            {(isEditing || editingElementId) && (
+              <div className="space-y-3 border-t border-gray-200 pt-3">
+                <h3 className="font-medium text-sm text-gray-700 mb-2">Edit Selected Text</h3>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Text Content</label>
+                  <Input 
+                    type="text" 
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md" 
+                    placeholder="Enter text" 
+                    value={currentText}
+                    onChange={(e) => setCurrentText(e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">Color</label>
+                    <Input 
+                      type="color" 
+                      className="w-full h-9 px-1 border border-gray-300 rounded-md" 
+                      value={currentColor}
+                      onChange={(e) => setCurrentColor(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">Font Size</label>
+                    <div className="flex items-center">
+                      <Slider 
+                        value={[currentFontSize]} 
+                        min={12} 
+                        max={72} 
+                        step={1}
+                        onValueChange={(value) => setCurrentFontSize(value[0])}
+                        className="flex-1 mr-2"
+                      />
+                      <span className="text-xs text-gray-500">{currentFontSize}px</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm"
+                    className="flex-1 bg-primary text-white px-3 py-1.5 rounded-full text-xs h-8"
+                    onClick={handleUpdateText}
+                  >
+                    Update Text
+                  </Button>
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    className="px-3 py-1.5 rounded-full text-xs h-8"
+                    onClick={() => {
+                      if (editingElementId) {
+                        handleDeleteText(editingElementId);
+                      }
+                    }}
+                  >
+                    <Trash className="h-3.5 w-3.5 text-red-500" />
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {(!isEditing && !editingElementId && activeElement && activeElement.startsWith('logo-')) && (
+              <div className="space-y-3 border-t border-gray-200 pt-3">
+                <h3 className="font-medium text-sm text-gray-700 mb-2">Edit Selected Logo</h3>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="block text-xs text-gray-600 mb-1">Size</label>
+                    <Slider 
+                      value={[logoElements.find(logo => logo.id === activeElement)?.size.width || 100]} 
+                      min={20} 
+                      max={300} 
+                      step={5}
+                      onValueChange={(value) => {
+                        setLogoElements(prev => prev.map(logo => {
+                          if (logo.id === activeElement) {
+                            const aspectRatio = logo.size.height / logo.size.width;
+                            const newWidth = value[0];
+                            const newHeight = logo.maintainAspectRatio ? Math.round(newWidth * aspectRatio) : logo.size.height;
+                            
+                            return {
+                              ...logo,
+                              size: {
+                                width: newWidth,
+                                height: newHeight
+                              }
+                            };
+                          }
+                          return logo;
+                        }));
+                      }}
+                      className="flex-1"
+                    />
+                  </div>
+                  <span className="text-xs text-gray-500 self-end mb-1">
+                    {logoElements.find(logo => logo.id === activeElement)?.size.width}px
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="block text-xs text-gray-600 mb-1">Rotation</label>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={() => {
+                          setLogoElements(prev => prev.map(logo => {
+                            if (logo.id === activeElement) {
+                              return {
+                                ...logo,
+                                rotation: ((logo.rotation || 0) - 90) % 360
+                              };
+                            }
+                            return logo;
+                          }));
+                        }}
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                      </Button>
+                      <Slider 
+                        value={[logoElements.find(logo => logo.id === activeElement)?.rotation || 0]} 
+                        min={0} 
+                        max={360} 
+                        step={5}
+                        onValueChange={(value) => {
+                          setLogoElements(prev => prev.map(logo => {
+                            if (logo.id === activeElement) {
+                              return {
+                                ...logo,
+                                rotation: value[0]
+                              };
+                            }
+                            return logo;
+                          }));
+                        }}
+                        className="flex-1"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={() => {
+                          setLogoElements(prev => prev.map(logo => {
+                            if (logo.id === activeElement) {
+                              return {
+                                ...logo,
+                                rotation: ((logo.rotation || 0) + 90) % 360
+                              };
+                            }
+                            return logo;
+                          }));
+                        }}
+                      >
+                        <RotateCw className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  <span className="text-xs text-gray-500 self-end mb-1">
+                    {logoElements.find(logo => logo.id === activeElement)?.rotation || 0}°
+                  </span>
+                </div>
+                <Button 
+                  variant="destructive"
+                  size="sm"
+                  className="text-xs h-8 w-full mt-2"
+                  onClick={() => {
+                    const newLogoElements = logoElements.filter(logo => logo.id !== activeElement);
+                    setLogoElements(newLogoElements);
+                    setActiveElement(null);
+                    
+                    const updatedLogos = newLogoElements.map(el => ({
+                      url: el.url,
+                      position: el.position,
+                      size: el.size,
+                      rotation: el.rotation || 0,
+                      maintainAspectRatio: el.maintainAspectRatio || true
+                    }));
+                    
+                    updateCustomizations({
+                      ...customizations,
+                      logos: updatedLogos
+                    });
+                  }}
+                >
+                  Remove Selected Logo
+                </Button>
+              </div>
+            )}
+            
+            {/* Mobile text input when adding new text */}
+            {!isEditing && !editingElementId && !activeElement && (
+              <div className="space-y-3 border-t border-gray-200 pt-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Text Content</label>
+                  <div className="flex gap-2">
+                    <Input 
+                      type="text" 
+                      className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md" 
+                      placeholder="Enter text" 
+                      value={currentText}
+                      onChange={(e) => setCurrentText(e.target.value)}
+                    />
+                    <Button 
+                      size="sm"
+                      className="bg-primary text-white px-3 py-1.5 rounded-full text-xs h-9"
+                      onClick={handleAddText}
+                      disabled={!currentText.trim()}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
