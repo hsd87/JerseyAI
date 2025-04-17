@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle, ArrowDown, PlayCircle, Users, Building, Chevro
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { apiRequest } from "@/lib/queryClient";
+import jerseyBannerImage from "../assets/a-photograph-of-a-crisp-blue-and-white-s_yjHJasjPRkO2o954EKAPwA_t7Yg8kMRRnWWWuzS_cgcVw.jpeg";
 
 // Feature cards for the "How It Works" section
 const processSteps = [
@@ -187,9 +188,14 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="relative h-[400px] rounded-xl overflow-hidden shadow-2xl">
-              {/* This would be better with a real image of a jersey or the design interface */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#39FF14]/20 to-blue-500/20 flex items-center justify-center">
-                <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md transform rotate-3">
+              {/* Using the blue and white jersey image */}
+              <img 
+                src={jerseyBannerImage} 
+                alt="Blue and white soccer jersey" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#39FF14]/10 to-blue-500/10 flex items-center justify-center">
+                <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-8 w-full max-w-md transform rotate-3">
                   <div className="text-center mb-6">
                     <span className="font-heading font-bold text-xl">Pro<span className="text-voro-red">Jersey</span> Designer</span>
                   </div>
