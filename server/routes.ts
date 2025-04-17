@@ -344,15 +344,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Check Stripe configuration
-      if (!process.env.STRIPE_SECRET_KEY) {
-        console.error("STRIPE_SECRET_KEY environment variable is not set");
-        return res.status(500).json({ 
-          message: "Payment system is not configured properly. Please contact support.",
-          error: "stripe_not_configured"
-        });
-      }
-
       // Get request data
       const { items, amount } = req.body;
       
@@ -362,22 +353,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         amount: amount,
         userId: req.user?.id
       });
-      
-      // Use a dummy item for testing if neither is provided
-      const shouldUseDummyItem = (!items || !Array.isArray(items) || items.length === 0) && !amount;
-      
-      if (shouldUseDummyItem) {
-        console.log("No items or amount provided, using dummy item for testing");
-      }
 
+      // Verify Stripe is properly configured
       try {
-        const { calculateOrderAmount, createPaymentIntent } = await import('./stripe');
+        const { checkStripeApiKey } = await import('./services/stripe-service');
+        const stripeStatus = await checkStripeApiKey();
         
-        // Get or create customer ID
+        if (!stripeStatus.valid) {
+          console.error("Stripe API key validation failed:", stripeStatus.message);
+          return res.status(503).json({ 
+            message: "Payment system is not available at this time. Please try again later.",
+            error: "stripe_unavailable",
+            details: stripeStatus.message
+          });
+        }
+        
+        // Now import the stripe functions we need
+        const { calculateOrderAmount, createPaymentIntent, createCustomer } = await import('./stripe');
+        
+        // Get or create customer ID for the user
         const user = req.user;
         if (!user.stripeCustomerId) {
           console.log(`Creating Stripe customer for user ${user.id}`);
-          const { createCustomer } = await import('./stripe');
           await createCustomer(user);
           
           // Reload user to get the updated stripeCustomerId
@@ -386,24 +383,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
             throw new Error("Failed to create or retrieve Stripe customer ID");
           }
           user.stripeCustomerId = updatedUser.stripeCustomerId;
+          console.log(`Successfully created Stripe customer: ${user.stripeCustomerId}`);
         }
         
         // Calculate final amount in cents
         let finalAmount: number;
         
-        if (shouldUseDummyItem) {
-          // For testing - minimum charge amount (50 cents)
-          finalAmount = 50;
-        } else if (amount) {
+        // Determine how to calculate the amount
+        if (amount) {
           // Direct amount provided
           finalAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-          // Convert to cents if it appears to be in dollars
+          
+          // Convert to cents if it appears to be in dollars (less than 50)
           if (finalAmount < 50) {
+            console.log(`Amount appears to be in dollars (${finalAmount}), converting to cents`);
             finalAmount = Math.round(finalAmount * 100);
           }
+        } else if (items && Array.isArray(items) && items.length > 0) {
+          // Calculate from items using the pricing module
+          console.log(`Calculating amount from ${items.length} items`);
+          finalAmount = await calculateOrderAmount(items, user.subscriptionTier === 'pro');
         } else {
-          // Calculate from items
-          finalAmount = await calculateOrderAmount(items);
+          // Fallback - use minimum amount for testing only
+          console.warn('No valid amount or items provided, using minimum amount');
+          finalAmount = 50; // Minimum 50 cents
         }
         
         // Validate final amount
@@ -415,7 +418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Round to ensure it's an integer (Stripe requires integer for cents)
         finalAmount = Math.round(finalAmount);
         
-        // Create payment intent
+        // Create payment intent with improved error handling
         console.log(`Creating payment intent for amount: ${finalAmount} cents with customer ID: ${user.stripeCustomerId}`);
         const clientSecret = await createPaymentIntent(finalAmount, user.stripeCustomerId);
         
@@ -430,6 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('Stripe payment error:', err);
         
         // Enhanced error handling with client-friendly messages
+        let statusCode = 500;
         let clientMessage = "Failed to process payment request";
         let errorCode = "stripe_error";
         
@@ -437,14 +441,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           clientMessage = "Payment system configuration error";
           errorCode = "stripe_auth_error";
         } else if (err.type === 'StripeConnectionError') {
+          statusCode = 503; // Service Unavailable
           clientMessage = "Could not connect to payment system. Please try again later";
           errorCode = "stripe_connection_error";
         } else if (err.type === 'StripeInvalidRequestError') {
+          statusCode = 400; // Bad Request
           clientMessage = "Invalid payment request";
           errorCode = "stripe_invalid_request";
+        } else if (err.message.includes('customer')) {
+          clientMessage = "Error with customer profile. Please try again later.";
+          errorCode = "customer_error";
         }
         
-        res.status(500).json({ 
+        res.status(statusCode).json({ 
           message: clientMessage, 
           error: errorCode,
           details: process.env.NODE_ENV === 'development' ? err.message : undefined
@@ -462,24 +471,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get or create subscription endpoint
   app.post("/api/get-or-create-subscription", async (req, res, next) => {
+    // Authentication check
     if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Please log in to manage your subscription" });
-    }
-    
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return res.status(500).json({ message: "Stripe is not configured" });
+      return res.status(401).json({ 
+        message: "Please log in to manage your subscription",
+        error: "authentication_required"
+      });
     }
     
     try {
+      // Verify Stripe is properly configured
+      const { checkStripeApiKey } = await import('./services/stripe-service');
+      const stripeStatus = await checkStripeApiKey();
+      
+      if (!stripeStatus.valid) {
+        console.error("Stripe API key validation failed:", stripeStatus.message);
+        return res.status(503).json({ 
+          message: "Subscription service is not available at this time. Please try again later.",
+          error: "stripe_unavailable",
+          details: stripeStatus.message
+        });
+      }
+      
       const { createSubscription, checkSubscriptionStatus } = await import('./stripe');
       
       // Check if user already has a subscription
       if (req.user.stripeSubscriptionId) {
         try {
+          console.log(`Checking existing subscription status for user ${req.user.id}: ${req.user.stripeSubscriptionId}`);
           const status = await checkSubscriptionStatus(req.user.stripeSubscriptionId);
           
           if (status.status === 'active') {
-            return res.status(400).json({ message: 'You already have an active subscription' });
+            console.log(`User ${req.user.id} already has an active subscription`);
+            return res.status(400).json({ 
+              message: 'You already have an active subscription',
+              error: 'subscription_exists'
+            });
+          } else {
+            console.log(`User ${req.user.id} has an inactive subscription with status: ${status.status}`);
           }
         } catch (err) {
           console.error('Error checking subscription status:', err);
@@ -488,83 +517,236 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create new subscription
+      console.log(`Creating new subscription for user ${req.user.id}`);
       const result = await createSubscription(req.user.id);
+      
+      // Log success and return result
+      console.log(`Successfully created subscription for user ${req.user.id}: ${result.subscriptionId}`);
       res.json(result);
     } catch (err: any) {
       console.error('Error creating subscription:', err);
-      res.status(500).json({ message: err.message });
+      
+      // Provide more helpful error messages
+      let statusCode = 500;
+      let errorCode = 'subscription_error';
+      let message = err.message || 'An error occurred while creating your subscription';
+      
+      if (err.type === 'StripeAuthenticationError') {
+        errorCode = 'stripe_auth_error';
+        message = 'Payment system configuration error';
+      } else if (err.type === 'StripeConnectionError') {
+        statusCode = 503;
+        errorCode = 'stripe_connection_error';
+        message = 'Could not connect to payment system. Please try again later';
+      } else if (err.type === 'StripeInvalidRequestError') {
+        statusCode = 400;
+        errorCode = 'stripe_invalid_request';
+        message = 'Invalid subscription request';
+      } else if (err.message.includes('customer')) {
+        errorCode = 'customer_error';
+        message = 'Error with customer profile. Please try again later';
+      }
+      
+      res.status(statusCode).json({ 
+        message, 
+        error: errorCode,
+        details: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
     }
   });
   
   // Cancel subscription endpoint
   app.post("/api/cancel-subscription", async (req, res, next) => {
+    // Authentication check
     if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Please log in to manage your subscription" });
-    }
-    
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return res.status(500).json({ message: "Stripe is not configured" });
+      return res.status(401).json({ 
+        message: "Please log in to manage your subscription",
+        error: "authentication_required" 
+      });
     }
     
     try {
-      if (!req.user.stripeSubscriptionId) {
-        return res.status(400).json({ message: 'No active subscription found' });
+      // Verify Stripe is properly configured
+      const { checkStripeApiKey } = await import('./services/stripe-service');
+      const stripeStatus = await checkStripeApiKey();
+      
+      if (!stripeStatus.valid) {
+        console.error("Stripe API key validation failed:", stripeStatus.message);
+        return res.status(503).json({ 
+          message: "Subscription service is not available at this time. Please try again later.",
+          error: "stripe_unavailable",
+          details: stripeStatus.message
+        });
       }
       
-      const { cancelSubscription } = await import('./stripe');
-      await cancelSubscription(req.user.stripeSubscriptionId);
+      // Verify user has an active subscription
+      if (!req.user.stripeSubscriptionId) {
+        console.log(`User ${req.user.id} attempted to cancel non-existent subscription`);
+        return res.status(400).json({ 
+          message: 'No active subscription found',
+          error: 'no_subscription' 
+        });
+      }
       
-      // Update user record
-      await storage.updateUserSubscription(req.user.id, 'free');
-      
-      res.json({ success: true });
+      try {
+        console.log(`Attempting to cancel subscription for user ${req.user.id}: ${req.user.stripeSubscriptionId}`);
+        const { cancelSubscription } = await import('./stripe');
+        await cancelSubscription(req.user.stripeSubscriptionId);
+        
+        // Update user record to free tier
+        console.log(`Updating user ${req.user.id} to free tier after subscription cancellation`);
+        await storage.updateUserSubscription(req.user.id, 'free');
+        
+        console.log(`Successfully canceled subscription for user ${req.user.id}`);
+        res.json({ 
+          success: true,
+          message: "Your subscription has been successfully canceled" 
+        });
+      } catch (err: any) {
+        console.error('Error during subscription cancellation:', err);
+        
+        // Attempt recovery by updating the user anyway
+        if (err.message.includes('No such subscription') || 
+            err.message.includes('resource_missing') ||
+            err.message.includes('invalid subscription')) {
+          console.log(`Subscription doesn't exist in Stripe but exists in DB. Updating user record anyway.`);
+          await storage.updateUserSubscription(req.user.id, 'free');
+          
+          return res.json({ 
+            success: true, 
+            message: "Your subscription has been successfully canceled",
+            warning: "Subscription was already canceled or expired" 
+          });
+        }
+        
+        // Handle error if recovery wasn't possible
+        throw err;
+      }
     } catch (err: any) {
-      console.error('Error canceling subscription:', err);
-      res.status(500).json({ message: err.message });
+      console.error('Subscription cancellation error:', err);
+      
+      // Enhanced error handling
+      let statusCode = 500;
+      let errorCode = 'cancellation_error';
+      let message = err.message || 'An error occurred while canceling your subscription';
+      
+      if (err.type === 'StripeAuthenticationError') {
+        errorCode = 'stripe_auth_error';
+        message = 'Payment system configuration error';
+      } else if (err.type === 'StripeConnectionError') {
+        statusCode = 503;
+        errorCode = 'stripe_connection_error';
+        message = 'Could not connect to payment system. Please try again later';
+      } else if (err.type === 'StripeInvalidRequestError') {
+        statusCode = 400;
+        errorCode = 'stripe_invalid_request';
+        message = 'Invalid cancellation request';
+      }
+      
+      res.status(statusCode).json({ 
+        message,
+        error: errorCode,
+        details: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
     }
   });
   
   // Stripe webhook handler
   app.post("/api/webhook", async (req, res, next) => {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return res.status(400).json({ message: "Stripe is not configured" });
-    }
-    
     try {
-      // Import Buffer from node:buffer to avoid compatibility issues
-      const buffer = Buffer.from(JSON.stringify(req.body));
-      const stripe = await import('stripe').then(pkg => new pkg.default(process.env.STRIPE_SECRET_KEY!));
+      // Verify Stripe is properly configured
+      const { checkStripeApiKey, getStripe } = await import('./services/stripe-service');
+      const stripeStatus = await checkStripeApiKey();
+      
+      if (!stripeStatus.valid) {
+        console.error("Stripe API key validation failed:", stripeStatus.message);
+        return res.status(503).json({ 
+          message: "Payment service is not available at this time",
+          error: "stripe_unavailable"
+        });
+      }
+      
+      // Import the webhook handler
       const { handleSubscriptionEvent } = await import('./stripe');
       
       // Get the signature from headers
       const signature = req.headers['stripe-signature'];
       
       if (!signature) {
-        return res.status(400).json({ message: "Missing stripe-signature header" });
+        console.error("Missing Stripe signature in webhook request");
+        return res.status(400).json({ 
+          message: "Missing stripe-signature header",
+          error: "missing_signature" 
+        });
       }
       
       try {
+        // Convert request body to buffer (Stripe requires raw body)
+        const buffer = Buffer.from(JSON.stringify(req.body));
+        
+        // Get stripe instance from our service
+        const stripe = getStripe();
+        if (!stripe) {
+          throw new Error("Could not initialize Stripe");
+        }
+        
+        // Validate webhook signature
+        const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test';
+        console.log(`Validating webhook signature with secret: ${webhookSecret.substring(0, 8)}...`);
+        
         const event = stripe.webhooks.constructEvent(
           buffer,
           signature,
-          process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test'
+          webhookSecret
         );
         
-        // Handle subscription-related events
+        // Log the event for debugging
+        console.log(`Received valid webhook event of type: ${event.type}`);
+        
+        // Handle supported event types
         if (
           event.type === 'customer.subscription.created' ||
           event.type === 'customer.subscription.updated' ||
           event.type === 'customer.subscription.deleted'
         ) {
+          console.log(`Processing ${event.type} event`);
           await handleSubscriptionEvent(event);
+          console.log(`Successfully processed ${event.type} event`);
+        } else {
+          console.log(`Ignoring unhandled event type: ${event.type}`);
         }
         
-        res.json({ received: true });
+        // Successful response
+        res.json({ 
+          received: true,
+          type: event.type
+        });
       } catch (err: any) {
-        console.error('Webhook error:', err.message);
-        return res.status(400).json({ message: `Webhook Error: ${err.message}` });
+        console.error('Webhook validation error:', err.message);
+        
+        // Provide better error messages based on common webhook issues
+        let errorMessage = `Webhook Error: ${err.message}`;
+        let errorCode = 'webhook_error';
+        
+        if (err.message.includes('No signatures found')) {
+          errorMessage = 'Invalid webhook signature. Check that your webhook secret is configured correctly.';
+          errorCode = 'invalid_signature';
+        } else if (err.message.includes('timestamp')) {
+          errorMessage = 'Webhook timestamp is outside of tolerance window. Check your server clock.';
+          errorCode = 'timestamp_error';
+        }
+        
+        return res.status(400).json({ 
+          message: errorMessage,
+          error: errorCode
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Unexpected webhook error:', error);
+      res.status(500).json({ 
+        message: "An unexpected error occurred processing the webhook",
+        error: "server_error" 
+      });
       next(error);
     }
   });
