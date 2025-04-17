@@ -1980,8 +1980,8 @@ export default function OrderConfig({
                 onClick={finalizeOrderForCheckout}
                 className="bg-voro-red hover:bg-voro-red/90 text-white font-medium px-6 rounded-xl shadow-sm"
               >
-                Save Order Details
-                <CheckIcon className="ml-2 h-4 w-4" />
+                Proceed to Checkout
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
