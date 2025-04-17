@@ -164,7 +164,8 @@ export default function DesignEditor() {
   };
 
   const handleProceedToOrder = () => {
-    navigate('/checkout');
+    // Navigate to the order configuration page instead of direct checkout
+    navigate('/order-config');
   };
 
   const handleDragStart = (e: React.MouseEvent | React.TouchEvent, elementId: string) => {
