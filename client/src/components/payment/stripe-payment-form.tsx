@@ -5,6 +5,7 @@ import {
   useElements,
   AddressElement,
 } from '@stripe/react-stripe-js';
+import { PaymentIntent } from '@stripe/stripe-js';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -36,23 +37,29 @@ export const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     setIsProcessing(true);
 
     try {
-      const { error, paymentIntent } = await stripe.confirmPayment({
+      // Get payment information from the form
+      const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/order-confirmation`,
-          // We'll handle the redirect manually to maintain order state
-          redirect: 'if_required',
         },
+        redirect: "if_required",
       });
 
+      // This point will only be reached if there is an immediate error when
+      // confirming the payment. Otherwise, your customer will be redirected to
+      // your `return_url`. For some payment methods like iDEAL, your customer will
+      // be redirected to an intermediate site first to authorize the payment, then
+      // redirected to the `return_url`.
       if (error) {
-        setMessage(error.message);
+        setMessage(error.message || 'Payment failed');
         toast({
           title: 'Payment Failed',
           description: error.message,
           variant: 'destructive',
         });
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      } else {
+        // Payment was successful
         setMessage('Payment successful!');
         toast({
           title: 'Payment Successful!',
@@ -62,12 +69,6 @@ export const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
         if (onSuccess) {
           onSuccess();
         }
-      } else {
-        setMessage('Unexpected payment state.');
-        toast({
-          title: 'Payment Status',
-          description: 'Payment is processing or requires additional verification',
-        });
       }
     } catch (err: any) {
       setMessage(`Payment error: ${err.message}`);

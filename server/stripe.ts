@@ -89,6 +89,7 @@ export async function checkSubscriptionStatus(subscriptionId: string): Promise<{
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   
+  // Access properties from the subscription object directly
   return {
     status: subscription.status,
     current_period_end: subscription.current_period_end
