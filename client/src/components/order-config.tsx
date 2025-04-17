@@ -91,7 +91,8 @@ export default function OrderConfig() {
   const [currentStep, setCurrentStep] = useState(1);
   const [teamName, setTeamName] = useState('');
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
+  // Use packageItems from the store
+  const { packageItems, setPackageItems } = useOrderStore();
   const [totalPrice, setTotalPrice] = useState(0);
 
   const form = useForm<OrderConfigValues>({

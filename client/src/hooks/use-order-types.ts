@@ -88,7 +88,7 @@ export interface OrderState {
   addOns: AddOn[];
   teamMembers: TeamMember[];
   isTeamOrder: boolean;
-  packageItems?: PackageItem[];
+  packageItems: PackageItem[];
   packageType?: string;
   
   // Pricing
@@ -121,6 +121,7 @@ export interface OrderState {
   setSport: (sport: string) => void;
   setPackageType: (packageType: string) => void;
   setDesign: (designId: number, designUrls: { front: string; back: string }) => void;
+  setPackageItems: (items: PackageItem[]) => void;
   
   // Gender and sizing
   gender?: string;

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { OrderState, OrderItem, TeamMember, AddOn, PriceBreakdown, OrderDetails } from './use-order-types';
+import { OrderState, OrderItem, TeamMember, AddOn, PriceBreakdown, OrderDetails, PackageItem } from './use-order-types';
 
 // Default values for price breakdown
 const defaultPriceBreakdown: PriceBreakdown = {
@@ -26,6 +26,7 @@ export const useOrderStore = create<OrderState>((set) => ({
   addOns: [],
   teamMembers: [],
   isTeamOrder: false,
+  packageItems: [], // Store for custom package items
   packageType: 'jerseyOnly', // Default package type
   
   // Pricing
@@ -113,5 +114,8 @@ export const useOrderStore = create<OrderState>((set) => ({
   setDesign: (designId: number, designUrls: { front: string; back: string }) => set({ 
     designId, 
     designUrls 
-  })
+  }),
+  
+  // Add method to set package items
+  setPackageItems: (items: PackageItem[]) => set({ packageItems: items })
 }));
