@@ -30,7 +30,8 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
     addOns,
     isTeamOrder,
     teamMembers,
-    setPriceBreakdown
+    setPriceBreakdown,
+    sport
   } = useOrderStore();
 
   // Get user's subscription status
@@ -60,7 +61,9 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
     subscriptionDiscountApplied: false,
     subscriptionDiscountAmount: 0,
     shippingFreeThresholdApplied: false,
-    priceBeforeTax: 0
+    priceBeforeTax: 0,
+    bundleSavings: 0,
+    bundleApplied: false
   });
 
   // Calculate the total number of items and prices
@@ -367,6 +370,16 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
               <span>-${priceBreakdown.subscriptionDiscountAmount.toFixed(2)}</span>
             </div>
           )}
+          
+          {priceBreakdown.bundleApplied && priceBreakdown.bundleSavings && priceBreakdown.bundleSavings > 0 && (
+            <div className="flex justify-between text-green-600">
+              <span className="flex items-center">
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Bundle Savings
+              </span>
+              <span>-${priceBreakdown.bundleSavings.toFixed(2)}</span>
+            </div>
+          )}
 
           <div className="flex justify-between">
             <span className="flex items-center">
@@ -405,6 +418,12 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
             {!priceBreakdown.subscriptionDiscountApplied && (
               <p className="mt-2">
                 Subscribe to Pro for an additional {(SUBSCRIPTION_DISCOUNT * 100).toFixed(0)}% off all orders.
+              </p>
+            )}
+            
+            {!priceBreakdown.bundleApplied && sport && (
+              <p className="mt-2">
+                Add matching pieces to unlock bundle discounts.
               </p>
             )}
           </div>
