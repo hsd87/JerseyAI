@@ -132,7 +132,7 @@ const SubscribePage: React.FC = () => {
   };
 
   const renderCurrentSubscription = () => {
-    const { isSubscribed, subscriptionStatus, subscriptionEndDate, remainingDesigns } = subscription.status;
+    const { isSubscribed, subscriptionStatus, subscriptionExpiry, remainingDesigns } = subscription;
     
     if (!isSubscribed) {
       return (
@@ -185,11 +185,11 @@ const SubscribePage: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {subscriptionEndDate && (
+          {subscriptionExpiry && (
             <div className="flex items-center">
               <Calendar className="h-5 w-5 mr-2 text-muted-foreground" />
               <p className="text-sm">
-                Renews on: {new Date(subscriptionEndDate).toLocaleDateString()}
+                Renews on: {new Date(subscriptionExpiry).toLocaleDateString()}
               </p>
             </div>
           )}
@@ -312,11 +312,11 @@ const SubscribePage: React.FC = () => {
             <Button 
               className="w-full" 
               onClick={startSubscription}
-              disabled={loading || subscription.status.isSubscribed}
+              disabled={loading || subscription.isSubscribed}
             >
               {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : subscription.status.isSubscribed ? (
+              ) : subscription.isSubscribed ? (
                 "Current Plan"
               ) : (
                 <>
