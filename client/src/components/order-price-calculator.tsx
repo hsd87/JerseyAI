@@ -130,22 +130,27 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
       const taxAmount = itemSubtotal * 0.07;
       const grandTotal = priceBeforeTax + taxAmount;
       
+      // Check for potential division by zero or NaN
+      const discountPercentage = baseTotal > 0 
+        ? (tierDiscountAmount + subscriptionDiscountAmount) / baseTotal
+        : 0;
+        
       // Build final price breakdown
       const breakdown: PriceBreakdown = {
-        subtotal: itemSubtotal,
-        discount: tierDiscountAmount + subscriptionDiscountAmount,
-        discountPercentage: (tierDiscountAmount + subscriptionDiscountAmount) / baseTotal,
-        shipping: shippingCost,
-        tax: taxAmount,
-        grandTotal: grandTotal,
-        itemCount: itemCount,
-        baseTotal: baseTotal,
-        tierDiscountApplied: tierDiscountApplied,
-        tierDiscountAmount: tierDiscountAmount,
-        subscriptionDiscountApplied: subscriptionDiscountApplied,
-        subscriptionDiscountAmount: subscriptionDiscountAmount,
-        shippingFreeThresholdApplied: shippingFreeThresholdApplied,
-        priceBeforeTax: priceBeforeTax
+        subtotal: itemSubtotal || 0,
+        discount: (tierDiscountAmount + subscriptionDiscountAmount) || 0,
+        discountPercentage: discountPercentage || 0,
+        shipping: shippingCost || 0,
+        tax: taxAmount || 0,
+        grandTotal: grandTotal || 0,
+        itemCount: itemCount || 0,
+        baseTotal: baseTotal || 0,
+        tierDiscountApplied: tierDiscountApplied || false,
+        tierDiscountAmount: tierDiscountAmount || 0,
+        subscriptionDiscountApplied: subscriptionDiscountApplied || false,
+        subscriptionDiscountAmount: subscriptionDiscountAmount || 0,
+        shippingFreeThresholdApplied: shippingFreeThresholdApplied || false,
+        priceBeforeTax: priceBeforeTax || 0
       };
       
       setPriceState(breakdown);
@@ -168,6 +173,38 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
       
     } catch (err) {
       console.error("Failed to update price breakdown:", err);
+      
+      // Set a safe fallback price breakdown on error
+      const safeBreakdown: PriceBreakdown = {
+        subtotal: 0,
+        discount: 0,
+        discountPercentage: 0,
+        shipping: 0,
+        tax: 0,
+        grandTotal: 0,
+        itemCount: 0,
+        baseTotal: 0,
+        tierDiscountApplied: false,
+        tierDiscountAmount: 0,
+        subscriptionDiscountApplied: false,
+        subscriptionDiscountAmount: 0,
+        shippingFreeThresholdApplied: false,
+        priceBeforeTax: 0
+      };
+      
+      setPriceState(safeBreakdown);
+      if (setPriceBreakdown) {
+        setPriceBreakdown(safeBreakdown);
+      }
+      
+      // Log more debugging information
+      console.log('Debug pricing info:', {
+        packageType,
+        packageItems,
+        addOns,
+        isTeamOrder,
+        teamMembers: teamMembers?.length || 0
+      });
     }
   }, [packageItems, addOns, isTeamOrder, teamMembers, packageType, isSubscribed, setPriceBreakdown]);
 
