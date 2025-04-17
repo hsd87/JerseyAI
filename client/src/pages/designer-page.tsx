@@ -168,7 +168,6 @@ export default function DesignerPage() {
                   kitType={useDesignStore.getState().formData.kitType}
                   onBackToCustomization={prevStep}
                 />
-                <TeamRoster />
               </div>
               
               <div className="mt-6 flex justify-between">
