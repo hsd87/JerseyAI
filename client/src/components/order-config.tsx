@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -117,6 +117,7 @@ export default function OrderConfig({
   // Use packageItems from the store
   const { packageItems, setPackageItems } = useOrderStore();
   const [totalPrice, setTotalPrice] = useState(0);
+  const [packageUnitPrice, setPackageUnitPrice] = useState(0);
 
   const form = useForm<OrderConfigValues>({
     resolver: zodResolver(orderConfigSchema),
@@ -218,27 +219,46 @@ export default function OrderConfig({
     }
   }, [watchedPackageType, watchedSize, watchedQuantity, watchedGender, designId]);
 
+  // Calculate the custom package unit price based on selected items
+  const calculateCustomPackagePrice = useCallback(() => {
+    if (!packageItems || packageItems.length === 0) {
+      return calculatePackageBasePrice(watchedPackageType || 'jerseyOnly');
+    }
+    
+    // Calculate the sum of all items in the package (unit price)
+    let packagePrice = 0;
+    packageItems.forEach(item => {
+      if (item && item.price) {
+        packagePrice += item.price;
+      }
+    });
+    
+    // Return package price with a minimum fallback
+    return Math.max(packagePrice, 1);
+  }, [packageItems, watchedPackageType]);
+
   // Calculate total price
   useEffect(() => {
     try {
       let price = 0;
       
+      // Calculate the custom package unit price first
+      const customUnitPrice = calculateCustomPackagePrice();
+      setPackageUnitPrice(customUnitPrice);
+      console.log('Custom package unit price:', customUnitPrice);
+      
       // Add up package items
       if (watchedIsTeamOrder) {
         const teamTotalQty = teamMembers.reduce((total, member) => total + 1, 0);
-        price = calculatePackageBasePrice(watchedPackageType || 'jerseyOnly') * Math.max(1, teamTotalQty);
+        price = customUnitPrice * Math.max(1, teamTotalQty);
       } else {
         // Individual order
         if (packageItems && packageItems.length > 0) {
-          packageItems.forEach(item => {
-            if (item && item.sizes && item.sizes.length > 0) {
-              const itemTotal = (item.price || 0) * item.sizes.reduce((total, size) => total + (size?.quantity || 0), 0);
-              price += itemTotal;
-            }
-          });
+          // Use custom package unit price multiplied by quantity
+          price = customUnitPrice * Math.max(1, watchedQuantity || 1);
         } else if (watchedPackageType) {
           // Fallback to base price if no items
-          price = calculatePackageBasePrice(watchedPackageType);
+          price = calculatePackageBasePrice(watchedPackageType) * Math.max(1, watchedQuantity || 1);
         }
       }
       
@@ -301,7 +321,7 @@ export default function OrderConfig({
       console.error("Error calculating price:", err);
       setTotalPrice(0);
     }
-  }, [packageItems, teamMembers, watchedPackageType, watchedQuantity, watchedIsTeamOrder, addOns, setPriceBreakdown]);
+  }, [packageItems, teamMembers, watchedPackageType, watchedQuantity, watchedIsTeamOrder, addOns, setPriceBreakdown, calculateCustomPackagePrice]);
 
   // Handle package selection
   const handlePackageTypeChange = (value: 'jerseyOnly' | 'jerseyShorts' | 'fullKit' | 'custom') => {
