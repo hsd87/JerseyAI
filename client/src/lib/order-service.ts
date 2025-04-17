@@ -1,38 +1,26 @@
 import { apiRequest } from './queryClient';
-import { OrderItem, OrderDetails } from '@/hooks/use-order-types';
+// Import types from our shared definitions
+import { 
+  OrderItem, 
+  OrderDetails, 
+  ShippingAddress,
+  CreatePaymentIntentRequest,
+  CreatePaymentIntentResponse,
+  CreateSubscriptionResponse,
+  Order
+} from '@shared/types/order';
 
-interface CreatePaymentIntentRequest {
-  amount: number;
-  orderItems: OrderItem[];
-}
-
-interface CreatePaymentIntentResponse {
-  clientSecret: string;
-  amount?: number;
-  success?: boolean;
-  error?: string;
-}
-
+// Define request for creating an order
 interface CreateOrderRequest {
-  items: OrderItem[];
+  designId: number;
+  sport: string;
+  totalAmount: number;
   orderDetails: OrderDetails;
-  totalAmount: number;
+  shippingAddress: ShippingAddress;
   paymentMethod: string;
-}
-
-interface CreateSubscriptionResponse {
-  clientSecret: string;
-  subscriptionId: string;
-}
-
-interface Order {
-  id: number;
-  userId: number;
-  totalAmount: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  items: any[];
+  designUrls?: { front: string; back: string };
+  prompt?: string;
+  metadata?: Record<string, any>;
 }
 
 class OrderService {
