@@ -10,9 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomizationData } from "@shared/schema";
 import { 
   X, Save, ShoppingCart, Undo, Download, Image, Type, Hash, Move, Plus, 
-  RotateCcw, RotateCw, Maximize, Minimize, Circle, TextCursorInput
+  RotateCcw, RotateCw, Maximize, Minimize, Circle, TextCursorInput, Edit, Trash
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 type TextElement = {
   id: string;
@@ -38,6 +39,7 @@ export default function DesignEditor() {
     formData
   } = useDesignStore();
   const { saveCustomizations, isSaving } = useReplicate();
+  const { toast } = useToast();
   const [_, navigate] = useLocation();
   
   const [activeElement, setActiveElement] = useState<string | null>(null);
@@ -52,6 +54,8 @@ export default function DesignEditor() {
   const [currentOutlineWidth, setCurrentOutlineWidth] = useState(1);
   const [logoUrl, setLogoUrl] = useState("");
   const [logoElements, setLogoElements] = useState<{id: string, url: string, position: {x: number, y: number}, size: {width: number, height: number}, rotation: number, maintainAspectRatio: boolean}[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingElementId, setEditingElementId] = useState<string | null>(null);
   
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -99,6 +103,133 @@ export default function DesignEditor() {
     };
     
     updateCustomizations(updatedCustomizations);
+  };
+  
+  // Function to start editing a text element
+  const handleEditText = (elementId: string) => {
+    const textElement = textElements.find(el => el.id === elementId);
+    if (!textElement) return;
+    
+    // Load the text element properties into the form
+    setCurrentText(textElement.content);
+    setCurrentColor(textElement.color);
+    setCurrentSize(textElement.size);
+    setCurrentFont(textElement.font);
+    setCurrentFontSize(textElement.fontSize);
+    setCurrentOutline(textElement.outline);
+    setCurrentOutlineColor(textElement.outlineColor);
+    setCurrentOutlineWidth(textElement.outlineWidth);
+    
+    // Set editing state
+    setIsEditing(true);
+    setEditingElementId(elementId);
+    setActiveElement(elementId);
+    
+    toast({
+      title: "Editing Text",
+      description: "Edit the text properties and click 'Update Text' when done.",
+      duration: 3000,
+    });
+  };
+  
+  // Function to update an existing text element
+  const handleUpdateText = () => {
+    if (!editingElementId) return;
+    
+    // Update the text element with new properties
+    setTextElements(prev => prev.map(el => {
+      if (el.id === editingElementId) {
+        return {
+          ...el,
+          content: currentText,
+          color: currentColor,
+          size: currentSize,
+          font: currentFont,
+          fontSize: currentFontSize,
+          outline: currentOutline,
+          outlineColor: currentOutlineColor,
+          outlineWidth: currentOutlineWidth
+        };
+      }
+      return el;
+    }));
+    
+    // Update customizations store
+    const updatedText = textElements.map(el => {
+      if (el.id === editingElementId) {
+        return {
+          content: currentText,
+          position: el.position,
+          color: currentColor,
+          size: currentSize,
+          font: currentFont,
+          fontSize: currentFontSize,
+          outline: currentOutline,
+          outlineColor: currentOutlineColor,
+          outlineWidth: currentOutlineWidth
+        };
+      }
+      return {
+        content: el.content,
+        position: el.position,
+        color: el.color,
+        size: el.size,
+        font: el.font,
+        fontSize: el.fontSize || 24,
+        outline: el.outline || false,
+        outlineColor: el.outlineColor || "#000000",
+        outlineWidth: el.outlineWidth || 1
+      };
+    });
+    
+    updateCustomizations({
+      ...customizations,
+      text: updatedText
+    });
+    
+    // Reset editing state
+    setIsEditing(false);
+    setEditingElementId(null);
+    setCurrentText("");
+    
+    toast({
+      title: "Text Updated",
+      description: "Your text has been updated successfully.",
+      duration: 3000,
+    });
+  };
+  
+  // Function to delete a text element
+  const handleDeleteText = (elementId: string) => {
+    // Remove the text element
+    const newTextElements = textElements.filter(el => el.id !== elementId);
+    setTextElements(newTextElements);
+    
+    // Update customizations store
+    const updatedText = newTextElements.map(el => ({
+      content: el.content,
+      position: el.position,
+      color: el.color,
+      size: el.size,
+      font: el.font,
+      fontSize: el.fontSize || 24,
+      outline: el.outline || false,
+      outlineColor: el.outlineColor || "#000000",
+      outlineWidth: el.outlineWidth || 1
+    }));
+    
+    updateCustomizations({
+      ...customizations,
+      text: updatedText
+    });
+    
+    setActiveElement(null);
+    
+    if (editingElementId === elementId) {
+      setIsEditing(false);
+      setEditingElementId(null);
+      setCurrentText("");
+    }
   };
   
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -376,9 +507,387 @@ export default function DesignEditor() {
       </div>
       
       {/* Editor Body */}
-      <div className="flex flex-col gap-4 sm:gap-6">
+      <div className="flex flex-col md:flex-row">
+        {/* Tools Panel - On left for desktop, on bottom for mobile */}
+        <div className="hidden md:block w-80 p-3 sm:p-4 border-r border-gray-200">
+          <div>
+            {/* Add Elements Section */}
+            <div className="mb-5">
+              <h3 className="font-medium text-sm text-gray-700 mb-2">Add Elements</h3>
+              <div className="grid grid-cols-3 gap-2">
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  className="text-xs flex items-center justify-center rounded-md h-10"
+                >
+                  <Type className="h-4 w-4 mr-1" /> Text
+                </Button>
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  className="text-xs flex items-center justify-center rounded-md h-10"
+                >
+                  <Hash className="h-4 w-4 mr-1" /> Number
+                </Button>
+                <label className="inline-block cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+                  <div 
+                    className="text-xs flex items-center justify-center rounded-md h-10 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-sm font-medium px-4 py-2"
+                  >
+                    <Image className="h-4 w-4 mr-1" /> Logo
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            {/* Text Tool Settings */}
+            <div className="mb-5">
+              <h3 className="font-medium text-sm text-gray-700 mb-2">Text Settings</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Text Content</label>
+                  <Input 
+                    type="text" 
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
+                    placeholder="Enter text" 
+                    value={currentText}
+                    onChange={(e) => setCurrentText(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Font</label>
+                  <Select value={currentFont} onValueChange={setCurrentFont}>
+                    <SelectTrigger className="w-full text-xs h-9">
+                      <SelectValue placeholder="Select font" />
+                    </SelectTrigger>
+                    <SelectContent className="z-[100] max-h-[300px] overflow-y-auto">
+                      <SelectItem value="Arial">Arial</SelectItem>
+                      <SelectItem value="Impact">Impact</SelectItem>
+                      <SelectItem value="Helvetica">Helvetica</SelectItem>
+                      <SelectItem value="Roboto">Roboto</SelectItem>
+                      <SelectItem value="Montserrat">Montserrat</SelectItem>
+                      <SelectItem value="Oswald">Oswald</SelectItem>
+                      <SelectItem value="Lato">Lato</SelectItem>
+                      <SelectItem value="Open Sans">Open Sans</SelectItem>
+                      <SelectItem value="Raleway">Raleway</SelectItem>
+                      <SelectItem value="Poppins">Poppins</SelectItem>
+                      <SelectItem value="Bebas Neue">Bebas Neue</SelectItem>
+                      <SelectItem value="Teko">Teko</SelectItem>
+                      <SelectItem value="Anton">Anton</SelectItem>
+                      <SelectItem value="Barlow">Barlow</SelectItem>
+                      <SelectItem value="Russo One">Russo One</SelectItem>
+                      <SelectItem value="Graduate">Graduate</SelectItem>
+                      <SelectItem value="Jost">Jost</SelectItem>
+                      <SelectItem value="Orbitron">Orbitron</SelectItem>
+                      <SelectItem value="Staatliches">Staatliches</SelectItem>
+                      <SelectItem value="Racing Sans One">Racing Sans One</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">Color</label>
+                    <Input 
+                      type="color" 
+                      className="w-full h-9 px-1 border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
+                      value={currentColor}
+                      onChange={(e) => setCurrentColor(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">Size</label>
+                    <Select value={currentSize} onValueChange={setCurrentSize}>
+                      <SelectTrigger className="w-full text-xs h-9">
+                        <SelectValue placeholder="Size" />
+                      </SelectTrigger>
+                      <SelectContent className="z-[100]">
+                        <SelectItem value="small">Small</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="large">Large</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                {/* Font Size Slider */}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-xs text-gray-600">Font Size</label>
+                    <span className="text-xs text-gray-500">{currentFontSize}px</span>
+                  </div>
+                  <Slider 
+                    value={[currentFontSize]} 
+                    min={12} 
+                    max={72} 
+                    step={1}
+                    onValueChange={(value) => setCurrentFontSize(value[0])}
+                    className="py-1"
+                  />
+                </div>
+                
+                {/* Text Outline Controls */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-gray-600">Text Outline</label>
+                    <Switch 
+                      checked={currentOutline}
+                      onCheckedChange={setCurrentOutline}
+                    />
+                  </div>
+                  
+                  {currentOutline && (
+                    <>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">Outline Color</label>
+                        <Input 
+                          type="color" 
+                          className="w-full h-9 px-1 border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
+                          value={currentOutlineColor}
+                          onChange={(e) => setCurrentOutlineColor(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="block text-xs text-gray-600">Outline Width</label>
+                          <span className="text-xs text-gray-500">{currentOutlineWidth}px</span>
+                        </div>
+                        <Slider 
+                          value={[currentOutlineWidth]} 
+                          min={1} 
+                          max={5} 
+                          step={0.5}
+                          onValueChange={(value) => setCurrentOutlineWidth(value[0])}
+                          className="py-1"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                <Button 
+                  size="sm"
+                  className="w-full bg-primary text-white px-4 py-2 rounded-full text-sm h-9 mt-3"
+                  onClick={isEditing ? handleUpdateText : handleAddText}
+                >
+                  {isEditing ? 'Update Text' : 'Add Text to Jersey'}
+                </Button>
+                {isEditing && (
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    className="w-full px-4 py-2 rounded-full text-sm h-9 mt-2"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditingElementId(null);
+                      setCurrentText("");
+                    }}
+                  >
+                    Cancel Editing
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            {/* Logo Settings */}
+            {logoElements.length > 0 && (
+              <div className="mb-5">
+                <h3 className="font-medium text-sm text-gray-700 mb-2">Logo Settings</h3>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex flex-wrap gap-2">
+                      {logoElements.map((logo) => (
+                        <div 
+                          key={logo.id}
+                          className={`w-16 h-16 border rounded-md flex items-center justify-center overflow-hidden cursor-pointer ${
+                            activeElement === logo.id ? 'border-primary border-2' : 'border-gray-200'
+                          }`}
+                          onClick={() => setActiveElement(logo.id)}
+                        >
+                          <img 
+                            src={logo.url} 
+                            alt="Logo thumbnail" 
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                      ))}
+                      <label className="w-16 h-16 border border-dashed border-gray-200 rounded-md flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleLogoUpload}
+                        />
+                        <Plus className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs text-gray-400 mt-1">Add New</span>
+                      </label>
+                    </div>
+                    
+                    {activeElement && activeElement.startsWith('logo-') && (
+                      <div className="mt-2 space-y-3">
+                        {/* Logo Size Controls */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="block text-xs text-gray-600">Width</label>
+                            <span className="text-xs text-gray-500">
+                              {logoElements.find(logo => logo.id === activeElement)?.size.width}px
+                            </span>
+                          </div>
+                          <Slider 
+                            value={[logoElements.find(logo => logo.id === activeElement)?.size.width || 100]} 
+                            min={20} 
+                            max={300} 
+                            step={5}
+                            onValueChange={(value) => {
+                              setLogoElements(prev => prev.map(logo => {
+                                if (logo.id === activeElement) {
+                                  const aspectRatio = logo.size.height / logo.size.width;
+                                  const newWidth = value[0];
+                                  const newHeight = logo.maintainAspectRatio ? Math.round(newWidth * aspectRatio) : logo.size.height;
+                                  
+                                  return {
+                                    ...logo,
+                                    size: {
+                                      width: newWidth,
+                                      height: newHeight
+                                    }
+                                  };
+                                }
+                                return logo;
+                              }));
+                            }}
+                            className="py-1"
+                          />
+                        </div>
+                        
+                        {/* Height control (only visible if not maintaining aspect ratio) */}
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-xs text-gray-600">Maintain Aspect Ratio</label>
+                            <Switch 
+                              checked={logoElements.find(logo => logo.id === activeElement)?.maintainAspectRatio || true}
+                              onCheckedChange={(checked) => {
+                                setLogoElements(prev => prev.map(logo => {
+                                  if (logo.id === activeElement) {
+                                    return {
+                                      ...logo,
+                                      maintainAspectRatio: checked
+                                    };
+                                  }
+                                  return logo;
+                                }));
+                              }}
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Rotation Control */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="block text-xs text-gray-600">Rotation</label>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => {
+                                  setLogoElements(prev => prev.map(logo => {
+                                    if (logo.id === activeElement) {
+                                      return {
+                                        ...logo,
+                                        rotation: ((logo.rotation || 0) - 90) % 360
+                                      };
+                                    }
+                                    return logo;
+                                  }));
+                                }}
+                              >
+                                <RotateCcw className="h-3 w-3" />
+                              </Button>
+                              <span className="text-xs text-gray-500">
+                                {logoElements.find(logo => logo.id === activeElement)?.rotation || 0}°
+                              </span>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => {
+                                  setLogoElements(prev => prev.map(logo => {
+                                    if (logo.id === activeElement) {
+                                      return {
+                                        ...logo,
+                                        rotation: ((logo.rotation || 0) + 90) % 360
+                                      };
+                                    }
+                                    return logo;
+                                  }));
+                                }}
+                              >
+                                <RotateCw className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          <Slider 
+                            value={[logoElements.find(logo => logo.id === activeElement)?.rotation || 0]} 
+                            min={0} 
+                            max={360} 
+                            step={5}
+                            onValueChange={(value) => {
+                              setLogoElements(prev => prev.map(logo => {
+                                if (logo.id === activeElement) {
+                                  return {
+                                    ...logo,
+                                    rotation: value[0]
+                                  };
+                                }
+                                return logo;
+                              }));
+                            }}
+                            className="py-1"
+                          />
+                        </div>
+                        
+                        {/* Delete Button */}
+                        <Button 
+                          variant="destructive"
+                          size="sm"
+                          className="text-xs h-8 w-full mt-2"
+                          onClick={() => {
+                            const newLogoElements = logoElements.filter(logo => logo.id !== activeElement);
+                            setLogoElements(newLogoElements);
+                            setActiveElement(null);
+                            
+                            const updatedLogos = newLogoElements.map(el => ({
+                              url: el.url,
+                              position: el.position,
+                              size: el.size,
+                              rotation: el.rotation || 0,
+                              maintainAspectRatio: el.maintainAspectRatio || true
+                            }));
+                            
+                            updateCustomizations({
+                              ...customizations,
+                              logos: updatedLogos
+                            });
+                          }}
+                        >
+                          Remove Selected Logo
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
         {/* Canvas Area - Combined View */}
-        <div className="p-3 sm:p-4 flex items-center justify-center bg-gray-50">
+        <div className="p-3 sm:p-4 flex-1 flex items-center justify-center bg-gray-50">
           <div className="w-full max-w-2xl">
             <div 
               ref={canvasRef}
@@ -430,8 +939,37 @@ export default function DesignEditor() {
                   }}
                   onMouseDown={(e) => handleDragStart(e, element.id)}
                   onTouchStart={(e) => handleDragStart(e, element.id)}
+                  onClick={() => handleEditText(element.id)}
                 >
-                  {element.content}
+                  <div className="relative">
+                    {element.content}
+                    {activeElement === element.id && (
+                      <div className="absolute -top-6 -right-2 flex gap-1">
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="h-5 w-5 p-0 rounded-full bg-white shadow-sm hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditText(element.id);
+                          }}
+                        >
+                          <Edit className="h-3 w-3 text-gray-600" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="h-5 w-5 p-0 rounded-full bg-white shadow-sm hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteText(element.id);
+                          }}
+                        >
+                          <Trash className="h-3 w-3 text-red-500" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
               
@@ -647,10 +1185,24 @@ export default function DesignEditor() {
                 <Button 
                   size="sm"
                   className="w-full bg-primary text-white px-4 py-2 rounded-full text-sm h-9 mt-3"
-                  onClick={handleAddText}
+                  onClick={isEditing ? handleUpdateText : handleAddText}
                 >
-                  Add Text to Jersey
+                  {isEditing ? 'Update Text' : 'Add Text to Jersey'}
                 </Button>
+                {isEditing && (
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    className="w-full px-4 py-2 rounded-full text-sm h-9 mt-2"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditingElementId(null);
+                      setCurrentText("");
+                    }}
+                  >
+                    Cancel Editing
+                  </Button>
+                )}
               </div>
             </div>
             
