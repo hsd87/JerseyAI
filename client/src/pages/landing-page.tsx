@@ -69,7 +69,7 @@ const testimonials = [
     title: "Soccer Coach"
   },
   {
-    quote: "We expanded our sports shop's offerings by partnering with ProJersey. The custom jersey line is now one of our best-sellers.",
+    quote: "We expanded our sports shop's offerings by partnering with VORO. The custom jersey line is now one of our best-sellers.",
     author: "Mark D.",
     title: "Retail Buyer"
   }
@@ -189,7 +189,7 @@ export default function LandingPage() {
             <div className="text-sm text-gray-500 uppercase mb-2">Your Kit Preview</div>
             <div className="rounded-xl shadow-sm border border-gray-300 bg-white p-6">
               <div className="text-center mb-4">
-                <span className="font-heading font-bold text-xl">Pro<span className="text-[#E34234]">Jersey</span> Designer</span>
+                <span className="font-heading font-bold text-xl"><span className="text-[#E34234]">VORO</span> Designer</span>
               </div>
               <div className="relative bg-gray-50 h-64 rounded-lg mb-6 flex items-center justify-center overflow-hidden border border-gray-200">
                 {designs.length > 0 ? (
@@ -320,13 +320,13 @@ export default function LandingPage() {
 
             {/* Comparison Table */}
             <div className="bg-white rounded-xl p-8 shadow-sm">
-              <h3 className="font-sora font-bold text-2xl mb-6">ProJersey vs. Traditional Printing</h3>
+              <h3 className="font-sora font-bold text-2xl mb-6">VORO vs. Traditional Printing</h3>
               <div className="overflow-hidden border border-gray-200 rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ProJersey</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VORO</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Traditional</th>
                     </tr>
                   </thead>
@@ -372,7 +372,7 @@ export default function LandingPage() {
                 <h3 className="font-sora font-bold text-2xl">Built for Teams of All Sizes</h3>
               </div>
               <p className="text-gray-700 mb-6">
-                Coaches and team managers love ProJersey – coordinate your entire team's kit in one go.
+                Coaches and team managers love VORO – coordinate your entire team's kit in one go.
               </p>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
@@ -415,7 +415,7 @@ export default function LandingPage() {
             <div className="bg-gray-50 rounded-xl p-8 border border-gray-200">
               <div className="flex items-center gap-3 mb-4">
                 <Building className="h-8 w-8 text-[#E34234]" />
-                <h3 className="font-sora font-bold text-2xl">Partner with ProJersey</h3>
+                <h3 className="font-sora font-bold text-2xl">Partner with VORO</h3>
               </div>
               <p className="text-gray-700 mb-6">
                 Need 50+ jerseys or want to resell custom kits? We've got you covered with scalable fulfillment.
@@ -464,7 +464,7 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <h2 className="font-sora text-3xl md:text-4xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Join thousands of satisfied customers who've transformed their team's look with ProJersey
+              Join thousands of satisfied customers who've transformed their team's look with VORO
             </p>
             <div className="mt-6 flex justify-center items-center gap-3">
               <div className="flex">
