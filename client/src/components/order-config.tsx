@@ -518,22 +518,26 @@ export default function OrderConfig() {
         }
       });
     } else {
-      // Process individual order
-      packageItems.forEach(item => {
-        item.sizes.forEach(sizeInfo => {
-          if (sizeInfo.quantity > 0) {
-            addItem({
-              id: `${item.type}-${sizeInfo.size}`,
-              type: item.type,
-              name: item.name,
-              size: sizeInfo.size,
-              quantity: sizeInfo.quantity,
-              gender: item.gender,
-              price: item.price
+      // Process individual order - with null checking
+      if (packageItems && packageItems.length > 0) {
+        packageItems.forEach(item => {
+          if (item.sizes && Array.isArray(item.sizes)) {
+            item.sizes.forEach(sizeInfo => {
+              if (sizeInfo && sizeInfo.quantity > 0) {
+                addItem({
+                  id: `${item.type}-${sizeInfo.size}`,
+                  type: item.type,
+                  name: item.name,
+                  size: sizeInfo.size,
+                  quantity: sizeInfo.quantity,
+                  gender: item.gender,
+                  price: item.price
+                });
+              }
             });
           }
         });
-      });
+      }
     }
     
     // Navigate to checkout or next step
@@ -685,7 +689,7 @@ export default function OrderConfig() {
                             }
                           }}
                         >
-                          {currentQty === 0 ? <Plus className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
+                          {currentQty === 0 ? <Plus className="h-4 w-4" /> : <Check className="h-4 w-4 text-green-500" />}
                         </Button>
                         
                         {currentQty > 0 && (
@@ -755,7 +759,7 @@ export default function OrderConfig() {
               })}
             </div>
             
-            {packageItems.length > 0 && (
+            {packageItems && packageItems.length > 0 && (
               <div className="border rounded-lg p-4 bg-slate-50 mt-4">
                 <h3 className="font-medium mb-2">Your Selected Items</h3>
                 <div className="space-y-2">
@@ -780,7 +784,7 @@ export default function OrderConfig() {
               </Button>
               <Button 
                 onClick={goToNextStep}
-                disabled={packageItems.length === 0}
+                disabled={!packageItems || packageItems.length === 0}
               >
                 Continue <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
@@ -797,7 +801,7 @@ export default function OrderConfig() {
             </div>
             
             <div className="space-y-6">
-              {packageItems.map((item, index) => (
+              {packageItems && packageItems.map((item, index) => (
                 <div key={item.id} className="border rounded-lg p-4">
                   <h3 className="font-medium text-lg mb-4 flex items-center">
                     {item.type === 'jersey' && <Shirt className="h-5 w-5 mr-2 text-primary" />}
@@ -812,7 +816,7 @@ export default function OrderConfig() {
                       <Select
                         value={item.gender}
                         onValueChange={(value) => {
-                          setPackageItems(items => items.map(i => {
+                          setPackageItems((items: PackageItem[] = []) => items.map((i: PackageItem) => {
                             if (i.id === item.id) {
                               return { ...i, gender: value };
                             }
@@ -838,7 +842,7 @@ export default function OrderConfig() {
                         <Select
                           value={item.sizes[0]?.size || 'M'}
                           onValueChange={(value) => {
-                            setPackageItems(items => items.map(i => {
+                            setPackageItems((items: PackageItem[] = []) => items.map((i: PackageItem) => {
                               if (i.id === item.id) {
                                 return { 
                                   ...i, 
