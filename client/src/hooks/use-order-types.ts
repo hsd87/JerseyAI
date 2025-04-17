@@ -7,6 +7,7 @@ export interface PackageItem {
   sizes: { size: string; quantity: number }[];
   price: number;
   gender: string;
+  sku?: string; // Added for product identification
 }
 
 export interface OrderAddon {

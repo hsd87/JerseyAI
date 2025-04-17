@@ -26,7 +26,7 @@ export const useOrderStore = create<OrderState>((set) => ({
   addOns: [],
   teamMembers: [],
   isTeamOrder: false,
-  packageItems: [], // Store for custom package items
+  packageItems: [], // Initialize as empty array for packageItems
   packageType: 'jerseyOnly', // Default package type
   
   // Pricing
