@@ -37,7 +37,10 @@ export const StripePaymentWrapper: React.FC<StripePaymentWrapperProps> = ({
       try {
         setLoading(true);
         // This will call the /api/create-payment-intent endpoint
-        const { clientSecret } = await orderService.createPaymentIntent(items);
+        const { clientSecret } = await orderService.createPaymentIntent({
+          amount: amount, // Use the amount prop
+          orderItems: items // Use the items prop
+        });
         setClientSecret(clientSecret);
       } catch (err: any) {
         console.error('Error fetching payment intent:', err);
@@ -48,7 +51,7 @@ export const StripePaymentWrapper: React.FC<StripePaymentWrapperProps> = ({
     };
 
     fetchPaymentIntent();
-  }, [items]);
+  }, [items, amount]);
 
   if (loading) {
     return (
