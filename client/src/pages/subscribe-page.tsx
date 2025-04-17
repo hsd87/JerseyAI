@@ -349,37 +349,38 @@ const SubscribePage: React.FC = () => {
               <CardTitle className="text-2xl">Welcome to VORO Pro!</CardTitle>
               <CardDescription>Your subscription has been activated</CardDescription>
             </CardHeader>
-          <CardContent className="pt-6">
-            <p className="mb-6">You now have access to unlimited designs and all premium features.</p>
-            <div className="bg-muted p-4 rounded-lg max-w-md mx-auto">
-              <h3 className="font-medium text-lg mb-2">Pro Benefits Include:</h3>
-              <ul className="space-y-2 text-left">
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 mr-2 text-green-500" />
-                  Unlimited jersey designs
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 mr-2 text-green-500" />
-                  10% discount on all orders
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 mr-2 text-green-500" />
-                  Priority customer support
-                </li>
-                <li className="flex items-center">
-                  <Check className="h-5 w-5 mr-2 text-green-500" />
-                  Access to premium design templates
-                </li>
-              </ul>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-center gap-4">
-            <Button onClick={() => setLocation('/designer')}>
-              Start Designing
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+            <CardContent className="pt-6">
+              <p className="mb-6">You now have access to unlimited designs and all premium features.</p>
+              <div className="bg-muted p-4 rounded-lg max-w-md mx-auto">
+                <h3 className="font-medium text-lg mb-2">Pro Benefits Include:</h3>
+                <ul className="space-y-2 text-left">
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-2 text-green-500" />
+                    Unlimited jersey designs
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-2 text-green-500" />
+                    10% discount on all orders
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-2 text-green-500" />
+                    Priority customer support
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-2 text-green-500" />
+                    Access to premium design templates
+                  </li>
+                </ul>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-center gap-4">
+              <Button onClick={() => setLocation('/designer')}>
+                Start Designing
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </>
     );
   }
 
