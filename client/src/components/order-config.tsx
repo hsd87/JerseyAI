@@ -625,7 +625,10 @@ export default function OrderConfig({
     // We use the navigate function from the useLocation hook
     try {
       // Save a timestamp with the order using the proper method
-      useOrderStore.getState().setOrderCreatedAt(new Date().toISOString());
+      const orderStore = useOrderStore.getState();
+      if (orderStore.setOrderCreatedAt) {
+        orderStore.setOrderCreatedAt(new Date().toISOString());
+      }
       
       // Navigate to the checkout page
       navigate('/checkout');

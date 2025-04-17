@@ -205,7 +205,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
+      // Validate design ID and handle non-numeric values
       const designId = parseInt(req.params.id);
+      if (isNaN(designId)) {
+        return res.status(400).json({ 
+          message: "Invalid design ID format", 
+          error: "invalid_id_format"
+        });
+      }
+
       const design = await storage.getDesignById(designId);
 
       if (!design) {
@@ -218,6 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(design);
     } catch (error) {
+      console.error('Error fetching design:', error);
       next(error);
     }
   });
@@ -229,7 +238,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
+      // Validate design ID and handle non-numeric values
       const designId = parseInt(req.params.id);
+      if (isNaN(designId)) {
+        return res.status(400).json({ 
+          message: "Invalid design ID format", 
+          error: "invalid_id_format"
+        });
+      }
+      
       const design = await storage.getDesignById(designId);
 
       if (!design) {
@@ -243,6 +260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deleteDesign(designId);
       res.status(204).send();
     } catch (error) {
+      console.error('Error deleting design:', error);
       next(error);
     }
   });
