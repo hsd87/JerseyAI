@@ -684,6 +684,12 @@ export default function OrderConfig() {
                               size="icon"
                               className="h-7 w-7"
                               onClick={() => {
+                                // Set package type to custom if it's not already
+                                if (watchedPackageType !== 'custom') {
+                                  setPackageType('custom');
+                                  form.setValue('packageType', 'custom');
+                                }
+                                
                                 // Increase quantity
                                 handlePackageItemQuantityChange(
                                   currentItem?.id || '',
