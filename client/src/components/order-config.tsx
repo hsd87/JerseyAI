@@ -31,7 +31,8 @@ import {
   ChevronRight,
   Ruler,
   Package,
-  ClipboardList
+  ClipboardList,
+  Check
 } from 'lucide-react';
 import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice, PRODUCTS, Product } from '@shared/product-configs';
 import { TeamMember, AddOn, OrderItem } from '@/hooks/use-order-types';
@@ -153,14 +154,20 @@ export default function OrderConfig() {
   // Initialize package items based on package type
   useEffect(() => {
     if (watchedPackageType) {
+      // Find the jersey product from PRODUCTS if a design was generated
+      const jerseyProduct = designId 
+        ? PRODUCTS.find(p => p.productType === 'JERSEY') 
+        : null;
+      
       let newItems: PackageItem[] = [
         {
-          id: 'jersey',
+          id: jerseyProduct?.sku || 'jersey',
           name: 'Custom Jersey',
           type: 'jersey',
           sizes: [{ size: watchedSize, quantity: watchedQuantity }],
-          price: 59.99,
-          gender: watchedGender
+          price: jerseyProduct?.basePrice || 59.99,
+          gender: watchedGender,
+          sku: jerseyProduct?.sku // Add SKU for the generated jersey
         }
       ];
 
@@ -188,7 +195,7 @@ export default function OrderConfig() {
 
       setPackageItems(newItems);
     }
-  }, [watchedPackageType, watchedSize, watchedQuantity, watchedGender]);
+  }, [watchedPackageType, watchedSize, watchedQuantity, watchedGender, designId]);
 
   // Calculate total price
   useEffect(() => {
@@ -625,13 +632,8 @@ export default function OrderConfig() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {PRODUCTS.filter(product => 
-                product.allowedInAiDesigner || 
-                product.productType === 'JERSEY' || 
-                product.productType === 'SHORTS' || 
-                product.productType === 'TROUSER' || 
-                product.productType === 'SOCKS'
-              ).map((product) => {
+              {/* Show all products including add-ons for selection */}
+              {PRODUCTS.map((product) => {
                 // Safely handle packageItems which might be undefined/null 
                 const safePackageItems = packageItems || [];
                 const isSelected = safePackageItems.some(item => item.sku === product.sku);
@@ -816,12 +818,13 @@ export default function OrderConfig() {
                       <Select
                         value={item.gender}
                         onValueChange={(value) => {
-                          setPackageItems((items: PackageItem[] = []) => items.map((i: PackageItem) => {
+                          const updatedItems = (packageItems || []).map((i: PackageItem) => {
                             if (i.id === item.id) {
                               return { ...i, gender: value };
                             }
                             return i;
-                          }));
+                          });
+                          setPackageItems(updatedItems);
                         }}
                       >
                         <SelectTrigger id={`${item.id}-gender`} className="mt-1">
