@@ -9,6 +9,10 @@ declare module 'stripe' {
     interface Invoice {
       payment_intent?: Stripe.PaymentIntent;
     }
+    
+    interface Subscription {
+      current_period_end: number;
+    }
   }
 }
 
@@ -87,9 +91,14 @@ export async function checkSubscriptionStatus(subscriptionId: string): Promise<{
 }> {
   if (!stripe) throw new Error('Stripe is not configured');
 
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const result = await stripe.subscriptions.retrieve(subscriptionId);
   
-  // Access properties from the subscription object directly
+  // Cast the result to access the properties we need
+  const subscription = result as unknown as {
+    status: Stripe.Subscription.Status;
+    current_period_end: number;
+  };
+  
   return {
     status: subscription.status,
     current_period_end: subscription.current_period_end

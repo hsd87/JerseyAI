@@ -9,8 +9,8 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface StripePaymentFormProps {
-  onSuccess: () => void;
-  onCancel: () => void;
+  onSuccess?: () => void;
+  onCancel?: () => void;
   amount: number;
   isProcessing?: boolean;
 }
@@ -58,7 +58,9 @@ export const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
       } else {
         // The payment has been processed!
         setIsSubmitting(false);
-        onSuccess();
+        if (onSuccess) {
+          onSuccess();
+        }
       }
     } catch (e: any) {
       setErrorMessage(e.message || 'An unexpected error occurred.');
@@ -108,7 +110,7 @@ export const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
           <Button
             type="button"
             variant="outline"
-            onClick={onCancel}
+            onClick={onCancel ? () => onCancel() : undefined}
             disabled={isSubmitting || isProcessing}
             className="flex-1 sm:flex-none"
           >
