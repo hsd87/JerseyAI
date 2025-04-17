@@ -81,6 +81,10 @@ export interface OrderState {
   removeItem: (id: string) => void;
   clearItems: () => void;
   
+  // Add-on actions
+  addAddOn?: (addon: AddOn) => void;
+  removeAddOn?: (index: number) => void;
+  
   // Team order actions
   setTeamOrder: (isTeam: boolean) => void;
   setTeamMembers: (members: TeamMember[] | (() => TeamMember[])) => void;
@@ -88,6 +92,7 @@ export interface OrderState {
   // Design reference
   designId: number | null;
   setDesignId: (id: number | null) => void;
+  designUrls?: { front: string; back: string } | null;
   
   // Order processing
   orderDetails: OrderDetails | null;
@@ -96,4 +101,12 @@ export interface OrderState {
   setSport: (sport: string) => void;
   setPackageType: (packageType: string) => void;
   setDesign: (designId: number, designUrls: { front: string; back: string }) => void;
+  
+  // Gender and sizing
+  gender?: string;
+  setGender?: (gender: string) => void;
+  size?: string;
+  setSize?: (size: string) => void;
+  quantity?: number;
+  setQuantity?: (quantity: number) => void;
 }
