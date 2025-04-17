@@ -3,6 +3,7 @@ import { storage } from './storage';
 import { User } from '@shared/schema';
 import { calculatePrice } from './utils/pricing';
 import type { CartItem } from './types';
+
 // Using type assertion to avoid Stripe types issues
 declare module 'stripe' {
   namespace Stripe {
@@ -16,25 +17,48 @@ declare module 'stripe' {
   }
 }
 
-// Make sure to check if the API key is available
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn('Missing Stripe secret key. Stripe functionality will not work.');
-}
-
-// Initialize Stripe with API key if available
-const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY)
-  : null;
-
-// Price IDs for subscription plans
-// Replace with actual price ID from Stripe dashboard if needed
+// Define the global variables
+let stripeInstance: Stripe | null = null;
 const SUBSCRIPTION_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1P5fLVCjzXg59EQpTjGcjjZM';
 
+// Initialize Stripe
+function initializeStripe(): Stripe | null {
+  try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.warn('Missing Stripe secret key. Stripe functionality will not work.');
+      return null;
+    }
+    
+    // Log masked key info for security
+    console.log('Stripe secret key is configured -', {
+      keyLength: process.env.STRIPE_SECRET_KEY.length,
+      keyPrefix: process.env.STRIPE_SECRET_KEY.substring(0, 4) + '...',
+      isValid: process.env.STRIPE_SECRET_KEY.startsWith('sk_')
+    });
+    
+    // Create Stripe instance
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2022-11-15' // Use a stable API version
+    });
+    
+    console.log('Stripe initialized successfully');
+    console.log('Using subscription price ID:', SUBSCRIPTION_PRICE_ID);
+    
+    return stripe;
+  } catch (error) {
+    console.error('Error initializing Stripe:', error);
+    return null;
+  }
+}
+
+// Initialize on module load
+stripeInstance = initializeStripe();
+
 export async function createCustomer(user: User): Promise<string> {
-  if (!stripe) throw new Error('Stripe is not configured');
+  if (!stripeInstance) throw new Error('Stripe is not configured');
   if (!user.email) throw new Error('User email is required to create a customer');
 
-  const customer = await stripe.customers.create({
+  const customer = await stripeInstance.customers.create({
     email: user.email,
     name: user.username,
     metadata: {
@@ -49,7 +73,7 @@ export async function createCustomer(user: User): Promise<string> {
 }
 
 export async function createSubscription(userId: number): Promise<{ clientSecret: string, subscriptionId: string }> {
-  if (!stripe) throw new Error('Stripe is not configured');
+  if (!stripeInstance) throw new Error('Stripe is not configured');
   
   // Get user from database
   const user = await storage.getUser(userId);
@@ -62,7 +86,7 @@ export async function createSubscription(userId: number): Promise<{ clientSecret
   }
 
   // Create subscription
-  const subscription = await stripe.subscriptions.create({
+  const subscription = await stripeInstance.subscriptions.create({
     customer: customerId,
     items: [{ price: SUBSCRIPTION_PRICE_ID }],
     payment_behavior: 'default_incomplete',
@@ -89,9 +113,9 @@ export async function checkSubscriptionStatus(subscriptionId: string): Promise<{
   status: Stripe.Subscription.Status,
   current_period_end: number
 }> {
-  if (!stripe) throw new Error('Stripe is not configured');
+  if (!stripeInstance) throw new Error('Stripe is not configured');
 
-  const result = await stripe.subscriptions.retrieve(subscriptionId);
+  const result = await stripeInstance.subscriptions.retrieve(subscriptionId);
   
   // Cast the result to access the properties we need
   const subscription = result as unknown as {
@@ -106,13 +130,13 @@ export async function checkSubscriptionStatus(subscriptionId: string): Promise<{
 }
 
 export async function cancelSubscription(subscriptionId: string): Promise<void> {
-  if (!stripe) throw new Error('Stripe is not configured');
+  if (!stripeInstance) throw new Error('Stripe is not configured');
   
-  await stripe.subscriptions.cancel(subscriptionId);
+  await stripeInstance.subscriptions.cancel(subscriptionId);
 }
 
 export async function createPaymentIntent(amount: number, customerId: string): Promise<string> {
-  if (!stripe) throw new Error('Stripe is not configured');
+  if (!stripeInstance) throw new Error('Stripe is not configured');
 
   try {
     console.log(`Creating Stripe payment intent for ${amount} cents with customer ${customerId}`);
@@ -123,7 +147,7 @@ export async function createPaymentIntent(amount: number, customerId: string): P
       amount = Math.max(50, Math.round(amount));
     }
     
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await stripeInstance.paymentIntents.create({
       amount, // Amount in cents
       currency: 'usd',
       customer: customerId,
@@ -178,7 +202,7 @@ export async function calculateOrderAmount(items: any[], isSubscriber: boolean =
 
 // Webhook handling for subscription events
 export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void> {
-  if (!stripe) throw new Error('Stripe is not configured');
+  if (!stripeInstance) throw new Error('Stripe is not configured');
 
   switch (event.type) {
     case 'customer.subscription.created':

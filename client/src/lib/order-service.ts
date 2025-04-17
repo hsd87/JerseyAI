@@ -8,6 +8,9 @@ interface CreatePaymentIntentRequest {
 
 interface CreatePaymentIntentResponse {
   clientSecret: string;
+  amount?: number;
+  success?: boolean;
+  error?: string;
 }
 
 interface CreateOrderRequest {
@@ -38,42 +41,76 @@ class OrderService {
    */
   async createPaymentIntent(request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> {
     try {
-      // Ensure we have valid items to send - if no items, create a dummy item with the amount
+      // Ensure we have valid items to send
       const items = request.orderItems && request.orderItems.length > 0 
         ? request.orderItems 
-        : [{ id: 'default', type: 'jersey', price: request.amount, quantity: 1, size: 'M', gender: 'unisex' }];
+        : [{ 
+            id: 'default', 
+            type: 'jersey', 
+            price: request.amount, 
+            quantity: 1, 
+            size: 'M', 
+            gender: 'unisex' 
+          }];
       
-      console.log(`Creating payment intent for amount: $${request.amount} with ${items.length} items`);
+      // Validate amount
+      const amount = request.amount;
+      if (isNaN(amount) || amount <= 0) {
+        console.error(`Invalid amount provided: ${amount}`);
+        throw new Error('Invalid payment amount. Please try again.');
+      }
       
+      console.log(`Creating payment intent for amount: $${amount} with ${items.length} items`);
+      
+      // Make API request
       const response = await apiRequest('POST', '/api/create-payment-intent', {
-        amount: request.amount,
-        items: items,
+        amount,
+        items,
       });
       
+      // Handle error responses
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Payment intent error response:', errorData);
         
-        // More specific error messages based on common issues
-        if (errorData.message && errorData.message.includes('API Key')) {
-          throw new Error('Payment system configuration error. Please contact support.');
-        } else if (response.status === 401) {
+        // Handle specific error types
+        if (errorData.error === 'stripe_not_configured') {
+          throw new Error('Payment system is not properly configured. Please contact support.');
+        } else if (errorData.error === 'authentication_required' || response.status === 401) {
           throw new Error('Authentication required. Please log in and try again.');
+        } else if (errorData.error === 'stripe_auth_error') {
+          throw new Error('Payment system configuration error. Please contact support.');
+        } else if (errorData.error === 'stripe_connection_error') {
+          throw new Error('Unable to connect to payment service. Please try again later.');
         } else {
           throw new Error(errorData.message || 'Failed to create payment intent');
         }
       }
       
-      return await response.json();
+      // Process successful response
+      const responseData = await response.json();
+      console.log('Payment intent created successfully:', responseData);
+      
+      // Ensure the response contains the required clientSecret
+      if (!responseData.clientSecret) {
+        console.error('Missing client secret in payment intent response:', responseData);
+        throw new Error('Invalid response from payment service. Please try again.');
+      }
+      
+      return responseData;
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
       
-      // Provide more specific error messages to help users
+      // Provide user-friendly error messages
       if (error.message.includes('Network Error') || error.message.includes('Failed to fetch')) {
         throw new Error('Network error. Please check your internet connection and try again.');
+      } else if (error.message.includes('Stripe') || error.message.includes('payment')) {
+        // Pass through payment-specific errors
+        throw error;
       }
       
-      throw new Error(error.message || 'Payment initialization failed');
+      // Generic fallback error
+      throw new Error(error.message || 'Unable to initialize payment. Please try again later.');
     }
   }
 
