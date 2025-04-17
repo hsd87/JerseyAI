@@ -113,7 +113,6 @@ export default function OrderConfig() {
     "Selected Kit",
     "Package Options",
     "Order Type",
-    "Package Details",
     "Order Details",
     "Pricing",
     "Summary"
@@ -467,7 +466,7 @@ export default function OrderConfig() {
 
   // Navigation functions
   const goToNextStep = () => {
-    if (currentStep < 7) {
+    if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -563,9 +562,9 @@ export default function OrderConfig() {
         
         {/* Progress indicator */}
         <div className="mt-4">
-          <Progress value={(currentStep / 7) * 100} className="h-2" />
+          <Progress value={(currentStep / 6) * 100} className="h-2" />
           <div className="flex justify-between mt-2 text-xs text-gray-500">
-            <span>Step {currentStep} of 7</span>
+            <span>Step {currentStep} of 6</span>
             <span>{stepTitles[currentStep - 1]}</span>
           </div>
         </div>
@@ -889,145 +888,14 @@ export default function OrderConfig() {
                 Back
               </Button>
               <Button onClick={goToNextStep}>
-                Continue to Package Details <ChevronRight className="ml-2 h-4 w-4" />
+                Continue to Order Details <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
         )}
 
-        {/* Step 4: Package Details */}
+        {/* Step 4: Order Details (Combined Package Details & Team/Individual Info) */}
         {currentStep === 4 && (
-          <div className="space-y-6">
-            <div className="bg-slate-50 p-4 rounded-md border mb-6">
-              <h3 className="font-medium mb-2">Selected Package: {kitTypeDisplayNames[watchedPackageType]}</h3>
-              <p className="text-sm text-gray-600">Customize the items in your package by adjusting sizes and quantities below.</p>
-            </div>
-            
-            <div className="space-y-6">
-              {packageItems && packageItems.map((item, index) => (
-                <div key={item.id} className="border rounded-lg p-4">
-                  <h3 className="font-medium text-lg mb-4 flex items-center">
-                    {item.type === 'jersey' && <Shirt className="h-5 w-5 mr-2 text-primary" />}
-                    {item.type === 'shorts' && <Shirt className="h-5 w-5 mr-2 text-primary" />}
-                    {item.type === 'socks' && <Shirt className="h-5 w-5 mr-2 text-primary" />}
-                    {item.name}
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor={`${item.id}-gender`}>Gender</Label>
-                      <Select
-                        value={item.gender}
-                        onValueChange={(value) => {
-                          const updatedItems = (packageItems || []).map((i: PackageItem) => {
-                            if (i.id === item.id) {
-                              return { ...i, gender: value };
-                            }
-                            return i;
-                          });
-                          setPackageItems(updatedItems);
-                        }}
-                      >
-                        <SelectTrigger id={`${item.id}-gender`} className="mt-1">
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Male">Men's</SelectItem>
-                          <SelectItem value="Female">Women's</SelectItem>
-                          <SelectItem value="Youth">Youth</SelectItem>
-                          <SelectItem value="Unisex">Unisex</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    {item.type !== 'socks' && (
-                      <div>
-                        <Label htmlFor={`${item.id}-size`}>Size</Label>
-                        <Select
-                          value={item.sizes[0]?.size || 'M'}
-                          onValueChange={(value) => {
-                            const updatedItems = (packageItems || []).map((i: PackageItem) => {
-                              if (i.id === item.id) {
-                                return { 
-                                  ...i, 
-                                  sizes: [{ size: value, quantity: i.sizes[0]?.quantity || 1 }]
-                                };
-                              }
-                              return i;
-                            });
-                            setPackageItems(updatedItems);
-                          }}
-                        >
-                          <SelectTrigger id={`${item.id}-size`} className="mt-1">
-                            <SelectValue placeholder="Select size" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="XS">XS</SelectItem>
-                            <SelectItem value="S">S</SelectItem>
-                            <SelectItem value="M">M</SelectItem>
-                            <SelectItem value="L">L</SelectItem>
-                            <SelectItem value="XL">XL</SelectItem>
-                            <SelectItem value="XXL">XXL</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                    
-                    <div className="md:col-span-2">
-                      <Label>Quantity</Label>
-                      <div className="flex items-center mt-1">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handlePackageItemQuantityChange(
-                            item.id,
-                            item.sizes[0]?.size || 'M',
-                            -1
-                          )}
-                          disabled={item.sizes[0]?.quantity <= 1}
-                        >
-                          <MinusCircle className="h-4 w-4" />
-                        </Button>
-                        <span className="mx-4">{item.sizes[0]?.quantity || 1}</span>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handlePackageItemQuantityChange(
-                            item.id,
-                            item.sizes[0]?.size || 'M',
-                            1
-                          )}
-                        >
-                          <PlusCircle className="h-4 w-4" />
-                        </Button>
-                        <div className="ml-6">
-                          <span className="text-sm font-medium">Item Total: </span>
-                          <span className="text-sm font-semibold">
-                            ${(item.price * (item.sizes[0]?.quantity || 1)).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex justify-between mt-6">
-              <Button variant="outline" onClick={goToPreviousStep}>
-                Back
-              </Button>
-              <Button onClick={goToNextStep}>
-                Continue to {watchedIsTeamOrder ? 'Team Roster' : 'Order Details'} <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 5: Order Details (Team Roster or Individual Details) */}
-        {currentStep === 5 && (
           <div className="space-y-6">
             {watchedIsTeamOrder ? (
               // Team order roster
@@ -1405,7 +1273,7 @@ export default function OrderConfig() {
         )}
 
         {/* Step 6: Pricing */}
-        {currentStep === 6 && (
+        {currentStep === 5 && (
           <div className="space-y-6">
             <div className="bg-slate-50 border rounded-lg p-6">
               <h3 className="font-medium text-lg mb-4">Order Price Breakdown</h3>
@@ -1479,7 +1347,7 @@ export default function OrderConfig() {
         )}
 
         {/* Step 7: Order Summary */}
-        {currentStep === 7 && (
+        {currentStep === 6 && (
           <div className="space-y-6">
             <div className="bg-primary/5 border-primary/10 border rounded-lg p-4 mb-6">
               <h3 className="font-medium flex items-center gap-2">
