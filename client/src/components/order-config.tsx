@@ -1272,7 +1272,7 @@ export default function OrderConfig() {
           </div>
         )}
 
-        {/* Step 6: Pricing */}
+        {/* Step 5: Pricing */}
         {currentStep === 5 && (
           <div className="space-y-6">
             <div className="bg-slate-50 border rounded-lg p-6">
@@ -1346,7 +1346,7 @@ export default function OrderConfig() {
           </div>
         )}
 
-        {/* Step 7: Order Summary */}
+        {/* Step 6: Order Summary */}
         {currentStep === 6 && (
           <div className="space-y-6">
             <div className="bg-primary/5 border-primary/10 border rounded-lg p-4 mb-6">
