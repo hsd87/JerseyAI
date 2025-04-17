@@ -35,7 +35,7 @@ import {
   Check
 } from 'lucide-react';
 import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice, PRODUCTS, Product } from '@shared/product-configs';
-import { TeamMember, AddOn, OrderItem } from '@/hooks/use-order-types';
+import { TeamMember, TeamMemberItem, AddOn, OrderItem } from '@/hooks/use-order-types';
 
 // Form schema
 const orderConfigSchema = z.object({
@@ -492,44 +492,66 @@ export default function OrderConfig() {
     clearItems();
     
     if (watchedIsTeamOrder) {
-      // Process team order
+      // Process team order using the team member items
       teamMembers.forEach(member => {
-        // Add jersey for each team member
-        addItem({
-          id: `jersey-${member.id}`,
-          type: 'jersey',
-          name: 'Custom Jersey',
-          size: member.size,
-          quantity: 1,
-          gender: member.gender,
-          price: calculatePackageBasePrice('jerseyOnly'),
-          customValue: member.number
-        });
-        
-        // Add shorts if applicable
-        if (watchedPackageType === 'jerseyShorts' || watchedPackageType === 'fullKit') {
+        if (member.items && member.items.length > 0) {
+          // Process all items from the member.items array
+          member.items.forEach(item => {
+            const itemName = item.itemType === 'jersey' ? 'Custom Jersey' :
+                           item.itemType === 'shorts' ? 'Matching Shorts' :
+                           item.itemType === 'socks' ? 'Team Socks' : 
+                           item.itemType.charAt(0).toUpperCase() + item.itemType.slice(1);
+            
+            addItem({
+              id: `${item.itemType}-${member.id}`,
+              type: item.itemType,
+              name: itemName,
+              size: item.itemType === 'socks' ? 'One Size' : member.size,
+              quantity: 1,
+              gender: item.itemType === 'socks' ? 'Unisex' : member.gender,
+              price: item.price,
+              customValue: item.itemType === 'jersey' ? member.number : undefined
+            });
+          });
+        } else {
+          // Fallback to old method if no items array
+          // Add jersey for each team member
           addItem({
-            id: `shorts-${member.id}`,
-            type: 'shorts',
-            name: 'Matching Shorts',
+            id: `jersey-${member.id}`,
+            type: 'jersey',
+            name: 'Custom Jersey',
             size: member.size,
             quantity: 1,
             gender: member.gender,
-            price: 29.99
+            price: calculatePackageBasePrice('jerseyOnly'),
+            customValue: member.number
           });
-        }
-        
-        // Add socks if full kit
-        if (watchedPackageType === 'fullKit') {
-          addItem({
-            id: `socks-${member.id}`,
-            type: 'socks',
-            name: 'Team Socks',
-            size: 'One Size',
-            quantity: 1,
-            gender: 'Unisex',
-            price: 12.99
-          });
+          
+          // Add shorts if applicable
+          if (watchedPackageType === 'jerseyShorts' || watchedPackageType === 'fullKit') {
+            addItem({
+              id: `shorts-${member.id}`,
+              type: 'shorts',
+              name: 'Matching Shorts',
+              size: member.size,
+              quantity: 1,
+              gender: member.gender,
+              price: 29.99
+            });
+          }
+          
+          // Add socks if full kit
+          if (watchedPackageType === 'fullKit') {
+            addItem({
+              id: `socks-${member.id}`,
+              type: 'socks',
+              name: 'Team Socks',
+              size: 'One Size',
+              quantity: 1,
+              gender: 'Unisex',
+              price: 12.99
+            });
+          }
         }
       });
     } else {
@@ -940,13 +962,14 @@ export default function OrderConfig() {
                         <TableHead>Number</TableHead>
                         <TableHead>Size</TableHead>
                         <TableHead>Gender</TableHead>
+                        <TableHead>Package Items</TableHead>
                         <TableHead className="w-16">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {teamMembers.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                          <TableCell colSpan={6} className="text-center py-6 text-gray-500">
                             No players added yet. Click "Add Player" to start building your roster.
                           </TableCell>
                         </TableRow>
@@ -1000,6 +1023,22 @@ export default function OrderConfig() {
                                   <SelectItem value="Youth">Youth</SelectItem>
                                 </SelectContent>
                               </Select>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-xs">
+                                {member.items && member.items.length > 0 ? (
+                                  <div className="space-y-1">
+                                    {member.items.map((item, idx) => (
+                                      <div key={idx} className="flex items-center">
+                                        <span className="text-primary">•</span>
+                                        <span className="ml-1">{item.itemType.charAt(0).toUpperCase() + item.itemType.slice(1)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-500">No items</span>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <Button
@@ -1102,8 +1141,63 @@ export default function OrderConfig() {
                         <TableRow key={item.id}>
                           <TableCell className="font-medium">{item.name}</TableCell>
                           <TableCell>{item.gender}</TableCell>
-                          <TableCell>{item.sizes[0]?.size || 'One Size'}</TableCell>
-                          <TableCell>{item.sizes[0]?.quantity || 0}</TableCell>
+                          <TableCell>
+                            {item.type === 'socks' ? (
+                              'One Size'
+                            ) : (
+                              <Select
+                                value={item.sizes[0]?.size || 'M'}
+                                onValueChange={(value) => {
+                                  const updatedItems = packageItems.map(i => {
+                                    if (i.id === item.id) {
+                                      return {
+                                        ...i,
+                                        sizes: i.sizes.map((s, idx) => idx === 0 ? { ...s, size: value } : s)
+                                      };
+                                    }
+                                    return i;
+                                  });
+                                  setPackageItems(updatedItems);
+                                }}
+                              >
+                                <SelectTrigger className="w-20">
+                                  <SelectValue placeholder="Size" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="XS">XS</SelectItem>
+                                  <SelectItem value="S">S</SelectItem>
+                                  <SelectItem value="M">M</SelectItem>
+                                  <SelectItem value="L">L</SelectItem>
+                                  <SelectItem value="XL">XL</SelectItem>
+                                  <SelectItem value="XXL">XXL</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handlePackageItemQuantityChange(item.id, item.sizes[0]?.size || 'M', -1)}
+                                disabled={(item.sizes[0]?.quantity || 0) <= 1}
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <span className="w-5 text-center">{item.sizes[0]?.quantity || 0}</span>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handlePackageItemQuantityChange(item.id, item.sizes[0]?.size || 'M', 1)}
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </TableCell>
                           <TableCell className="text-right">
                             ${(item.price * (item.sizes[0]?.quantity || 1)).toFixed(2)}
                           </TableCell>
@@ -1115,7 +1209,30 @@ export default function OrderConfig() {
                           <TableCell className="font-medium">{addon.name}</TableCell>
                           <TableCell>Unisex</TableCell>
                           <TableCell>One Size</TableCell>
-                          <TableCell>{addon.quantity}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handleAddonQuantityChange(addon.id, -1)}
+                                disabled={addon.quantity <= 1}
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <span className="w-5 text-center">{addon.quantity}</span>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handleAddonQuantityChange(addon.id, 1)}
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </TableCell>
                           <TableCell className="text-right">
                             ${(addon.price * addon.quantity).toFixed(2)}
                           </TableCell>
