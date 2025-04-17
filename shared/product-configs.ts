@@ -398,7 +398,9 @@ export const PACKAGE_ITEMS: Record<string, Array<{sku: string, defaultQty: numbe
   trainingKit: [
     { sku: 'PFJKT03', defaultQty: 1 },
     { sku: 'PFTR04', defaultQty: 1 }
-  ]
+  ],
+  // Custom package type - starts with no default items, user will add them individually
+  custom: []
 };
 
 // Get product by SKU
@@ -408,6 +410,10 @@ export const getProductBySku = (sku: string): Product | undefined => {
 
 // Calculate base price for a package
 export const calculatePackageBasePrice = (packageType: string): number => {
+  // For custom package type, we use a base price of 0 since it will be calculated
+  // based on the items added to the package
+  if (packageType === 'custom') return 0;
+  
   if (!PACKAGE_ITEMS[packageType]) return 0;
   
   return PACKAGE_ITEMS[packageType].reduce((total, item) => {

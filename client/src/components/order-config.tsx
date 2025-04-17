@@ -97,7 +97,7 @@ export default function OrderConfig() {
   const form = useForm<OrderConfigValues>({
     resolver: zodResolver(orderConfigSchema),
     defaultValues: {
-      packageType: packageType as 'jerseyOnly' | 'jerseyShorts' | 'fullKit',
+      packageType: packageType as 'jerseyOnly' | 'jerseyShorts' | 'fullKit' | 'custom',
       gender: gender as 'Male' | 'Female' | 'Youth',
       size: size as 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL',
       quantity,
@@ -627,8 +627,8 @@ export default function OrderConfig() {
                             } else {
                               // Decrease quantity
                               handlePackageItemQuantityChange(
-                                currentItem.id,
-                                currentItem.sizes[0]?.size || 'M',
+                                currentItem?.id || '',
+                                currentItem?.sizes[0]?.size || 'M',
                                 -1
                               );
                             }
@@ -648,8 +648,8 @@ export default function OrderConfig() {
                               onClick={() => {
                                 // Increase quantity
                                 handlePackageItemQuantityChange(
-                                  currentItem.id,
-                                  currentItem.sizes[0]?.size || 'M',
+                                  currentItem?.id || '',
+                                  currentItem?.sizes[0]?.size || 'M',
                                   1
                                 );
                               }}
