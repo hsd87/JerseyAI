@@ -43,19 +43,36 @@ class OrderService {
         ? request.orderItems 
         : [{ id: 'default', type: 'jersey', price: request.amount, quantity: 1, size: 'M', gender: 'unisex' }];
       
+      console.log(`Creating payment intent for amount: $${request.amount} with ${items.length} items`);
+      
       const response = await apiRequest('POST', '/api/create-payment-intent', {
         amount: request.amount,
         items: items,
       });
       
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create payment intent');
+        const errorData = await response.json();
+        console.error('Payment intent error response:', errorData);
+        
+        // More specific error messages based on common issues
+        if (errorData.message && errorData.message.includes('API Key')) {
+          throw new Error('Payment system configuration error. Please contact support.');
+        } else if (response.status === 401) {
+          throw new Error('Authentication required. Please log in and try again.');
+        } else {
+          throw new Error(errorData.message || 'Failed to create payment intent');
+        }
       }
       
       return await response.json();
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
+      
+      // Provide more specific error messages to help users
+      if (error.message.includes('Network Error') || error.message.includes('Failed to fetch')) {
+        throw new Error('Network error. Please check your internet connection and try again.');
+      }
+      
       throw new Error(error.message || 'Payment initialization failed');
     }
   }

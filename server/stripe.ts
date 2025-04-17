@@ -114,16 +114,42 @@ export async function cancelSubscription(subscriptionId: string): Promise<void> 
 export async function createPaymentIntent(amount: number, customerId: string): Promise<string> {
   if (!stripe) throw new Error('Stripe is not configured');
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount, // Amount in cents
-    currency: 'usd',
-    customer: customerId,
-    automatic_payment_methods: {
-      enabled: true,
-    },
-  });
+  try {
+    console.log(`Creating Stripe payment intent for ${amount} cents with customer ${customerId}`);
+    
+    // Validate amount is a positive integer in cents
+    if (!Number.isInteger(amount) || amount < 50) {
+      console.warn(`Invalid amount ${amount}, ensuring minimum of 50 cents`);
+      amount = Math.max(50, Math.round(amount));
+    }
+    
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount, // Amount in cents
+      currency: 'usd',
+      customer: customerId,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
 
-  return paymentIntent.client_secret as string;
+    console.log(`Payment intent created successfully with ID: ${paymentIntent.id}`);
+    return paymentIntent.client_secret as string;
+  } catch (error: any) {
+    // Log the full error for debugging
+    console.error('Stripe payment intent creation failed:', error);
+    
+    // Check for specific Stripe error types for better error handling
+    if (error.type === 'StripeAuthenticationError') {
+      throw new Error('Stripe API key is invalid or not configured correctly.');
+    } else if (error.type === 'StripeConnectionError') {
+      throw new Error('Could not connect to Stripe. Please try again later.');
+    } else if (error.type === 'StripeInvalidRequestError') {
+      throw new Error(`Invalid request to Stripe: ${error.message}`);
+    }
+    
+    // Re-throw the original error if not handled specifically
+    throw error;
+  }
 }
 
 export async function calculateOrderAmount(items: any[], isSubscriber: boolean = false): Promise<number> {
