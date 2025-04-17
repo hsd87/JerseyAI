@@ -29,10 +29,10 @@ import {
   Minus,
   CheckCircle,
   ChevronRight,
-  Ruler,
+  Check,
   Package,
-  ClipboardList,
-  Check
+  Ruler,
+  ClipboardList
 } from 'lucide-react';
 import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice, PRODUCTS, Product } from '@shared/product-configs';
 import { TeamMember, TeamMemberItem, AddOn, OrderItem } from '@/hooks/use-order-types';
@@ -668,12 +668,27 @@ export default function OrderConfig() {
                 const safePackageItems = packageItems || [];
                 const isSelected = safePackageItems.some(item => item.sku === product.sku);
                 const currentItem = safePackageItems.find(item => item.sku === product.sku);
-                const currentQty = currentItem?.sizes[0]?.quantity || 0;
                 
                 return (
                   <div 
                     key={product.sku}
-                    className={`border rounded-lg p-4 hover:border-primary transition-colors ${isSelected ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                    className={`border rounded-lg p-4 hover:border-primary transition-colors cursor-pointer ${isSelected ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                    onClick={() => {
+                      // Set package type to custom if it's not already
+                      if (watchedPackageType !== 'custom') {
+                        setPackageType('custom');
+                        form.setValue('packageType', 'custom');
+                      }
+                        
+                      if (!isSelected) {
+                        // Add the product
+                        handleProductSelect(product);
+                      } else {
+                        // Remove the product
+                        const safeItems = packageItems || [];
+                        setPackageItems(safeItems.filter(item => item.sku !== product.sku));
+                      }
+                    }}
                   >
                     <div className="flex justify-between mb-2">
                       {product.productType === 'JERSEY' && <Shirt className="h-6 w-6 text-primary" />}
@@ -683,74 +698,13 @@ export default function OrderConfig() {
                       {product.productType === 'KITBAG' && <Package className="h-6 w-6 text-primary" />}
                       {product.productType === 'BAGPACK' && <Package className="h-6 w-6 text-primary" />}
                       {product.productType === 'BEANIE' && <Shirt className="h-6 w-6 text-primary" />}
+                      {isSelected && <CheckCircle className="h-5 w-5 text-green-500" />}
                     </div>
                     
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h3 className="font-medium">{product.name}</h3>
                         <p className="text-base font-semibold">${product.basePrice}</p>
-                      </div>
-                      
-                      <div className="flex items-center space-x-1">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7"
-                          onClick={() => {
-                            // Set package type to custom if it's not already
-                            if (watchedPackageType !== 'custom') {
-                              setPackageType('custom');
-                              form.setValue('packageType', 'custom');
-                            }
-                              
-                            if (currentQty === 0) {
-                              // Use the handleProductSelect function to add the product
-                              handleProductSelect(product);
-                            } else if (currentQty === 1) {
-                              // Remove item from package - safely handle packageItems
-                              const safeItems = packageItems || [];
-                              setPackageItems(safeItems.filter(item => item.sku !== product.sku));
-                            } else {
-                              // Decrease quantity
-                              handlePackageItemQuantityChange(
-                                currentItem?.id || '',
-                                currentItem?.sizes[0]?.size || 'M',
-                                -1
-                              );
-                            }
-                          }}
-                        >
-                          {currentQty === 0 ? <Plus className="h-4 w-4" /> : <Check className="h-4 w-4 text-green-500" />}
-                        </Button>
-                        
-                        {currentQty > 0 && (
-                          <>
-                            <span className="w-5 text-center text-sm">{currentQty}</span>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              className="h-7 w-7"
-                              onClick={() => {
-                                // Set package type to custom if it's not already
-                                if (watchedPackageType !== 'custom') {
-                                  setPackageType('custom');
-                                  form.setValue('packageType', 'custom');
-                                }
-                                
-                                // Increase quantity
-                                handlePackageItemQuantityChange(
-                                  currentItem?.id || '',
-                                  currentItem?.sizes[0]?.size || 'M',
-                                  1
-                                );
-                              }}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
                       </div>
                     </div>
                     
@@ -793,20 +747,31 @@ export default function OrderConfig() {
             
             {packageItems && packageItems.length > 0 && (
               <div className="border rounded-lg p-4 bg-slate-50 mt-4">
-                <h3 className="font-medium mb-2">Your Selected Items</h3>
+                <h3 className="font-medium mb-2">Your Selected Components</h3>
                 <div className="space-y-2">
                   {packageItems.map(item => (
                     <div key={item.id} className="flex justify-between text-sm">
-                      <span>{item.name} × {item.sizes[0]?.quantity || 0}</span>
-                      <span className="font-medium">${(item.price * (item.sizes[0]?.quantity || 0)).toFixed(2)}</span>
+                      <div className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        <span>{item.name}</span>
+                      </div>
+                      <span className="font-medium">${item.price.toFixed(2)}</span>
                     </div>
                   ))}
                   <div className="border-t pt-2 mt-2 font-medium flex justify-between">
                     <span>Subtotal:</span>
                     <span>${packageItems.reduce((total, item) => 
-                      total + (item.price * (item.sizes[0]?.quantity || 0)), 0).toFixed(2)}</span>
+                      total + item.price, 0).toFixed(2)}</span>
                   </div>
                 </div>
+                {packageItems.length >= 2 && (
+                  <div className="mt-2 text-xs text-green-600">
+                    <div className="flex items-center">
+                      <Info className="h-3 w-3 mr-1" />
+                      <span>Bundle discount may apply to your selection</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             
