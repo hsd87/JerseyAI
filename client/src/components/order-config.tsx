@@ -193,7 +193,7 @@ export default function OrderConfig() {
     // Add up package items
     if (watchedIsTeamOrder) {
       const teamTotalQty = teamMembers.reduce((total, member) => total + 1, 0);
-      price = PACKAGE_PRICES[watchedPackageType] * teamTotalQty;
+      price = calculatePackageBasePrice(watchedPackageType) * teamTotalQty;
     } else {
       // Individual order
       packageItems.forEach(item => {
@@ -427,7 +427,7 @@ export default function OrderConfig() {
           size: member.size,
           quantity: 1,
           gender: member.gender,
-          price: PACKAGE_PRICES.jerseyOnly,
+          price: calculatePackageBasePrice('jerseyOnly'),
           customValue: member.number
         });
         
@@ -602,7 +602,7 @@ export default function OrderConfig() {
                   {watchedPackageType === 'fullKit' && <CheckCircle className="h-5 w-5 text-green-500" />}
                 </div>
                 <h3 className="font-semibold">Full Kit</h3>
-                <p className="text-lg font-bold">${PACKAGE_PRICES.fullKit}</p>
+                <p className="text-lg font-bold">${calculatePackageBasePrice('fullKit')}</p>
                 <p className="text-sm text-gray-500 mt-2">Jersey, shorts & accessories</p>
                 <div className="mt-4 text-sm">
                   <p className="flex items-center"><CheckCircle className="h-3 w-3 text-green-500 mr-2" /> Premium fabric</p>
@@ -1292,7 +1292,7 @@ export default function OrderConfig() {
                 
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-medium">Base Price Per Unit:</span>
-                  <span>${PACKAGE_PRICES[watchedPackageType]}</span>
+                  <span>${calculatePackageBasePrice(watchedPackageType)}</span>
                 </div>
                 
                 <div className="flex justify-between border-b pb-2">
@@ -1518,7 +1518,7 @@ export default function OrderConfig() {
                   <div className="space-y-3">
                     <div className="flex justify-between border-b pb-2">
                       <span>Base Package Price:</span>
-                      <span>${PACKAGE_PRICES[watchedPackageType]}</span>
+                      <span>${calculatePackageBasePrice(watchedPackageType)}</span>
                     </div>
                     
                     <div className="flex justify-between border-b pb-2">
