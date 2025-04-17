@@ -104,11 +104,18 @@ export interface OrderState {
   sport: string;
   priceBreakdown: PriceBreakdown | null;
   
+  // Cart view
+  cart?: OrderItem[]; // Used in checkout page - combined items and add-ons
+  
+  // Checkout status
+  orderCompleted: boolean;
+  
   // Cart actions
   addItem: (item: OrderItem) => void;
   updateItem: (id: string, updatedItem: OrderItem) => void;
   removeItem: (id: string) => void;
   clearItems: () => void;
+  clearCart: () => void; // Clear all items in cart
   
   // Add-on actions
   addAddOn?: (addon: AddOn) => void;
@@ -131,6 +138,7 @@ export interface OrderState {
   setPackageType: (packageType: string) => void;
   setDesign: (designId: number, designUrls: { front: string; back: string }) => void;
   setPackageItems: (items: PackageItem[]) => void;
+  setOrderCompleted: (completed: boolean) => void;
   
   // Gender and sizing
   gender?: string;

@@ -1,310 +1,467 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { useSubscription } from '@/hooks/use-subscription-store';
-import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import Navbar from '@/components/layout/navbar';
-import Footer from '@/components/layout/footer';
+import { orderService } from '@/lib/order-service';
+import { loadStripe, Stripe, StripeElementsOptions } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { StripePaymentForm } from '@/components/payment/stripe-payment-form';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Check } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import {
+  ChevronRight,
+  Star,
+  Zap,
+  Calendar,
+  Award,
+  Check,
+  Loader2,
+  AlertTriangle,
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
-// Load Stripe outside of component render
-const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY 
-  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY) 
-  : null;
+// Make sure to call loadStripe outside of a component's render to avoid recreation on each render
+let stripePromise: Promise<Stripe | null> | null = null;
+const getStripePromise = () => {
+  if (!stripePromise && import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  }
+  return stripePromise;
+};
 
-function SubscriptionForm() {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { toast } = useToast();
-  const [, navigate] = useLocation();
-  const subscription = useSubscription();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    try {
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        redirect: "if_required",
-        confirmParams: {
-          return_url: `${window.location.origin}/dashboard`,
-        },
-      });
-
-      if (error) {
-        setErrorMessage(error.message || 'An error occurred with your subscription');
-        toast({
-          title: 'Subscription Failed',
-          description: error.message,
-          variant: 'destructive',
-        });
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Payment succeeded, fetch updated subscription status
-        await subscription.fetchSubscription();
-        toast({
-          title: 'Subscription Active',
-          description: 'Your Pro subscription is now active!',
-        });
-        navigate('/dashboard');
-      }
-    } catch (error: any) {
-      setErrorMessage(error.message || 'An unexpected error occurred');
-      toast({
-        title: 'Subscription Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
-      
-      {errorMessage && (
-        <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
-      )}
-      
-      <Button
-        type="submit"
-        disabled={!stripe || isLoading}
-        className="w-full bg-black hover:bg-gray-800"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : (
-          'Subscribe Now'
-        )}
-      </Button>
-    </form>
-  );
-}
-
-export default function SubscribePage() {
+const SubscribePage: React.FC = () => {
+  const [location, setLocation] = useLocation();
   const { user } = useAuth();
-  const subscription = useSubscription();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [, navigate] = useLocation();
   const { toast } = useToast();
-  
-  // Redirect if not logged in
+  const subscription = useSubscription();
+  const [loading, setLoading] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentStep, setPaymentStep] = useState<'plans' | 'payment' | 'success'>('plans');
+
   useEffect(() => {
-    if (user === null) {
-      navigate('/auth');
+    // Fetch subscription status
+    if (user) {
+      subscription.fetchSubscription();
     }
-  }, [user, navigate]);
-
-  // Create subscription when component mounts
-  useEffect(() => {
-    if (!user) return;
-
-    // If already on pro tier, redirect to dashboard
-    if (subscription.isSubscribed) {
-      toast({
-        title: 'Already subscribed',
-        description: 'You are already on the Pro plan.',
-      });
-      navigate('/dashboard');
-      return;
-    }
-
-    const createSubscription = async () => {
-      try {
-        const response = await apiRequest('POST', '/api/subscribe', {});
-        const data = await response.json();
-        setClientSecret(data.clientSecret);
-      } catch (error: any) {
-        toast({
-          title: 'Error',
-          description: `Could not initialize subscription: ${error.message}`,
-          variant: 'destructive',
-        });
-      }
-    };
-
-    createSubscription();
-  }, [user, navigate, toast, subscription]);
-
-  // Options for the Stripe Elements
-  const options = clientSecret ? {
-    clientSecret,
-    appearance: {
-      theme: 'stripe',
-      variables: {
-        colorPrimary: '#39FF14',
-        colorBackground: '#ffffff',
-        colorText: '#000000',
-      },
-    },
-  } : {};
+  }, [user]);
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      <div className="container max-w-4xl mx-auto py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Login Required</CardTitle>
+            <CardDescription>Please log in to manage your subscription</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button onClick={() => setLocation('/auth')}>
+              Login or Register
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+  const startSubscription = async () => {
+    setLoading(true);
+    
+    try {
+      const { clientSecret, subscriptionId } = await orderService.createSubscription();
+      setClientSecret(clientSecret);
+      setPaymentStep('payment');
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to start subscription process',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelSubscription = async () => {
+    if (!window.confirm('Are you sure you want to cancel your subscription?')) {
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      await orderService.cancelSubscription();
+      await subscription.fetchSubscription();
       
-      <main className="flex-grow py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold font-sora mb-8">
-            Upgrade to Pro
-          </h1>
+      toast({
+        title: 'Subscription Cancelled',
+        description: 'Your subscription has been cancelled',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to cancel subscription',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaymentSuccess = async () => {
+    setPaymentStep('success');
+    await subscription.fetchSubscription();
+    
+    toast({
+      title: 'Subscription Activated!',
+      description: 'You now have access to Pro features',
+    });
+  };
+
+  const handlePaymentCancel = () => {
+    setPaymentStep('plans');
+    setClientSecret(null);
+  };
+
+  const renderCurrentSubscription = () => {
+    const { isSubscribed, subscriptionStatus, subscriptionEndDate, remainingDesigns } = subscription.status;
+    
+    if (!isSubscribed) {
+      return (
+        <Card className="bg-muted/30">
+          <CardHeader>
+            <CardTitle className="text-lg">Current Plan: Free</CardTitle>
+            <CardDescription>
+              Limited features with {remainingDesigns === -1 ? 'unlimited' : remainingDesigns} designs
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Upgrade to Pro to unlock all features and unlimited designs
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Button 
+              className="w-full" 
+              onClick={startSubscription}
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Zap className="mr-2 h-4 w-4" />
+              )}
+              Upgrade to Pro
+            </Button>
+          </CardFooter>
+        </Card>
+      );
+    }
+
+    return (
+      <Card className="bg-primary/5 border-primary/30">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-lg">
+                Current Plan: Pro
+                <Badge variant="outline" className="ml-2 bg-primary/10 text-primary">
+                  Active
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Full access to all premium features
+              </CardDescription>
+            </div>
+            <Star className="h-8 w-8 text-primary/70" />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {subscriptionEndDate && (
+            <div className="flex items-center">
+              <Calendar className="h-5 w-5 mr-2 text-muted-foreground" />
+              <p className="text-sm">
+                Renews on: {new Date(subscriptionEndDate).toLocaleDateString()}
+              </p>
+            </div>
+          )}
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Subscription Form */}
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pro Subscription - $9/month</CardTitle>
-                  <CardDescription>
-                    Complete your subscription using a credit or debit card.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {clientSecret && stripePromise ? (
-                    <Elements stripe={stripePromise} options={options}>
-                      <SubscriptionForm />
-                    </Elements>
-                  ) : (
-                    <div className="flex justify-center py-8">
-                      <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+          <div className="space-y-1">
+            <p className="font-medium">Included Benefits:</p>
+            <ul className="space-y-1">
+              <li className="flex items-center text-sm">
+                <Check className="h-4 w-4 mr-2 text-green-500" />
+                Unlimited jersey design generations
+              </li>
+              <li className="flex items-center text-sm">
+                <Check className="h-4 w-4 mr-2 text-green-500" />
+                10% discount on all orders
+              </li>
+              <li className="flex items-center text-sm">
+                <Check className="h-4 w-4 mr-2 text-green-500" />
+                Priority customer support
+              </li>
+              <li className="flex items-center text-sm">
+                <Check className="h-4 w-4 mr-2 text-green-500" />
+                Access to premium design templates
+              </li>
+            </ul>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            variant="outline" 
+            className="w-full text-destructive border-destructive/30 hover:bg-destructive/10"
+            onClick={cancelSubscription}
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <AlertTriangle className="mr-2 h-4 w-4" />
+            )}
+            Cancel Subscription
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  };
+
+  const renderPlansComparison = () => {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Free Plan */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Free Plan</CardTitle>
+            <CardDescription>For casual users</CardDescription>
+            <div className="mt-2">
+              <p className="text-3xl font-bold">$0</p>
+              <p className="text-sm text-muted-foreground">Free forever</p>
             </div>
-            
-            {/* Benefits */}
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pro Benefits</CardTitle>
-                  <CardDescription>
-                    Upgrade to unlock these premium features
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="bg-green-100 text-green-600 p-1 rounded-full">
-                        <Check className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <h4 className="font-medium">Unlimited Designs</h4>
-                      <p className="text-sm text-gray-600">Create as many AI-generated jersey designs as you need</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="bg-green-100 text-green-600 p-1 rounded-full">
-                        <Check className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <h4 className="font-medium">Exclusive Discount</h4>
-                      <p className="text-sm text-gray-600">Get 15% off on all jersey orders</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="bg-green-100 text-green-600 p-1 rounded-full">
-                        <Check className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <h4 className="font-medium">Priority Support</h4>
-                      <p className="text-sm text-gray-600">Get faster responses and dedicated customer service</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="bg-green-100 text-green-600 p-1 rounded-full">
-                        <Check className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <h4 className="font-medium">Premium Design Features</h4>
-                      <p className="text-sm text-gray-600">Access to exclusive patterns and customization options</p>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="bg-gray-50 border-t border-gray-100 text-sm text-gray-600">
-                  <p>Cancel anytime. No long-term commitment required.</p>
-                </CardFooter>
-              </Card>
-              
-              {/* Compare Plans */}
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-4">Compare Plans</h3>
-                <div className="overflow-hidden ring-1 ring-gray-200 rounded-lg">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Feature</th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Free</th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Pro</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      <tr>
-                        <td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">Monthly designs</td>
-                        <td className="px-3 py-4 text-sm text-gray-500">6</td>
-                        <td className="px-3 py-4 text-sm font-medium text-green-600">Unlimited</td>
-                      </tr>
-                      <tr>
-                        <td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">Order discount</td>
-                        <td className="px-3 py-4 text-sm text-gray-500">None</td>
-                        <td className="px-3 py-4 text-sm font-medium text-green-600">15%</td>
-                      </tr>
-                      <tr>
-                        <td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">Support</td>
-                        <td className="px-3 py-4 text-sm text-gray-500">Standard</td>
-                        <td className="px-3 py-4 text-sm font-medium text-green-600">Priority</td>
-                      </tr>
-                      <tr>
-                        <td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">Price</td>
-                        <td className="px-3 py-4 text-sm text-gray-500">$0</td>
-                        <td className="px-3 py-4 text-sm font-medium text-green-600">$9/month</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              <li className="flex items-start">
+                <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                <span>6 jersey designs per month</span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                <span>Basic design options</span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                <span>Standard support</span>
+              </li>
+            </ul>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="w-full" disabled>
+              Current Plan
+            </Button>
+          </CardFooter>
+        </Card>
+
+        {/* Pro Plan */}
+        <Card className="border-primary shadow-md relative">
+          <div className="absolute -top-3 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold">
+            RECOMMENDED
+          </div>
+          <CardHeader>
+            <CardTitle>Pro Plan</CardTitle>
+            <CardDescription>For serious teams & designers</CardDescription>
+            <div className="mt-2">
+              <p className="text-3xl font-bold">$9.99</p>
+              <p className="text-sm text-muted-foreground">per month</p>
             </div>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              <li className="flex items-start">
+                <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                <span>Unlimited jersey designs</span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                <span>All advanced design options</span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                <span>10% discount on all orders</span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                <span>Priority support</span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                <span>Premium design templates</span>
+              </li>
+            </ul>
+          </CardContent>
+          <CardFooter>
+            <Button 
+              className="w-full" 
+              onClick={startSubscription}
+              disabled={loading || subscription.status.isSubscribed}
+            >
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : subscription.status.isSubscribed ? (
+                "Current Plan"
+              ) : (
+                <>
+                  <Zap className="mr-2 h-4 w-4" />
+                  Upgrade Now
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  };
+
+  // Success page after subscription is activated
+  if (paymentStep === 'success') {
+    return (
+      <div className="container max-w-2xl mx-auto py-16 px-4">
+        <Card className="text-center">
+          <CardHeader>
+            <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
+              <Award className="h-8 w-8 text-primary" />
+            </div>
+            <CardTitle className="text-2xl">Welcome to ProJersey Pro!</CardTitle>
+            <CardDescription>Your subscription has been activated</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <p className="mb-6">You now have access to unlimited designs and all premium features.</p>
+            <div className="bg-muted p-4 rounded-lg max-w-md mx-auto">
+              <h3 className="font-medium text-lg mb-2">Pro Benefits Include:</h3>
+              <ul className="space-y-2 text-left">
+                <li className="flex items-center">
+                  <Check className="h-5 w-5 mr-2 text-green-500" />
+                  Unlimited jersey designs
+                </li>
+                <li className="flex items-center">
+                  <Check className="h-5 w-5 mr-2 text-green-500" />
+                  10% discount on all orders
+                </li>
+                <li className="flex items-center">
+                  <Check className="h-5 w-5 mr-2 text-green-500" />
+                  Priority customer support
+                </li>
+                <li className="flex items-center">
+                  <Check className="h-5 w-5 mr-2 text-green-500" />
+                  Access to premium design templates
+                </li>
+              </ul>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-center gap-4">
+            <Button onClick={() => setLocation('/designer')}>
+              Start Designing
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
+  // Payment form
+  if (paymentStep === 'payment' && clientSecret) {
+    const options: StripeElementsOptions = {
+      clientSecret,
+      appearance: {
+        theme: 'stripe',
+        labels: 'floating',
+      },
+    };
+
+    return (
+      <div className="container max-w-2xl mx-auto py-12 px-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Complete Your Subscription</CardTitle>
+            <CardDescription>Enter your payment details to activate Pro features</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Elements options={options} stripe={getStripePromise()}>
+              <StripePaymentForm 
+                onSuccess={handlePaymentSuccess} 
+                onCancel={handlePaymentCancel} 
+                amount={999} // $9.99
+              />
+            </Elements>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Default view - subscription plans
+  return (
+    <div className="container max-w-6xl mx-auto py-8 px-4">
+      <div className="max-w-2xl mx-auto mb-8">
+        <h1 className="text-3xl font-bold">Subscription Plans</h1>
+        <p className="text-muted-foreground mt-2">
+          Choose the right plan for your jersey design needs
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="md:col-span-2">
+          {renderPlansComparison()}
+        </div>
+        <div className="md:col-span-1">
+          {renderCurrentSubscription()}
+        </div>
+      </div>
+
+      <div className="mt-16 max-w-3xl mx-auto">
+        <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold text-lg">What's included in the Pro plan?</h3>
+            <p className="mt-2 text-muted-foreground">
+              Pro plan includes unlimited jersey designs, 10% discount on all orders, priority customer support, 
+              and access to premium design templates.
+            </p>
+          </div>
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold text-lg">Can I cancel my subscription anytime?</h3>
+            <p className="mt-2 text-muted-foreground">
+              Yes, you can cancel your subscription at any time. You'll continue to have access to Pro features 
+              until the end of your current billing period.
+            </p>
+          </div>
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold text-lg">How does the design limit work on the free plan?</h3>
+            <p className="mt-2 text-muted-foreground">
+              Free users can create up to 6 jersey designs per month. Once you reach this limit, you'll need to 
+              wait until the next month or upgrade to Pro for unlimited designs.
+            </p>
+          </div>
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold text-lg">Is my payment information secure?</h3>
+            <p className="mt-2 text-muted-foreground">
+              Yes, all payments are processed securely through Stripe. We never store your payment information 
+              on our servers.
+            </p>
           </div>
         </div>
-      </main>
-      
-      <Footer />
+      </div>
     </div>
   );
-}
+};
+
+export default SubscribePage;

@@ -20,7 +20,7 @@ const defaultPriceBreakdown: PriceBreakdown = {
 };
 
 // Create the store with Zustand
-export const useOrderStore = create<OrderState>((set) => ({
+export const useOrderStore = create<OrderState>((set, get) => ({
   // Order items
   items: [],
   addOns: [],
@@ -32,6 +32,16 @@ export const useOrderStore = create<OrderState>((set) => ({
   // Pricing
   sport: 'soccer',
   priceBreakdown: null,
+  
+  // Cart access - combined items from cart (derived getter for checkout)
+  get cart() {
+    const items = get().items;
+    const addOns = get().addOns;
+    return [...items, ...addOns];
+  },
+  
+  // Checkout status
+  orderCompleted: false,
   
   // Design reference
   designId: null,

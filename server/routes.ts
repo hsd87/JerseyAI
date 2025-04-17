@@ -376,6 +376,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get or create subscription endpoint
+  app.post("/api/get-or-create-subscription", async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Please log in to manage your subscription" });
+    }
+    
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(500).json({ message: "Stripe is not configured" });
+    }
+    
+    try {
+      const { createSubscription, checkSubscriptionStatus } = await import('./stripe');
+      
+      // Check if user already has a subscription
+      if (req.user.stripeSubscriptionId) {
+        try {
+          const status = await checkSubscriptionStatus(req.user.stripeSubscriptionId);
+          
+          if (status.status === 'active') {
+            return res.status(400).json({ message: 'You already have an active subscription' });
+          }
+        } catch (err) {
+          console.error('Error checking subscription status:', err);
+          // Continue if the subscription doesn't exist anymore
+        }
+      }
+      
+      // Create new subscription
+      const result = await createSubscription(req.user.id);
+      res.json(result);
+    } catch (err: any) {
+      console.error('Error creating subscription:', err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+  
+  // Cancel subscription endpoint
+  app.post("/api/cancel-subscription", async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Please log in to manage your subscription" });
+    }
+    
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(500).json({ message: "Stripe is not configured" });
+    }
+    
+    try {
+      if (!req.user.stripeSubscriptionId) {
+        return res.status(400).json({ message: 'No active subscription found' });
+      }
+      
+      const { cancelSubscription } = await import('./stripe');
+      await cancelSubscription(req.user.stripeSubscriptionId);
+      
+      // Update user record
+      await storage.updateUserSubscription(req.user.id, 'free');
+      
+      res.json({ success: true });
+    } catch (err: any) {
+      console.error('Error canceling subscription:', err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+  
   // Stripe webhook handler
   app.post("/api/webhook", async (req, res, next) => {
     if (!process.env.STRIPE_SECRET_KEY) {
