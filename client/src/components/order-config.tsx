@@ -618,10 +618,20 @@ export default function OrderConfig({
       }
     }
     
-    // Navigate to checkout or next step
-    // This would typically redirect to a checkout page or show a confirmation
-    // For now, we'll just log a message
+    // Log order information
     console.log('Order finalized and ready for checkout');
+    
+    // Navigate to checkout page with the order information
+    // We use the navigate function from the useLocation hook
+    try {
+      // Save a timestamp with the order
+      useOrderStore.setState({ orderCreatedAt: new Date().toISOString() });
+      
+      // Navigate to the checkout page
+      navigate('/checkout');
+    } catch (error) {
+      console.error('Error navigating to checkout:', error);
+    }
   };
 
   return (
