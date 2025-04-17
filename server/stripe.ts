@@ -22,8 +22,9 @@ const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
   : null;
 
-// Price IDs should be configured in a real system
-const SUBSCRIPTION_PRICE_ID = 'price_placeholder'; // Replace with actual price ID when available
+// Price IDs for subscription plans
+// Replace with actual price ID from Stripe dashboard if needed
+const SUBSCRIPTION_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1P5fLVCjzXg59EQpTjGcjjZM';
 
 export async function createCustomer(user: User): Promise<string> {
   if (!stripe) throw new Error('Stripe is not configured');
