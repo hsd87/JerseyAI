@@ -28,8 +28,10 @@ import {
   Trash2, 
   Plus,
   Minus,
+  Check as CheckIcon,
   CheckCircle,
   ChevronRight,
+  ChevronLeft,
   Check,
   Package,
   Ruler,
@@ -1756,42 +1758,42 @@ export default function OrderConfig({
             
             {/* Order summary tabs */}
             <Tabs defaultValue="order" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="order">Order Details</TabsTrigger>
-                <TabsTrigger value="design">Design</TabsTrigger>
-                <TabsTrigger value="pricing">Pricing</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-xl">
+                <TabsTrigger value="order" className="font-heading text-sm">Order Details</TabsTrigger>
+                <TabsTrigger value="design" className="font-heading text-sm">Design</TabsTrigger>
+                <TabsTrigger value="pricing" className="font-heading text-sm">Pricing</TabsTrigger>
               </TabsList>
               
               {/* Order details tab */}
-              <TabsContent value="order" className="space-y-4 pt-4">
-                <div className="grid grid-cols-2 gap-4">
+              <TabsContent value="order" className="space-y-5 pt-5">
+                <div className="grid grid-cols-2 gap-6 bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
                   <div>
-                    <h4 className="font-medium text-sm text-gray-500">Package Type</h4>
-                    <p>{kitTypeDisplayNames[watchedPackageType]}</p>
+                    <h4 className="font-heading text-sm text-gray-500 uppercase tracking-wide">Package Type</h4>
+                    <p className="font-medium text-voro-black mt-1">{kitTypeDisplayNames[watchedPackageType]}</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-sm text-gray-500">Order Type</h4>
-                    <p>{watchedIsTeamOrder ? 'Team Order' : 'Individual Order'}</p>
+                    <h4 className="font-heading text-sm text-gray-500 uppercase tracking-wide">Order Type</h4>
+                    <p className="font-medium text-voro-black mt-1">{watchedIsTeamOrder ? 'Team Order' : 'Individual Order'}</p>
                   </div>
                 </div>
                 
                 {watchedIsTeamOrder ? (
                   <div className="mt-6">
-                    <h4 className="font-medium mb-2">Team: {teamName || 'Unnamed Team'}</h4>
-                    <div className="border rounded-lg overflow-hidden">
+                    <h4 className="font-heading font-medium text-voro-black text-lg mb-3">Team: {teamName || 'Unnamed Team'}</h4>
+                    <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                       <Table>
-                        <TableHeader>
+                        <TableHeader className="bg-gray-50">
                           <TableRow>
-                            <TableHead>Player Name</TableHead>
-                            <TableHead>Number</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead>Gender</TableHead>
+                            <TableHead className="font-heading text-voro-black">Player Name</TableHead>
+                            <TableHead className="font-heading text-voro-black">Number</TableHead>
+                            <TableHead className="font-heading text-voro-black">Size</TableHead>
+                            <TableHead className="font-heading text-voro-black">Gender</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {teamMembers.map((member) => (
-                            <TableRow key={member.id}>
-                              <TableCell>{member.name || 'Unnamed Player'}</TableCell>
+                            <TableRow key={member.id} className="hover:bg-gray-50">
+                              <TableCell className="font-medium">{member.name || 'Unnamed Player'}</TableCell>
                               <TableCell>{member.number || 'N/A'}</TableCell>
                               <TableCell>{member.size}</TableCell>
                               <TableCell>{member.gender}</TableCell>
@@ -1800,27 +1802,28 @@ export default function OrderConfig({
                         </TableBody>
                       </Table>
                     </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Total team members: {teamMembers.length}
+                    <p className="text-sm text-gray-600 mt-3 flex items-center">
+                      <Users className="h-4 w-4 mr-2 text-gray-500" />
+                      Total team members: <span className="font-medium ml-1">{teamMembers.length}</span>
                     </p>
                   </div>
                 ) : (
                   <div className="mt-6">
-                    <h4 className="font-medium mb-2">Order Items</h4>
-                    <div className="border rounded-lg overflow-hidden">
+                    <h4 className="font-heading font-medium text-voro-black text-lg mb-3">Order Items</h4>
+                    <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                       <Table>
-                        <TableHeader>
+                        <TableHeader className="bg-gray-50">
                           <TableRow>
-                            <TableHead>Item</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead>Gender</TableHead>
-                            <TableHead>Quantity</TableHead>
+                            <TableHead className="font-heading text-voro-black">Item</TableHead>
+                            <TableHead className="font-heading text-voro-black">Size</TableHead>
+                            <TableHead className="font-heading text-voro-black">Gender</TableHead>
+                            <TableHead className="font-heading text-voro-black">Quantity</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {packageItems.map((item) => (
-                            <TableRow key={item.id}>
-                              <TableCell>{item.name}</TableCell>
+                            <TableRow key={item.id} className="hover:bg-gray-50">
+                              <TableCell className="font-medium">{item.name}</TableCell>
                               <TableCell>{item.sizes[0]?.size || 'One Size'}</TableCell>
                               <TableCell>{item.gender}</TableCell>
                               <TableCell>{item.sizes[0]?.quantity || 0}</TableCell>
@@ -1834,24 +1837,24 @@ export default function OrderConfig({
                 
                 {addOns.length > 0 && (
                   <div className="mt-6">
-                    <h4 className="font-medium mb-2">Add-Ons</h4>
-                    <div className="border rounded-lg overflow-hidden">
+                    <h4 className="font-heading font-medium text-voro-black text-lg mb-3">Add-Ons</h4>
+                    <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                       <Table>
-                        <TableHeader>
+                        <TableHeader className="bg-gray-50">
                           <TableRow>
-                            <TableHead>Item</TableHead>
-                            <TableHead>Price</TableHead>
-                            <TableHead>Quantity</TableHead>
-                            <TableHead>Total</TableHead>
+                            <TableHead className="font-heading text-voro-black">Item</TableHead>
+                            <TableHead className="font-heading text-voro-black">Price</TableHead>
+                            <TableHead className="font-heading text-voro-black">Quantity</TableHead>
+                            <TableHead className="font-heading text-voro-black">Total</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {addOns.map((addon) => (
-                            <TableRow key={addon.id}>
-                              <TableCell>{addon.name}</TableCell>
+                            <TableRow key={addon.id} className="hover:bg-gray-50">
+                              <TableCell className="font-medium">{addon.name}</TableCell>
                               <TableCell>${addon.price.toFixed(2)}</TableCell>
                               <TableCell>{addon.quantity}</TableCell>
-                              <TableCell>${(addon.price * addon.quantity).toFixed(2)}</TableCell>
+                              <TableCell className="font-medium text-voro-black">${(addon.price * addon.quantity).toFixed(2)}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -1862,13 +1865,13 @@ export default function OrderConfig({
               </TabsContent>
               
               {/* Design tab */}
-              <TabsContent value="design" className="pt-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TabsContent value="design" className="pt-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {designUrls ? (
                     <>
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Front View</h4>
-                        <div className="aspect-square border rounded-md overflow-hidden">
+                      <div className="space-y-3">
+                        <h4 className="font-heading font-medium text-voro-black text-sm uppercase tracking-wide">Front View</h4>
+                        <div className="aspect-square border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm p-2">
                           <img 
                             src={designUrls.front} 
                             alt="Jersey Front Design" 
@@ -1876,9 +1879,9 @@ export default function OrderConfig({
                           />
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Back View</h4>
-                        <div className="aspect-square border rounded-md overflow-hidden">
+                      <div className="space-y-3">
+                        <h4 className="font-heading font-medium text-voro-black text-sm uppercase tracking-wide">Back View</h4>
+                        <div className="aspect-square border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm p-2">
                           <img 
                             src={designUrls.back} 
                             alt="Jersey Back Design" 
@@ -1888,13 +1891,13 @@ export default function OrderConfig({
                       </div>
                     </>
                   ) : (
-                    <div className="col-span-2 text-center py-12 text-gray-500">
-                      <Shirt className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                      <p>No design images available</p>
+                    <div className="col-span-2 text-center py-16 text-gray-500 bg-gray-50 rounded-xl">
+                      <Shirt className="h-14 w-14 mx-auto mb-4 opacity-30 text-gray-400" />
+                      <p className="font-medium">No design images available</p>
                     </div>
                   )}
                 </div>
-                <div className="mt-6 text-sm text-gray-500">
+                <div className="mt-6 text-sm text-gray-500 border-t border-gray-200 pt-4">
                   <p>Design ID: {designId || 'Not available'}</p>
                 </div>
               </TabsContent>
@@ -1964,15 +1967,21 @@ export default function OrderConfig({
               </TabsContent>
             </Tabs>
             
-            <div className="flex justify-between mt-6">
-              <Button variant="outline" onClick={goToPreviousStep}>
+            <div className="flex justify-between mt-8">
+              <Button 
+                variant="outline" 
+                onClick={goToPreviousStep}
+                className="border-gray-300 hover:bg-gray-100 text-voro-black font-medium px-6 rounded-xl"
+              >
+                <ChevronLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
               <Button 
                 onClick={finalizeOrderForCheckout}
-                className="btn-primary"
+                className="bg-voro-red hover:bg-voro-red/90 text-white font-medium px-6 rounded-xl shadow-sm"
               >
                 Save Order Details
+                <CheckIcon className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
