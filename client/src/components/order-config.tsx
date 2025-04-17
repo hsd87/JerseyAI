@@ -691,20 +691,57 @@ export default function OrderConfig() {
                     }}
                   >
                     <div className="flex justify-between mb-2">
-                      {product.productType === 'JERSEY' && <Shirt className="h-6 w-6 text-primary" />}
-                      {product.productType === 'SHORTS' && <Shirt className="h-6 w-6 text-primary" />}
-                      {product.productType === 'TROUSER' && <Shirt className="h-6 w-6 text-primary" />}
-                      {product.productType === 'SOCKS' && <Shirt className="h-6 w-6 text-primary" />}
-                      {product.productType === 'KITBAG' && <Package className="h-6 w-6 text-primary" />}
-                      {product.productType === 'BAGPACK' && <Package className="h-6 w-6 text-primary" />}
-                      {product.productType === 'BEANIE' && <Shirt className="h-6 w-6 text-primary" />}
-                      {isSelected && <CheckCircle className="h-5 w-5 text-green-500" />}
+                      <div className="flex items-center">
+                        {product.productType === 'JERSEY' && 
+                          <div className="bg-primary/10 p-1.5 rounded-md">
+                            <Shirt className="h-5 w-5 text-primary" />
+                          </div>
+                        }
+                        {product.productType === 'SHORTS' && 
+                          <div className="bg-primary/10 p-1.5 rounded-md">
+                            <Ruler className="h-5 w-5 text-primary" />
+                          </div>
+                        }
+                        {product.productType === 'TROUSER' && 
+                          <div className="bg-primary/10 p-1.5 rounded-md">
+                            <Ruler className="h-5 w-5 text-primary" />
+                          </div>
+                        }
+                        {product.productType === 'SOCKS' && 
+                          <div className="bg-primary/10 p-1.5 rounded-md">
+                            <Shirt className="h-5 w-5 text-primary" />
+                          </div>
+                        }
+                        {product.productType === 'KITBAG' && 
+                          <div className="bg-primary/10 p-1.5 rounded-md">
+                            <Package className="h-5 w-5 text-primary" />
+                          </div>
+                        }
+                        {product.productType === 'BAGPACK' && 
+                          <div className="bg-primary/10 p-1.5 rounded-md">
+                            <Package className="h-5 w-5 text-primary" />
+                          </div>
+                        }
+                        {product.productType === 'BEANIE' && 
+                          <div className="bg-primary/10 p-1.5 rounded-md">
+                            <Shirt className="h-5 w-5 text-primary" />
+                          </div>
+                        }
+                      </div>
+                      {isSelected && 
+                        <div className="bg-green-50 p-1 rounded-full">
+                          <Check className="h-4 w-4 text-green-600" />
+                        </div>
+                      }
                     </div>
                     
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h3 className="font-medium">{product.name}</h3>
-                        <p className="text-base font-semibold">${product.basePrice}</p>
+                        <div className="flex items-center mt-1">
+                          <span className="text-base font-semibold text-primary">${product.basePrice.toFixed(2)}</span>
+                          <span className="text-xs text-gray-500 ml-1">per item</span>
+                        </div>
                       </div>
                     </div>
                     
@@ -746,29 +783,32 @@ export default function OrderConfig() {
             </div>
             
             {packageItems && packageItems.length > 0 && (
-              <div className="border rounded-lg p-4 bg-slate-50 mt-4">
-                <h3 className="font-medium mb-2">Your Selected Components</h3>
+              <div className="border-2 border-primary/20 rounded-lg p-5 bg-primary/5 mt-4">
+                <h3 className="font-medium mb-3 flex items-center text-lg">
+                  <Package className="h-5 w-5 mr-2 text-primary" />
+                  Your Selected Components
+                </h3>
                 <div className="space-y-2">
                   {packageItems.map(item => (
-                    <div key={item.id} className="flex justify-between text-sm">
+                    <div key={item.id} className="flex justify-between text-sm bg-white p-2 rounded shadow-sm">
                       <div className="flex items-center">
                         <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        <span>{item.name}</span>
+                        <span className="font-medium">{item.name}</span>
                       </div>
-                      <span className="font-medium">${item.price.toFixed(2)}</span>
+                      <span className="font-semibold text-primary">${item.price.toFixed(2)}</span>
                     </div>
                   ))}
-                  <div className="border-t pt-2 mt-2 font-medium flex justify-between">
+                  <div className="border-t border-primary/20 pt-3 mt-2 flex justify-between font-medium">
                     <span>Subtotal:</span>
-                    <span>${packageItems.reduce((total, item) => 
+                    <span className="text-lg">${packageItems.reduce((total, item) => 
                       total + item.price, 0).toFixed(2)}</span>
                   </div>
                 </div>
                 {packageItems.length >= 2 && (
-                  <div className="mt-2 text-xs text-green-600">
+                  <div className="mt-3 text-sm text-green-600 bg-green-50 p-2 rounded-md border border-green-200">
                     <div className="flex items-center">
-                      <Info className="h-3 w-3 mr-1" />
-                      <span>Bundle discount may apply to your selection</span>
+                      <Info className="h-4 w-4 mr-2" />
+                      <span>Bundle discount of up to 15% will be applied at checkout!</span>
                     </div>
                   </div>
                 )}
