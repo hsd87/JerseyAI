@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useLocation } from 'wouter';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -82,6 +83,7 @@ export default function OrderConfig({
   onBackToCustomization 
 }: OrderConfigProps) {
   const { user } = useAuth();
+  const [, navigate] = useLocation();
   const { 
     packageType = 'jerseyOnly',
     setPackageType,
