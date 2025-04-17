@@ -24,6 +24,7 @@ const OrderConfirmationPage = React.lazy(() => import('./pages/order-confirmatio
 const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
 const JerseyEditorPage = React.lazy(() => import('./pages/jersey-editor-page'));
 const PricingCalculatorPage = React.lazy(() => import('./pages/pricing-calculator-page'));
+const ProductsPage = React.lazy(() => import('./pages/products-page'));
 const TestPage = React.lazy(() => import('./pages/test-page'));
 const OrderDemoPage = React.lazy(() => import('./pages/order-demo-page'));
 
@@ -86,6 +87,10 @@ function AppContent() {
           
           <Route path="/order-config">
             <OrderConfigurationPage />
+          </Route>
+          
+          <Route path="/products">
+            <ProductsPage />
           </Route>
           
           {/* Protected routes */}
