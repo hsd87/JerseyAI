@@ -12,29 +12,29 @@ const processSteps = [
   {
     title: "Choose Your Gear",
     description: "Pick a sport and jersey style from our catalog",
-    icon: <div className="w-12 h-12 rounded-full bg-[#39FF14]/10 flex items-center justify-center">
-      <span className="text-xl font-bold">1</span>
+    icon: <div className="w-12 h-12 rounded-full bg-[#E34234]/10 flex items-center justify-center">
+      <span className="text-xl font-bold text-[#E34234]">1</span>
     </div>
   },
   {
     title: "AI Generates Designs",
     description: "Get instant designs to choose from",
-    icon: <div className="w-12 h-12 rounded-full bg-[#39FF14]/10 flex items-center justify-center">
-      <span className="text-xl font-bold">2</span>
+    icon: <div className="w-12 h-12 rounded-full bg-[#E34234]/10 flex items-center justify-center">
+      <span className="text-xl font-bold text-[#E34234]">2</span>
     </div>
   },
   {
     title: "Customize Details",
     description: "Add names, numbers, logos easily",
-    icon: <div className="w-12 h-12 rounded-full bg-[#39FF14]/10 flex items-center justify-center">
-      <span className="text-xl font-bold">3</span>
+    icon: <div className="w-12 h-12 rounded-full bg-[#E34234]/10 flex items-center justify-center">
+      <span className="text-xl font-bold text-[#E34234]">3</span>
     </div>
   },
   {
     title: "Order & Fulfillment",
     description: "We produce and ship to your door",
-    icon: <div className="w-12 h-12 rounded-full bg-[#39FF14]/10 flex items-center justify-center">
-      <span className="text-xl font-bold">4</span>
+    icon: <div className="w-12 h-12 rounded-full bg-[#E34234]/10 flex items-center justify-center">
+      <span className="text-xl font-bold text-[#E34234]">4</span>
     </div>
   }
 ];
@@ -163,73 +163,69 @@ export default function LandingPage() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-gray-50 to-gray-100 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h1 className="font-sora text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900">
-                Design Pro-Quality Team Jerseys in <span className="text-[#39FF14]">Seconds</span> with AI
-              </h1>
-              <p className="text-xl text-gray-600 max-w-lg">
-                No design skills needed – our AI Designer does the work for you. Get custom jerseys for your team or yourself with professional quality.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link href="/designer">
-                  <Button size="lg" className="bg-black hover:bg-gray-800 text-white px-8 py-6 rounded-lg text-lg font-medium transition-all flex items-center gap-2 h-auto">
-                    Start Designing Now <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link href="#team-solutions">
-                  <Button variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-6 rounded-lg text-lg font-medium transition-all h-auto">
-                    Request Bulk Quote
-                  </Button>
-                </Link>
-              </div>
+      <section className="relative bg-[#FAFAFA] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 flex flex-col md:flex-row items-center justify-between">
+          <div className="w-full md:w-3/5 space-y-8 mb-12 md:mb-0">
+            <h1 className="font-sora text-4xl md:text-6xl font-bold leading-tight text-[#0F0F0F]">
+              Design Custom Teamwear <span className="text-[#E34234]">in Seconds</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-md">
+              AI-powered kit builder. No design skills needed.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Link href="/designer">
+                <Button size="lg" className="bg-[#E34234] hover:bg-opacity-80 text-white px-8 py-3 rounded-2xl text-lg font-semibold transition-all flex items-center gap-2 h-auto">
+                  Start Designing <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="#team-solutions">
+                <Button variant="outline" size="lg" className="border-[#0F0F0F] text-[#0F0F0F] hover:bg-gray-50 px-8 py-3 rounded-2xl text-lg font-semibold transition-all h-auto">
+                  Request Bulk Quote
+                </Button>
+              </Link>
             </div>
-            <div className="relative h-[400px] rounded-xl overflow-hidden shadow-2xl">
-              {/* This would be better with a real image of a jersey or the design interface */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#39FF14]/20 to-blue-500/20 flex items-center justify-center">
-                <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md transform rotate-3">
-                  <div className="text-center mb-6">
-                    <span className="font-heading font-bold text-xl">Pro<span className="text-voro-red">Jersey</span> Designer</span>
-                  </div>
-                  <div className="relative bg-gray-50 h-48 rounded-lg mb-6 flex items-center justify-center overflow-hidden border border-gray-200">
-                    {designs.length > 0 ? (
-                      <img 
-                        src={designs[currentDesignIndex]?.urls?.front || ''} 
-                        alt="Jersey preview" 
-                        className="h-full w-full object-contain"
-                      />
-                    ) : (
-                      <span className="text-gray-400">Jersey preview</span>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={showPreviousDesign}
-                      disabled={designs.length === 0}
-                      className="text-voro-black border-gray-300"
-                    >
-                      <ChevronLeft className="h-4 w-4 mr-1" />
-                      Previous
-                    </Button>
-                    <span className="text-sm text-gray-500">
-                      {designs.length > 0 ? `${currentDesignIndex + 1}/${designs.length}` : '0/0'}
-                    </span>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={showNextDesign}
-                      disabled={designs.length === 0}
-                      className="text-voro-black border-gray-300"
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </div>
-                </div>
+          </div>
+          <div className="w-full md:w-2/5">
+            <div className="text-sm text-gray-500 uppercase mb-2">Your Kit Preview</div>
+            <div className="rounded-xl shadow-sm border border-gray-300 bg-white p-6">
+              <div className="text-center mb-4">
+                <span className="font-heading font-bold text-xl">Pro<span className="text-[#E34234]">Jersey</span> Designer</span>
+              </div>
+              <div className="relative bg-gray-50 h-64 rounded-lg mb-6 flex items-center justify-center overflow-hidden border border-gray-200">
+                {designs.length > 0 ? (
+                  <img 
+                    src={designs[currentDesignIndex]?.urls?.front || ''} 
+                    alt="Jersey preview" 
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-gray-400">Jersey preview</span>
+                )}
+              </div>
+              <div className="flex justify-between items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={showPreviousDesign}
+                  disabled={designs.length === 0}
+                  className="text-[#0F0F0F] border-gray-300"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                <span className="text-sm text-gray-500">
+                  {designs.length > 0 ? `${currentDesignIndex + 1}/${designs.length}` : '0/0'}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={showNextDesign}
+                  disabled={designs.length === 0}
+                  className="text-[#0F0F0F] border-gray-300"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
               </div>
             </div>
           </div>
@@ -276,7 +272,7 @@ export default function LandingPage() {
             <div className="order-1 lg:order-2 relative">
               <div className="aspect-video bg-gray-100 rounded-lg shadow-lg relative overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <PlayCircle className="h-16 w-16 text-[#39FF14] cursor-pointer hover:scale-110 transition-transform" />
+                  <PlayCircle className="h-16 w-16 text-[#E34234] cursor-pointer hover:scale-110 transition-transform" />
                 </div>
                 {/* This would be a video or interactive element in reality */}
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 to-gray-700/20"></div>

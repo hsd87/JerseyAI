@@ -1,0 +1,63 @@
+You are improving the hero section of an AI-powered sportswear customization website (brand: VORO, domain: vorosport.ai). The functionality must remain unchanged — your task is to generate a styled banner layout for the hero section with modern visual structure and brand-aligned styling.
+
+---
+
+🎯 OBJECTIVE:
+Design a visually powerful, responsive hero banner with a strong message and a two-column layout (text + image preview). Emphasize clarity, spacing, and conversion.
+
+---
+
+✅ STRUCTURE & COMPONENTS:
+
+1. **Left Column – Text Content (60%)**
+   - Headline:
+     ```
+     Design Custom Teamwear in Seconds
+     ```
+     Style:
+     - Font: `Space Grotesk`
+     - Size: `text-4xl md:text-6xl`
+     - Color: `text-black`
+     - Emphasis: Highlight “in Seconds” with `text-accent` (`#E34234`)
+
+   - Subheadline:
+     ```
+     AI-powered kit builder. No design skills needed.
+     ```
+     Style:
+     - Font: `Inter`, `text-lg md:text-xl text-gray-600`
+     - Max width: `max-w-md`
+
+   - Buttons (side-by-side):
+     - “Start Designing” → `bg-accent text-white rounded-2xl px-6 py-3 font-semibold`
+     - “Request Bulk Quote” → `border border-black text-black rounded-2xl px-6 py-3 font-semibold`
+
+2. **Right Column – Image Preview (40%)**
+   - Mockup box with rounded border: `rounded-xl shadow-sm border border-gray-300`
+   - Inside, show current AI kit preview if available
+   - Text above image: “Your Kit Preview” in `text-sm text-gray-500 uppercase`
+
+---
+
+🎨 BRAND STYLING:
+
+- Fonts:  
+  - Headings: `Space Grotesk`  
+  - Body: `Inter`
+
+- Colors:  
+  - Background: `#FAFAFA`  
+  - Primary Text: `#0F0F0F`  
+  - Accent: `#E34234`  
+  - Button hover: `hover:bg-opacity-80`
+
+- Layout:  
+  - Use `flex flex-col md:flex-row items-center justify-between px-6 md:px-12 py-20`
+  - Responsive: Stacks on mobile, columns on desktop
+
+---
+
+📌 Additional Notes:
+- Do NOT modify underlying form or AI image logic
+- Ensure the section is fully mobile responsive
+- Maintain accessibility standards for contrast and buttons
