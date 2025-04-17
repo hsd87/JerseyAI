@@ -32,7 +32,10 @@ import {
   Check,
   Package,
   Ruler,
-  ClipboardList
+  ClipboardList,
+  Calculator,
+  ArrowLeft,
+  ArrowRight
 } from 'lucide-react';
 import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice, PRODUCTS, Product } from '@shared/product-configs';
 import { TeamMember, TeamMemberItem, AddOn, OrderItem } from '@/hooks/use-order-types';
@@ -66,7 +69,24 @@ interface PackageItem {
   sku?: string; // Added for product identification
 }
 
-export default function OrderConfig() {
+interface OrderConfigProps {
+  designId?: number;
+  designUrls?: {
+    front: string;
+    back: string;
+  };
+  sport?: string;
+  kitType?: string;
+  onBackToCustomization?: () => void;
+}
+
+export default function OrderConfig({ 
+  designId: propsDesignId, 
+  designUrls: propsDesignUrls, 
+  sport, 
+  kitType, 
+  onBackToCustomization 
+}: OrderConfigProps) {
   const { user } = useAuth();
   const { 
     packageType = 'jerseyOnly',
@@ -74,8 +94,6 @@ export default function OrderConfig() {
     isTeamOrder = false,
     setTeamOrder,
     addOns = [],
-    designId,
-    designUrls,
     items,
     setPriceBreakdown,
     setTeamMembers: setStoreTeamMembers,
@@ -84,6 +102,10 @@ export default function OrderConfig() {
     removeItem,
     clearItems
   } = useOrderStore();
+  
+  // Use design data from props if available, otherwise from store
+  const designId = useOrderStore(state => state.designId) || propsDesignId;
+  const designUrls = useOrderStore(state => state.designUrls) || propsDesignUrls;
   
   // Local state for form values if not in global store
   const [gender, setGender] = useState('Male');
@@ -1407,17 +1429,20 @@ export default function OrderConfig() {
         {currentStep === 5 && (
           <div className="space-y-6">
             <div className="bg-slate-50 border rounded-lg p-6">
-              <h3 className="font-medium text-lg mb-4">Order Price Breakdown</h3>
+              <h3 className="font-medium text-lg mb-4 flex items-center">
+                <Calculator className="mr-2 h-5 w-5 text-primary" />
+                Order Price Breakdown
+              </h3>
               
               <div className="space-y-4">
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-medium">Package Type:</span>
-                  <span>{kitTypeDisplayNames[watchedPackageType]}</span>
+                  <span>{kitTypeDisplayNames[watchedPackageType] || 'Custom'}</span>
                 </div>
                 
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-medium">Base Price Per Unit:</span>
-                  <span>${calculatePackageBasePrice(watchedPackageType)}</span>
+                  <span className="font-semibold">${calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
                 </div>
                 
                 <div className="flex justify-between border-b pb-2">
@@ -1430,6 +1455,25 @@ export default function OrderConfig() {
                   <span>{watchedIsTeamOrder ? teamMembers.length : watchedQuantity}</span>
                 </div>
                 
+                {/* Items section */}
+                <div className="border-b pb-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Selected Items:</span>
+                    <span></span>
+                  </div>
+                  {packageItems && packageItems.length > 0 ? (
+                    packageItems.map(item => (
+                      <div key={item.id} className="flex justify-between pl-4 text-sm mt-1">
+                        <span>{item.name}</span>
+                        <span>${item.price.toFixed(2)}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="pl-4 text-sm mt-1 text-gray-500">No items selected</div>
+                  )}
+                </div>
+                
+                {/* Add-ons section */}
                 {addOns.length > 0 && (
                   <div className="border-b pb-2">
                     <div className="flex justify-between">
@@ -1442,9 +1486,25 @@ export default function OrderConfig() {
                         <span>${(addon.price * addon.quantity).toFixed(2)}</span>
                       </div>
                     ))}
+                    <div className="flex justify-between pl-4 font-medium text-sm mt-2 pt-1 border-t border-dashed">
+                      <span>Add-ons Subtotal:</span>
+                      <span>${addOns.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0).toFixed(2)}</span>
+                    </div>
                   </div>
                 )}
                 
+                {/* Bundle discount section */}
+                {packageItems && packageItems.length >= 2 && (
+                  <div className="flex justify-between border-b pb-2 text-green-600">
+                    <span className="font-medium">Bundle Discount:</span>
+                    <span>
+                      {packageItems.length >= 4 ? '15%' : 
+                       packageItems.length >= 3 ? '10%' : '5%'}
+                    </span>
+                  </div>
+                )}
+                
+                {/* Quantity discount section */}
                 {(watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 10 && (
                   <div className="flex justify-between border-b pb-2 text-green-600">
                     <span className="font-medium">Quantity Discount:</span>
@@ -1455,9 +1515,29 @@ export default function OrderConfig() {
                   </div>
                 )}
                 
+                {/* Subtotal before discounts */}
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Subtotal (before discounts):</span>
+                  <span className="font-medium">
+                    ${
+                      (
+                        calculatePackageBasePrice(watchedPackageType) * (watchedIsTeamOrder ? teamMembers.length : watchedQuantity) + 
+                        (packageItems ? packageItems.reduce((sum, item) => sum + item.price, 0) : 0) + 
+                        addOns.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0)
+                      ).toFixed(2)
+                    }
+                  </span>
+                </div>
+                
+                {/* Total price with discounts */}
                 <div className="flex justify-between pt-2 text-lg font-bold">
                   <span>Total Price:</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <span className="text-primary">
+                    ${typeof totalPrice === 'number' && !isNaN(totalPrice) ? 
+                        totalPrice.toFixed(2) : 
+                        "0.00"
+                    }
+                  </span>
                 </div>
                 
                 <p className="text-sm text-gray-500 mt-2">
