@@ -28,6 +28,19 @@ export default function DesignerPage() {
     }
   }, [hasGenerated, isEditorOpen]);
 
+  // Listen for the custom event from design-editor to proceed to order step
+  useEffect(() => {
+    const handleProceedToOrderStep = () => {
+      setCurrentStep(3); // Move to Order Configuration step
+    };
+
+    window.addEventListener('proceedToOrderStep', handleProceedToOrderStep);
+    
+    return () => {
+      window.removeEventListener('proceedToOrderStep', handleProceedToOrderStep);
+    };
+  }, []);
+
   // Go to next step in the process
   const nextStep = () => {
     if (currentStep < 4) {

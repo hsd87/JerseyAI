@@ -164,8 +164,9 @@ export default function DesignEditor() {
   };
 
   const handleProceedToOrder = () => {
-    // Navigate to the order configuration page instead of direct checkout
-    navigate('/order-config');
+    // Instead of navigating away, we'll update the current step in the parent component
+    // This will show the order configuration within the same page flow
+    window.dispatchEvent(new CustomEvent('proceedToOrderStep'));
   };
 
   const handleDragStart = (e: React.MouseEvent | React.TouchEvent, elementId: string) => {
