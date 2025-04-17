@@ -2,6 +2,7 @@ import { useDesignStore } from "@/hooks/use-design-store";
 import { Button } from "@/components/ui/button";
 import { useOrderStore } from "@/hooks/use-order-store";
 import { ShoppingCart, PenSquare, RotateCcw } from "lucide-react";
+import dreamJerseyImage from "../assets/a-vibrant-expansive-banner-design-showca_2Er3bKEQTOS85sW6Bmb0oQ_vbmCb9xDThmzV5jO0QV1_Q.png";
 
 export default function DesignResults() {
   const { 
@@ -61,8 +62,8 @@ export default function DesignResults() {
             <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
               <div className="text-center">
                 <img 
-                  src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=800&auto=format&fit=crop" 
-                  alt="Soccer Jersey Design" 
+                  src={dreamJerseyImage}
+                  alt="Dream Jersey Design" 
                   className="mx-auto rounded-lg w-full max-w-lg h-auto object-cover mb-6" 
                 />
                 
