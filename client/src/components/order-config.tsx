@@ -1107,6 +1107,170 @@ export default function OrderConfig({
                     </Button>
                   </div>
                 )}
+                
+                <div className="rounded-md border p-4 bg-gray-50 mt-6">
+                  <h4 className="font-medium mb-3">Size Chart</h4>
+                  <div className="overflow-x-auto max-h-72 overflow-y-auto">
+                    {/* Men's Size Chart */}
+                    <div className="mb-4">
+                      <h5 className="font-medium text-primary mb-2">Men's Sizes</h5>
+                      <table className="min-w-full divide-y divide-gray-300 text-sm">
+                        <thead>
+                          <tr className="divide-x divide-gray-200">
+                            <th className="px-3 py-2 bg-gray-100">Size</th>
+                            <th className="px-3 py-2 bg-gray-100">Chest (in)</th>
+                            <th className="px-3 py-2 bg-gray-100">Waist (in)</th>
+                            <th className="px-3 py-2 bg-gray-100">Hips (in)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XS</td>
+                            <td className="px-3 py-2">33-35</td>
+                            <td className="px-3 py-2">27-29</td>
+                            <td className="px-3 py-2">33-35</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">S</td>
+                            <td className="px-3 py-2">36-38</td>
+                            <td className="px-3 py-2">30-32</td>
+                            <td className="px-3 py-2">36-38</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">M</td>
+                            <td className="px-3 py-2">39-41</td>
+                            <td className="px-3 py-2">33-35</td>
+                            <td className="px-3 py-2">39-41</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">L</td>
+                            <td className="px-3 py-2">42-44</td>
+                            <td className="px-3 py-2">36-38</td>
+                            <td className="px-3 py-2">42-44</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XL</td>
+                            <td className="px-3 py-2">45-47</td>
+                            <td className="px-3 py-2">39-41</td>
+                            <td className="px-3 py-2">45-47</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XXL</td>
+                            <td className="px-3 py-2">48-50</td>
+                            <td className="px-3 py-2">42-44</td>
+                            <td className="px-3 py-2">48-50</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {/* Women's Size Chart */}
+                    <div className="mb-4">
+                      <h5 className="font-medium text-primary mb-2">Women's Sizes</h5>
+                      <table className="min-w-full divide-y divide-gray-300 text-sm">
+                        <thead>
+                          <tr className="divide-x divide-gray-200">
+                            <th className="px-3 py-2 bg-gray-100">Size</th>
+                            <th className="px-3 py-2 bg-gray-100">Chest (in)</th>
+                            <th className="px-3 py-2 bg-gray-100">Waist (in)</th>
+                            <th className="px-3 py-2 bg-gray-100">Hips (in)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XS</td>
+                            <td className="px-3 py-2">30-32</td>
+                            <td className="px-3 py-2">24-26</td>
+                            <td className="px-3 py-2">33-35</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">S</td>
+                            <td className="px-3 py-2">33-35</td>
+                            <td className="px-3 py-2">27-29</td>
+                            <td className="px-3 py-2">36-38</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">M</td>
+                            <td className="px-3 py-2">36-38</td>
+                            <td className="px-3 py-2">30-32</td>
+                            <td className="px-3 py-2">39-41</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">L</td>
+                            <td className="px-3 py-2">39-41</td>
+                            <td className="px-3 py-2">33-35</td>
+                            <td className="px-3 py-2">42-44</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XL</td>
+                            <td className="px-3 py-2">42-44</td>
+                            <td className="px-3 py-2">36-38</td>
+                            <td className="px-3 py-2">45-47</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XXL</td>
+                            <td className="px-3 py-2">45-47</td>
+                            <td className="px-3 py-2">39-41</td>
+                            <td className="px-3 py-2">48-50</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {/* Youth Size Chart */}
+                    <div>
+                      <h5 className="font-medium text-primary mb-2">Youth Sizes</h5>
+                      <table className="min-w-full divide-y divide-gray-300 text-sm">
+                        <thead>
+                          <tr className="divide-x divide-gray-200">
+                            <th className="px-3 py-2 bg-gray-100">Size</th>
+                            <th className="px-3 py-2 bg-gray-100">Chest (in)</th>
+                            <th className="px-3 py-2 bg-gray-100">Waist (in)</th>
+                            <th className="px-3 py-2 bg-gray-100">Hips (in)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XS (6-7)</td>
+                            <td className="px-3 py-2">24-26</td>
+                            <td className="px-3 py-2">22-24</td>
+                            <td className="px-3 py-2">24-26</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">S (8-9)</td>
+                            <td className="px-3 py-2">26-28</td>
+                            <td className="px-3 py-2">24-25</td>
+                            <td className="px-3 py-2">26-28</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">M (10-11)</td>
+                            <td className="px-3 py-2">28-30</td>
+                            <td className="px-3 py-2">25-26</td>
+                            <td className="px-3 py-2">28-30</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">L (12-13)</td>
+                            <td className="px-3 py-2">30-32</td>
+                            <td className="px-3 py-2">26-27</td>
+                            <td className="px-3 py-2">30-32</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XL (14-15)</td>
+                            <td className="px-3 py-2">32-34</td>
+                            <td className="px-3 py-2">27-29</td>
+                            <td className="px-3 py-2">32-34</td>
+                          </tr>
+                          <tr className="divide-x divide-gray-200">
+                            <td className="px-3 py-2 font-medium">XXL (16)</td>
+                            <td className="px-3 py-2">34-36</td>
+                            <td className="px-3 py-2">29-31</td>
+                            <td className="px-3 py-2">34-36</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               // Individual order details
