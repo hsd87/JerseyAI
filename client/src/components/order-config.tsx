@@ -1812,9 +1812,9 @@ export default function OrderConfig({
               </Button>
               <Button 
                 onClick={finalizeOrderForCheckout}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-primary hover:bg-primary/90"
               >
-                Proceed to Checkout
+                Save Order Details
               </Button>
             </div>
           </div>

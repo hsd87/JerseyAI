@@ -174,8 +174,8 @@ export default function DesignerPage() {
                 <Button variant="outline" onClick={prevStep}>
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back to Customization
                 </Button>
-                <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
-                  Review Order <ArrowRight className="ml-2 h-4 w-4" />
+                <Button onClick={nextStep} className="bg-green-600 hover:bg-green-700">
+                  Proceed to Checkout <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
