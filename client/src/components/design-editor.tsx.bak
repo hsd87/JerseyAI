@@ -28,91 +28,41 @@ type TextElement = {
   outlineWidth: number;
 };
 
-type LogoElement = {
-  id: string;
-  url: string;
-  position: { x: number; y: number };
-  size: { width: number; height: number };
-  rotation?: number;
-  maintainAspectRatio?: boolean;
-};
-
 export default function DesignEditor() {
-  const { toast } = useToast();
   const { 
-    formData, 
-    designUrls, 
-    customizations, 
-    updateCustomizations, 
-    saveCustomizations
+    isGenerating, 
+    hasGenerated, 
+    frontImage, 
+    backImage,
+    customizations,
+    updateCustomizations,
+    formData
   } = useDesignStore();
+  const { saveCustomizations, isSaving } = useReplicate();
+  const { toast } = useToast();
+  const [_, navigate] = useLocation();
   
-  const { isGenerating, hasGenerated, handleGenerateDesigns } = useReplicate();
-  const canvasRef = useRef<HTMLDivElement>(null);
-  
-  // State for customization elements
-  const [textElements, setTextElements] = useState<TextElement[]>([]);
-  const [logoElements, setLogoElements] = useState<LogoElement[]>([]);
   const [activeElement, setActiveElement] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  
-  // State for text customization
+  const [textElements, setTextElements] = useState<TextElement[]>([]);
   const [currentText, setCurrentText] = useState("");
-  const [currentColor, setCurrentColor] = useState("#ffffff");
+  const [currentColor, setCurrentColor] = useState("#FFFFFF");
   const [currentSize, setCurrentSize] = useState("medium");
   const [currentFont, setCurrentFont] = useState("Arial");
   const [currentFontSize, setCurrentFontSize] = useState(24);
   const [currentOutline, setCurrentOutline] = useState(false);
   const [currentOutlineColor, setCurrentOutlineColor] = useState("#000000");
   const [currentOutlineWidth, setCurrentOutlineWidth] = useState(1);
-  
-  // State for editing text
+  const [logoUrl, setLogoUrl] = useState("");
+  const [logoElements, setLogoElements] = useState<{id: string, url: string, position: {x: number, y: number}, size: {width: number, height: number}, rotation: number, maintainAspectRatio: boolean}[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingElementId, setEditingElementId] = useState<string | null>(null);
   
-  // Initialize from customizations if available
-  useEffect(() => {
-    if (customizations?.text?.length) {
-      const initialTextElements = customizations.text.map((text, index) => ({
-        id: `text-${Date.now()}-${index}`,
-        content: text.content,
-        position: text.position,
-        color: text.color,
-        size: text.size,
-        font: text.font,
-        fontSize: text.fontSize || 24,
-        outline: text.outline || false,
-        outlineColor: text.outlineColor || "#000000",
-        outlineWidth: text.outlineWidth || 1
-      }));
-      setTextElements(initialTextElements);
-    }
-    
-    if (customizations?.logos?.length) {
-      const initialLogoElements = customizations.logos.map((logo, index) => ({
-        id: `logo-${Date.now()}-${index}`,
-        url: logo.url,
-        position: logo.position,
-        size: logo.size,
-        rotation: logo.rotation || 0,
-        maintainAspectRatio: logo.maintainAspectRatio || true
-      }));
-      setLogoElements(initialLogoElements);
-    }
-  }, []);
-  
-  // Get design URLs
-  const frontImage = designUrls?.front;
-  const backImage = designUrls?.back;
-  
-  // Set appropriate aspect ratio based on sport
-  let aspectRatio = "3/4"; // Default for most jerseys
-  if (formData.sport === "soccer" || formData.sport === "rugby") {
-    aspectRatio = "3/4";
-  } else if (formData.sport === "basketball") {
-    aspectRatio = "3/4";
-  } else if (formData.sport === "cricket") {
-    aspectRatio = "3/4";
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Determine aspect ratio based on sport
+  let aspectRatio = "1/1";
+  if (formData.sport === "soccer" || formData.sport === "basketball") {
+    aspectRatio = "3/4"; // Taller jerseys
   } else if (formData.sport === "esports") {
     aspectRatio = "4/3"; // Wider jerseys
   }
@@ -558,7 +508,7 @@ export default function DesignEditor() {
       
       {/* Editor Body */}
       <div className="flex flex-col md:flex-row">
-        {/* Tools Panel - On left for desktop, hidden on mobile */}
+        {/* Tools Panel - On left for desktop, on bottom for mobile */}
         <div className="hidden md:block w-80 p-3 sm:p-4 border-r border-gray-200">
           <div>
             {/* Add Elements Section */}
@@ -933,13 +883,6 @@ export default function DesignEditor() {
                 </div>
               </div>
             )}
-            
-            {/* Help Section */}
-            <div className="text-center">
-              <p className="text-xs text-gray-600">
-                Click and drag elements to position them • Use pinch gestures to zoom on mobile
-              </p>
-            </div>
           </div>
         </div>
         
@@ -962,97 +905,102 @@ export default function DesignEditor() {
                     alt={`${formData.sport} jersey front view`}
                     className="absolute top-0 left-0 w-full h-full object-contain"
                   />
-                  
-                  {/* Draggable Text Elements */}
-                  {textElements.map((element) => (
-                    <div 
-                      key={element.id}
-                      className={`absolute cursor-grab ${activeElement === element.id ? 'cursor-grabbing z-30' : 'z-20'}`}
-                      style={{
-                        top: `${element.position.y}%`,
-                        left: `${element.position.x}%`,
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                        padding: '0.25rem 0.5rem',
-                        border: activeElement === element.id ? '2px dashed #39FF14' : '2px dashed transparent',
-                        borderRadius: '0.25rem',
-                        color: element.color,
-                        fontSize: element.fontSize ? `${element.fontSize}px` : (element.size === 'small' ? '1rem' : element.size === 'medium' ? '1.5rem' : '2rem'),
-                        fontFamily: element.font,
-                        textShadow: element.outline ? `
-                          -${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
-                          ${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
-                          -${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
-                          ${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}
-                        ` : 'none',
-                        fontWeight: element.size === 'large' ? 'bold' : 'normal'
-                      }}
-                      onMouseDown={(e) => handleDragStart(e, element.id)}
-                      onTouchStart={(e) => handleDragStart(e, element.id)}
-                      onClick={() => handleEditText(element.id)}
-                    >
-                      <div className="relative">
-                        {element.content}
-                        {activeElement === element.id && (
-                          <div className="absolute -top-6 -right-2 flex gap-1">
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              className="h-5 w-5 p-0 rounded-full bg-white shadow-sm hover:bg-gray-100"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditText(element.id);
-                              }}
-                            >
-                              <Edit className="h-3 w-3 text-gray-600" />
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              className="h-5 w-5 p-0 rounded-full bg-white shadow-sm hover:bg-gray-100"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteText(element.id);
-                              }}
-                            >
-                              <Trash className="h-3 w-3 text-red-500" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {/* Draggable Logo Elements */}
-                  {logoElements.map((logo) => (
-                    <div
-                      key={logo.id}
-                      className={`absolute cursor-grab ${activeElement === logo.id ? 'cursor-grabbing z-30' : 'z-20'}`}
-                      style={{
-                        top: `${logo.position.y}%`,
-                        left: `${logo.position.x}%`,
-                        transform: `translate(-50%, -50%) rotate(${logo.rotation || 0}deg)`,
-                        border: activeElement === logo.id ? '2px dashed #39FF14' : '2px dashed transparent',
-                        width: `${logo.size.width}px`,
-                        height: logo.maintainAspectRatio ? 'auto' : `${logo.size.height}px`,
-                        borderRadius: '0.25rem'
-                      }}
-                      onMouseDown={(e) => handleDragStart(e, logo.id)}
-                      onTouchStart={(e) => handleDragStart(e, logo.id)}
-                    >
-                      <img 
-                        src={logo.url} 
-                        alt="Uploaded logo" 
-                        className="w-full h-auto object-contain"
-                        style={{ 
-                          maxWidth: '100%', 
-                          maxHeight: '100%'
-                        }}
-                      />
-                    </div>
-                  ))}
+                  <div className="absolute text-center w-full bottom-2">
+                    <span className="inline-flex items-center gap-1 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                      <Move className="h-3 w-3" /> Drag elements to position
+                    </span>
+                  </div>
                 </div>
               )}
+              
+              {/* Draggable Text Elements */}
+              {textElements.map((element) => (
+                <div 
+                  key={element.id}
+                  className={`absolute cursor-grab ${activeElement === element.id ? 'cursor-grabbing z-30' : 'z-20'}`}
+                  style={{
+                    top: `${element.position.y}%`,
+                    left: `${element.position.x}%`,
+                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    padding: '0.25rem 0.5rem',
+                    border: activeElement === element.id ? '2px dashed #39FF14' : '2px dashed transparent',
+                    borderRadius: '0.25rem',
+                    color: element.color,
+                    fontSize: element.fontSize ? `${element.fontSize}px` : (element.size === 'small' ? '1rem' : element.size === 'medium' ? '1.5rem' : '2rem'),
+                    fontFamily: element.font,
+                    textShadow: element.outline ? `
+                      -${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      ${element.outlineWidth || 1}px -${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      -${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}, 
+                      ${element.outlineWidth || 1}px ${element.outlineWidth || 1}px 0 ${element.outlineColor || '#000'}
+                    ` : 'none',
+                    fontWeight: element.size === 'large' ? 'bold' : 'normal'
+                  }}
+                  onMouseDown={(e) => handleDragStart(e, element.id)}
+                  onTouchStart={(e) => handleDragStart(e, element.id)}
+                  onClick={() => handleEditText(element.id)}
+                >
+                  <div className="relative">
+                    {element.content}
+                    {activeElement === element.id && (
+                      <div className="absolute -top-6 -right-2 flex gap-1">
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="h-5 w-5 p-0 rounded-full bg-white shadow-sm hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditText(element.id);
+                          }}
+                        >
+                          <Edit className="h-3 w-3 text-gray-600" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="h-5 w-5 p-0 rounded-full bg-white shadow-sm hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteText(element.id);
+                          }}
+                        >
+                          <Trash className="h-3 w-3 text-red-500" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              
+              {/* Draggable Logo Elements */}
+              {logoElements.map((logo) => (
+                <div
+                  key={logo.id}
+                  className={`absolute cursor-grab ${activeElement === logo.id ? 'cursor-grabbing z-30' : 'z-20'}`}
+                  style={{
+                    top: `${logo.position.y}%`,
+                    left: `${logo.position.x}%`,
+                    transform: `translate(-50%, -50%) rotate(${logo.rotation || 0}deg)`,
+                    border: activeElement === logo.id ? '2px dashed #39FF14' : '2px dashed transparent',
+                    width: `${logo.size.width}px`,
+                    height: logo.maintainAspectRatio ? 'auto' : `${logo.size.height}px`,
+                    borderRadius: '0.25rem'
+                  }}
+                  onMouseDown={(e) => handleDragStart(e, logo.id)}
+                  onTouchStart={(e) => handleDragStart(e, logo.id)}
+                >
+                  <img 
+                    src={logo.url} 
+                    alt="Uploaded logo" 
+                    className="w-full h-auto object-contain"
+                    style={{ 
+                      maxWidth: '100%', 
+                      maxHeight: '100%'
+                    }}
+                  />
+                </div>
+              ))}
             </div>
             
             <div className="flex flex-wrap justify-between gap-2 mt-4">
@@ -1071,7 +1019,10 @@ export default function DesignEditor() {
               </div>
             </div>
           </div>
+        </div>
         
+
+          
           {/* Mobile Tools Panel - Appears only on mobile */}
           <div className="md:hidden mt-4 border-t border-gray-200 pt-4">
             <div className="mb-3">
