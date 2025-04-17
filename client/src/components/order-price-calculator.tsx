@@ -5,6 +5,13 @@ import {
   getProductBySku,
   calculateQuantityDiscount
 } from '@shared/product-configs';
+import { 
+  BASE_PRICES, 
+  TIER_DISCOUNTS, 
+  SUBSCRIPTION_DISCOUNT,
+  SHIPPING_RULES,
+  TAX_RATE
+} from '@shared/pricing';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { PackageItem, OrderAddon, PriceBreakdown } from '@/hooks/use-order-types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -96,7 +103,7 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
         }
       }
 
-      // Calculate tier discount based on quantity
+      // Calculate tier discount based on quantity using the centralized pricing logic
       const tierDiscountRate = calculateQuantityDiscount(itemCount);
       const tierDiscountAmount = baseTotal * tierDiscountRate;
       const tierDiscountApplied = tierDiscountRate > 0;
@@ -104,30 +111,32 @@ export function OrderPriceCalculator({ className }: OrderPriceCalculatorProps) {
       // Apply discount
       itemSubtotal = baseTotal - tierDiscountAmount;
       
-      // Apply subscription discount (10% off) if user is subscribed
+      // Apply subscription discount if user is subscribed
       let subscriptionDiscountAmount = 0;
       let subscriptionDiscountApplied = false;
       
       if (isSubscribed) {
-        subscriptionDiscountAmount = itemSubtotal * 0.1; // 10% off for subscribers
+        subscriptionDiscountAmount = itemSubtotal * SUBSCRIPTION_DISCOUNT;
         itemSubtotal -= subscriptionDiscountAmount;
         subscriptionDiscountApplied = true;
       }
       
-      // Calculate shipping - free for orders over $200, $20 for orders over $100, otherwise $30
-      let shippingCost = 30;
+      // Calculate shipping using the rules from the shared pricing module
+      let shippingCost = SHIPPING_RULES[SHIPPING_RULES.length - 1].cost; // Default to highest cost
       let shippingFreeThresholdApplied = false;
       
-      if (itemSubtotal > 200) {
-        shippingCost = 0;
-        shippingFreeThresholdApplied = true;
-      } else if (itemSubtotal >= 100) {
-        shippingCost = 20;
+      // Find the applicable shipping rule
+      for (const rule of SHIPPING_RULES) {
+        if (itemSubtotal >= rule.threshold) {
+          shippingCost = rule.cost;
+          shippingFreeThresholdApplied = rule.cost === 0;
+          break;
+        }
       }
 
-      // Calculate tax (7%)
+      // Calculate tax using the centralized tax rate
       const priceBeforeTax = itemSubtotal + shippingCost;
-      const taxAmount = itemSubtotal * 0.07;
+      const taxAmount = itemSubtotal * TAX_RATE;
       const grandTotal = priceBeforeTax + taxAmount;
       
       // Check for potential division by zero or NaN
