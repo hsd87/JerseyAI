@@ -1,0 +1,67 @@
+You are updating the **UI styling only** of an existing functional web app. Do not touch the JavaScript/TypeScript or backend logic. Your job is to apply the VORO brand’s frontend identity using CSS (Tailwind or global styles depending on setup).
+
+---
+
+**1. Fonts:**
+- Primary Heading Font: `Space Grotesk`, `Satoshi`, or fallback `sans-serif`
+- Body Font: `Inter`, fallback `system-ui`, `sans-serif`
+
+---
+
+**2. Brand Colors:**
+- Primary Black: `#0F0F0F` (Used for text, headers, nav)
+- Ice White: `#FAFAFA` (Main background)
+- Accent Red: `#E34234` (Buttons, call-to-action)
+- Graphite Grey: `#404040` (Footer background, dividers)
+
+---
+
+**3. Layout Style & Margins:**
+- Use generous padding (`px-6 md:px-12`) and clean white space
+- Max content width: `1200px`
+- Center content with `mx-auto`
+- Section spacing: `py-12`, `md:py-20` for hero, features, footer
+
+---
+
+**4. Nav Bar Styling:**
+- Sticky top navbar with background: `bg-[#0F0F0F]`, text: `white`
+- Logo aligned left, nav links right (`flex justify-between`)
+- Nav link hover: `underline` or `text-[#E34234]`
+
+---
+
+**5. Footer Styling:**
+- Background: `#404040`, text: `white`, links muted grey
+- Footer columns layout: 2 or 3-grid
+- Include optional mini logo and tagline
+- Use padding: `py-8 px-6 md:px-12`
+
+---
+
+**6. Sizing & Typography:**
+- Headline sizes: `text-4xl`, `md:text-5xl` for H1
+- Body: `text-base` or `text-lg` with `leading-relaxed`
+- Button: `py-2 px-6`, `rounded-xl`, `bg-[#E34234]`, `text-white`
+
+---
+
+**7. General UI Styling Notes:**
+- Keep everything clean and minimal — no drop shadows or clutter
+- Border radius: use `rounded-2xl` consistently
+- Ensure mobile-first responsive design
+- Buttons must feel tap-friendly (`min-w-[120px]`, `h-[44px]`)
+- Apply accent colors subtly — use red only for CTAs and interactions
+
+---
+
+📌 Do **NOT** alter:
+- App logic
+- State handling
+- Data submission functions
+- Backend API logic
+- Form validations
+
+Your updates must only apply to visual styling (HTML structure, classes, CSS files, Tailwind config, etc.).
+
+Use VORO’s branding as the visual foundation, while preserving the app’s operational integrity.

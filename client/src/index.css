@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,6 +10,60 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-[#FAFAFA] text-[#0F0F0F] leading-relaxed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl leading-tight;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+
+  p {
+    @apply text-base md:text-lg;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply px-6 md:px-12 mx-auto max-w-[1200px];
+  }
+  
+  .btn-primary {
+    @apply py-2 px-6 rounded-xl bg-[#E34234] text-white min-w-[120px] h-[44px] flex items-center justify-center font-medium transition-colors hover:bg-[#d93a2d];
+  }
+  
+  .btn-secondary {
+    @apply py-2 px-6 rounded-xl border border-[#0F0F0F] text-[#0F0F0F] min-w-[120px] h-[44px] flex items-center justify-center font-medium transition-colors hover:bg-[#0F0F0F] hover:text-white;
+  }
+  
+  .nav-item {
+    @apply text-[#FAFAFA] hover:text-[#E34234] transition-colors font-medium;
+  }
+  
+  .section-spacing {
+    @apply py-12 md:py-20;
+  }
+  
+  .footer {
+    @apply bg-[#404040] text-white py-8 px-6 md:px-12;
+  }
+  
+  .card-custom {
+    @apply bg-white shadow-sm rounded-2xl p-6 border border-gray-100;
   }
 }

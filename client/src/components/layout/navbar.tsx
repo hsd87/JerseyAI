@@ -47,68 +47,68 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 ${scrolled ? 'shadow-sm' : ''} transition-shadow duration-300`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-14 sm:h-16">
+    <nav className={`bg-voro-black sticky top-0 z-50 ${scrolled ? 'shadow-md' : ''} transition-shadow duration-300`}>
+      <div className="container-custom mx-auto">
+        <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
-                <span className="font-sora font-semibold text-xl">Pro<span className="text-primary">Jersey</span></span>
+                <span className="font-heading font-semibold text-voro-white text-xl">Pro<span className="text-voro-red">Jersey</span></span>
               </Link>
             </div>
           </div>
           
           <div className="hidden md:block">
             <div className="ml-4 flex items-center space-x-7">
-              <Link href="/" className={`text-sm font-medium ${location === '/' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+              <Link href="/" className={`nav-item ${location === '/' ? 'text-voro-red' : ''}`}>
                 Home
               </Link>
-              <Link href="/designer" className={`text-sm font-medium ${location === '/designer' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+              <Link href="/designer" className={`nav-item ${location === '/designer' ? 'text-voro-red' : ''}`}>
                 AI Designer
               </Link>
-              <Link href="/jersey-editor" className={`text-sm font-medium ${location === '/jersey-editor' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+              <Link href="/jersey-editor" className={`nav-item ${location === '/jersey-editor' ? 'text-voro-red' : ''}`}>
                 Jersey Editor
               </Link>
-              <Link href="/products" className={`text-sm font-medium ${location === '/products' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+              <Link href="/products" className={`nav-item ${location === '/products' ? 'text-voro-red' : ''}`}>
                 Shop
               </Link>
-              <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              <button className="nav-item">
                 Gallery
               </button>
-              <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              <button className="nav-item">
                 Pricing
               </button>
-              <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              <button className="nav-item">
                 How It Works
               </button>
-              <Link href="/partner" className={`text-sm font-medium ${location === '/partner' ? 'text-primary' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+              <Link href="/partner" className={`nav-item ${location === '/partner' ? 'text-voro-red' : ''}`}>
                 Partner With Us
               </Link>
               
               {user ? (
                 <>
                   {subscription.isSubscribed ? (
-                    <Badge className="bg-primary/10 text-primary border-primary flex items-center gap-1">
+                    <Badge className="bg-voro-red/10 text-voro-red border-voro-red flex items-center gap-1">
                       <CrownIcon className="h-3 w-3" />
                       <span>Pro</span>
                     </Badge>
                   ) : (
-                    <Link href="/subscribe" className="text-primary border border-primary/30 bg-primary/5 px-3 py-1 rounded-full text-sm font-medium hover:bg-primary/10 transition-colors flex items-center gap-1">
+                    <Link href="/subscribe" className="text-voro-red border border-voro-red/30 bg-voro-red/5 px-3 py-1 rounded-xl text-sm font-medium hover:bg-voro-red/10 transition-colors flex items-center gap-1">
                       <CrownIcon className="h-3 w-3" />
                       <span>Upgrade</span>
                     </Link>
                   )}
-                  <Link href="/dashboard" className="bg-primary text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-primary/90 transition-colors">
+                  <Link href="/dashboard" className="btn-primary py-1.5 px-4 text-sm">
                     Dashboard
                   </Link>
                   {user.role === 'admin' && (
-                    <Link href="/admin" className="bg-gray-800 text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-700 transition-colors">
+                    <Link href="/admin" className="bg-voro-grey text-voro-white px-4 py-1.5 rounded-xl text-sm font-medium hover:bg-opacity-90 transition-colors">
                       Admin
                     </Link>
                   )}
                 </>
               ) : (
-                <Link href="/auth" className="bg-primary text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-primary/90 transition-colors">
+                <Link href="/auth" className="btn-primary py-1.5 px-4 text-sm">
                   Sign In
                 </Link>
               )}
@@ -123,7 +123,7 @@ export default function Navbar() {
             
             <button 
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary transition-colors"
+              className="inline-flex items-center justify-center p-2 rounded-md text-voro-white hover:text-voro-red focus:outline-none transition-colors"
               aria-expanded={isMenuOpen}
             >
               <span className="sr-only">{isMenuOpen ? 'Close menu' : 'Open menu'}</span>
@@ -136,7 +136,7 @@ export default function Navbar() {
           </div>
           
           <div className="hidden md:flex items-center space-x-4">
-            <button className="p-2 rounded-full text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary transition-colors">
+            <button className="p-2 rounded-md text-voro-white hover:text-voro-red focus:outline-none transition-colors">
               <span className="sr-only">Dark mode</span>
               <Moon className="h-5 w-5" />
             </button>
@@ -149,12 +149,12 @@ export default function Navbar() {
               <div className="relative">
                 <button 
                   onClick={handleLogout}
-                  className="p-2 rounded-full text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary transition-colors relative"
+                  className="p-2 rounded-md text-voro-white hover:text-voro-red focus:outline-none transition-colors relative"
                   aria-label="User account and settings"
                 >
                   <span className="sr-only">Logout</span>
                   <UserCircle className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary transform translate-x-1 -translate-y-1"></span>
+                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-voro-red transform translate-x-1 -translate-y-1"></span>
                 </button>
               </div>
             )}
@@ -163,46 +163,46 @@ export default function Navbar() {
       </div>
       
       {/* Basic Mobile menu dropdown */}
-      <div className={`md:hidden bg-white border-t border-gray-200 ${isMenuOpen ? 'block' : 'hidden'}`}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          <Link href="/" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/' ? 'text-primary' : 'text-gray-700'}`}>
+      <div className={`md:hidden bg-voro-black border-t border-voro-grey/20 ${isMenuOpen ? 'block' : 'hidden'}`}>
+        <div className="px-4 pt-2 pb-3 space-y-1">
+          <Link href="/" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/' ? 'text-voro-red' : 'text-voro-white'}`}>
             Home
           </Link>
-          <Link href="/designer" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/designer' ? 'text-primary' : 'text-gray-700'}`}>
+          <Link href="/designer" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/designer' ? 'text-voro-red' : 'text-voro-white'}`}>
             AI Designer
           </Link>
-          <Link href="/jersey-editor" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/jersey-editor' ? 'text-primary' : 'text-gray-700'}`}>
+          <Link href="/jersey-editor" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/jersey-editor' ? 'text-voro-red' : 'text-voro-white'}`}>
             Jersey Editor
           </Link>
-          <Link href="/products" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/products' ? 'text-primary' : 'text-gray-700'}`}>
+          <Link href="/products" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/products' ? 'text-voro-red' : 'text-voro-white'}`}>
             Shop
           </Link>
-          <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700">
+          <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-voro-white">
             Gallery
           </Link>
-          <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700">
+          <Link href="#" className="block px-3 py-2 rounded-md text-base font-medium text-voro-white">
             Pricing
           </Link>
-          <Link href="/partner" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/partner' ? 'text-primary' : 'text-gray-700'}`}>
+          <Link href="/partner" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/partner' ? 'text-voro-red' : 'text-voro-white'}`}>
             Partner With Us
           </Link>
           
           {user ? (
             <>
-              <Link href="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-primary">
+              <Link href="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-voro-red">
                 Dashboard
               </Link>
               {user.role === 'admin' && (
-                <Link href="/admin" className="block px-3 py-2 rounded-md text-base font-medium bg-gray-800 text-white">
+                <Link href="/admin" className="block px-3 py-2 rounded-md text-base font-medium bg-voro-grey text-voro-white">
                   Admin Dashboard
                 </Link>
               )}
-              <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700">
+              <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-voro-white">
                 Sign Out
               </button>
             </>
           ) : (
-            <Link href="/auth" className="block px-3 py-2 rounded-md text-base font-medium text-primary">
+            <Link href="/auth" className="block px-3 py-2 rounded-md text-base font-medium text-voro-red">
               Sign In
             </Link>
           )}
