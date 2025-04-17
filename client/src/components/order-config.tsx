@@ -1612,76 +1612,76 @@ export default function OrderConfig({
         {/* Step 5: Pricing */}
         {currentStep === 5 && (
           <div className="space-y-6">
-            <div className="bg-slate-50 border rounded-lg p-6">
-              <h3 className="font-medium text-lg mb-4 flex items-center">
-                <Calculator className="mr-2 h-5 w-5 text-primary" />
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <h3 className="font-heading font-medium text-voro-black text-xl mb-5 flex items-center">
+                <Calculator className="mr-3 h-5 w-5 text-voro-red" />
                 Order Price Breakdown
               </h3>
               
               <div className="space-y-4">
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Package Type:</span>
-                  <span>{kitTypeDisplayNames[watchedPackageType] || 'Custom'}</span>
+                <div className="flex justify-between border-b border-gray-200 pb-3">
+                  <span className="font-medium text-voro-black">Package Type:</span>
+                  <span className="text-gray-700">{kitTypeDisplayNames[watchedPackageType] || 'Custom'}</span>
                 </div>
                 
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Base Price Per Unit:</span>
-                  <span className="font-semibold">${packageUnitPrice > 0 ? packageUnitPrice.toFixed(2) : calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
+                <div className="flex justify-between border-b border-gray-200 pb-3">
+                  <span className="font-medium text-voro-black">Base Price Per Unit:</span>
+                  <span className="font-semibold text-voro-black">${packageUnitPrice > 0 ? packageUnitPrice.toFixed(2) : calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
                 </div>
                 
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Order Type:</span>
-                  <span>{watchedIsTeamOrder ? 'Team Order' : 'Individual Order'}</span>
+                <div className="flex justify-between border-b border-gray-200 pb-3">
+                  <span className="font-medium text-voro-black">Order Type:</span>
+                  <span className="text-gray-700">{watchedIsTeamOrder ? 'Team Order' : 'Individual Order'}</span>
                 </div>
                 
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Total Units:</span>
-                  <span>{watchedIsTeamOrder ? teamMembers.length : watchedQuantity}</span>
+                <div className="flex justify-between border-b border-gray-200 pb-3">
+                  <span className="font-medium text-voro-black">Total Units:</span>
+                  <span className="text-gray-700">{watchedIsTeamOrder ? teamMembers.length : watchedQuantity}</span>
                 </div>
                 
                 {/* Items section */}
-                <div className="border-b pb-2">
+                <div className="border-b border-gray-200 pb-3">
                   <div className="flex justify-between">
-                    <span className="font-medium">Selected Items:</span>
+                    <span className="font-medium text-voro-black">Selected Items:</span>
                     <span></span>
                   </div>
                   {packageItems && packageItems.length > 0 ? (
                     packageItems.map(item => (
-                      <div key={item.id} className="flex justify-between pl-4 text-sm mt-1">
-                        <span>{item.name}</span>
-                        <span>${item.price.toFixed(2)}</span>
+                      <div key={item.id} className="flex justify-between pl-4 text-sm mt-2">
+                        <span className="text-gray-700">{item.name}</span>
+                        <span className="font-medium text-voro-black">${item.price.toFixed(2)}</span>
                       </div>
                     ))
                   ) : (
-                    <div className="pl-4 text-sm mt-1 text-gray-500">No items selected</div>
+                    <div className="pl-4 text-sm mt-2 text-gray-500">No items selected</div>
                   )}
                 </div>
                 
                 {/* Add-ons section */}
                 {addOns.length > 0 && (
-                  <div className="border-b pb-2">
+                  <div className="border-b border-gray-200 pb-3">
                     <div className="flex justify-between">
-                      <span className="font-medium">Add-ons:</span>
+                      <span className="font-medium text-voro-black">Add-ons:</span>
                       <span></span>
                     </div>
                     {addOns.map(addon => (
-                      <div key={addon.id} className="flex justify-between pl-4 text-sm mt-1">
-                        <span>{addon.name} (x{addon.quantity})</span>
-                        <span>${(addon.price * addon.quantity).toFixed(2)}</span>
+                      <div key={addon.id} className="flex justify-between pl-4 text-sm mt-2">
+                        <span className="text-gray-700">{addon.name} (x{addon.quantity})</span>
+                        <span className="font-medium text-voro-black">${(addon.price * addon.quantity).toFixed(2)}</span>
                       </div>
                     ))}
-                    <div className="flex justify-between pl-4 font-medium text-sm mt-2 pt-1 border-t border-dashed">
-                      <span>Add-ons Subtotal:</span>
-                      <span>${addOns.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0).toFixed(2)}</span>
+                    <div className="flex justify-between pl-4 font-medium text-sm mt-3 pt-2 border-t border-dashed">
+                      <span className="text-voro-black">Add-ons Subtotal:</span>
+                      <span className="text-voro-black">${addOns.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0).toFixed(2)}</span>
                     </div>
                   </div>
                 )}
                 
                 {/* Bundle discount section */}
                 {packageItems && packageItems.length >= 2 && (
-                  <div className="flex justify-between border-b pb-2 text-green-600">
+                  <div className="flex justify-between border-b border-gray-200 pb-3 text-green-600">
                     <span className="font-medium">Bundle Discount:</span>
-                    <span>
+                    <span className="font-medium">
                       {packageItems.length >= 4 ? '15%' : 
                        packageItems.length >= 3 ? '10%' : '5%'}
                     </span>
@@ -1690,9 +1690,9 @@ export default function OrderConfig({
                 
                 {/* Quantity discount section */}
                 {(watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 10 && (
-                  <div className="flex justify-between border-b pb-2 text-green-600">
+                  <div className="flex justify-between border-b border-gray-200 pb-3 text-green-600">
                     <span className="font-medium">Quantity Discount:</span>
-                    <span>
+                    <span className="font-medium">
                       {(watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 50 ? '15%' : 
                        (watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 20 ? '10%' : '5%'}
                     </span>
@@ -1700,9 +1700,9 @@ export default function OrderConfig({
                 )}
                 
                 {/* Subtotal before discounts */}
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Subtotal (before discounts):</span>
-                  <span className="font-medium">
+                <div className="flex justify-between border-b border-gray-200 pb-3">
+                  <span className="font-medium text-voro-black">Subtotal (before discounts):</span>
+                  <span className="font-medium text-voro-black">
                     ${
                       (
                         calculatePackageBasePrice(watchedPackageType) * (watchedIsTeamOrder ? teamMembers.length : watchedQuantity) + 
@@ -1714,9 +1714,9 @@ export default function OrderConfig({
                 </div>
                 
                 {/* Total price with discounts */}
-                <div className="flex justify-between pt-2 text-lg font-bold">
-                  <span>Total Price:</span>
-                  <span className="text-primary">
+                <div className="flex justify-between pt-3 text-xl font-bold">
+                  <span className="text-voro-black">Total Price:</span>
+                  <span className="text-voro-red">
                     ${typeof totalPrice === 'number' && !isNaN(totalPrice) ? 
                         totalPrice.toFixed(2) : 
                         "0.00"
@@ -1724,7 +1724,7 @@ export default function OrderConfig({
                   </span>
                 </div>
                 
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-600 mt-3">
                   Taxes and shipping will be calculated at checkout.
                 </p>
               </div>
@@ -1744,12 +1744,12 @@ export default function OrderConfig({
         {/* Step 6: Order Summary */}
         {currentStep === 6 && (
           <div className="space-y-6">
-            <div className="bg-primary/5 border-primary/10 border rounded-lg p-4 mb-6">
-              <h3 className="font-medium flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
+            <div className="bg-voro-red/5 border-voro-red/10 border rounded-2xl p-5 mb-6 shadow-sm">
+              <h3 className="font-heading font-medium text-voro-black flex items-center gap-2 text-lg">
+                <CheckCircle className="h-5 w-5 text-green-600" />
                 Order Configuration Complete
               </h3>
-              <p className="text-sm mt-1">
+              <p className="text-sm mt-2 text-gray-600">
                 Review your complete order summary below before proceeding to checkout.
               </p>
             </div>
@@ -1901,63 +1901,63 @@ export default function OrderConfig({
               
               {/* Pricing tab */}
               <TabsContent value="pricing" className="pt-4">
-                <div className="bg-slate-50 border rounded-lg p-6">
-                  <h4 className="font-medium mb-4">Price Breakdown</h4>
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <h4 className="font-heading font-medium text-voro-black text-lg mb-5">Price Breakdown</h4>
                   
-                  <div className="space-y-3">
-                    <div className="flex justify-between border-b pb-2">
-                      <span>Base Package Price:</span>
-                      <span>${packageUnitPrice > 0 ? packageUnitPrice.toFixed(2) : calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
+                  <div className="space-y-4">
+                    <div className="flex justify-between border-b border-gray-200 pb-3">
+                      <span className="font-medium text-voro-black">Base Package Price:</span>
+                      <span className="text-gray-700">${packageUnitPrice > 0 ? packageUnitPrice.toFixed(2) : calculatePackageBasePrice(watchedPackageType).toFixed(2)}</span>
                     </div>
                     
-                    <div className="flex justify-between border-b pb-2">
-                      <span>Quantity:</span>
-                      <span>{watchedIsTeamOrder ? teamMembers.length : watchedQuantity}</span>
+                    <div className="flex justify-between border-b border-gray-200 pb-3">
+                      <span className="font-medium text-voro-black">Quantity:</span>
+                      <span className="text-gray-700">{watchedIsTeamOrder ? teamMembers.length : watchedQuantity}</span>
                     </div>
                     
                     {addOns.length > 0 && (
-                      <div className="border-b pb-2">
+                      <div className="border-b border-gray-200 pb-3">
                         <div className="flex justify-between">
-                          <span>Add-ons:</span>
+                          <span className="font-medium text-voro-black">Add-ons:</span>
                           <span></span>
                         </div>
                         {addOns.map(addon => (
-                          <div key={addon.id} className="flex justify-between pl-4 text-sm mt-1">
-                            <span>{addon.name} (x{addon.quantity})</span>
-                            <span>${(addon.price * addon.quantity).toFixed(2)}</span>
+                          <div key={addon.id} className="flex justify-between pl-4 text-sm mt-2">
+                            <span className="text-gray-700">{addon.name} (x{addon.quantity})</span>
+                            <span className="font-medium text-voro-black">${(addon.price * addon.quantity).toFixed(2)}</span>
                           </div>
                         ))}
                       </div>
                     )}
                     
                     {(watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 10 && (
-                      <div className="flex justify-between border-b pb-2 text-green-600">
-                        <span>Quantity Discount:</span>
-                        <span>
+                      <div className="flex justify-between border-b border-gray-200 pb-3 text-green-600">
+                        <span className="font-medium">Quantity Discount:</span>
+                        <span className="font-medium">
                           {(watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 50 ? '15% off' : 
                            (watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 20 ? '10% off' : '5% off'}
                         </span>
                       </div>
                     )}
                     
-                    <div className="flex justify-between border-b pb-2">
-                      <span>Subtotal:</span>
-                      <span>${totalPrice.toFixed(2)}</span>
+                    <div className="flex justify-between border-b border-gray-200 pb-3">
+                      <span className="font-medium text-voro-black">Subtotal:</span>
+                      <span className="font-medium text-voro-black">${totalPrice.toFixed(2)}</span>
                     </div>
                     
-                    <div className="flex justify-between border-b pb-2 text-gray-500">
+                    <div className="flex justify-between border-b border-gray-200 pb-3 text-gray-600">
                       <span>Estimated Tax:</span>
                       <span>${(totalPrice * 0.07).toFixed(2)}</span>
                     </div>
                     
-                    <div className="flex justify-between border-b pb-2 text-gray-500">
+                    <div className="flex justify-between border-b border-gray-200 pb-3 text-gray-600">
                       <span>Shipping:</span>
                       <span>$9.99</span>
                     </div>
                     
-                    <div className="flex justify-between pt-2 text-lg font-bold">
-                      <span>Total:</span>
-                      <span>${(totalPrice * 1.07 + 9.99).toFixed(2)}</span>
+                    <div className="flex justify-between pt-3 text-xl font-bold">
+                      <span className="text-voro-black">Total:</span>
+                      <span className="text-voro-red">${(totalPrice * 1.07 + 9.99).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -1970,7 +1970,7 @@ export default function OrderConfig({
               </Button>
               <Button 
                 onClick={finalizeOrderForCheckout}
-                className="bg-primary hover:bg-primary/90"
+                className="btn-primary"
               >
                 Save Order Details
               </Button>
