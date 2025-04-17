@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useOrderStore } from '@/hooks/use-order-store';
+import { PackageItem } from '@/hooks/use-order-types'; // Import from the correct location
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -58,16 +59,7 @@ const orderConfigSchema = z.object({
 
 type OrderConfigValues = z.infer<typeof orderConfigSchema>;
 
-// Package item interface used for individual orders
-interface PackageItem {
-  id: string;
-  name: string;
-  type: string;
-  sizes: { size: string; quantity: number }[];
-  price: number;
-  gender: string;
-  sku?: string; // Added for product identification
-}
+// PackageItem is now imported from @/hooks/use-order-types
 
 interface OrderConfigProps {
   designId?: number;
@@ -331,21 +323,27 @@ export default function OrderConfig({
 
   // Handle gender selection 
   const handleGenderChange = (value: 'Male' | 'Female' | 'Youth') => {
+    // Update form
     form.setValue('gender', value);
+    
+    // Update local state
     setGender(value);
     
-    // Update all package items with new gender
-    // Make sure we're handling an array, or use an empty array as fallback
-    const updatedItems = packageItems?.map(item => ({
-      ...item,
-      gender: value
-    })) || [];
-    
-    setPackageItems(updatedItems);
-    
-    // Only try to update the store if we have package items and store functions
-    if (typeof setStorePackageItems === 'function' && updatedItems.length > 0) {
-      setStorePackageItems(updatedItems);
+    // Update package items with new gender if they exist
+    if (packageItems && packageItems.length > 0) {
+      const updatedItems = packageItems.map(item => ({
+        ...item,
+        gender: value
+      }));
+      
+      // Update local state first
+      setPackageItems(updatedItems);
+      
+      // Then update the store
+      const setPackageItemsInStore = useOrderStore.getState().setPackageItems;
+      if (typeof setPackageItemsInStore === 'function') {
+        setPackageItemsInStore(updatedItems);
+      }
     }
   };
 
