@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { StripeElementsForm } from './stripe-elements-form';
+import StripeElementsForm from './stripe-elements-form';
 
 // Initialize Stripe outside component to avoid re-initialization on re-renders
 let stripePromise: Promise<Stripe | null> | null = null;

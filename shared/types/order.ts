@@ -53,6 +53,9 @@ export interface CreateOrderRequest {
 export interface CreatePaymentIntentRequest {
   amount?: number;
   orderItems?: OrderItem[];
+  items?: any[]; // Support generic items data structure
+  requestId?: string; // For request tracking
+  componentId?: string; // For component identification
 }
 
 export interface CreatePaymentIntentResponse {

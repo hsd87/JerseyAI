@@ -303,20 +303,48 @@ export default function StripeDiagnostic() {
           </div>
         </CardContent>
         
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={resetTests} disabled={isRunning}>
-            Reset Tests
-          </Button>
-          <Button onClick={checkStripeConfig} disabled={isRunning}>
-            {isRunning ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Running Tests...
-              </>
-            ) : (
-              'Run Diagnostic'
-            )}
-          </Button>
+        <CardFooter className="flex flex-col gap-4">
+          <div className="flex justify-between w-full">
+            <Button variant="outline" onClick={resetTests} disabled={isRunning}>
+              Reset Tests
+            </Button>
+            <Button onClick={checkStripeConfig} disabled={isRunning}>
+              {isRunning ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Running Tests...
+                </>
+              ) : (
+                'Run Diagnostic'
+              )}
+            </Button>
+          </div>
+          
+          <Separator className="my-2" />
+          
+          <div className="flex flex-col gap-2">
+            <h3 className="text-sm font-medium">Test Payment Flows:</h3>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/checkout">
+                <Button variant="outline" size="sm">
+                  Original Checkout
+                </Button>
+              </Link>
+              <Link href="/checkout-fixed">
+                <Button variant="outline" size="sm" className="bg-green-50">
+                  Fixed Checkout
+                </Button>
+              </Link>
+              <Link href="/checkout-elements">
+                <Button variant="outline" size="sm">
+                  Elements Checkout
+                </Button>
+              </Link>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              After running diagnostics, try the payment flows above to test in action
+            </p>
+          </div>
         </CardFooter>
       </Card>
     </div>
