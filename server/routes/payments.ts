@@ -1,8 +1,17 @@
-import { Router } from 'express';
-import { createPaymentIntent } from '../services/stripe-service';
+import { Router, json, Request } from 'express';
+import { createPaymentIntent, getStripe } from '../services/stripe-service';
 import { storage } from '../storage';
+import Stripe from 'stripe';
 
 const router = Router();
+
+// Use JSON raw body parser for webhook verification
+const webhookMiddleware = json({
+  verify: (req: Request & { rawBody?: Buffer }, res, buf) => {
+    // Store the raw body for webhook signature verification
+    req.rawBody = buf;
+  },
+});
 
 /**
  * Create a payment intent for Stripe Elements
@@ -106,26 +115,65 @@ router.post('/create-payment-intent', async (req, res) => {
  * Webhook endpoint for Stripe event handling
  * POST /api/payment/webhook
  */
-router.post('/webhook', async (req, res) => {
+router.post('/webhook', webhookMiddleware, async (req: Request & { rawBody?: Buffer }, res) => {
   // Generate a webhook handling ID for tracking this specific webhook
   const webhookId = `whk_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   console.log(`[${webhookId}] Received Stripe webhook`);
   
-  const event = req.body;
-
-  // Simple validation of the event
-  if (!event || !event.type) {
-    console.warn(`[${webhookId}] Invalid webhook event received - missing type`);
-    return res.status(400).json({ error: 'Invalid event', webhookId });
-  }
-
-  console.log(`[${webhookId}] Processing webhook event type: ${event.type}`);
+  let event: Stripe.Event;
+  
+  // Get the Stripe webhook secret from environment variables
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  // Get the signature from headers
+  const signature = req.headers['stripe-signature'];
   
   try {
+    // If we have a webhook secret and raw body, verify the signature
+    if (webhookSecret && signature && req.rawBody) {
+      console.log(`[${webhookId}] Verifying webhook signature`);
+      
+      const stripe = getStripe();
+      if (!stripe) {
+        throw new Error('Stripe is not initialized');
+      }
+      
+      // Construct the event by verifying the signature
+      event = stripe.webhooks.constructEvent(
+        req.rawBody,
+        signature,
+        webhookSecret
+      );
+      
+      console.log(`[${webhookId}] Webhook signature verified successfully`);
+    } else {
+      // For development/testing we can bypass verification
+      if (!webhookSecret) {
+        console.warn(`[${webhookId}] STRIPE_WEBHOOK_SECRET not configured - skipping signature verification`);
+      }
+      if (!signature) {
+        console.warn(`[${webhookId}] No stripe-signature header present - skipping signature verification`);
+      }
+      if (!req.rawBody) {
+        console.warn(`[${webhookId}] No raw body available - skipping signature verification`);
+      }
+      
+      // Use the event as is (not verified)
+      event = req.body;
+      
+      // Simple validation of the event
+      if (!event || !event.type) {
+        console.warn(`[${webhookId}] Invalid webhook event received - missing type`);
+        return res.status(400).json({ error: 'Invalid event', webhookId });
+      }
+    }
+    
+    console.log(`[${webhookId}] Processing webhook event type: ${event.type}`);
+    
     // Handle different event types
     switch (event.type) {
       case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object;
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log(`[${webhookId}] Payment succeeded: ${paymentIntent.id}`);
         
         // Check for metadata to link to order
@@ -139,7 +187,7 @@ router.post('/webhook', async (req, res) => {
         break;
         
       case 'payment_intent.payment_failed':
-        const failedPayment = event.data.object;
+        const failedPayment = event.data.object as Stripe.PaymentIntent;
         console.log(`[${webhookId}] Payment failed: ${failedPayment.id}`);
         
         // Check for failure reason if available
@@ -155,7 +203,7 @@ router.post('/webhook', async (req, res) => {
         break;
         
       case 'charge.succeeded':
-        const charge = event.data.object;
+        const charge = event.data.object as Stripe.Charge;
         console.log(`[${webhookId}] Charge succeeded: ${charge.id}`);
         break;
         
@@ -177,6 +225,16 @@ router.post('/webhook', async (req, res) => {
     res.json({ received: true, webhookId });
   } catch (error: any) {
     console.error(`[${webhookId}] Error processing webhook:`, error);
+    
+    // Check if the error is related to signature verification
+    if (error.type === 'StripeSignatureVerificationError') {
+      console.error(`[${webhookId}] Webhook signature verification failed:`, error.message);
+      return res.status(400).json({ 
+        error: 'Webhook signature verification failed', 
+        webhookId 
+      });
+    }
+    
     res.status(500).json({ 
       error: error.message || 'Webhook processing failed',
       webhookId 
