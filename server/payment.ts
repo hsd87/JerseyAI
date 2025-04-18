@@ -444,11 +444,12 @@ export function registerPaymentRoutes(app: Express) {
       console.log(`Payment Intent Request [${requestId || 'no-id'}]:`, {
         componentId: componentId || 'unknown',
         hasAmount: Boolean(amount),
-        amount,
+        amount: amount ? `$${amount} (${typeof amount})` : 'not provided',
         hasAmountInCents: Boolean(amountInCents),
-        amountInCents,
+        amountInCents: amountInCents ? `${amountInCents} cents (${typeof amountInCents})` : 'not provided',
         hasItems: Boolean(items),
         itemsCount: items?.length || 0,
+        firstItemAmount: items?.[0]?.price ? `$${items[0].price}` : 'no price',
         userId: req.user?.id || 'not-authenticated',
         requestId
       });

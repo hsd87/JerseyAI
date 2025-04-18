@@ -91,8 +91,16 @@ export default function StripeElementsWrapper({
           componentId
         });
         
+        // Log for debugging purposes
+        console.log(`Creating payment intent for amount: $${amount} with the following details:`, {
+          amountInDollars: amount,
+          itemsCount: items?.length || 0,
+          requestId,
+          componentId
+        });
+        
         const response = await orderService.createPaymentIntent({
-          amount,
+          amount, // This is in dollars (e.g., 250.00 for $250)
           items,
           requestId,
           componentId

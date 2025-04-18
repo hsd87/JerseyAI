@@ -211,6 +211,13 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
               ) : (
                 `Pay $${(amount || 0).toFixed(2)}`
               )}
+              
+              {/* Debug amount information - hidden in production */}
+              {process.env.NODE_ENV === 'development' && (
+                <span className="sr-only">
+                  Amount: ${amount} (displayed as: ${(amount || 0).toFixed(2)})
+                </span>
+              )}
             </Button>
           </div>
         </form>

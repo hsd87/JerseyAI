@@ -295,9 +295,17 @@ export default function StripeDiagnostic() {
                   
                   <StripeElementsWrapper
                     amount={parseFloat(amount) || 0.5}
-                    items={[{ id: 'test-item', name: 'Test Item', price: parseFloat(amount) || 0.5 }]}
+                    items={[{ 
+                      id: 'test-item', 
+                      name: 'Test Item', 
+                      price: parseFloat(amount) || 0.5,
+                      quantity: 1 
+                    }]}
                     onSuccess={handlePaymentSuccess}
                   />
+                  <div className="text-xs mt-2 text-muted-foreground">
+                    Testing with amount: ${parseFloat(amount) || 0.5} (Payment will appear as ${parseFloat(amount) || 0.5} in Stripe)
+                  </div>
                 </div>
               </>
             )}
