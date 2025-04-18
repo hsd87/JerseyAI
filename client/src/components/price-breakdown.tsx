@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 // Import the PriceBreakdown interface from the shared types
 import { PriceBreakdown } from '@/hooks/use-order-types';
+import { formatPrice as globalFormatPrice } from '@/lib/format-utils';
 
 interface PriceBreakdownProps {
   breakdown: PriceBreakdown;
@@ -19,14 +20,11 @@ interface PriceBreakdownProps {
  * Shows base total, applied discounts, shipping costs, and final total
  */
 export function PriceBreakdownCard({ breakdown, className }: PriceBreakdownProps) {
-  // Format currency values
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
+  // Use the centralized formatting function to ensure consistency across the app
+  // This ensures exactly 2 decimal places for all price displays
   
-  // Format cents to dollars
-  const formatPrice = (cents: number) => formatter.format(cents / 100);
+  // Format value in cents to a dollar amount with 2 decimal places
+  const formatPrice = (cents: number) => globalFormatPrice(cents / 100);
   
   return (
     <Card className={className}>
@@ -64,14 +62,11 @@ export function PriceBreakdownCard({ breakdown, className }: PriceBreakdownProps
  * Simpler component that just shows the final price with any applicable discounts
  */
 export function SimplePriceSummary({ breakdown, className }: PriceBreakdownProps) {
-  // Format currency values
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
+  // Use the centralized formatting function to ensure consistency across the app
+  // This ensures exactly 2 decimal places for all price displays
   
-  // Format cents to dollars
-  const formatPrice = (cents: number) => formatter.format(cents / 100);
+  // Format value in cents to a dollar amount with 2 decimal places
+  const formatPrice = (cents: number) => globalFormatPrice(cents / 100);
   
   // Removed all discounts, shipping, and taxes per user request
   
