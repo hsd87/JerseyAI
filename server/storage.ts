@@ -37,6 +37,11 @@ export interface IStorage {
   updateOrder(id: number, data: Partial<Order>): Promise<Order>;
   updateOrderStatus(id: number, status: string, trackingId?: string): Promise<Order>;
   updateOrderPdfUrl(id: number, pdfUrl: string): Promise<Order>;
+  updateOrderInvoice(id: number, invoiceData: { 
+    invoiceNumber: string;
+    invoiceUrl: string;
+    invoiceDate: string;
+  }): Promise<Order>;
   
   // Subscription Methods
   updateUserSubscription(userId: number, tier: string, subscriptionId?: string): Promise<User>;
