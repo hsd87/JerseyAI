@@ -17,11 +17,23 @@ declare module 'stripe' {
   }
 }
 
-// Override the Stripe key if it's a live key to ensure we're using test keys
+// Override the Stripe key if it's a live key in non-production environments
 if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_live_')) {
-  console.warn('⚠️ Live Stripe key detected! Forcing use of test key for safety.');
-  // Use a placeholder test key that will fail correctly instead of a live key
-  process.env.STRIPE_SECRET_KEY = 'sk_test_placeholder';
+  // Check if we're in a development or test environment
+  const isDevEnvironment = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+  
+  if (isDevEnvironment) {
+    console.warn('⚠️ WARNING: Live Stripe key detected on non-production environment!');
+    console.warn('Refusing to initialize live Stripe integration on development or staging environment.');
+    console.warn('This is a security precaution to prevent accidental charges.');
+    console.warn('Using test key placeholder instead for safety.');
+    
+    // Use a placeholder test key that will fail correctly instead of a live key
+    // This prevents accidental charges but will show proper error messages
+    process.env.STRIPE_SECRET_KEY = 'sk_test_placeholder';
+  } else {
+    console.log('Live Stripe key detected in production environment - proceeding with caution');
+  }
 }
 
 // Define the global variables

@@ -28,16 +28,36 @@ export default function StripeElementsWrapper({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Track if the component is mounted to prevent state updates after unmounting
+  const isMounted = React.useRef(true);
+  
+  // Use a ref to track if we're already fetching to prevent duplicate requests
+  const isRequestInProgress = React.useRef(false);
+
   useEffect(() => {
-    // Create a PaymentIntent as soon as the page loads
+    return () => {
+      isMounted.current = false; // Set to false when component unmounts
+    };
+  }, []);
+
+  useEffect(() => {
+    // Create a PaymentIntent as soon as the page loads, but only if not already in progress
     const fetchPaymentIntent = async () => {
+      // Prevent duplicate requests for same amount and items
+      if (isRequestInProgress.current || !amount || items.length === 0) {
+        return;
+      }
+
+      isRequestInProgress.current = true;
       setIsLoading(true);
       setError(null);
 
+      // For debugging - generate a request ID to track this specific request
+      const requestId = `req_${Date.now()}`;
+      console.log(`[${requestId}] Creating payment intent for amount: $${amount} with ${items.length} items`);
+      
       try {
-        console.log(`Creating payment intent for amount: $${amount} with ${items.length} items`);
-        
-        console.log("Starting payment intent creation with timeout of 30 seconds");
+        console.log(`[${requestId}] Starting payment intent creation with timeout of 30 seconds`);
         
         // Create an AbortController with a longer timeout (30 seconds)
         const controller = new AbortController();
@@ -45,7 +65,8 @@ export default function StripeElementsWrapper({
         
         const response = await apiRequest('POST', '/api/create-payment-intent', {
           amount,
-          items
+          items,
+          requestId, // Add request ID to track on server
         }, controller.signal);
         
         // Clear the timeout
@@ -57,7 +78,7 @@ export default function StripeElementsWrapper({
           throw new Error(data.message || 'Could not create payment intent');
         }
         
-        console.log('Payment intent created successfully:', {
+        console.log(`[${requestId}] Payment intent created successfully:`, {
           hasClientSecret: !!data.clientSecret,
           clientSecretLength: data.clientSecret?.length,
           amount: data.amount
@@ -67,12 +88,24 @@ export default function StripeElementsWrapper({
           throw new Error('No client secret returned from payment service');
         }
         
-        setClientSecret(data.clientSecret);
+        // Only update state if component is still mounted
+        if (isMounted.current) {
+          setClientSecret(data.clientSecret);
+        }
       } catch (err: any) {
-        console.error('Error creating payment intent:', err);
-        setError(err.message || 'An unexpected error occurred');
+        console.error(`[${requestId}] Error creating payment intent:`, err);
+        
+        // Only update state if component is still mounted
+        if (isMounted.current) {
+          setError(err.message || 'An unexpected error occurred');
+        }
       } finally {
-        setIsLoading(false);
+        isRequestInProgress.current = false;
+        
+        // Only update state if component is still mounted
+        if (isMounted.current) {
+          setIsLoading(false);
+        }
       }
     };
 
