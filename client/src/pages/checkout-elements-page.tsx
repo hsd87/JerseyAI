@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useRoute, Link } from 'wouter';
-import StripeElementsWrapper from '@/components/payment/stripe-elements-wrapper';
+import StripeElementsWrapper from '@/components/payment/stripe-elements-wrapper-fixed';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, ArrowLeft, CheckCircle } from 'lucide-react';
