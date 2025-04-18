@@ -109,9 +109,8 @@ export default function OrderSummary({
   // Verify that the price breakdown has all required properties to avoid errors
   const isValidPriceBreakdown = (pb: any): boolean => {
     return pb && 
-      typeof pb.baseTotal === 'number' && 
-      typeof pb.shippingCost === 'number' && 
-      typeof pb.subtotalAfterDiscounts === 'number' && 
+      typeof pb.subtotal === 'number' && 
+      typeof pb.shipping === 'number' && 
       typeof pb.grandTotal === 'number';
   };
   
@@ -172,12 +171,12 @@ export default function OrderSummary({
         </div>
         
         {/* Shipping threshold notifications */}
-        {validatedPriceBreakdown && validatedPriceBreakdown.shippingCost > 0 && (
+        {validatedPriceBreakdown && validatedPriceBreakdown.shipping > 0 && (
           <div className="text-sm bg-muted p-2 rounded-md text-center">
-            {validatedPriceBreakdown.subtotalAfterDiscounts < 20000 ? (
+            {validatedPriceBreakdown.subtotal < 200 ? (
               <p>Add more items to qualify for reduced shipping ($20)</p>
-            ) : validatedPriceBreakdown.subtotalAfterDiscounts < 50000 ? (
-              <p>Spend ${((50000 - validatedPriceBreakdown.subtotalAfterDiscounts) / 100).toFixed(2)} more for free shipping</p>
+            ) : validatedPriceBreakdown.subtotal < 500 ? (
+              <p>Spend ${(500 - validatedPriceBreakdown.subtotal).toFixed(2)} more for free shipping</p>
             ) : null}
           </div>
         )}

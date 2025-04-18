@@ -6,17 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// Define the PriceBreakdown interface locally for now
-interface PriceBreakdown {
-  baseTotal: number;
-  tierDiscountApplied: string;
-  tierDiscountAmount: number;
-  subscriptionDiscountApplied: string;
-  subscriptionDiscountAmount: number;
-  subtotalAfterDiscounts: number;
-  shippingCost: number;
-  grandTotal: number;
-}
+// Import the PriceBreakdown interface from the shared types
+import { PriceBreakdown } from '@/hooks/use-order-types';
 
 interface PriceBreakdownProps {
   breakdown: PriceBreakdown;
@@ -47,34 +38,34 @@ export function PriceBreakdownCard({ breakdown, className }: PriceBreakdownProps
         <div className="space-y-4">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Base total:</span>
-            <span>{formatPrice(breakdown.baseTotal)}</span>
+            <span>{formatPrice(breakdown.subtotal)}</span>
           </div>
           
           {breakdown.tierDiscountAmount > 0 && (
             <div className="flex justify-between text-green-600">
-              <span>Quantity discount ({breakdown.tierDiscountApplied}):</span>
+              <span>Quantity discount {breakdown.tierDiscountApplied ? "(applied)" : ""}:</span>
               <span>-{formatPrice(breakdown.tierDiscountAmount)}</span>
             </div>
           )}
           
           {breakdown.subscriptionDiscountAmount > 0 && (
             <div className="flex justify-between text-green-600">
-              <span>Pro member discount ({breakdown.subscriptionDiscountApplied}):</span>
+              <span>Pro member discount {breakdown.subscriptionDiscountApplied ? "(applied)" : ""}:</span>
               <span>-{formatPrice(breakdown.subscriptionDiscountAmount)}</span>
             </div>
           )}
           
           <div className="flex justify-between font-medium pt-2 border-t">
             <span>Subtotal:</span>
-            <span>{formatPrice(breakdown.subtotalAfterDiscounts)}</span>
+            <span>{formatPrice(breakdown.subtotal - breakdown.discount)}</span>
           </div>
           
           <div className="flex justify-between">
             <span className="text-muted-foreground">Shipping:</span>
             <span>
-              {breakdown.shippingCost === 0 
+              {breakdown.shipping === 0 
                 ? <span className="text-green-600">FREE</span> 
-                : formatPrice(breakdown.shippingCost)}
+                : formatPrice(breakdown.shipping)}
             </span>
           </div>
           

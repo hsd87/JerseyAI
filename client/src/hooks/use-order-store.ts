@@ -29,6 +29,12 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   packageItems: [], // Initialize as empty array for packageItems
   packageType: 'jerseyOnly', // Default package type
   
+  // Helper method to get cart items for checkout
+  getCartItems: () => {
+    const state = get();
+    return [...state.items];
+  },
+  
   // Pricing
   sport: 'soccer',
   priceBreakdown: null,

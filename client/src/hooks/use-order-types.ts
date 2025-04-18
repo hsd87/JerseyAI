@@ -109,6 +109,7 @@ export interface OrderState {
   
   // Cart view
   cart?: OrderItem[]; // Used in checkout page - combined items and add-ons
+  getCartItems: () => OrderItem[]; // Helper method to get cart items
   
   // Checkout status
   orderCompleted: boolean;
