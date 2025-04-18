@@ -91,13 +91,9 @@ export function usePriceCalculator() {
             success: false,
             breakdown: {
               baseTotal: cartTotal,
-              tierDiscountApplied: "Error",
-              tierDiscountAmount: 0,
-              subscriptionDiscountApplied: "Error",
-              subscriptionDiscountAmount: 0,
-              subtotalAfterDiscounts: cartTotal,
-              shippingCost: 0,
-              grandTotal: cartTotal
+              subtotal: cartTotal,
+              grandTotal: cartTotal,
+              itemCount: cart.length
             },
             formatted: {},
             error: fetchError.message || 'Network error during price calculation'
@@ -162,8 +158,9 @@ export function usePriceCalculator() {
         console.log("Creating default price breakdown as fallback");
         const fallback = createDefaultPriceBreakdown();
         fallback.baseTotal = clientSideTotal;
-        fallback.subtotalAfterDiscounts = clientSideTotal;
+        fallback.subtotal = clientSideTotal;
         fallback.grandTotal = clientSideTotal;
+        fallback.itemCount = cart.length;
         return fallback;
       }
     } catch (error) {
@@ -178,9 +175,9 @@ export function usePriceCalculator() {
       
       const fallback = createDefaultPriceBreakdown();
       fallback.baseTotal = simpleTotal;
-      fallback.subtotalAfterDiscounts = simpleTotal;
+      fallback.subtotal = simpleTotal;
       fallback.grandTotal = simpleTotal;
-      fallback.tierDiscountApplied = "Error";
+      fallback.itemCount = cart.length;
       
       return fallback;
     }
@@ -190,13 +187,9 @@ export function usePriceCalculator() {
   const createDefaultPriceBreakdown = (): PriceBreakdown => {
     return {
       baseTotal: 0,
-      tierDiscountApplied: "None",
-      tierDiscountAmount: 0,
-      subscriptionDiscountApplied: "None",
-      subscriptionDiscountAmount: 0,
-      subtotalAfterDiscounts: 0,
-      shippingCost: 0,
-      grandTotal: 0
+      subtotal: 0,
+      grandTotal: 0,
+      itemCount: 0
     };
   };
 

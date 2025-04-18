@@ -1,5 +1,13 @@
 // Define the core types for our order system
 
+// CartItem interface for price calculations
+export interface CartItem {
+  productId: string;
+  productType: string;
+  basePrice: number;
+  quantity: number;
+}
+
 export interface PackageItem {
   id: string;
   name: string;
