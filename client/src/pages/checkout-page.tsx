@@ -4,10 +4,9 @@ import { useAuth } from '@/hooks/use-auth';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { useToast } from '@/hooks/use-toast';
 import { useFormatPrice } from '@/hooks/use-format-price';
-import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe, Stripe, StripeElementsOptions } from '@stripe/stripe-js';
-import { StripePaymentForm } from '@/components/payment/stripe-payment-form';
 import { orderService } from '@/lib/order-service';
+import { SimplifiedStripeForm } from '@/components/payment/simplified-stripe-form';
 
 // UI Components
 import {
@@ -32,17 +31,7 @@ import {
   Check,
 } from 'lucide-react';
 
-// Make sure to call loadStripe outside of a component's render to avoid recreation on each render
-let stripePromise: Promise<Stripe | null> | null = null;
-const getStripePromise = () => {
-  if (!stripePromise && import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-    console.log('Checkout page: initializing Stripe with key prefix:', import.meta.env.VITE_STRIPE_PUBLIC_KEY.substring(0, 8));
-    stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-  } else if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-    console.error('Checkout page: Missing Stripe public key (VITE_STRIPE_PUBLIC_KEY)');
-  }
-  return stripePromise;
-};
+// We're using the initializeStripe function from the SimplifiedStripeForm component
 
 const CheckoutPage: React.FC = () => {
   const [location, setLocation] = useLocation();
@@ -104,7 +93,6 @@ const CheckoutPage: React.FC = () => {
       console.log('Creating payment intent for checkout with:', {
         amount: priceBreakdown.grandTotal,
         cartItems: cart.length,
-        hasStripePromise: !!getStripePromise()
       });
       
       try {
@@ -480,26 +468,17 @@ const CheckoutPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               {clientSecret ? (
-                <Elements
-                  options={{
-                    clientSecret,
-                    appearance: {
-                      theme: 'stripe',
-                      labels: 'floating',
-                    },
-                  }}
-                  stripe={getStripePromise()}
-                >
-                  <StripePaymentForm
-                    onSuccess={handlePaymentSuccess}
-                    onCancel={handlePaymentCancel}
-                    amount={priceBreakdown?.grandTotal || 0}
-                    isProcessing={orderProcessing}
-                  />
-                </Elements>
+                // Using the simplified stripe form component
+                <SimplifiedStripeForm
+                  clientSecret={clientSecret}
+                  amount={priceBreakdown?.grandTotal || 0}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
+                />
               ) : (
-                <div className="flex items-center justify-center py-6">
+                <div className="flex flex-col items-center justify-center py-6 space-y-2">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Setting up payment form...</p>
                 </div>
               )}
             </CardContent>
