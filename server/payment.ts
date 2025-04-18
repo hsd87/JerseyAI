@@ -478,10 +478,20 @@ export function registerPaymentRoutes(app: Express) {
         // Use pre-calculated amount from client
         finalAmountInCents = Math.round(amountInCents);
         console.log(`Using client-provided amount in cents: ${finalAmountInCents}`);
+      } else if (amount) {
+        // Check if amount is likely already in cents (larger than a typical dollar value)
+        // This prevents double conversion for large amounts like 250.00
+        if (amount >= 100) {
+          // Amount is likely already in cents
+          finalAmountInCents = Math.round(amount);
+          console.log(`Amount ${amount} appears to be in cents already, using directly: ${finalAmountInCents}`);
+        } else {
+          // Convert dollar amount to cents for Stripe (e.g., 19.99 -> 1999)
+          finalAmountInCents = Math.round(amount * 100);
+          console.log(`Calculated amount in cents from dollars: ${amount} * 100 = ${finalAmountInCents}`);
+        }
       } else {
-        // Convert dollar amount to cents for Stripe
-        finalAmountInCents = Math.round(amount * 100);
-        console.log(`Calculated amount in cents from dollars: ${amount} * 100 = ${finalAmountInCents}`);
+        throw new Error('Invalid payment amount');
       }
 
       // Determine the customer ID
