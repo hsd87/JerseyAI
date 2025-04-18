@@ -46,10 +46,11 @@ export default function CheckoutElementsPage() {
     }, 2000);
   };
 
-  // If there are no items, redirect to the cart page
+  // If there are no items, redirect to the designer page
   useEffect(() => {
     if (items.length === 0 && !paymentCompleted) {
-      setLocation('/cart');
+      console.log('No items in cart, redirecting to designer page');
+      setLocation('/designer');
     }
   }, [items, paymentCompleted, setLocation]);
 
@@ -93,9 +94,9 @@ export default function CheckoutElementsPage() {
   return (
     <div className="container mx-auto py-8">
       <div className="flex items-center mb-8">
-        <Button variant="ghost" onClick={() => setLocation('/cart')}>
+        <Button variant="ghost" onClick={() => setLocation('/designer')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Cart
+          Back to Designer
         </Button>
         <h1 className="text-2xl font-bold ml-auto">Checkout</h1>
       </div>
@@ -128,7 +129,7 @@ export default function CheckoutElementsPage() {
 
               <div className="flex justify-between font-medium">
                 <span>Total</span>
-                <span>${(totalAmount || 0).toFixed(2)}</span>
+                <span>${(totalAmount || calculatedTotal || 0).toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>
@@ -137,10 +138,10 @@ export default function CheckoutElementsPage() {
         {/* Payment Form */}
         <div>
           <StripeElementsWrapper 
-            amount={totalAmount}
+            amount={totalAmount || calculatedTotal}
             items={items}
             onSuccess={handlePaymentSuccess}
-            onCancel={() => setLocation('/cart')}
+            onCancel={() => setLocation('/designer')}
           />
         </div>
       </div>
