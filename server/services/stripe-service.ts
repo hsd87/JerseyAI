@@ -65,43 +65,127 @@ export async function checkStripeApiKey(): Promise<{ valid: boolean, message: st
   }
 }
 
-export async function createCheckoutSession(order: any, successUrl: string, cancelUrl: string) {
+/**
+ * Create a Stripe Checkout session for a one-time payment
+ * @param order Order details including items and customer information
+ * @param successUrl URL to redirect to after successful payment
+ * @param cancelUrl URL to redirect to if payment is cancelled
+ * @returns Stripe Checkout session object
+ */
+export async function createCheckoutSession(
+  order: any,
+  successUrl: string,
+  cancelUrl: string
+) {
   // Create a checkout session using the Stripe API
   if (!stripeInstance) throw new Error('Stripe is not configured');
   
-  // Format the line items for the session
-  const lineItems = order.items.map((item: any) => {
-    return {
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: item.name || `${item.productType} - ${item.size}`,
-          description: item.description || `${item.sport} ${item.productType}`,
-          metadata: {
-            productId: item.productId || item.id
-          }
+  try {
+    console.log('Creating Stripe Checkout session with success URL:', successUrl);
+    
+    // Format the line items for the session
+    const lineItems = order.items.map((item: any) => {
+      return {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: item.name || `${item.productType || 'Jersey'} - ${item.size || 'One Size'}`,
+            description: item.description || `${item.sport || 'Custom'} ${item.productType || 'Jersey'}`,
+            images: item.imageUrl ? [item.imageUrl] : undefined,
+            metadata: {
+              productId: item.productId || item.id || 'custom-product'
+            }
+          },
+          unit_amount: Math.round(item.price * 100), // Convert to cents
         },
-        unit_amount: Math.round(item.price * 100), // Convert to cents
-      },
-      quantity: item.quantity,
-    };
-  });
-  
-  // Create session with line items
-  const session = await stripeInstance.checkout.sessions.create({
-    payment_method_types: ['card'],
-    mode: 'payment',
-    success_url: successUrl,
-    cancel_url: cancelUrl,
-    client_reference_id: order.id.toString(),
-    customer_email: order.customerEmail,
-    line_items: lineItems,
-    metadata: {
-      orderId: order.id.toString()
+        quantity: item.quantity || 1,
+      };
+    });
+    
+    // Add any add-ons as separate line items if they exist
+    if (order.addOns && order.addOns.length > 0) {
+      order.addOns.forEach((addon: any) => {
+        if (addon.price && addon.price > 0) {
+          lineItems.push({
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: addon.name || 'Add-on',
+                description: addon.description || 'Additional service or product',
+              },
+              unit_amount: Math.round(addon.price * 100), // Convert to cents
+            },
+            quantity: addon.quantity || 1,
+          });
+        }
+      });
     }
-  });
-  
-  return session;
+    
+    // Build the session parameters
+    const sessionParams = {
+      payment_method_types: ['card'],
+      mode: 'payment',
+      success_url: `${successUrl}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl,
+      customer: order.customerId || undefined,
+      customer_email: order.customerEmail || order.email || undefined,
+      line_items: lineItems,
+      metadata: {
+        orderId: order.id?.toString() || 'new-order',
+        designId: order.designId?.toString() || '',
+        customerSource: 'website',
+      },
+      // Enable shipping address collection if appropriate for physical products
+      shipping_address_collection: {
+        allowed_countries: ['US', 'CA'], // Allow US and Canada shipping addresses
+      }
+    };
+    
+    // Add shipping options if not already included in the order
+    if (!order.shippingIncluded) {
+      Object.assign(sessionParams, {
+        shipping_options: [
+          {
+            shipping_rate_data: {
+              type: 'fixed_amount',
+              fixed_amount: {
+                amount: order.shippingCost ? Math.round(order.shippingCost * 100) : 995, // Default to $9.95
+                currency: 'usd',
+              },
+              display_name: 'Standard Shipping',
+              delivery_estimate: {
+                minimum: {
+                  unit: 'business_day',
+                  value: 7,
+                },
+                maximum: {
+                  unit: 'business_day',
+                  value: 14,
+                },
+              },
+            },
+          },
+        ]
+      });
+    }
+    
+    // Create the Checkout Session - type assertion to satisfy TypeScript
+    const session = await stripeInstance.checkout.sessions.create({
+      ...sessionParams,
+      mode: 'payment' as Stripe.Checkout.SessionCreateParams.Mode
+    });
+    
+    console.log('Checkout session created with ID:', session.id);
+    return session;
+  } catch (error: any) {
+    console.error('Error creating checkout session:', error);
+    
+    if (error.type === 'StripeInvalidRequestError') {
+      throw new Error(`Invalid request: ${error.message}`);
+    }
+    
+    throw error;
+  }
 }
 
 export async function verifyCheckoutSession(sessionId: string) {
@@ -284,6 +368,92 @@ export async function createPaymentIntent(amount: number, customerId: string): P
  * @param user User object from the database
  * @returns The Stripe customer ID
  */
+/**
+ * Create a Payment Link for a product or order
+ * @param order Order or product details
+ * @returns The URL of the payment link
+ */
+export async function createPaymentLink(order: any): Promise<string> {
+  if (!stripeInstance) throw new Error('Stripe is not configured');
+  
+  try {
+    console.log('Creating Stripe Payment Link for order:', order.id);
+    
+    // Format the line items for the link
+    const lineItems = order.items.map((item: any) => {
+      return {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: item.name || `${item.productType || 'Jersey'} - ${item.size || 'One Size'}`,
+            description: item.description || `${item.sport || 'Custom'} ${item.productType || 'Jersey'}`,
+            images: item.imageUrl ? [item.imageUrl] : undefined,
+          },
+          unit_amount: Math.round(item.price * 100), // Convert to cents
+        },
+        quantity: item.quantity || 1,
+      };
+    });
+    
+    // Add any add-ons as separate line items if they exist
+    if (order.addOns && order.addOns.length > 0) {
+      order.addOns.forEach((addon: any) => {
+        if (addon.price && addon.price > 0) {
+          lineItems.push({
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: addon.name || 'Add-on',
+                description: addon.description || 'Additional service or product',
+              },
+              unit_amount: Math.round(addon.price * 100), // Convert to cents
+            },
+            quantity: addon.quantity || 1,
+          });
+        }
+      });
+    }
+    
+    // Create the payment link
+    const paymentLink = await stripeInstance.paymentLinks.create({
+      line_items: lineItems,
+      after_completion: {
+        type: 'redirect',
+        redirect: {
+          url: `${process.env.APP_URL || 'https://voro.replit.app'}/order-confirmation?payment_link_id={PAYMENT_LINK_ID}`,
+        },
+      },
+      shipping_address_collection: {
+        allowed_countries: ['US', 'CA'],
+      },
+      metadata: {
+        orderId: order.id?.toString() || 'new-order',
+        designId: order.designId?.toString() || '',
+        customerSource: 'payment_link',
+      },
+      custom_text: {
+        shipping_address: {
+          message: 'Please provide your shipping address for the jersey delivery.',
+        },
+        submit: {
+          message: 'We\'ll process your order as soon as payment is complete.',
+        },
+      },
+    });
+    
+    console.log('Payment link created with URL:', paymentLink.url);
+    return paymentLink.url;
+  } catch (error: any) {
+    console.error('Error creating payment link:', error);
+    
+    if (error.type === 'StripeInvalidRequestError') {
+      throw new Error(`Invalid request: ${error.message}`);
+    }
+    
+    throw error;
+  }
+}
+
 export async function createCustomer(user: any): Promise<string> {
   if (!stripeInstance) throw new Error('Stripe is not configured');
   
