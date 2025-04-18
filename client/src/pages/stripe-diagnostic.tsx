@@ -101,7 +101,7 @@ export default function StripeDiagnostic() {
       }]);
       
       try {
-        const stripe = await loadStripe(stripePublicKey);
+        const stripe = await loadStripe(stripePublicKey as string);
         
         if (!stripe) {
           setResults(prev => [
