@@ -180,12 +180,18 @@ export default function StripeElementsWrapper({
           </div>
         ) : error ? (
           <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>
+              <div className="font-semibold">Payment Error</div>
+              <div className="mt-1">{error}</div>
+              <div className="mt-2 text-xs text-muted-foreground">
+                If you're seeing this error repeatedly, please try refreshing the page or using a different payment method. You can also contact our support team for assistance.
+              </div>
+            </AlertDescription>
           </Alert>
         ) : clientSecret ? (
           <Elements stripe={stripePromise} options={{ clientSecret }}>
             <StripeElementsForm 
-              amount={typeof amount === 'number' ? Math.round(amount * 100) : 0} 
+              amount={typeof amount === 'number' ? amount : 0} 
               onSuccess={onSuccess}
               onCancel={onCancel}
             />

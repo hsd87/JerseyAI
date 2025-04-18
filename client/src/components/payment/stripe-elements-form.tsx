@@ -30,6 +30,19 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
       console.log('Waiting for Stripe Elements to load...');
     }
   }, [elements]);
+  
+  // Check Stripe initialization
+  useEffect(() => {
+    if (!stripe) {
+      console.log('Waiting for Stripe.js to load...');
+    } else {
+      console.log('Stripe initialized successfully:', {
+        stripeJs: 'loaded',
+        elementsLoaded: !!elements,
+        amount: amount
+      });
+    }
+  }, [stripe, elements, amount]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

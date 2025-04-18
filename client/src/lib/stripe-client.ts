@@ -25,13 +25,13 @@ function validateStripeKey(key: string | undefined): { isValid: boolean, keyType
   // Validate key type against environment
   if (isLiveKey && !isProdEnvironment) {
     console.warn('WARNING: Live Stripe key detected on non-production environment!');
-    console.warn('This is a security precaution to prevent accidental charges.');
-    console.warn('Using test key placeholder instead for safety.');
+    console.warn('This is a security risk that could lead to real charges.');
+    console.warn('Proceeding with the live key as it seems to be intended for testing.');
     
     return {
-      isValid: true, // We'll still try to use it but log warnings
+      isValid: true,
       keyType: 'live',
-      warning: 'Using live Stripe key in development environment'
+      warning: 'Using live Stripe key in development environment - this will process real payments!'
     };
   }
   
@@ -82,7 +82,19 @@ let stripePromise: ReturnType<typeof loadStripe> | null = null;
 
 // Only initialize if the key is valid
 if (keyValidation.isValid && stripeKey) {
-  stripePromise = loadStripe(stripeKey);
+  try {
+    // Attempt to load Stripe with the key
+    stripePromise = loadStripe(stripeKey);
+    
+    // Add error handling to the promise
+    stripePromise?.catch(err => {
+      console.error('Error initializing Stripe:', err);
+      // We'll still return the promise, and components can handle the rejection
+    });
+  } catch (err) {
+    console.error('Failed to initialize Stripe:', err);
+    stripePromise = null;
+  }
 } else {
   console.error('Failed to initialize Stripe - invalid or missing public key');
   // We'll return null and let components handle the error state
