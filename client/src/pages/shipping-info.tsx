@@ -689,7 +689,7 @@ export default function ShippingInfoPage() {
                     Back to Cart
                   </Button>
                   <Button type="submit" disabled={calculatingShipping || loading}>
-                    Continue to Payment
+                    Proceed to Payment
                     <CreditCard className="ml-2 h-4 w-4" />
                   </Button>
                 </CardFooter>
