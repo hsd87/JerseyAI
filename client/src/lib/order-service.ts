@@ -132,9 +132,12 @@ class OrderService {
       
       try {
         // Make API request with timeout using updated API that accepts AbortSignal
+        // Note: We send the amount in dollars (e.g., 250.00) and server will convert to cents
         const response = await apiRequest('POST', '/api/create-payment-intent', {
-          amount,
+          amount, // Amount in dollars (e.g., 250.00 = $250.00)
           items,
+          requestId: request.requestId,
+          componentId: request.componentId
         }, controller.signal);
         
         // Clear timeout if request completes
