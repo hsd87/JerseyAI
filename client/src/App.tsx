@@ -117,7 +117,7 @@ function AppContent() {
             <ProtectedRoute path="/checkout" component={CheckoutPage} />
           </Route>
           <Route path="/checkout-elements">
-            <ProtectedRoute path="/checkout-elements" component={CheckoutElementsPage} />
+            <CheckoutElementsPage />
           </Route>
           <Route path="/subscribe">
             <ProtectedRoute path="/subscribe" component={SubscribePage} />

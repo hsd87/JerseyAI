@@ -1,0 +1,69 @@
+🔧 Fix Stripe Checkout Issue: Payment Intent is Created, but UI Doesn’t Appear
+
+You're debugging a full-stack Stripe integration in a kit customization app. The backend successfully creates the Stripe payment intent or session, but the frontend doesn't proceed to payment or show the checkout UI.
+
+---
+
+✅ Step-by-Step Instructions:
+
+1. **Check if you're using Stripe Elements or Stripe Checkout Session**
+
+   - If using **Stripe Elements**:
+     - Ensure the `clientSecret` is fetched via API and passed to:
+       ```tsx
+       <Elements stripe={stripePromise} options={{ clientSecret }}>
+         <StripeForm />
+       </Elements>
+       ```
+     - Add `console.log("clientSecret:", clientSecret)` and show a loading/error UI if undefined
+
+   - If using **Checkout Session (Redirect method)**:
+     - You must manually redirect the user after getting the session ID:
+       ```tsx
+       const { sessionId } = await axios.post('/api/create-checkout-session')
+       window.location.href = `https://checkout.stripe.com/pay/${sessionId}`
+       ```
+
+---
+
+2. **Check Backend Endpoint Logic**
+
+   - In `server/stripe.ts` or `payment.ts`:
+     - Make sure you're returning the right value:
+       ```ts
+       res.json({ clientSecret }); // for Elements
+       or
+       res.json({ sessionId }); // for redirect checkout
+       ```
+
+   - Validate that `.env` has:
+     ```
+     STRIPE_SECRET_KEY=sk_test_...
+     STRIPE_PRICE_ID=price_123abc456
+     ```
+
+---
+
+3. **Debugging Tips**
+
+   - Add logging in both frontend and backend:
+     ```tsx
+     console.log("Received from backend:", clientSecret || sessionId);
+     ```
+     ```ts
+     console.log("Created Stripe intent/session:", intent.id || session.id);
+     ```
+
+   - Add a fallback message on UI if checkout is not ready:
+     ```tsx
+     if (!clientSecret) return <div>Preparing checkout...</div>;
+     ```
+
+---
+
+✅ Expected Outcome:
+- Payment intent is created
+- Client secret or session ID is received by the frontend
+- Stripe Elements renders OR checkout redirects
+
+🚫 Do NOT modify AI generation, form logic, or pricing structure. Only inspect and repair Stripe flow from backend to frontend UI.

@@ -51,8 +51,10 @@ export default function CheckoutElementsPage() {
     if (items.length === 0 && !paymentCompleted) {
       console.log('No items in cart, redirecting to designer page');
       setLocation('/designer');
+    } else {
+      console.log('Checkout started with', items.length, 'items, total amount:', totalAmount || calculatedTotal);
     }
-  }, [items, paymentCompleted, setLocation]);
+  }, [items, paymentCompleted, setLocation, totalAmount, calculatedTotal]);
 
   if (paymentCompleted) {
     return (
@@ -66,7 +68,7 @@ export default function CheckoutElementsPage() {
             <p className="text-center">Your payment has been processed successfully. Thank you for your purchase!</p>
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Button onClick={() => setLocation('/')}>Return to Home</Button>
+            <Button onClick={() => setLocation('/designer')}>Go to Designer</Button>
           </CardFooter>
         </Card>
       </div>
@@ -84,7 +86,7 @@ export default function CheckoutElementsPage() {
             <ShoppingCart className="h-16 w-16 text-muted-foreground" />
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Button onClick={() => setLocation('/')}>Return to Home</Button>
+            <Button onClick={() => setLocation('/designer')}>Go to Designer</Button>
           </CardFooter>
         </Card>
       </div>
