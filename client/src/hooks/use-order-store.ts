@@ -148,6 +148,57 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   
   setOrderDetails: (details: OrderDetails) => set({ orderDetails: details }),
   
+  // Update partial order details
+  updateOrderDetails: (details: Partial<OrderDetails>) => set((state) => ({
+    orderDetails: state.orderDetails 
+      ? { ...state.orderDetails, ...details } 
+      : details as OrderDetails
+  })),
+  
+  // Update order with customer info, shipping details, etc.
+  updateOrder: (data) => set((state) => {
+    const { customerInfo, shippingAddress, shippingOption, priceBreakdown } = data;
+    
+    // Create a new state object
+    const newState: Partial<OrderState> = {};
+    
+    // Update customer info if provided
+    if (customerInfo) {
+      newState.customerInfo = customerInfo;
+    }
+    
+    // Update order details if we have them already
+    if (state.orderDetails) {
+      newState.orderDetails = { ...state.orderDetails };
+      
+      // Update shipping address if provided
+      if (shippingAddress) {
+        newState.orderDetails.shippingAddress = shippingAddress;
+      }
+    } else if (shippingAddress) {
+      // Create order details if we don't have them yet
+      newState.orderDetails = {
+        items: state.items,
+        addOns: state.addOns,
+        isTeamOrder: state.isTeamOrder,
+        packageType: state.packageType || 'jerseyOnly',
+        shippingAddress
+      };
+    }
+    
+    // Update shipping option if provided
+    if (shippingOption) {
+      newState.shippingOption = shippingOption;
+    }
+    
+    // Update price breakdown if provided
+    if (priceBreakdown) {
+      newState.priceBreakdown = priceBreakdown;
+    }
+    
+    return newState;
+  }),
+  
   setPriceBreakdown: (breakdown: PriceBreakdown | null) => set({ 
     priceBreakdown: breakdown ?? defaultPriceBreakdown 
   }),

@@ -1,4 +1,14 @@
-import { ShippingAddress } from '@/types/order';
+/**
+ * Interface for shipping address
+ */
+export interface ShippingAddress {
+  name: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
 
 /**
  * Interface for shipping options

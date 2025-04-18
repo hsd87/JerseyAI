@@ -80,15 +80,31 @@ export interface OrderDetails {
 }
 
 export interface ShippingAddress {
-  firstName: string;
-  lastName: string;
+  name: string;
   street: string;
   city: string;
   state: string;
-  zipCode: string;
+  postalCode: string;
   country: string;
-  phone: string;
+}
+
+export interface CustomerInfo {
+  firstName: string;
+  lastName: string;
   email: string;
+  phone: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  additionalInfo?: string;
+}
+
+export interface ShippingOption {
+  id: string;
+  name: string;
+  price: number;
 }
 
 export interface OrderState {
@@ -136,6 +152,7 @@ export interface OrderState {
   // Order processing
   orderDetails: OrderDetails | null;
   setOrderDetails: (details: OrderDetails) => void;
+  updateOrderDetails: (details: Partial<OrderDetails>) => void;
   setPriceBreakdown: (breakdown: PriceBreakdown | null) => void;
   setSport: (sport: string) => void;
   setPackageType: (packageType: string) => void;
@@ -143,6 +160,16 @@ export interface OrderState {
   setPackageItems: (items: PackageItem[]) => void;
   setOrderCompleted: (completed: boolean) => void;
   setOrderCreatedAt?: (timestamp: string) => void;
+  
+  // Shipping and customer information
+  customerInfo?: CustomerInfo;
+  shippingOption?: ShippingOption;
+  updateOrder: (data: {
+    customerInfo?: CustomerInfo;
+    shippingAddress?: ShippingAddress;
+    shippingOption?: ShippingOption;
+    priceBreakdown?: PriceBreakdown;
+  }) => void;
   
   // Gender and sizing
   gender?: string;
