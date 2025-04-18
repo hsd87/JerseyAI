@@ -36,7 +36,10 @@ import {
 let stripePromise: Promise<Stripe | null> | null = null;
 const getStripePromise = () => {
   if (!stripePromise && import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    console.log('Checkout page: initializing Stripe with key prefix:', import.meta.env.VITE_STRIPE_PUBLIC_KEY.substring(0, 8));
     stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  } else if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    console.error('Checkout page: Missing Stripe public key (VITE_STRIPE_PUBLIC_KEY)');
   }
   return stripePromise;
 };
@@ -87,18 +90,40 @@ const CheckoutPage: React.FC = () => {
 
   // Create payment intent when page loads
   useEffect(() => {
-    if (!priceBreakdown) return;
+    if (!priceBreakdown || !cart || cart.length === 0) {
+      console.log('Skipping payment intent creation - missing price/cart data:', {
+        hasPriceBreakdown: !!priceBreakdown,
+        hasCart: !!cart,
+        cartLength: cart?.length || 0
+      });
+      return;
+    }
     
     const createPaymentIntent = async () => {
       setLoading(true);
+      console.log('Creating payment intent for checkout with:', {
+        amount: priceBreakdown.grandTotal,
+        cartItems: cart.length,
+        hasStripePromise: !!getStripePromise()
+      });
       
       try {
-        const { clientSecret } = await orderService.createPaymentIntent({
+        const response = await orderService.createPaymentIntent({
           amount: priceBreakdown.grandTotal,
           orderItems: cart || [],
         });
         
-        setClientSecret(clientSecret);
+        console.log('Payment intent created successfully:', { 
+          hasClientSecret: !!response.clientSecret,
+          clientSecretLength: response.clientSecret?.length,
+          amount: response.amount
+        });
+        
+        if (!response.clientSecret) {
+          throw new Error('No client secret returned from payment service');
+        }
+        
+        setClientSecret(response.clientSecret);
       } catch (error: any) {
         console.error('Payment intent creation failed:', error);
         
@@ -127,7 +152,7 @@ const CheckoutPage: React.FC = () => {
     };
     
     createPaymentIntent();
-  }, [priceBreakdown]);
+  }, [priceBreakdown, cart]);
 
   const handlePaymentSuccess = async () => {
     setOrderProcessing(true);

@@ -10,7 +10,10 @@ let stripePromise: Promise<Stripe | null> | null = null;
 
 const getStripePromise = () => {
   if (!stripePromise && import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    console.log('Initializing Stripe with key prefix:', import.meta.env.VITE_STRIPE_PUBLIC_KEY.substring(0, 8));
     stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  } else if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    console.error('Missing Stripe public key (VITE_STRIPE_PUBLIC_KEY)');
   }
   return stripePromise;
 };
@@ -36,12 +39,24 @@ export const StripePaymentWrapper: React.FC<StripePaymentWrapperProps> = ({
     const fetchPaymentIntent = async () => {
       try {
         setLoading(true);
+        console.log('Creating payment intent with:', {
+          amount,
+          itemsCount: items?.length,
+          hasItems: items?.length > 0
+        });
+        
         // This will call the /api/create-payment-intent endpoint
-        const { clientSecret } = await orderService.createPaymentIntent({
+        const response = await orderService.createPaymentIntent({
           amount: amount, // Use the amount prop
           orderItems: items // Use the items prop
         });
-        setClientSecret(clientSecret);
+        
+        console.log('Payment intent created successfully:', {
+          hasClientSecret: !!response.clientSecret,
+          secretLength: response.clientSecret?.length
+        });
+        
+        setClientSecret(response.clientSecret);
       } catch (err: any) {
         console.error('Error fetching payment intent:', err);
         setError(err.message || 'Failed to initialize payment');
@@ -50,7 +65,13 @@ export const StripePaymentWrapper: React.FC<StripePaymentWrapperProps> = ({
       }
     };
 
-    fetchPaymentIntent();
+    if (amount > 0 && items) {
+      fetchPaymentIntent();
+    } else {
+      console.error('Invalid amount or items:', { amount, items });
+      setError('Missing payment amount or order items');
+      setLoading(false);
+    }
   }, [items, amount]);
 
   if (loading) {
