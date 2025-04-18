@@ -931,11 +931,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Payment routes - importing from payment.ts for Stripe checkout flow
   try {
-    const { registerPaymentRoutes } = await import('./payment');
-    registerPaymentRoutes(app);
-    console.log('Payment routes registered successfully');
+    // We're excluding the payment routes registration to avoid conflicts
+    // with the implementation in this file (specifically the /api/create-payment-intent endpoint)
+    // const { registerPaymentRoutes } = await import('./payment');
+    // registerPaymentRoutes(app);
+    console.log('Payment routes managed directly in routes.ts');
   } catch (error) {
-    console.error('Error registering payment routes:', error);
+    console.error('Error managing payment routes:', error);
   }
   
   // Stripe health check endpoint
