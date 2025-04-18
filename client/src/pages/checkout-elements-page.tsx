@@ -105,7 +105,7 @@ export default function CheckoutElementsPage() {
                 {items.map((item) => (
                   <div key={item.id} className="flex justify-between">
                     <div>
-                      <p className="font-medium">{item.name || item.productType}</p>
+                      <p className="font-medium">{item.name || item.type}</p>
                       <p className="text-sm text-muted-foreground">
                         {item.size} | Qty: {item.quantity}
                       </p>

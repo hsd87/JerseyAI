@@ -444,7 +444,7 @@ export function registerPaymentRoutes(app: Express) {
       }
 
       // Create the payment intent
-      const clientSecret = await createPaymentIntent(amountInCents, customerId);
+      const clientSecret = await createPaymentIntent(amountInCents, customerId || '');
 
       res.json({
         clientSecret,

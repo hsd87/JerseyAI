@@ -269,7 +269,7 @@ export async function checkSubscriptionStatus(subscriptionId: string): Promise<{
 async function createPaymentIntentWithStripe(
   stripe: Stripe, 
   amount: number, 
-  customerId: string
+  customerId?: string | null
 ): Promise<string> {
   // Validate the amount (minimum 50 cents)
   if (!amount || amount < 50) {
@@ -285,16 +285,23 @@ async function createPaymentIntentWithStripe(
     // Add timing logs to track potential bottlenecks
     const startTime = Date.now();
     
-    // Create the payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
+    // Prepare payment intent data
+    const paymentIntentData: Stripe.PaymentIntentCreateParams = {
       amount: intAmount,
       currency: 'usd',
-      customer: customerId,
       payment_method_types: ['card'],
       automatic_payment_methods: {
         enabled: true,
       },
-    });
+    };
+    
+    // Only add customer if provided
+    if (customerId) {
+      paymentIntentData.customer = customerId;
+    }
+    
+    // Create the payment intent
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
     
     const duration = Date.now() - startTime;
     console.log(`Payment intent created in ${duration}ms with ID: ${paymentIntent.id}`);
@@ -329,7 +336,7 @@ async function createPaymentIntentWithStripe(
  * @param customerId Stripe customer ID
  * @returns The client secret for the payment intent
  */
-export async function createPaymentIntent(amount: number, customerId: string): Promise<string> {
+export async function createPaymentIntent(amount: number, customerId?: string | null): Promise<string> {
   // First validate the Stripe instance
   if (!stripeInstance) {
     console.error('Stripe instance not initialized when creating payment intent');
