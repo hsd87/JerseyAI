@@ -241,14 +241,14 @@ export async function calculateOrderAmount(items: any[], isSubscriber: boolean =
       quantity: item.quantity
     }));
     
-    // Use the pricing module to calculate the final price
+    // Use the simplified pricing module - no discounts, shipping, or taxes
     const priceResult = calculatePrice(cartItems, isSubscriber);
     
     // Return the grand total (already in cents)
     return priceResult.breakdown.grandTotal;
   } catch (error) {
     console.error('Error calculating order amount:', error);
-    // Fallback to simple calculation if pricing module fails
+    // Fallback to simple calculation - no discounts, shipping, or taxes
     return items.reduce((total, item) => {
       return total + Math.round((item.price * item.quantity) * 100);
     }, 0);

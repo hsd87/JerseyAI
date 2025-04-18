@@ -44,7 +44,7 @@ function orderDetailsToCartItems(orderDetails: OrderDetails): CartItem[] {
 
 /**
  * Calculate the price for an order based on its items and addons
- * Uses the dynamic pricing module that applies tier discounts, subscription discounts, and shipping costs
+ * Uses the simplified pricing model with no discounts, shipping costs, or taxes
  */
 export function calculateOrderPrice(orderData: InsertOrder, isSubscriber: boolean = false): {
   totalInCents: number;
@@ -76,13 +76,9 @@ export function calculateOrderPrice(orderData: InsertOrder, isSubscriber: boolea
       totalInCents: orderData.totalAmount,
       breakdown: {
         baseTotal: orderData.totalAmount,
-        tierDiscountApplied: "0%",
-        tierDiscountAmount: 0,
-        subscriptionDiscountApplied: "0%",
-        subscriptionDiscountAmount: 0,
-        subtotalAfterDiscounts: orderData.totalAmount,
-        shippingCost: 0,
-        grandTotal: orderData.totalAmount
+        subtotal: orderData.totalAmount,
+        grandTotal: orderData.totalAmount,
+        itemCount: 1 // Default to 1 if we can't determine the actual count
       }
     };
   }
