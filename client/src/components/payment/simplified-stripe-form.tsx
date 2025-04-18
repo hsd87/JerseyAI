@@ -166,10 +166,10 @@ const CheckoutForm: React.FC<{
       )}
       
       {paymentSuccess && (
-        <Alert variant="success" className="bg-green-50 border-green-200 text-green-800">
-          <ShieldCheck className="h-4 w-4 mr-2 text-green-600" />
-          <AlertDescription>Payment successful! Processing your order...</AlertDescription>
-        </Alert>
+        <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-md flex items-start">
+          <ShieldCheck className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
+          <span>Payment successful! Processing your order...</span>
+        </div>
       )}
 
       <PaymentElement />

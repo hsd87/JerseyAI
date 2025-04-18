@@ -48,9 +48,15 @@ const CheckoutPage: React.FC = () => {
 
   // Check for authentication and empty cart
   useEffect(() => {
-    // First check if user is logged in
+    // Enhanced authentication check with more detailed logging
     if (!user) {
-      console.log('User not authenticated, redirecting to auth page');
+      console.log('User authentication check failed:', {
+        userExists: !!user,
+        authState: 'unauthenticated',
+        currentUrl: window.location.pathname
+      });
+      
+      // Show a friendly toast notification
       toast({
         title: 'Login Required',
         description: 'Please login to continue with checkout',
@@ -59,11 +65,39 @@ const CheckoutPage: React.FC = () => {
       
       // Allow animations to complete before redirecting
       setTimeout(() => {
-        setLocation('/auth');
+        setLocation('/auth?redirect=checkout');
       }, 500);
       
       return; // Skip the rest of the initialization
     }
+    
+    // Additional check for user ID to ensure complete authentication
+    if (!user.id) {
+      console.warn('User object incomplete - missing ID:', {
+        userObject: user,
+        authState: 'incomplete'
+      });
+      
+      toast({
+        title: 'Authentication Error',
+        description: 'Your session appears to be incomplete. Please log in again.',
+        variant: 'destructive',
+      });
+      
+      // Redirect to auth page with return URL
+      setTimeout(() => {
+        setLocation('/auth?redirect=checkout');
+      }, 500);
+      
+      return;
+    }
+    
+    // Log successful authentication for debugging
+    console.log('User authenticated successfully:', {
+      userId: user.id,
+      username: user.username,
+      authState: 'authenticated'
+    });
     
     // Then check if cart is empty
     if (!cart || cart.length === 0) {
@@ -109,11 +143,26 @@ const CheckoutPage: React.FC = () => {
       return;
     }
     
-    // Check if user is authenticated first
-    if (!user) {
-      console.log('Skipping payment intent creation - user not authenticated');
+    // Enhanced authentication check for payment intent creation
+    if (!user || !user.id) {
+      console.log('Skipping payment intent creation - authentication issue:', {
+        userExists: !!user,
+        hasUserId: user ? !!user.id : false,
+        stage: 'payment_intent_creation'
+      });
       setLoading(false);
+      
+      // No need to show a toast here as the first useEffect will handle the redirect
       return;
+    }
+    
+    // Additional check for Stripe customer ID
+    if (!user.stripeCustomerId) {
+      console.warn('User missing Stripe customer ID - may cause payment creation issues:', {
+        userId: user.id,
+        hasStripeId: !!user.stripeCustomerId
+      });
+      // Continue anyway as the server will create a customer if needed
     }
     
     const createPaymentIntent = async () => {
@@ -344,7 +393,8 @@ const CheckoutPage: React.FC = () => {
     );
   };
 
-  if (!user) {
+  // Final authentication check before rendering main content
+  if (!user || !user.id) {
     return (
       <div className="container max-w-lg mx-auto py-12">
         <Card className="mt-6">
@@ -352,8 +402,16 @@ const CheckoutPage: React.FC = () => {
             <CardTitle>Login Required</CardTitle>
             <CardDescription>Please login to complete your purchase</CardDescription>
           </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Your session may have expired. Please login again to continue with your purchase.
+            </p>
+          </CardContent>
           <CardFooter>
-            <Button onClick={() => setLocation('/auth')} className="w-full">
+            <Button 
+              onClick={() => setLocation('/auth?redirect=checkout')} 
+              className="w-full"
+            >
               Login or Register
             </Button>
           </CardFooter>
