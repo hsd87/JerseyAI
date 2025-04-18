@@ -100,7 +100,8 @@ export default function OrderConfig({
     addItem,
     updateItem,
     removeItem,
-    clearItems
+    clearItems,
+    setOrderDetails
   } = useOrderStore();
   
   // Use design data from props if available, otherwise from store
@@ -689,7 +690,7 @@ export default function OrderConfig({
       toast({
         title: "Cart updated",
         description: "Proceeding to checkout...",
-        variant: "success",
+        variant: "default",
       });
       
       // Navigate to the checkout page with a slight delay to allow state updates
