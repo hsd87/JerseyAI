@@ -97,15 +97,20 @@ export async function createCustomer(user: User): Promise<string> {
   return customer.id;
 }
 
-export async function createSubscription(userId: number): Promise<{ clientSecret: string, subscriptionId: string }> {
+export async function createSubscription(
+  userId: number, 
+  providedCustomerId?: string
+): Promise<{ clientSecret: string, subscriptionId: string }> {
   if (!stripeInstance) throw new Error('Stripe is not configured');
   
   // Get user from database
   const user = await storage.getUser(userId);
   if (!user) throw new Error('User not found');
 
-  // Ensure user has a Stripe customer ID
-  let customerId = user.stripeCustomerId;
+  // Use provided customer ID if given, otherwise get from user record
+  let customerId = providedCustomerId || user.stripeCustomerId;
+  
+  // Create a new customer if needed
   if (!customerId) {
     customerId = await createCustomer(user);
   }
@@ -185,11 +190,11 @@ export async function cancelSubscription(subscriptionId: string): Promise<void> 
   await stripeInstance.subscriptions.cancel(subscriptionId);
 }
 
-export async function createPaymentIntent(amount: number, customerId: string): Promise<string> {
+export async function createPaymentIntent(amount: number, customerId?: string): Promise<string> {
   if (!stripeInstance) throw new Error('Stripe is not configured');
 
   try {
-    console.log(`Creating Stripe payment intent for ${amount} cents with customer ${customerId}`);
+    console.log(`Creating Stripe payment intent for ${amount} cents${customerId ? ` with customer ${customerId}` : ''}`);
     
     // Validate amount is a positive integer in cents
     if (!Number.isInteger(amount) || amount < 50) {

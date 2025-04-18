@@ -530,7 +530,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Get or create customer ID for the user
         const user = req.user;
-        if (!user.stripeCustomerId) {
+        
+        // Check if we need to create a new customer ID
+        let createNewCustomer = !user.stripeCustomerId;
+        
+        // Also check if we're using a live key with a test customer ID or vice versa
+        if (user.stripeCustomerId) {
+          const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+          const isLiveKey = stripeKey.startsWith('sk_live_') || stripeKey.startsWith('rk_live_');
+          const isLiveCustomer = user.stripeCustomerId.startsWith('cus_') && !user.stripeCustomerId.includes('_test_');
+          
+          if ((isLiveKey && !isLiveCustomer) || (!isLiveKey && isLiveCustomer)) {
+            console.log(`Key/customer mode mismatch. Key: ${isLiveKey ? 'live' : 'test'}, Customer: ${isLiveCustomer ? 'live' : 'test'}`);
+            console.log(`Creating new ${isLiveKey ? 'live' : 'test'} mode customer for user ${user.id}`);
+            createNewCustomer = true;
+          }
+        }
+        
+        // Create customer if needed
+        if (createNewCustomer) {
           console.log(`Creating Stripe customer for user ${user.id}`);
           await createCustomer(user);
           
@@ -577,7 +595,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Create payment intent with improved error handling
         console.log(`Creating payment intent for amount: ${finalAmount} cents with customer ID: ${user.stripeCustomerId}`);
-        const clientSecret = await createPaymentIntent(finalAmount, user.stripeCustomerId);
+        // Handle the possibility of null customerId
+        const customerId = user.stripeCustomerId || undefined;
+        const clientSecret = await createPaymentIntent(finalAmount, customerId);
         
         // Successful response
         console.log(`Payment intent created successfully for amount: ${finalAmount} cents`);
@@ -673,9 +693,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Create new subscription
+      // Check if we need to create a new customer due to test/live mode mismatch
+      const user = req.user;
+      let newCustomerId: string | undefined = undefined;
+      
+      if (user.stripeCustomerId) {
+        const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+        const isLiveKey = stripeKey.startsWith('sk_live_') || stripeKey.startsWith('rk_live_');
+        const isLiveCustomer = user.stripeCustomerId.startsWith('cus_') && !user.stripeCustomerId.includes('_test_');
+        
+        if ((isLiveKey && !isLiveCustomer) || (!isLiveKey && isLiveCustomer)) {
+          console.log(`Key/customer mode mismatch in subscription flow. Key: ${isLiveKey ? 'live' : 'test'}, Customer: ${isLiveCustomer ? 'live' : 'test'}`);
+          console.log(`Creating new ${isLiveKey ? 'live' : 'test'} mode customer for user ${user.id}`);
+          
+          const { createCustomer } = await import('./stripe');
+          newCustomerId = await createCustomer(user);
+          
+          // Update user record with the new customer ID
+          await storage.updateUserStripeCustomerId(user.id, newCustomerId);
+          console.log(`Updated user with new customer ID: ${newCustomerId}`);
+        }
+      }
+      
+      // Create new subscription with the appropriate customer ID
       console.log(`Creating new subscription for user ${req.user.id}`);
-      const result = await createSubscription(req.user.id);
+      const result = await createSubscription(req.user.id, newCustomerId);
       
       // Log success and return result
       console.log(`Successfully created subscription for user ${req.user.id}: ${result.subscriptionId}`);

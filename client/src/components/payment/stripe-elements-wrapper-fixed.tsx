@@ -185,7 +185,7 @@ export default function StripeElementsWrapper({
         ) : clientSecret ? (
           <Elements stripe={stripePromise} options={{ clientSecret }}>
             <StripeElementsForm 
-              amount={typeof amount === 'number' ? Math.round(amount * 100) : 0} 
+              amount={typeof amount === 'number' ? (amount < 50 ? Math.round(amount * 100) : amount) : 0} 
               onSuccess={onSuccess}
               onCancel={onCancel}
             />
