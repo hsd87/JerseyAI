@@ -1,227 +1,148 @@
-import React, { useState, useEffect } from 'react';
-import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import React, { useState } from 'react';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
-import { Loader2, AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
+import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface StripeElementsFormProps {
-  onSuccess?: (paymentIntent: any) => void;
-  onCancel?: () => void;
   amount: number;
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export default function StripeElementsForm({ onSuccess, onCancel, amount }: StripeElementsFormProps) {
+export default function StripeElementsForm({ amount, onSuccess, onCancel }: StripeElementsFormProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
-  const [succeeded, setSucceeded] = useState(false);
-  const [elementsReady, setElementsReady] = useState(false);
-  const { toast } = useToast();
-
-  // Track component instance for debugging
-  const componentId = React.useMemo(() => 
-    `stripe-form-${Math.random().toString(36).substring(2, 10)}`, 
-    []
-  );
-
-  // Reset error when elements change
-  useEffect(() => {
-    if (elements) {
-      setErrorMessage(undefined);
-      setElementsReady(true);
-      console.log(`[${componentId}] Stripe Elements loaded successfully`);
-    } else {
-      setElementsReady(false);
-      console.log(`[${componentId}] Waiting for Stripe Elements to load...`);
-    }
-  }, [elements, componentId]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
-  // Check Stripe initialization
-  useEffect(() => {
-    if (!stripe) {
-      console.log(`[${componentId}] Waiting for Stripe.js to load...`);
-    } else {
-      console.log(`[${componentId}] Stripe initialized successfully:`, {
-        stripeJs: 'loaded',
-        elementsLoaded: !!elements,
-        amount
-      });
-    }
-  }, [stripe, elements, amount, componentId]);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!stripe || !elements) {
-      console.error(`[${componentId}] Stripe or Elements not loaded`);
-      setErrorMessage('Payment system not fully loaded. Please try again.');
+      // Stripe.js has not loaded yet
       return;
     }
-
-    setIsLoading(true);
-    setErrorMessage(undefined);
-
+    
+    const cardElement = elements.getElement(CardElement);
+    
+    if (!cardElement) {
+      setError('Card element not found');
+      return;
+    }
+    
+    setIsProcessing(true);
+    setError(null);
+    
     try {
-      console.log(`[${componentId}] Processing payment for amount:`, amount);
-      
-      // Validate payment element data first
-      const { error: submitError } = await elements.submit();
-      if (submitError) {
-        console.error(`[${componentId}] Payment element validation error:`, submitError);
-        throw new Error(submitError.message || 'Please check your payment details');
-      }
-      
-      // Confirm the payment
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/order-confirmation`,
+      const { error: submitError, paymentIntent } = await stripe.confirmCardPayment('', {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            // These would typically come from form values
+            name: 'Customer Name',
+          },
         },
-        redirect: 'if_required',
       });
-
-      console.log(`[${componentId}] Payment confirmation response:`, {
-        hasError: !!error,
-        hasPaymentIntent: !!paymentIntent,
-        paymentIntentStatus: paymentIntent?.status
-      });
-
-      if (error) {
-        console.error(`[${componentId}] Payment confirmation error:`, error);
-        
-        // Format error message based on type
-        let errorMsg = error.message;
-        if (error.type === 'card_error') {
-          if (error.code === 'card_declined') {
-            errorMsg = 'Your card was declined. Please try a different payment method.';
-          } else if (error.code === 'expired_card') {
-            errorMsg = 'Your card has expired. Please try a different card.';
-          }
-        }
-        
-        setErrorMessage(errorMsg);
-        toast({
-          title: 'Payment failed',
-          description: errorMsg,
-          variant: 'destructive',
-        });
-      } else if (paymentIntent) {
-        console.log(`[${componentId}] Payment successful:`, paymentIntent.id);
-        // Payment succeeded
-        setSucceeded(true);
-        
-        toast({
-          title: 'Payment successful',
-          description: `Your payment for $${(amount || 0).toFixed(2)} was successful.`,
-        });
-        
-        if (onSuccess) {
-          onSuccess(paymentIntent);
-        }
-      } else {
-        console.warn(`[${componentId}] No payment intent or error returned - this is unusual`);
-        // This is an edge case but we should handle it
-        setErrorMessage('Payment status unclear. Please contact support if your card was charged.');
-        
-        toast({
-          title: 'Payment status unclear',
-          description: 'We couldn\'t confirm if your payment was processed. Please check your email for payment confirmation.',
-          variant: 'default',
-        });
-      }
-    } catch (err: any) {
-      console.error(`[${componentId}] Payment processing error:`, err);
-      setErrorMessage(err.message || 'An unexpected error occurred');
       
-      toast({
-        title: 'Payment error',
-        description: err.message || 'An unexpected error occurred',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
+      if (submitError) {
+        setError(submitError.message || 'An error occurred with your payment');
+        setIsProcessing(false);
+        return;
+      }
+      
+      // Payment success
+      setIsComplete(true);
+      setIsProcessing(false);
+      
+      // Notify parent of success
+      setTimeout(() => {
+        onSuccess();
+      }, 1000);
+      
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      setError(error.message || 'An unexpected error occurred');
+      setIsProcessing(false);
     }
   };
-
+  
+  const cardElementOptions = {
+    style: {
+      base: {
+        fontSize: '16px',
+        color: '#424770',
+        '::placeholder': {
+          color: '#aab7c4',
+        },
+      },
+      invalid: {
+        color: '#9e2146',
+      },
+    },
+    hidePostalCode: true,
+  };
+  
+  // Success view
+  if (isComplete) {
+    return (
+      <div className="flex flex-col items-center justify-center py-6">
+        <div className="bg-green-100 p-3 rounded-full mb-4">
+          <CheckCircle2 className="h-12 w-12 text-green-600" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2">Payment Successful!</h3>
+        <p className="text-center text-muted-foreground mb-8">
+          Your payment has been processed successfully. We're creating your order now.
+        </p>
+      </div>
+    );
+  }
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Complete Your Order</CardTitle>
-        <CardDescription>
-          Enter your payment details to finalize your purchase
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {errorMessage && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4 mr-2" />
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
+      <div className="space-y-2">
+        <Label htmlFor="card-element">Card Details</Label>
+        <div className="p-3 border rounded-md">
+          <CardElement id="card-element" options={cardElementOptions} />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          We use Stripe to process payments securely. Your card information is never stored on our servers.
+        </p>
+      </div>
+      
+      <div className="pt-4 flex justify-between">
+        <Button 
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isProcessing}
+        >
+          Back
+        </Button>
+        <Button
+          type="submit"
+          disabled={!stripe || isProcessing}
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>
+              Pay ${amount.toFixed(2)}
+            </>
           )}
-          
-          {succeeded && (
-            <Alert className="mb-4 bg-green-50 text-green-800 border-green-300">
-              <CheckCircle2 className="h-4 w-4 mr-2 text-green-600" />
-              <AlertDescription>Payment processed successfully!</AlertDescription>
-            </Alert>
-          )}
-          
-          <div className="rounded-md p-4 bg-card">
-            <PaymentElement />
-          </div>
-          
-          <div className="mt-2 text-sm text-muted-foreground">
-            <p className="flex items-center">
-              <ShieldCheck className="h-4 w-4 mr-1 text-primary" />
-              Your payment information is encrypted and secure
-            </p>
-          </div>
-          
-          <div className="flex justify-between mt-6">
-            {onCancel && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isLoading || succeeded}
-              >
-                Cancel
-              </Button>
-            )}
-            
-            <Button
-              type="submit"
-              disabled={!stripe || !elementsReady || isLoading || succeeded}
-              className={onCancel ? "ml-4" : "w-full"}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : succeeded ? (
-                <>
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Payment Complete
-                </>
-              ) : (
-                `Pay $${(amount || 0).toFixed(2)}`
-              )}
-              
-              {/* Debug amount information - hidden in production */}
-              {process.env.NODE_ENV === 'development' && (
-                <span className="sr-only">
-                  Amount: ${amount} (displayed as: ${(amount || 0).toFixed(2)})
-                </span>
-              )}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        </Button>
+      </div>
+    </form>
   );
 }

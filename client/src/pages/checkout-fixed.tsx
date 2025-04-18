@@ -421,7 +421,10 @@ export default function CheckoutFixedPage() {
         totalAmount: finalTotal,
         orderDetails: {
           items,
-          addOns,
+          addOns: addOns.map(addon => ({
+            ...addon,
+            name: addon.name || addon.type,
+          })),
           isTeamOrder: false,
           packageType: 'jerseyOnly',
           paymentMethod: 'stripe',
@@ -451,7 +454,7 @@ export default function CheckoutFixedPage() {
           country: customerInfo?.country || 'US',
         },
         paymentMethod: 'stripe',
-        designUrls,
+        designUrls: designUrls || { front: '', back: '' },
       });
       
       // Mark order as completed
