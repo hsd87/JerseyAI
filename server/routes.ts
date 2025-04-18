@@ -593,11 +593,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Round to ensure it's an integer (Stripe requires integer for cents)
         finalAmount = Math.round(finalAmount);
         
-        // Create payment intent with improved error handling
-        console.log(`Creating payment intent for amount: ${finalAmount} cents with customer ID: ${user.stripeCustomerId}`);
-        // Handle the possibility of null customerId
-        const customerId = user.stripeCustomerId || undefined;
-        const clientSecret = await createPaymentIntent(finalAmount, customerId);
+        // Create payment intent without customer ID to avoid test/live mode mismatch
+        console.log(`Creating payment intent for amount: ${finalAmount} cents without customer ID to avoid mode mismatch`);
+        // Skip customer ID entirely - this allows the payment to work regardless of test/live mode
+        const clientSecret = await createPaymentIntent(finalAmount);
         
         // Successful response
         console.log(`Payment intent created successfully for amount: ${finalAmount} cents`);

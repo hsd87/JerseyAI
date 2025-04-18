@@ -194,7 +194,11 @@ export async function createPaymentIntent(amount: number, customerId?: string): 
   if (!stripeInstance) throw new Error('Stripe is not configured');
 
   try {
-    console.log(`Creating Stripe payment intent for ${amount} cents${customerId ? ` with customer ${customerId}` : ''}`);
+    // If customerId is provided, log it (but skip using it to avoid test/live mode mismatch)
+    if (customerId) {
+      console.log(`Note: Customer ID ${customerId} provided but will be ignored to avoid test/live mode mismatch`);
+    }
+    console.log(`Creating Stripe payment intent for ${amount} cents without customer association`);
     
     // Validate amount is a positive integer in cents
     if (!Number.isInteger(amount) || amount < 50) {
@@ -205,7 +209,7 @@ export async function createPaymentIntent(amount: number, customerId?: string): 
     const paymentIntent = await stripeInstance.paymentIntents.create({
       amount, // Amount in cents
       currency: 'usd',
-      customer: customerId,
+      // Skip customer ID entirely to avoid test/live mode mismatches
       automatic_payment_methods: {
         enabled: true,
       },
