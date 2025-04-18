@@ -37,10 +37,21 @@ export default function StripeElementsWrapper({
       try {
         console.log(`Creating payment intent for amount: $${amount} with ${items.length} items`);
         
-        const response = await apiRequest('POST', '/api/create-payment-intent', {
-          amount,
-          items
-        });
+        console.log("Starting payment intent creation with timeout of 30 seconds");
+        
+        // Create an AbortController with a longer timeout (30 seconds)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        
+        try {
+          const response = await apiRequest('POST', '/api/create-payment-intent', {
+            amount,
+            items
+          }, controller.signal);
+          
+          // Clear the timeout
+          clearTimeout(timeoutId);
+          
         
         const data = await response.json();
         
