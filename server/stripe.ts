@@ -26,7 +26,7 @@ if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('s
 
 // Define the global variables
 export let stripeInstance: Stripe | null = null;
-export const SUBSCRIPTION_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1P5fLVCjzXg59EQpTjGcjjZM';
+export const SUBSCRIPTION_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_test_placeholder';
 
 // Initialize Stripe
 function initializeStripe(): Stripe | null {
@@ -102,28 +102,53 @@ export async function createSubscription(userId: number): Promise<{ clientSecret
     customerId = await createCustomer(user);
   }
 
-  // Create subscription
-  const subscription = await stripeInstance.subscriptions.create({
-    customer: customerId,
-    items: [{ price: SUBSCRIPTION_PRICE_ID }],
-    payment_behavior: 'default_incomplete',
-    payment_settings: { save_default_payment_method: 'on_subscription' },
-    expand: ['latest_invoice.payment_intent'],
-  });
+  try {
+    // Validate the price ID before creating subscription
+    if (SUBSCRIPTION_PRICE_ID === 'price_test_placeholder') {
+      console.warn('Using placeholder price ID. Please set a valid STRIPE_PRICE_ID in your environment.');
+      throw new Error('Subscription price not properly configured. Please contact support.');
+    }
+    
+    // Check if price exists before creating subscription
+    try {
+      await stripeInstance.prices.retrieve(SUBSCRIPTION_PRICE_ID);
+    } catch (priceError: any) {
+      console.error('Invalid price ID:', SUBSCRIPTION_PRICE_ID, priceError.message);
+      if (priceError.type === 'StripeInvalidRequestError') {
+        throw new Error(`Price ID ${SUBSCRIPTION_PRICE_ID} does not exist. Please configure a valid price ID.`);
+      }
+      throw priceError;
+    }
 
-  // Update user with subscription ID
-  await storage.updateUser(user.id, { 
-    stripeSubscriptionId: subscription.id 
-  });
+    // Create subscription with validated price
+    const subscription = await stripeInstance.subscriptions.create({
+      customer: customerId,
+      items: [{ price: SUBSCRIPTION_PRICE_ID }],
+      payment_behavior: 'default_incomplete',
+      payment_settings: { save_default_payment_method: 'on_subscription' },
+      expand: ['latest_invoice.payment_intent'],
+    });
 
-  // Get client secret for frontend payment confirmation
-  const invoice = subscription.latest_invoice as Stripe.Invoice;
-  const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+    // Update user with subscription ID
+    await storage.updateUser(user.id, { 
+      stripeSubscriptionId: subscription.id 
+    });
 
-  return {
-    clientSecret: paymentIntent.client_secret as string,
-    subscriptionId: subscription.id
-  };
+    // Get client secret for frontend payment confirmation
+    const invoice = subscription.latest_invoice as Stripe.Invoice;
+    const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+
+    return {
+      clientSecret: paymentIntent.client_secret as string,
+      subscriptionId: subscription.id
+    };
+  } catch (error) {
+    // Add subscription-specific context to error
+    console.error('Subscription creation failed:', error);
+    
+    // Re-throw with more context
+    throw error;
+  }
 }
 
 export async function checkSubscriptionStatus(subscriptionId: string): Promise<{

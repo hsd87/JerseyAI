@@ -155,7 +155,20 @@ class OrderService {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          const errorData = await response.json();
+          // Safely get error data even if response format is unexpected
+          let errorData: any = {};
+          try {
+            errorData = await response.json();
+          } catch (jsonError) {
+            console.error('Error parsing subscription error response:', jsonError);
+            // If we can't parse the JSON, create a basic error object based on status
+            errorData = { 
+              message: `Subscription error (${response.status})`, 
+              error: 'parse_error',
+              details: response.statusText 
+            };
+          }
+          
           console.error('Subscription creation error response:', errorData);
           
           // Handle specific error types
@@ -165,6 +178,12 @@ class OrderService {
             throw new Error('Authentication required. Please log in and try again.');
           } else if (errorData.error === 'stripe_auth_error') {
             throw new Error('Subscription system configuration error. Our team has been notified.');
+          } else if (errorData.error === 'stripe_invalid_request') {
+            // Handle missing or invalid price ID
+            if (errorData.details && errorData.details.includes('price')) {
+              throw new Error('Subscription plan is not properly configured. Please contact support.');
+            }
+            throw new Error(errorData.message || 'Invalid subscription request');
           } else if (errorData.error === 'stripe_connection_error') {
             throw new Error('Unable to connect to subscription service. Please try again later.');
           } else if (errorData.error === 'subscription_exists') {
