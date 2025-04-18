@@ -10,23 +10,33 @@ export function getStripe(): Stripe | null {
 export async function checkStripeApiKey(): Promise<{ valid: boolean, message: string }> {
   try {
     // Validate STRIPE_SECRET_KEY is present
-    if (!process.env.STRIPE_SECRET_KEY) {
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) {
       return { 
         valid: false, 
         message: "STRIPE_SECRET_KEY is not configured in the environment variables." 
       };
     }
 
-    // Check if the instance was initialized properly
-    if (!stripeInstance) {
-      return { 
-        valid: false, 
-        message: "Stripe instance failed to initialize." 
+    // Check that it starts with sk_test_ for test mode or sk_live_ for live mode
+    if (!stripeKey.startsWith('sk_test_') && !stripeKey.startsWith('sk_live_')) {
+      return {
+        valid: false,
+        message: "Invalid Stripe key format. Key must start with sk_test_ or sk_live_."
       };
     }
 
+    // Create a temporary Stripe instance to verify the key
+    // This ensures we're using the exact environment key and not any cached value
+    const tempStripe = new Stripe(stripeKey, { 
+      apiVersion: '2022-11-15' as any // Use a compatible API version
+    });
+    
     // Attempt to make a test API call to verify the key is working
-    const balance = await stripeInstance.balance.retrieve();
+    const balance = await tempStripe.balance.retrieve();
+    
+    // If we get here, the key is valid and working
+    console.log("✅ Stripe API key validated successfully with direct check");
     
     return { 
       valid: true, 

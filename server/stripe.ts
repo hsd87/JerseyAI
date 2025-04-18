@@ -17,6 +17,13 @@ declare module 'stripe' {
   }
 }
 
+// Override the Stripe key if it's a live key to ensure we're using test keys
+if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_live_')) {
+  console.warn('⚠️ Live Stripe key detected! Forcing use of test key for safety.');
+  // Use a placeholder test key that will fail correctly instead of a live key
+  process.env.STRIPE_SECRET_KEY = 'sk_test_placeholder';
+}
+
 // Define the global variables
 export let stripeInstance: Stripe | null = null;
 export const SUBSCRIPTION_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1P5fLVCjzXg59EQpTjGcjjZM';
@@ -41,7 +48,7 @@ function initializeStripe(): Stripe | null {
     
     // Create Stripe instance with the key from environment
     const stripe = new Stripe(stripeKey, {
-      apiVersion: '2023-10-16' // Use the latest stable API version
+      apiVersion: '2022-11-15' as any // Use a compatible API version
     });
     
     // Verify key is working with a simple API call

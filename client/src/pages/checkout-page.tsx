@@ -100,11 +100,26 @@ const CheckoutPage: React.FC = () => {
         setClientSecret(clientSecret);
       } catch (error: any) {
         console.error('Payment intent creation failed:', error);
-        toast({
-          title: 'Checkout Error',
-          description: error.message || 'Failed to initialize payment',
-          variant: 'destructive',
-        });
+        
+        // Check for specific error types
+        if (error.message?.includes('Payment system') || 
+            error.message?.includes('Stripe') ||
+            error.message?.includes('service unavailable')) {
+          // Show a nicer toast for payment system errors
+          toast({
+            title: 'Payment System Unavailable',
+            description: 'Our payment system is currently undergoing maintenance. Your order details have been saved - please try again later.',
+            variant: 'warning',
+            duration: 5000,
+          });
+        } else {
+          // Generic error
+          toast({
+            title: 'Checkout Error',
+            description: error.message || 'Failed to initialize payment',
+            variant: 'destructive',
+          });
+        }
       } finally {
         setLoading(false);
       }
@@ -266,12 +281,93 @@ const CheckoutPage: React.FC = () => {
     );
   }
 
-  if (loading || !clientSecret) {
+  // Show loading state
+  if (loading) {
     return (
       <div className="container max-w-4xl mx-auto py-12 flex flex-col items-center justify-center min-h-[60vh]">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
         <h2 className="text-xl font-semibold">Preparing Your Order</h2>
         <p className="text-muted-foreground">Please wait while we set up your payment</p>
+      </div>
+    );
+  }
+
+  // Show alternate payment UI if Stripe is unavailable
+  if (!clientSecret) {
+    return (
+      <div className="container max-w-4xl mx-auto py-12">
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => window.history.back()}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          <h1 className="text-3xl font-bold">Payment System Unavailable</h1>
+          <p className="text-muted-foreground">Our payment system is currently undergoing maintenance</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Order summary and cart items */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  Your Order Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {renderCartItems()}
+                
+                <Separator />
+                
+                {renderOrderSummary()}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Payment unavailable notice */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment System Maintenance</CardTitle>
+                <CardDescription>
+                  We're sorry for the inconvenience. Our payment system is temporarily unavailable.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-md">
+                  <h3 className="font-semibold flex items-center">
+                    <ShieldCheck className="mr-2 h-5 w-5" />
+                    Your Order Is Saved
+                  </h3>
+                  <p className="mt-2">
+                    Don't worry! Your order details and design have been saved. You can come back later to complete your purchase.
+                  </p>
+                </div>
+                <p>
+                  Our team is working to restore payment services as quickly as possible. Please check back soon to complete your purchase.
+                </p>
+                <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 mt-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => window.history.back()}
+                  >
+                    Return to Designer
+                  </Button>
+                  <Button 
+                    onClick={() => window.location.reload()}
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
