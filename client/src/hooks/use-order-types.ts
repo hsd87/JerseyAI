@@ -61,11 +61,14 @@ export interface TeamMember {
 }
 
 export interface PriceBreakdown {
-  // Removed all discounts, shipping costs, and taxes per user request
   subtotal: number;
   grandTotal: number;
   itemCount: number;
   baseTotal: number;
+  shipping?: number;
+  shippingCost?: number; // Added for compatibility
+  discount?: number;
+  tax?: number;
 }
 
 export interface OrderDetails {
@@ -77,6 +80,9 @@ export interface OrderDetails {
   paymentMethod?: string;
   shippingAddress?: ShippingAddress;
   priceBreakdown?: PriceBreakdown;
+  customerEmail?: string;
+  customerPhone?: string;
+  additionalInfo?: string;
 }
 
 export interface ShippingAddress {

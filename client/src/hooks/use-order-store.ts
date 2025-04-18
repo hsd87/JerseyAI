@@ -5,18 +5,12 @@ import { OrderState, OrderItem, TeamMember, AddOn, PriceBreakdown, OrderDetails,
 const defaultPriceBreakdown: PriceBreakdown = {
   subtotal: 0,
   discount: 0,
-  discountPercentage: 0,
-  shipping: 9.99,
+  shipping: 0,
+  shippingCost: 0,
   tax: 0,
   grandTotal: 0,
   itemCount: 0,
-  baseTotal: 0,
-  tierDiscountApplied: false,
-  tierDiscountAmount: 0,
-  subscriptionDiscountApplied: false,
-  subscriptionDiscountAmount: 0,
-  shippingFreeThresholdApplied: false,
-  priceBeforeTax: 0
+  baseTotal: 0
 };
 
 // Create the store with Zustand

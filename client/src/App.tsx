@@ -25,6 +25,7 @@ import OrderConfigurationPage from "@/pages/order-configuration-page";
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
 const CheckoutFixedPage = React.lazy(() => import('./pages/checkout-fixed')); // New fixed version
 const CheckoutElementsPage = React.lazy(() => import('./pages/checkout-elements-page'));
+const ShippingInfoPage = React.lazy(() => import('./pages/shipping-info')); // Add shipping info page
 const OrderConfirmationPage = React.lazy(() => import('./pages/order-confirmation'));
 const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
 const JerseyEditorPage = React.lazy(() => import('./pages/jersey-editor-page'));
@@ -124,6 +125,9 @@ function AppContent() {
           </Route>
           <Route path="/checkout-elements">
             <CheckoutElementsPage />
+          </Route>
+          <Route path="/shipping-info">
+            <ProtectedRoute path="/shipping-info" component={ShippingInfoPage} />
           </Route>
           <Route path="/subscribe">
             <ProtectedRoute path="/subscribe" component={SubscribePage} />

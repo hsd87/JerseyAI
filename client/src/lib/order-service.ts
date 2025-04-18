@@ -21,6 +21,9 @@ interface CreateOrderRequest {
   designUrls?: { front: string; back: string };
   prompt?: string;
   metadata?: Record<string, any>;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
 }
 
 class OrderService {

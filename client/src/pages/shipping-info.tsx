@@ -311,9 +311,14 @@ export default function ShippingInfoPage() {
           price: shippingOption.price
         },
         priceBreakdown: {
-          ...priceBreakdown,
+          subtotal: subtotal || 0,
+          baseTotal: subtotal || 0,
+          itemCount: cart.length,
           shippingCost: shippingOption.price,
-          grandTotal: subtotal + shippingOption.price
+          shipping: shippingOption.price,
+          discount: 0,
+          tax: 0,
+          grandTotal: (subtotal || 0) + shippingOption.price
         }
       });
       
