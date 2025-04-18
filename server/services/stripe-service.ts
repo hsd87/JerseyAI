@@ -18,11 +18,14 @@ export async function checkStripeApiKey(): Promise<{ valid: boolean, message: st
       };
     }
 
-    // Check that it starts with sk_test_ for test mode or sk_live_ for live mode
-    if (!stripeKey.startsWith('sk_test_') && !stripeKey.startsWith('sk_live_')) {
+    // Check that the key format is valid (standard or restricted keys)
+    if (!stripeKey.startsWith('sk_test_') && 
+        !stripeKey.startsWith('sk_live_') && 
+        !stripeKey.startsWith('rk_test_') && 
+        !stripeKey.startsWith('rk_live_')) {
       return {
         valid: false,
-        message: "Invalid Stripe key format. Key must start with sk_test_ or sk_live_."
+        message: "Invalid Stripe key format. Key must start with sk_test_, sk_live_, rk_test_, or rk_live_."
       };
     }
 

@@ -18,7 +18,9 @@ declare module 'stripe' {
 }
 
 // Override the Stripe key if it's a live key in non-production environments
-if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_live_')) {
+if (process.env.STRIPE_SECRET_KEY && 
+   (process.env.STRIPE_SECRET_KEY.startsWith('sk_live_') || 
+    process.env.STRIPE_SECRET_KEY.startsWith('rk_live_'))) {
   // Check if we're in a development or test environment
   const isDevEnvironment = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
   
@@ -55,7 +57,7 @@ function initializeStripe(): Stripe | null {
     console.log('Stripe secret key is configured -', {
       keyLength: stripeKey.length,
       keyPrefix: stripeKey.substring(0, 4) + '...',
-      isValid: stripeKey.startsWith('sk_')
+      isValid: stripeKey.startsWith('sk_') || stripeKey.startsWith('rk_')
     });
     
     // Create Stripe instance with the key from environment
