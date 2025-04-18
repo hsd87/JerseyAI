@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { useLocation } from 'wouter';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { useFormatPrice } from '@/hooks/use-format-price';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useOrderStore } from '@/hooks/use-order-store';
@@ -529,9 +531,39 @@ export default function OrderConfig({
 
   // Finalize order for checkout
   const finalizeOrderForCheckout = () => {
+    // Show loading toast
+    toast({
+      title: "Preparing checkout",
+      description: "Adding items to cart...",
+    });
+    
     // Clear any existing items first
     clearItems();
     
+    // Prepare order details for storage
+    const orderDetailsData = {
+      packageType: watchedPackageType,
+      isTeamOrder: watchedIsTeamOrder,
+      quantity: watchedQuantity,
+      designId: designId,
+      designUrls: designUrls,
+      sport: sport,
+      // Save price breakdown information
+      priceDetails: {
+        basePrice: packageUnitPrice,
+        subtotal: totalPrice,
+        tax: totalPrice * 0.07,
+        shipping: 9.99,
+        totalAmount: totalPrice * 1.07 + 9.99,
+      }
+    };
+    
+    // Save order details to store
+    if (setOrderDetails) {
+      setOrderDetails(orderDetailsData);
+    }
+    
+    // Process team order
     if (watchedIsTeamOrder) {
       // Process team order using the team member items
       teamMembers.forEach(member => {
@@ -551,7 +583,8 @@ export default function OrderConfig({
               quantity: 1,
               gender: item.itemType === 'socks' ? 'Unisex' : member.gender,
               price: item.price,
-              customValue: item.itemType === 'jersey' ? member.number : undefined
+              customValue: item.itemType === 'jersey' ? member.number : undefined,
+              designId: designId, // Add design ID reference
             });
           });
         } else {
@@ -565,7 +598,8 @@ export default function OrderConfig({
             quantity: 1,
             gender: member.gender,
             price: calculatePackageBasePrice('jerseyOnly'),
-            customValue: member.number
+            customValue: member.number,
+            designId: designId,
           });
           
           // Add shorts if applicable
@@ -577,7 +611,8 @@ export default function OrderConfig({
               size: member.size,
               quantity: 1,
               gender: member.gender,
-              price: 29.99
+              price: 29.99,
+              designId: designId,
             });
           }
           
@@ -590,7 +625,8 @@ export default function OrderConfig({
               size: 'One Size',
               quantity: 1,
               gender: 'Unisex',
-              price: 12.99
+              price: 12.99,
+              designId: designId,
             });
           }
         }
@@ -609,7 +645,8 @@ export default function OrderConfig({
                   size: sizeInfo.size,
                   quantity: sizeInfo.quantity,
                   gender: item.gender,
-                  price: watchedPackageType === 'custom' ? (packageUnitPrice / packageItems.length) : item.price
+                  price: watchedPackageType === 'custom' ? (packageUnitPrice / packageItems.length) : item.price,
+                  designId: designId,
                 });
               }
             });
@@ -618,11 +655,27 @@ export default function OrderConfig({
       }
     }
     
+    // Add any add-ons to the cart
+    if (addOns && addOns.length > 0) {
+      addOns.forEach(addon => {
+        if (addon && addon.quantity > 0) {
+          addItem({
+            id: `addon-${addon.id}`,
+            type: 'addon',
+            name: addon.name,
+            size: 'One Size',
+            quantity: addon.quantity,
+            gender: 'Unisex',
+            price: addon.price,
+          });
+        }
+      });
+    }
+    
     // Log order information
     console.log('Order finalized and ready for checkout');
     
     // Navigate to checkout page with the order information
-    // We use the navigate function from the useLocation hook
     try {
       // Save a timestamp with the order using the proper method
       const orderStore = useOrderStore.getState();
@@ -630,10 +683,24 @@ export default function OrderConfig({
         orderStore.setOrderCreatedAt(new Date().toISOString());
       }
       
-      // Navigate to the checkout page
-      navigate('/checkout');
+      // Success toast
+      toast({
+        title: "Cart updated",
+        description: "Proceeding to checkout...",
+        variant: "success",
+      });
+      
+      // Navigate to the checkout page with a slight delay to allow state updates
+      setTimeout(() => {
+        navigate('/checkout');
+      }, 300);
     } catch (error) {
       console.error('Error navigating to checkout:', error);
+      toast({
+        title: "Error",
+        description: "Failed to proceed to checkout. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
