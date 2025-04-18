@@ -194,7 +194,7 @@ export default function OrderSummary({
                   const cartItems = getCartItems();
                   if (cartItems.length > 0) {
                     console.log("Proceeding to checkout with", cartItems.length, "items");
-                    setLocation("/checkout");
+                    setLocation("/checkout-elements");
                   } else {
                     console.warn("Empty cart detected despite items being present");
                     setLocation("/designer");

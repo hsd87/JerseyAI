@@ -15,6 +15,13 @@ export default function CheckoutElementsPage() {
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  
+  // Calculate total from items as a fallback if totalAmount is not available
+  const calculatedTotal = React.useMemo(() => {
+    return items.reduce((total, item) => {
+      return total + (item.price * (item.quantity || 1));
+    }, 0);
+  }, [items]);
 
   // Use the order ID from the route if it exists
   const orderId = match ? params?.orderId : null;
