@@ -623,6 +623,76 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+  
+  /**
+   * Update an order with invoice information
+   */
+  async updateOrderInvoice(orderId: number, invoiceData: { 
+    invoiceNumber: string; 
+    invoiceUrl: string;
+    invoiceDate: string;
+  }): Promise<Order> {
+    try {
+      // Get current order data
+      const [currentOrder] = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.id, orderId));
+      
+      if (!currentOrder) {
+        throw new Error(`Order ${orderId} not found`);
+      }
+      
+      // Parse existing metadata or initialize if none
+      let metadata = {};
+      if (currentOrder.metadata) {
+        if (typeof currentOrder.metadata === 'string') {
+          metadata = JSON.parse(currentOrder.metadata);
+        } else {
+          metadata = currentOrder.metadata;
+        }
+      }
+      
+      // Add invoice data to metadata
+      metadata = {
+        ...metadata,
+        invoice: invoiceData
+      };
+      
+      // Update the order record
+      const [updatedOrder] = await db
+        .update(orders)
+        .set({ 
+          metadata: JSON.stringify(metadata)
+        })
+        .where(eq(orders.id, orderId))
+        .returning();
+      
+      if (!updatedOrder) {
+        throw new Error(`Failed to update order ${orderId}`);
+      }
+      
+      // Format the order data for return
+      return {
+        ...updatedOrder,
+        orderDetails: typeof updatedOrder.orderDetails === 'string' 
+          ? JSON.parse(updatedOrder.orderDetails) 
+          : updatedOrder.orderDetails,
+        shippingAddress: typeof updatedOrder.shippingAddress === 'string' 
+          ? JSON.parse(updatedOrder.shippingAddress) 
+          : updatedOrder.shippingAddress,
+        designUrls: typeof updatedOrder.designUrls === 'string' 
+          ? JSON.parse(updatedOrder.designUrls) 
+          : updatedOrder.designUrls,
+        metadata: typeof updatedOrder.metadata === 'string' 
+          ? JSON.parse(updatedOrder.metadata) 
+          : updatedOrder.metadata
+      };
+    } catch (error) {
+      console.error('Error updating order invoice:', error);
+      throw error;
+    }
+  }
 }
 
 // Export database storage instead of memory storage
