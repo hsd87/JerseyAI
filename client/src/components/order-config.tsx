@@ -85,6 +85,8 @@ export default function OrderConfig({
   onBackToCustomization 
 }: OrderConfigProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const { formatPrice } = useFormatPrice();
   const [, navigate] = useLocation();
   const { 
     packageType = 'jerseyOnly',
