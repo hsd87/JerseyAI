@@ -983,14 +983,21 @@ export default function CheckoutFixedPage() {
               <CardContent className="space-y-4">
                 {clientSecret ? (
                   <Elements stripe={stripePromise} options={{ clientSecret }}>
-                    <StripeElementsForm
-                      amount={finalTotal}
-                      onSuccess={handlePaymentSuccess}
-                      onCancel={() => {
-                        setCheckoutStep(CheckoutStep.SHIPPING_INFO);
-                        setCheckoutProgress(33);
-                      }}
-                    />
+                    {/* Store client secret in window object for the form to access */}
+                    {(() => {
+                      // Make the client secret available to the StripeElementsForm
+                      (window as any).stripeClientSecret = clientSecret;
+                      return (
+                        <StripeElementsForm
+                          amount={finalTotal}
+                          onSuccess={handlePaymentSuccess}
+                          onCancel={() => {
+                            setCheckoutStep(CheckoutStep.SHIPPING_INFO);
+                            setCheckoutProgress(33);
+                          }}
+                        />
+                      );
+                    })()}
                   </Elements>
                 ) : error ? (
                   <Alert variant="destructive">

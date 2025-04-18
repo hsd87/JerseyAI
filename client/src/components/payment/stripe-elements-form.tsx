@@ -37,7 +37,16 @@ export default function StripeElementsForm({ amount, onSuccess, onCancel }: Stri
     setError(null);
     
     try {
-      const { error: submitError, paymentIntent } = await stripe.confirmCardPayment('', {
+      // Get the clientSecret from the Stripe Elements wrapper
+      const clientSecret = (window as any).stripeClientSecret;
+      
+      if (!clientSecret) {
+        setError('Payment setup error: Missing client secret');
+        setIsProcessing(false);
+        return;
+      }
+
+      const { error: submitError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardElement,
           billing_details: {
