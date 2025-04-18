@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { validateStripeKey, logStripeKeyInfo } from "@/lib/stripe-key-validator";
 import StripeElementsWrapper from "@/components/payment/stripe-elements-wrapper-fixed";
+import { useLocation } from "wouter";
 
 interface TestResult {
   test: string;
@@ -325,21 +326,28 @@ export default function StripeDiagnostic() {
           <div className="flex flex-col gap-2">
             <h3 className="text-sm font-medium">Test Payment Flows:</h3>
             <div className="flex flex-wrap gap-2">
-              <Link href="/checkout">
-                <Button variant="outline" size="sm">
-                  Original Checkout
-                </Button>
-              </Link>
-              <Link href="/checkout-fixed">
-                <Button variant="outline" size="sm" className="bg-green-50">
-                  Fixed Checkout
-                </Button>
-              </Link>
-              <Link href="/checkout-elements">
-                <Button variant="outline" size="sm">
-                  Elements Checkout
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.location.href = "/checkout"}
+              >
+                Original Checkout
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="bg-green-50"
+                onClick={() => window.location.href = "/checkout-fixed"}
+              >
+                Fixed Checkout
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.location.href = "/checkout-elements"}
+              >
+                Elements Checkout
+              </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               After running diagnostics, try the payment flows above to test in action
