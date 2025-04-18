@@ -67,7 +67,7 @@ export async function checkStripeApiKey(): Promise<{ valid: boolean, message: st
     // For standard keys, use the Stripe library (more reliable for non-restricted keys)
     // Create a temporary Stripe instance to verify the key
     const tempStripe = new Stripe(stripeKey, { 
-      apiVersion: '2022-11-15' as any // Use a compatible API version
+      apiVersion: '2023-10-16' as any // Use the latest API version for best compatibility
     });
     
     // Attempt to make a test API call to verify the key is working
@@ -395,7 +395,7 @@ export async function createPaymentIntent(amount: number, customerId?: string | 
     try {
       console.log('Creating local Stripe instance for payment intent');
       const localStripeInstance = new Stripe(stripeKey, {
-        apiVersion: '2022-11-15' as any // Use compatible API version
+        apiVersion: '2023-10-16' as any // Use the latest API version for best compatibility
       });
       
       // Use the local instance for this request

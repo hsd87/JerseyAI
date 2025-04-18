@@ -56,7 +56,7 @@ function initializeStripe(): Stripe | null {
     
     // Create Stripe instance with the key from environment
     const stripe = new Stripe(stripeKey, {
-      apiVersion: '2023-10-16' // Use the latest API version for best compatibility
+      apiVersion: '2023-10-16' as any // Use the latest API version with type assertion
     });
     
     // Verify key is working with a simple API call
