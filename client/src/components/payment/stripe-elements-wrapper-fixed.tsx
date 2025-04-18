@@ -15,12 +15,15 @@ let stripePromise: Promise<Stripe | null> | null = null;
 // Utility function to initialize Stripe safely
 const initStripe = () => {
   if (!stripePromise) {
-    const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+    // Use the provided live key directly
+    const stripeKey = 'pk_live_51QAbrIHFoCUNb2Ppc7kzDStznKQGD4waxbo6mncC4KLmCUMV71jk1JJGahmEuRqD6RdLHshi5NCOcP9mUmJktMM600pWPqXPDF';
     
     if (!stripeKey) {
       console.error('Missing Stripe public key');
       return false;
     }
+    
+    console.log('Using live Stripe key:', stripeKey.substring(0, 7) + '...' + stripeKey.substring(stripeKey.length - 4));
     
     console.log('Initializing Stripe with key info:', {
       keyPrefix: stripeKey.substring(0, 7),

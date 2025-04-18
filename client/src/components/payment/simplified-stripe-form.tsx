@@ -10,33 +10,20 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 let stripePromise: Promise<Stripe | null> | null = null;
 
 export const initializeStripe = () => {
-  // Always check the env variable to ensure it's loaded
-  const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+  // Using the provided live key directly
+  const stripeKey = 'pk_live_51QAbrIHFoCUNb2Ppc7kzDStznKQGD4waxbo6mncC4KLmCUMV71jk1JJGahmEuRqD6RdLHshi5NCOcP9mUmJktMM600pWPqXPDF';
   
   if (!stripePromise && stripeKey) {
     try {
       // Log information about the key for debugging (securely)
-      console.log('Initializing Stripe with key information:', {
-        keyPrefix: stripeKey.substring(0, 7), // Show just "pk_test_" prefix
+      console.log('Initializing Stripe with live key:', stripeKey.substring(0, 7) + '...' + stripeKey.substring(stripeKey.length - 4));
+      console.log('Key properties:', {
         keyLength: stripeKey.length,
-        isTestKey: stripeKey.startsWith('pk_test_'),
         isLiveKey: stripeKey.startsWith('pk_live_')
       });
       
-      // Check for common issues with Stripe keys
-      if (stripeKey.startsWith('pk_live_') && window.location.hostname !== 'voro.com') {
-        // Using live key on non-production environment - safety override
-        console.warn('WARNING: Live Stripe key detected on non-production environment!');
-        console.warn('Refusing to initialize live Stripe integration on development or staging environment.');
-        console.warn('This is a security precaution to prevent accidental charges.');
-        
-        // Force use of test key with warning
-        const testKeyPlaceholder = 'pk_test_51P3pFOCjzXg59EQpClvaxeHXwQMDdEaiEZpITsYQlPnStS7HaMcKVGgP8LbYxIQlC5jyKbP5rYlKNlp7E60C00jMAIrV3JL';
-        console.warn('Using test key placeholder instead for safety.');
-        
-        stripePromise = loadStripe(testKeyPlaceholder);
-        return true;
-      }
+      // Using live key as provided in all environments
+      console.log('Using live Stripe key in current environment');
 
       // Initialize Stripe with the public key
       stripePromise = loadStripe(stripeKey);

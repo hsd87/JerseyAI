@@ -2,7 +2,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { validateStripeKey, logStripeKeyInfo } from './stripe-key-validator';
 
 // Environment validation check
-const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+// Using the directly provided live key
+const stripeKey = 'pk_live_51QAbrIHFoCUNb2Ppc7kzDStznKQGD4waxbo6mncC4KLmCUMV71jk1JJGahmEuRqD6RdLHshi5NCOcP9mUmJktMM600pWPqXPDF';
 
 // Log detailed information about the key for debugging
 logStripeKeyInfo();
