@@ -109,7 +109,7 @@ const CheckoutPage: React.FC = () => {
           toast({
             title: 'Payment System Unavailable',
             description: 'Our payment system is currently undergoing maintenance. Your order details have been saved - please try again later.',
-            variant: 'warning',
+            variant: 'destructive',
             duration: 5000,
           });
         } else {
@@ -143,7 +143,18 @@ const CheckoutPage: React.FC = () => {
           size: item.size,
           gender: item.gender,
         })) || [],
-        orderDetails: orderDetails || {
+        orderDetails: orderDetails ? {
+          // Convert client-side OrderDetails to the format expected by the backend API
+          items: orderDetails.items || [],
+          // Ensure addOns have required properties for OrderAddOn type
+          addOns: (orderDetails.addOns || []).map(addon => ({
+            name: addon.name || addon.id || 'Unknown Add-on',
+            price: addon.price,
+            quantity: addon.quantity
+          })),
+          isTeamOrder: orderDetails.isTeamOrder || false,
+          packageType: orderDetails.packageType || '',
+        } : {
           items: [],
           addOns: [],
           isTeamOrder: false,

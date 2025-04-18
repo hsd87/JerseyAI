@@ -298,17 +298,78 @@ class OrderService {
    */
   async createOrder(request: CreateOrderRequest): Promise<Order> {
     try {
-      const response = await apiRequest('POST', '/api/orders', request);
+      // Set a reasonable timeout for order creation
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 seconds timeout for order creation
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create order');
+      try {
+        // Make API request with timeout
+        const response = await apiRequest('POST', '/api/orders', request, controller.signal);
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Order creation error response:', errorData);
+          
+          // Handle specific error types
+          if (errorData.error === 'authentication_required' || response.status === 401) {
+            throw new Error('Authentication required. Please log in and try again.');
+          } else if (errorData.error === 'validation_error') {
+            throw new Error('Please check your order details and try again.');
+          } else if (errorData.error === 'design_not_found') {
+            throw new Error('The selected design could not be found. Please choose another design.');
+          } else {
+            throw new Error(errorData.message || 'Failed to create order');
+          }
+        }
+        
+        return await response.json();
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error('Order creation request timed out after 20 seconds');
+          
+          // Try to save the order locally or in session storage for recovery
+          try {
+            const orderBackup = JSON.stringify(request);
+            sessionStorage.setItem('pendingOrder', orderBackup);
+            console.log('Order details saved to session storage for recovery');
+          } catch (storageError) {
+            console.error('Failed to save order to session storage:', storageError);
+          }
+          
+          throw new Error('Order creation is taking longer than expected. Your order details have been saved and you can try again later.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
       }
-      
-      return await response.json();
     } catch (error: any) {
       console.error('Order creation error:', error);
-      throw new Error(error.message || 'Order creation failed');
+      
+      // Log detailed error info for debugging
+      console.log('Order creation error details:', { 
+        message: error.message, 
+        name: error.name, 
+        stack: error.stack
+      });
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('The order system is responding slowly. Your order details have been saved and you can try again later.');
+      }
+      
+      // Rethrow specific errors or use a generic message
+      throw new Error(error.message || 'Order creation failed. Please try again later.');
     }
   }
 
@@ -317,17 +378,57 @@ class OrderService {
    */
   async getOrders(): Promise<Order[]> {
     try {
-      const response = await apiRequest('GET', '/api/orders');
+      // Set a reasonable timeout for fetching orders
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch orders');
+      try {
+        // Make API request with timeout
+        const response = await apiRequest('GET', '/api/orders', undefined, controller.signal);
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Order fetch error response:', errorData);
+          
+          // Handle specific error types
+          if (errorData.error === 'authentication_required' || response.status === 401) {
+            throw new Error('Authentication required. Please log in to view your orders.');
+          } else {
+            throw new Error(errorData.message || 'Failed to fetch orders');
+          }
+        }
+        
+        return await response.json();
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error('Order fetch request timed out after 15 seconds');
+          throw new Error('The system is taking too long to fetch your orders. Please try again later.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
       }
-      
-      return await response.json();
     } catch (error: any) {
       console.error('Order fetch error:', error);
-      throw new Error(error.message || 'Failed to fetch orders');
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('The system is responding slowly. Please try again later.');
+      }
+      
+      // Rethrow specific errors or use a generic message
+      throw new Error(error.message || 'Failed to fetch your orders. Please try again later.');
     }
   }
 
@@ -336,17 +437,59 @@ class OrderService {
    */
   async getOrderById(orderId: number): Promise<Order> {
     try {
-      const response = await apiRequest('GET', `/api/orders/${orderId}`);
+      // Set a reasonable timeout for fetching order details
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch order');
+      try {
+        // Make API request with timeout
+        const response = await apiRequest('GET', `/api/orders/${orderId}`, undefined, controller.signal);
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error(`Order ${orderId} fetch error response:`, errorData);
+          
+          // Handle specific error types
+          if (errorData.error === 'authentication_required' || response.status === 401) {
+            throw new Error('Authentication required. Please log in to view this order.');
+          } else if (errorData.error === 'order_not_found' || response.status === 404) {
+            throw new Error('Order not found. It may have been deleted or you may not have permission to view it.');
+          } else {
+            throw new Error(errorData.message || 'Failed to fetch order details');
+          }
+        }
+        
+        return await response.json();
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error(`Order ${orderId} fetch request timed out after 15 seconds`);
+          throw new Error('The system is taking too long to fetch your order details. Please try again later.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
+      }
+    } catch (error: any) {
+      console.error(`Order ${orderId} fetch error:`, error);
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('The system is responding slowly. Please try again later.');
       }
       
-      return await response.json();
-    } catch (error: any) {
-      console.error('Order fetch error:', error);
-      throw new Error(error.message || 'Failed to fetch order details');
+      // Rethrow specific errors or use a generic message
+      throw new Error(error.message || 'Failed to fetch order details. Please try again later.');
     }
   }
 }
