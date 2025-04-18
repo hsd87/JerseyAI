@@ -511,6 +511,140 @@ class OrderService {
       throw new Error(error.message || 'Failed to fetch order details. Please try again later.');
     }
   }
+  
+  /**
+   * Get payment status for an order including invoice information if available
+   */
+  async getPaymentStatus(orderId: number): Promise<any> {
+    try {
+      // Set a reasonable timeout for fetching payment status
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      
+      try {
+        // Make API request with timeout
+        const response = await apiRequest('GET', `/api/payment/status/${orderId}`, undefined, controller.signal);
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error(`Payment status for order ${orderId} fetch error:`, errorData);
+          
+          // Handle specific error types
+          if (errorData.error === 'authentication_required' || response.status === 401) {
+            throw new Error('Authentication required. Please log in to view payment status.');
+          } else if (errorData.error === 'order_not_found' || response.status === 404) {
+            throw new Error('Order not found. It may have been deleted or you may not have permission to view it.');
+          } else {
+            throw new Error(errorData.message || 'Failed to fetch payment status');
+          }
+        }
+        
+        return await response.json();
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error(`Payment status fetch request timed out after 15 seconds`);
+          throw new Error('The system is taking too long to fetch payment status. Please try again later.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
+      }
+    } catch (error: any) {
+      console.error(`Payment status fetch error for order ${orderId}:`, error);
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('The system is responding slowly. Please try again later.');
+      }
+      
+      // Rethrow specific errors or use a generic message
+      throw new Error(error.message || 'Failed to fetch payment status. Please try again later.');
+    }
+  }
+  
+  /**
+   * Get the invoice for an order
+   * @param orderId The order ID
+   * @param format Optional format (json or html)
+   * @returns Invoice data or URL
+   */
+  async getInvoice(orderId: number, format: 'json' | 'url' = 'json'): Promise<any> {
+    try {
+      // For URL format, return the URL directly (will be redirected on server)
+      if (format === 'url') {
+        return {
+          invoiceUrl: `/api/payment/invoice/${orderId}`
+        };
+      }
+      
+      // Set a reasonable timeout for fetching invoice
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      
+      try {
+        // Make API request with timeout
+        const response = await apiRequest('GET', `/api/payment/invoice/${orderId}?format=json`, undefined, controller.signal);
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error(`Invoice fetch error for order ${orderId}:`, errorData);
+          
+          // Handle specific error types
+          if (errorData.error === 'authentication_required' || response.status === 401) {
+            throw new Error('Authentication required. Please log in to view invoice.');
+          } else if (errorData.error === 'order_not_found' || response.status === 404) {
+            throw new Error('Invoice not found. The order may be pending or not completed.');
+          } else if (errorData.error === 'invoice_generation_failed' || response.status === 500) {
+            throw new Error('Failed to generate invoice. Please try again later or contact support.');
+          } else {
+            throw new Error(errorData.message || 'Failed to fetch invoice');
+          }
+        }
+        
+        return await response.json();
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error(`Invoice fetch request timed out after 15 seconds`);
+          throw new Error('The system is taking too long to fetch invoice. Please try again later.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
+      }
+    } catch (error: any) {
+      console.error(`Invoice fetch error for order ${orderId}:`, error);
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('The system is responding slowly. Please try again later.');
+      }
+      
+      // Rethrow specific errors or use a generic message
+      throw new Error(error.message || 'Failed to fetch invoice. Please try again later.');
+    }
+  }
 }
 
 export const orderService = new OrderService();

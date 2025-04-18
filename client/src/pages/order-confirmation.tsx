@@ -14,7 +14,16 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Check, Package, ShoppingBag, ChevronRight, Loader2 } from 'lucide-react';
+import { 
+  Check, 
+  Package, 
+  ShoppingBag, 
+  ChevronRight, 
+  Loader2, 
+  FileText, 
+  Download,
+  AlertCircle
+} from 'lucide-react';
 
 const OrderConfirmationPage: React.FC = () => {
   const [location, setLocation] = useLocation();
@@ -24,7 +33,57 @@ const OrderConfirmationPage: React.FC = () => {
   const { orderCompleted } = useOrderStore();
   const [loading, setLoading] = useState(true);
   const [orderDetails, setOrderDetails] = useState<any | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<any | null>(null);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Get payment status and invoice information
+  const fetchPaymentStatus = async (orderId: number) => {
+    try {
+      const status = await orderService.getPaymentStatus(orderId);
+      console.log('Payment status:', status);
+      setPaymentStatus(status);
+    } catch (err: any) {
+      console.error('Error fetching payment status:', err);
+      // We don't set an error here as this is secondary information
+    }
+  };
+
+  // Get invoice URL for direct download
+  const getInvoiceUrl = async (orderId: number) => {
+    try {
+      setInvoiceLoading(true);
+      const { invoiceUrl } = await orderService.getInvoice(orderId, 'url');
+      return invoiceUrl;
+    } catch (err: any) {
+      console.error('Error getting invoice URL:', err);
+      toast({
+        title: "Invoice error",
+        description: err.message || "Failed to get invoice",
+        variant: "destructive"
+      });
+      return null;
+    } finally {
+      setInvoiceLoading(false);
+    }
+  };
+
+  // Handle invoice download
+  const handleViewInvoice = async () => {
+    if (orderDetails && orderDetails.id) {
+      const invoiceUrl = await getInvoiceUrl(orderDetails.id);
+      if (invoiceUrl) {
+        // Open the invoice in a new tab
+        window.open(invoiceUrl, '_blank');
+      }
+    } else {
+      toast({
+        title: "Invoice unavailable",
+        description: "Order information is missing",
+        variant: "destructive"
+      });
+    }
+  };
 
   useEffect(() => {
     // If we navigated here without completing an order, show an error
@@ -40,7 +99,13 @@ const OrderConfirmationPage: React.FC = () => {
         const orders = await orderService.getOrders();
         if (orders && orders.length > 0) {
           // Use the most recent order
-          setOrderDetails(orders[0]);
+          const latestOrder = orders[0];
+          setOrderDetails(latestOrder);
+          
+          // Fetch payment status for this order
+          if (latestOrder.id) {
+            fetchPaymentStatus(latestOrder.id);
+          }
         } else {
           setError('No orders found');
         }
@@ -137,6 +202,52 @@ const OrderConfirmationPage: React.FC = () => {
               <span className="font-medium">Total Amount:</span>
               <span className="font-bold">${totalAmount?.toFixed(2) || '0.00'}</span>
             </div>
+            
+            {/* Payment status information */}
+            {paymentStatus && (
+              <div className="flex justify-between items-center pt-2">
+                <span className="font-medium">Payment Status:</span>
+                <span className={`px-2 py-1 rounded text-sm ${
+                  paymentStatus.status === 'paid' 
+                    ? 'bg-green-100 text-green-800' 
+                    : paymentStatus.status === 'pending' 
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {paymentStatus.status === 'paid' 
+                    ? 'Paid' 
+                    : paymentStatus.status === 'pending' 
+                    ? 'Payment Pending'
+                    : paymentStatus.status || 'Unknown'}
+                </span>
+              </div>
+            )}
+            
+            {/* Invoice information */}
+            {paymentStatus && paymentStatus.status === 'paid' && paymentStatus.invoiceAvailable && (
+              <div className="flex justify-between items-center pt-2">
+                <span className="font-medium">Invoice:</span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleViewInvoice}
+                  disabled={invoiceLoading}
+                  className="py-1 h-auto"
+                >
+                  {invoiceLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="mr-2 h-3 w-3" />
+                      View Invoice
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
 
           <div>
@@ -172,6 +283,50 @@ const OrderConfirmationPage: React.FC = () => {
               )}
             </div>
           </div>
+          
+          {/* Payment information section */}
+          {paymentStatus && paymentStatus.status === 'paid' && paymentStatus.invoiceDetails && (
+            <div className="border border-green-200 bg-green-50 p-4 rounded-lg">
+              <h3 className="font-medium text-lg mb-3 flex items-center text-green-800">
+                <FileText className="mr-2 h-5 w-5" />
+                Payment Information
+              </h3>
+              <div className="space-y-2">
+                {paymentStatus.invoiceDetails.invoiceNumber && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">Invoice Number:</span>
+                    <span className="text-sm">{paymentStatus.invoiceDetails.invoiceNumber}</span>
+                  </div>
+                )}
+                {paymentStatus.invoiceDetails.invoiceDate && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">Invoice Date:</span>
+                    <span className="text-sm">
+                      {new Date(paymentStatus.invoiceDetails.invoiceDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-600">Payment Method:</span>
+                  <span className="text-sm capitalize">
+                    {paymentStatus.paymentMethod || 'Credit Card'}
+                  </span>
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleViewInvoice}
+                    disabled={invoiceLoading}
+                    className="bg-white"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Invoice
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="bg-primary/5 p-4 rounded-lg">
             <h3 className="font-medium text-lg mb-2">What's Next?</h3>
@@ -206,6 +361,16 @@ const OrderConfirmationPage: React.FC = () => {
         </CardContent>
 
         <CardFooter className="flex flex-wrap gap-4 justify-center">
+          {paymentStatus && paymentStatus.status === 'paid' && paymentStatus.invoiceAvailable && (
+            <Button onClick={handleViewInvoice} disabled={invoiceLoading} variant="secondary">
+              {invoiceLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileText className="mr-2 h-4 w-4" />
+              )}
+              Download Invoice
+            </Button>
+          )}
           <Button onClick={() => setLocation('/dashboard')}>
             <ShoppingBag className="mr-2 h-4 w-4" />
             View My Orders
