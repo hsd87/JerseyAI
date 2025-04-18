@@ -343,6 +343,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error('Error registering pricing routes:', error);
   }
   
+  // Shipping routes - importing from routes/shipping.ts for shipping calculations
+  try {
+    const { registerShippingRoutes } = await import('./routes/shipping');
+    registerShippingRoutes(app);
+    console.log('Shipping routes registered successfully');
+  } catch (error) {
+    console.error('Error registering shipping routes:', error);
+  }
+  
   // Admin routes - importing from admin.ts for admin dashboard functionality
   try {
     registerAdminRoutes(app);

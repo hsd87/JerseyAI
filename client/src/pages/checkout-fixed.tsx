@@ -5,6 +5,9 @@ import { useOrderStore } from '@/hooks/use-order-store';
 import { useToast } from '@/hooks/use-toast';
 import { orderService } from '@/lib/order-service';
 import StripeElementsWrapper from '@/components/payment/stripe-elements-wrapper-fixed';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 // UI Components
 import {
@@ -24,7 +27,48 @@ import {
   ShieldCheck,
   ArrowLeft,
   Check,
+  UserCircle2,
+  CreditCard,
+  Mail,
+  Phone,
+  MapPin,
 } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+
+// Customer information form schema
+const customerInfoSchema = z.object({
+  firstName: z.string().min(2, { message: "First name is required" }),
+  lastName: z.string().min(2, { message: "Last name is required" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  phone: z.string().min(5, { message: "Phone number is required" }),
+  street: z.string().min(3, { message: "Street address is required" }),
+  city: z.string().min(2, { message: "City is required" }),
+  state: z.string().min(2, { message: "State is required" }),
+  postalCode: z.string().min(3, { message: "Postal code is required" }),
+  country: z.string().min(2, { message: "Country is required" }).default("US"),
+  additionalInfo: z.string().optional(),
+});
+
+type CustomerInfo = z.infer<typeof customerInfoSchema>;
+
+// Checkout steps enum
+enum CheckoutStep {
+  CUSTOMER_INFO = 0,
+  PAYMENT = 1,
+  CONFIRMATION = 2,
+}
 
 export default function CheckoutFixedPage() {
   const [location, setLocation] = useLocation();
@@ -35,7 +79,8 @@ export default function CheckoutFixedPage() {
     priceBreakdown, 
     orderDetails, 
     clearCart, 
-    setOrderCompleted 
+    setOrderCompleted,
+    updateOrderDetails,
   } = useOrderStore();
   
   // Get cart items directly
@@ -44,6 +89,26 @@ export default function CheckoutFixedPage() {
   const [loading, setLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [orderProcessing, setOrderProcessing] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState(CheckoutStep.CUSTOMER_INFO);
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
+  const [checkoutProgress, setCheckoutProgress] = useState(33);
+
+  // Customer info form
+  const form = useForm<CustomerInfo>({
+    resolver: zodResolver(customerInfoSchema),
+    defaultValues: {
+      firstName: user?.username?.split(' ')[0] || '',
+      lastName: user?.username?.split(' ')[1] || '',
+      email: user?.email || '',
+      phone: '',
+      street: orderDetails?.shippingAddress?.street || '',
+      city: orderDetails?.shippingAddress?.city || '',
+      state: orderDetails?.shippingAddress?.state || '',
+      postalCode: orderDetails?.shippingAddress?.postalCode || '',
+      country: orderDetails?.shippingAddress?.country || 'US',
+      additionalInfo: '',
+    },
+  });
 
   // Enhanced authentication check with detailed logging
   useEffect(() => {
@@ -107,15 +172,51 @@ export default function CheckoutFixedPage() {
     }
   }, [user, cart, priceBreakdown, setLocation, toast]);
 
+  // Handle customer info submission
+  const onSubmitCustomerInfo = (data: CustomerInfo) => {
+    console.log('Customer information collected:', data);
+    setCustomerInfo(data);
+    
+    // Update order details with customer info
+    updateOrderDetails({
+      shippingAddress: {
+        name: `${data.firstName} ${data.lastName}`,
+        street: data.street,
+        city: data.city,
+        state: data.state,
+        postalCode: data.postalCode,
+        country: data.country,
+      },
+      customerEmail: data.email,
+      customerPhone: data.phone,
+      additionalInfo: data.additionalInfo,
+    });
+    
+    // Proceed to payment step
+    setCheckoutStep(CheckoutStep.PAYMENT);
+    setCheckoutProgress(66);
+    
+    toast({
+      title: 'Information Saved',
+      description: 'Your information has been saved. Proceed to payment.',
+    });
+  };
+
   const handlePaymentSuccess = async (paymentIntent: any) => {
     setPaymentSuccess(true);
     setOrderProcessing(true);
+    setCheckoutStep(CheckoutStep.CONFIRMATION);
+    setCheckoutProgress(100);
     
     try {
       console.log('Payment successful, creating order:', {
         paymentId: paymentIntent.id,
         status: paymentIntent.status
       });
+      
+      if (!customerInfo) {
+        throw new Error('Customer information is missing');
+      }
       
       // Create the order in the backend
       await orderService.createOrder({
@@ -124,6 +225,11 @@ export default function CheckoutFixedPage() {
         sport: orderDetails?.packageType?.includes('soccer') ? 'soccer' : 'basketball',
         totalAmount: priceBreakdown?.grandTotal || 0,
         paymentMethod: 'stripe',
+        
+        // Customer info
+        customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+        customerEmail: customerInfo.email,
+        customerPhone: customerInfo.phone,
         
         // Order details
         orderDetails: orderDetails ? {
@@ -144,12 +250,12 @@ export default function CheckoutFixedPage() {
         
         // Shipping address
         shippingAddress: {
-          name: user?.username || 'Customer',
-          street: '',
-          city: '',
-          state: '',
-          postalCode: '',
-          country: 'US',
+          name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+          street: customerInfo.street,
+          city: customerInfo.city,
+          state: customerInfo.state,
+          postalCode: customerInfo.postalCode,
+          country: customerInfo.country,
         },
       });
       
@@ -165,7 +271,9 @@ export default function CheckoutFixedPage() {
       });
       
       // Redirect to confirmation page
-      setLocation('/order-confirmation');
+      setTimeout(() => {
+        setLocation('/order-confirmation');
+      }, 2000);
     } catch (error: any) {
       console.error('Order creation failed:', error);
       toast({
@@ -179,6 +287,12 @@ export default function CheckoutFixedPage() {
   };
 
   const handlePaymentCancel = () => {
+    // Go back to customer info step
+    setCheckoutStep(CheckoutStep.CUSTOMER_INFO);
+    setCheckoutProgress(33);
+  };
+
+  const handleBackToCart = () => {
     setLocation('/designer');
   };
 
@@ -262,15 +376,320 @@ export default function CheckoutFixedPage() {
       <div className="container max-w-4xl mx-auto py-12 flex flex-col items-center justify-center min-h-[60vh]">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
         <h2 className="text-xl font-semibold">Preparing Your Order</h2>
-        <p className="text-muted-foreground">Please wait while we set up your payment</p>
+        <p className="text-muted-foreground">Please wait while we set up your checkout</p>
       </div>
     );
   }
 
+  // Render checkout step indicator
+  const renderCheckoutProgress = () => {
+    return (
+      <div className="mb-8">
+        <Progress value={checkoutProgress} className="h-2 mb-2" />
+        <div className="flex justify-between text-sm text-muted-foreground">
+          <div className={checkoutStep >= CheckoutStep.CUSTOMER_INFO ? "text-primary font-medium" : ""}>
+            Customer Information
+          </div>
+          <div className={checkoutStep >= CheckoutStep.PAYMENT ? "text-primary font-medium" : ""}>
+            Payment
+          </div>
+          <div className={checkoutStep >= CheckoutStep.CONFIRMATION ? "text-primary font-medium" : ""}>
+            Confirmation
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render customer information form
+  const renderCustomerInfoForm = () => {
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmitCustomerInfo)} className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <UserCircle2 className="mr-2 h-5 w-5" />
+                Customer Information
+              </CardTitle>
+              <CardDescription>
+                Please provide your contact information for this order
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="First name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Last name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Email address" type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Phone number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <MapPin className="mr-2 h-5 w-5" />
+                Shipping Address
+              </CardTitle>
+              <CardDescription>
+                Where should we ship your order?
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="street"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Street Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Street address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="City" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State/Province</FormLabel>
+                      <FormControl>
+                        <Input placeholder="State" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="postalCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Postal Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Postal code" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Country" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="additionalInfo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Additional Information (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Additional notes, delivery instructions, etc." 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" type="button" onClick={handleBackToCart}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Cart
+              </Button>
+              <Button type="submit">
+                Continue to Payment
+                <CreditCard className="ml-2 h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+      </Form>
+    );
+  };
+
+  // Render payment form
+  const renderPaymentForm = () => {
+    return (
+      <>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <UserCircle2 className="mr-2 h-5 w-5" />
+              Customer Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {customerInfo && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="font-medium mb-1">Contact Information:</p>
+                  <p>{customerInfo.firstName} {customerInfo.lastName}</p>
+                  <p className="flex items-center gap-1 text-muted-foreground">
+                    <Mail className="h-3 w-3" /> {customerInfo.email}
+                  </p>
+                  <p className="flex items-center gap-1 text-muted-foreground">
+                    <Phone className="h-3 w-3" /> {customerInfo.phone}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-medium mb-1">Shipping Address:</p>
+                  <p>{customerInfo.street}</p>
+                  <p>{customerInfo.city}, {customerInfo.state} {customerInfo.postalCode}</p>
+                  <p>{customerInfo.country}</p>
+                </div>
+              </div>
+            )}
+            <div className="flex justify-end">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setCheckoutStep(CheckoutStep.CUSTOMER_INFO)}
+              >
+                Edit Information
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <CreditCard className="mr-2 h-5 w-5" />
+              Payment Details
+            </CardTitle>
+            <CardDescription>
+              Complete your purchase securely
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <StripeElementsWrapper 
+              amount={priceBreakdown?.grandTotal || 0}
+              items={cart || []}
+              onSuccess={handlePaymentSuccess}
+              onCancel={handlePaymentCancel}
+            />
+          </CardContent>
+        </Card>
+      </>
+    );
+  };
+
+  // Render confirmation
+  const renderConfirmation = () => {
+    return (
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center text-green-600">
+            <Check className="mr-2 h-5 w-5" />
+            Payment Successful
+          </CardTitle>
+          <CardDescription>
+            Your payment has been processed successfully. We're finalizing your order...
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center py-4">
+            {orderProcessing ? (
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            ) : (
+              <ShieldCheck className="h-12 w-12 text-green-500" />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   // Main checkout UI
   return (
     <div className="container max-w-4xl mx-auto py-8">
-      <div className="flex items-center mb-8">
+      <div className="flex items-center mb-4">
         <Button variant="ghost" onClick={() => setLocation('/designer')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Designer
@@ -278,59 +697,35 @@ export default function CheckoutFixedPage() {
         <h1 className="text-2xl font-bold ml-auto">Checkout</h1>
       </div>
 
-      {paymentSuccess ? (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center text-green-600">
-              <Check className="mr-2 h-5 w-5" />
-              Payment Successful
-            </CardTitle>
-            <CardDescription>
-              Your payment has been processed successfully. We're finalizing your order...
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-center py-4">
-              {orderProcessing ? (
-                <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              ) : (
-                <ShieldCheck className="h-12 w-12 text-green-500" />
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Order summary and cart items */}
-          <div className="md:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Your Order Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {renderCartItems()}
-                
-                <Separator />
-                
-                {renderOrderSummary()}
-              </CardContent>
-            </Card>
-          </div>
+      {renderCheckoutProgress()}
 
-          {/* Payment Form */}
-          <div className="md:col-span-2">
-            <StripeElementsWrapper 
-              amount={priceBreakdown?.grandTotal || 0}
-              items={cart || []}
-              onSuccess={handlePaymentSuccess}
-              onCancel={handlePaymentCancel}
-            />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Order summary and cart items */}
+        <div className="md:col-span-1">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                Your Order Summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {renderCartItems()}
+              
+              <Separator />
+              
+              {renderOrderSummary()}
+            </CardContent>
+          </Card>
         </div>
-      )}
+
+        {/* Dynamic content based on checkout step */}
+        <div className="md:col-span-2">
+          {checkoutStep === CheckoutStep.CUSTOMER_INFO && renderCustomerInfoForm()}
+          {checkoutStep === CheckoutStep.PAYMENT && renderPaymentForm()}
+          {checkoutStep === CheckoutStep.CONFIRMATION && renderConfirmation()}
+        </div>
+      </div>
     </div>
   );
 }
