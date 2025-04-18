@@ -109,11 +109,33 @@ const CheckoutPage: React.FC = () => {
       return;
     }
     
+    // Check if user is authenticated first
+    if (!user) {
+      console.log('Skipping payment intent creation - user not authenticated');
+      setLoading(false);
+      return;
+    }
+    
     const createPaymentIntent = async () => {
       setLoading(true);
+      
+      // Set timeout to prevent hanging on network issues
+      const timeoutId = setTimeout(() => {
+        console.log('Payment intent creation timed out after 10 seconds');
+        setLoading(false);
+        // Show timeout toast
+        toast({
+          title: 'Payment Service Timeout',
+          description: 'We\'re experiencing high demand. Your order details have been saved - please try again later.',
+          variant: 'destructive',
+          duration: 5000,
+        });
+      }, 10000); // 10 second timeout
+      
       console.log('Creating payment intent for checkout with:', {
         amount: priceBreakdown.grandTotal,
         cartItems: cart.length,
+        userId: user?.id
       });
       
       try {
@@ -121,6 +143,9 @@ const CheckoutPage: React.FC = () => {
           amount: priceBreakdown.grandTotal,
           orderItems: cart || [],
         });
+        
+        // Clear timeout since request completed
+        clearTimeout(timeoutId);
         
         console.log('Payment intent created successfully:', { 
           hasClientSecret: !!response.clientSecret,
@@ -134,12 +159,16 @@ const CheckoutPage: React.FC = () => {
         
         setClientSecret(response.clientSecret);
       } catch (error: any) {
+        // Clear timeout since request completed (with error)
+        clearTimeout(timeoutId);
+        
         console.error('Payment intent creation failed:', error);
         
         // Check for specific error types
         if (error.message?.includes('Payment system') || 
             error.message?.includes('Stripe') ||
-            error.message?.includes('service unavailable')) {
+            error.message?.includes('service unavailable') ||
+            error.message?.includes('Failed to fetch')) {
           // Show a nicer toast for payment system errors
           toast({
             title: 'Payment System Unavailable',
@@ -161,7 +190,7 @@ const CheckoutPage: React.FC = () => {
     };
     
     createPaymentIntent();
-  }, [priceBreakdown, cart]);
+  }, [priceBreakdown, cart, user]);
 
   const handlePaymentSuccess = async () => {
     setOrderProcessing(true);

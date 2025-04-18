@@ -180,26 +180,60 @@ export async function checkSubscriptionStatus(subscriptionId: string): Promise<{
  * @returns The client secret for the payment intent
  */
 export async function createPaymentIntent(amount: number, customerId: string): Promise<string> {
-  if (!stripeInstance) throw new Error('Stripe is not configured');
+  // First validate the Stripe instance
+  if (!stripeInstance) {
+    console.error('Stripe instance not initialized when creating payment intent');
+    
+    // Check if API key exists
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) {
+      throw new Error('Stripe is not configured - missing API key');
+    }
+    
+    // Try to reinitialize Stripe
+    try {
+      console.log('Attempting to reinitialize Stripe instance');
+      stripeInstance = new Stripe(stripeKey, {
+        apiVersion: '2022-11-15' as any // Use compatible API version
+      });
+    } catch (initError) {
+      console.error('Failed to reinitialize Stripe:', initError);
+      throw new Error('Stripe payment service is unavailable. Please try again later.');
+    }
+  }
   
+  // Validate the amount (minimum 50 cents)
   if (!amount || amount < 50) {
-    throw new Error('Amount must be at least 50 cents');
+    console.warn(`Invalid amount provided: ${amount}. Setting to minimum 50 cents.`);
+    amount = 50; // Set to minimum rather than throwing error
   }
   
   // Ensure amount is an integer
   const intAmount = Math.round(amount);
+  console.log(`Creating payment intent for ${intAmount} cents for customer ${customerId}`);
   
   try {
+    // Add timing logs to track potential bottlenecks
+    const startTime = Date.now();
+    
     // Create the payment intent
     const paymentIntent = await stripeInstance.paymentIntents.create({
       amount: intAmount,
       currency: 'usd',
       customer: customerId,
       payment_method_types: ['card'],
+      // Add automatic payment methods for a smoother customer experience
+      automatic_payment_methods: {
+        enabled: true,
+      },
     });
     
+    const duration = Date.now() - startTime;
+    console.log(`Payment intent created in ${duration}ms with ID: ${paymentIntent.id}`);
+    
     if (!paymentIntent.client_secret) {
-      throw new Error('No client secret returned from Stripe');
+      console.error('Missing client secret in Stripe payment intent response');
+      throw new Error('Payment service returned an invalid response. Please try again.');
     }
     
     return paymentIntent.client_secret;
@@ -210,11 +244,23 @@ export async function createPaymentIntent(amount: number, customerId: string): P
     if (error.type === 'StripeCardError') {
       throw new Error(`Card error: ${error.message}`);
     } else if (error.type === 'StripeInvalidRequestError') {
+      // Check if the customer ID is invalid
+      if (error.message?.includes('customer') || error.param === 'customer') {
+        throw new Error('Customer account not found. Please try again or contact support.');
+      }
       throw new Error(`Invalid request: ${error.message}`);
+    } else if (error.type === 'StripeAuthenticationError') {
+      // This indicates issues with the API key
+      console.error('Stripe authentication error - invalid API key');
+      throw new Error('Payment service authentication failed. Please contact support.');
+    } else if (error.type === 'StripeRateLimitError') {
+      throw new Error('Payment service is temporarily overloaded. Please try again in a few minutes.');
+    } else if (error.type === 'StripeConnectionError' || error.type === 'StripeAPIError') {
+      throw new Error('Unable to connect to payment service. Please try again later.');
     }
     
-    // Re-throw the original error
-    throw error;
+    // Generic error fallback
+    throw new Error('Payment initialization failed. Please try again later.');
   }
 }
 
