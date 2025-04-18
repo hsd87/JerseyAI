@@ -24,21 +24,31 @@ export const SUBSCRIPTION_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1P5fL
 // Initialize Stripe
 function initializeStripe(): Stripe | null {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
+    // Get the Stripe key from environment
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    
+    if (!stripeKey) {
       console.warn('Missing Stripe secret key. Stripe functionality will not work.');
       return null;
     }
     
     // Log masked key info for security
     console.log('Stripe secret key is configured -', {
-      keyLength: process.env.STRIPE_SECRET_KEY.length,
-      keyPrefix: process.env.STRIPE_SECRET_KEY.substring(0, 4) + '...',
-      isValid: process.env.STRIPE_SECRET_KEY.startsWith('sk_')
+      keyLength: stripeKey.length,
+      keyPrefix: stripeKey.substring(0, 4) + '...',
+      isValid: stripeKey.startsWith('sk_')
     });
     
-    // Create Stripe instance
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2022-11-15' as any // Use a stable API version
+    // Create Stripe instance with the key from environment
+    const stripe = new Stripe(stripeKey, {
+      apiVersion: '2023-10-16' // Use the latest stable API version
+    });
+    
+    // Verify key is working with a simple API call
+    stripe.balance.retrieve().then(() => {
+      console.log('✅ Stripe API key verified successfully');
+    }).catch(err => {
+      console.error('❌ Stripe API key verification failed:', err.message);
     });
     
     console.log('Stripe initialized successfully');
