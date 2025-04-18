@@ -6,7 +6,8 @@ import {
   verifyCheckoutSession, 
   getReceiptUrl,
   createPaymentLink,
-  checkStripeApiKey
+  checkStripeApiKey,
+  createPaymentIntent
 } from './services/stripe-service';
 import { sendOrderConfirmationEmail } from './services/email-service';
 import { db } from './db';
@@ -393,6 +394,73 @@ export function registerPaymentRoutes(app: Express) {
     }
   });
   
+  // Create a payment intent for Stripe Elements
+  app.post('/api/create-payment-intent', async (req: Request, res: Response) => {
+    try {
+      // Verify Stripe configuration
+      const stripeStatus = await checkStripeApiKey();
+      if (!stripeStatus.valid) {
+        return res.status(503).json({
+          message: 'Payment service is currently unavailable',
+          error: 'stripe_unavailable'
+        });
+      }
+      
+      const { amount, items } = req.body;
+      
+      if (!amount || amount < 0.5) {
+        return res.status(400).json({
+          error: 'Invalid amount provided. Amount must be at least $0.50',
+          success: false
+        });
+      }
+
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({
+          error: 'No items provided for payment',
+          success: false
+        });
+      }
+
+      // Log transaction details for debugging
+      console.log('Payment Intent Request:', {
+        hasItems: Boolean(items),
+        itemsCount: items.length,
+        amount,
+        userId: req.user?.id || 'not-authenticated'
+      });
+
+      // Convert dollar amount to cents for Stripe
+      const amountInCents = Math.round(amount * 100);
+
+      // Determine the customer ID
+      let customerId = null;
+      
+      if (req.isAuthenticated && req.isAuthenticated() && req.user) {
+        const user = await storage.getUser(req.user.id);
+        if (user && user.stripeCustomerId) {
+          customerId = user.stripeCustomerId;
+        }
+      }
+
+      // Create the payment intent
+      const clientSecret = await createPaymentIntent(amountInCents, customerId);
+
+      res.json({
+        clientSecret,
+        amount: Math.round(amountInCents),
+        success: true
+      });
+    } catch (error: any) {
+      console.error('Error creating payment intent:', error);
+      
+      res.status(500).json({
+        error: error.message || 'Failed to create payment intent',
+        success: false
+      });
+    }
+  });
+
   // Create a payment link for an order
   app.post('/api/payment/create-payment-link', async (req: Request, res: Response) => {
     try {

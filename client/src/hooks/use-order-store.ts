@@ -35,6 +35,25 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     return [...state.items];
   },
   
+  // Get total amount of all items in the cart
+  get totalAmount() {
+    const state = get();
+    const items = state.items;
+    const addOns = state.addOns;
+    
+    // Calculate total from items
+    const itemsTotal = items.reduce((total, item) => {
+      return total + (item.price * (item.quantity || 1));
+    }, 0);
+    
+    // Calculate total from add-ons
+    const addOnsTotal = addOns.reduce((total, addon) => {
+      return total + (addon.price * (addon.quantity || 1));
+    }, 0);
+    
+    return Number((itemsTotal + addOnsTotal).toFixed(2));
+  },
+  
   // Pricing
   sport: 'soccer',
   priceBreakdown: null,

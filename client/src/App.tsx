@@ -23,6 +23,7 @@ import OrderConfigurationPage from "@/pages/order-configuration-page";
 
 // Lazy-loaded components
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
+const CheckoutElementsPage = React.lazy(() => import('./pages/checkout-elements-page'));
 const OrderConfirmationPage = React.lazy(() => import('./pages/order-confirmation'));
 const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
 const JerseyEditorPage = React.lazy(() => import('./pages/jersey-editor-page'));
@@ -114,6 +115,9 @@ function AppContent() {
           </Route>
           <Route path="/checkout">
             <ProtectedRoute path="/checkout" component={CheckoutPage} />
+          </Route>
+          <Route path="/checkout-elements">
+            <ProtectedRoute path="/checkout-elements" component={CheckoutElementsPage} />
           </Route>
           <Route path="/subscribe">
             <ProtectedRoute path="/subscribe" component={SubscribePage} />
