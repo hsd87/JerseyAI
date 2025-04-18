@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import stripePromise from '@/lib/stripe-client';
+import { logStripeKeyInfo, getStripeKey } from '@/lib/stripe-key-validator';
 
 interface StripeElementsWrapperProps {
   amount: number | undefined;
@@ -42,6 +43,18 @@ export default function StripeElementsWrapper({
 
   useEffect(() => {
     console.log(`[${componentId.current}] Component mounted`);
+    
+    // Log Stripe key info for debugging
+    logStripeKeyInfo();
+    
+    // Validate Stripe is properly initialized
+    if (!stripePromise) {
+      console.error(`[${componentId.current}] Stripe not initialized - payments will fail`);
+      setError('Payment system unavailable - please try again later');
+      setIsLoading(false);
+    } else {
+      console.log(`[${componentId.current}] Stripe initialized successfully`);
+    }
     
     return () => {
       console.log(`[${componentId.current}] Component unmounting`);
@@ -105,8 +118,11 @@ export default function StripeElementsWrapper({
         }, 30000);
         
         // Add a unique componentId to track this specific component instance
+        // Important: The server expects the amount in cents, but we're storing it in dollars
+        // We'll send both the formatted amount and the raw amount for verification purposes
         const response = await apiRequest('POST', '/api/create-payment-intent', {
           amount,
+          amountInCents: Math.round(amount * 100), // Server expects cents
           items,
           requestId,
           componentId: componentId.current
