@@ -31,9 +31,17 @@ class OrderService {
     try {
       // Ensure we have valid items to send
       const items = request.orderItems && request.orderItems.length > 0 
-        ? request.orderItems 
+        ? request.orderItems.map(item => ({
+            // Ensure every item has a valid ID
+            id: item.id || `${item.type}-${Date.now()}`,
+            type: item.type,
+            price: item.price,
+            quantity: item.quantity || 1,
+            size: item.size || 'M',
+            gender: item.gender || 'unisex'
+          }))
         : [{ 
-            id: 'default', 
+            id: `jersey-${Date.now()}`, 
             type: 'jersey', 
             price: request.amount, 
             quantity: 1, 

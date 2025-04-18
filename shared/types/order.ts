@@ -1,11 +1,15 @@
 // Order and payment related types
 
 export interface OrderItem {
+  id: string;
   type: string; // jersey, shorts, etc.
   size: string;
   quantity: number;
   gender: string; // Male, Female, Youth
   price: number;
+  name?: string;
+  customValue?: string;
+  designId?: number;
 }
 
 export interface OrderAddOn {
