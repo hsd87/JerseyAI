@@ -554,13 +554,14 @@ export default function OrderConfig({
     
     // Create default items array from packageItems
     const orderItems: OrderItem[] = packageItems.map(item => ({
-      id: item.id,
+      id: item.id || `${item.type}-${Date.now()}`, // Ensure unique ID
       type: item.type,
       size: item.sizes[0]?.size || 'M',
       quantity: item.sizes[0]?.quantity || 1,
       gender: item.gender,
       price: item.price,
-      name: item.name
+      name: item.name,
+      designId: designId // Add design ID for reference
     }));
     
     // Create order details object matching the OrderDetails interface
@@ -591,7 +592,25 @@ export default function OrderConfig({
     // Save order details to store
     setOrderDetails(orderDetailsData);
     
-    // Process team order
+    // First add main item based on package type (this ensures we have at least one item in cart)
+    // Generate unique IDs with timestamps to avoid duplicates
+    const mainItemId = `jersey-${designId}-${Date.now()}`;
+    
+    // Add main jersey item - this is required in all package types
+    addItem({
+      id: mainItemId,
+      type: 'jersey',
+      name: 'Custom Jersey',
+      size: watchedSize,
+      quantity: watchedQuantity,
+      gender: watchedGender,
+      price: packageUnitPrice > 0 ? packageUnitPrice : calculatePackageBasePrice(watchedPackageType),
+      designId: designId
+    });
+    
+    console.log('Added main jersey item to cart', mainItemId);
+    
+    // Now handle team orders
     if (watchedIsTeamOrder) {
       // Process team order using the team member items
       teamMembers.forEach(member => {
@@ -604,7 +623,7 @@ export default function OrderConfig({
                            item.itemType.charAt(0).toUpperCase() + item.itemType.slice(1);
             
             addItem({
-              id: `${item.itemType}-${member.id}`,
+              id: `${item.itemType}-${member.id}-${Date.now()}`,
               type: item.itemType,
               name: itemName,
               size: item.itemType === 'socks' ? 'One Size' : member.size,
@@ -612,14 +631,14 @@ export default function OrderConfig({
               gender: item.itemType === 'socks' ? 'Unisex' : member.gender,
               price: item.price,
               customValue: item.itemType === 'jersey' ? member.number : undefined,
-              designId: designId, // Add design ID reference
+              designId: designId
             });
           });
         } else {
           // Fallback to old method if no items array
           // Add jersey for each team member
           addItem({
-            id: `jersey-${member.id}`,
+            id: `jersey-${member.id}-${Date.now()}`,
             type: 'jersey',
             name: 'Custom Jersey',
             size: member.size,
@@ -627,34 +646,34 @@ export default function OrderConfig({
             gender: member.gender,
             price: calculatePackageBasePrice('jerseyOnly'),
             customValue: member.number,
-            designId: designId,
+            designId: designId
           });
           
           // Add shorts if applicable
           if (watchedPackageType === 'jerseyShorts' || watchedPackageType === 'fullKit') {
             addItem({
-              id: `shorts-${member.id}`,
+              id: `shorts-${member.id}-${Date.now()}`,
               type: 'shorts',
               name: 'Matching Shorts',
               size: member.size,
               quantity: 1,
               gender: member.gender,
               price: 29.99,
-              designId: designId,
+              designId: designId
             });
           }
           
           // Add socks if full kit
           if (watchedPackageType === 'fullKit') {
             addItem({
-              id: `socks-${member.id}`,
+              id: `socks-${member.id}-${Date.now()}`,
               type: 'socks',
               name: 'Team Socks',
               size: 'One Size',
               quantity: 1,
               gender: 'Unisex',
               price: 12.99,
-              designId: designId,
+              designId: designId
             });
           }
         }
@@ -662,24 +681,61 @@ export default function OrderConfig({
     } else {
       // Process individual order - with null checking
       if (packageItems && packageItems.length > 0) {
-        packageItems.forEach(item => {
-          if (item.sizes && Array.isArray(item.sizes)) {
-            item.sizes.forEach(sizeInfo => {
-              if (sizeInfo && sizeInfo.quantity > 0) {
-                addItem({
-                  id: `${item.type}-${sizeInfo.size}`,
-                  type: item.type,
-                  name: item.name,
-                  size: sizeInfo.size,
-                  quantity: sizeInfo.quantity,
-                  gender: item.gender,
-                  price: watchedPackageType === 'custom' ? (packageUnitPrice / packageItems.length) : item.price,
-                  designId: designId,
-                });
-              }
-            });
-          }
-        });
+        // For individual orders, we already added the main jersey above,
+        // so we only need to add additional items for other package types
+        
+        // Add shorts if applicable
+        if (watchedPackageType === 'jerseyShorts' || watchedPackageType === 'fullKit') {
+          addItem({
+            id: `shorts-${Date.now()}`,
+            type: 'shorts',
+            name: 'Matching Shorts',
+            size: watchedSize,
+            quantity: watchedQuantity,
+            gender: watchedGender,
+            price: 29.99,
+            designId: designId
+          });
+        }
+        
+        // Add socks if full kit
+        if (watchedPackageType === 'fullKit') {
+          addItem({
+            id: `socks-${Date.now()}`,
+            type: 'socks',
+            name: 'Team Socks',
+            size: 'One Size',
+            quantity: watchedQuantity,
+            gender: 'Unisex',
+            price: 12.99,
+            designId: designId
+          });
+        }
+        
+        // For custom packages, add each individual item
+        if (watchedPackageType === 'custom') {
+          packageItems.forEach((item, index) => {
+            // Skip the first item since we already added it as main jersey
+            if (index === 0) return;
+            
+            if (item.sizes && Array.isArray(item.sizes)) {
+              item.sizes.forEach(sizeInfo => {
+                if (sizeInfo && sizeInfo.quantity > 0) {
+                  addItem({
+                    id: `${item.type}-${sizeInfo.size}-${Date.now()}`,
+                    type: item.type,
+                    name: item.name,
+                    size: sizeInfo.size,
+                    quantity: sizeInfo.quantity,
+                    gender: item.gender,
+                    price: item.price,
+                    designId: designId
+                  });
+                }
+              });
+            }
+          });
+        }
       }
     }
     
@@ -688,13 +744,14 @@ export default function OrderConfig({
       addOns.forEach(addon => {
         if (addon && addon.quantity > 0) {
           addItem({
-            id: `addon-${addon.id}`,
+            id: `addon-${addon.id}-${Date.now()}`,
             type: 'addon',
             name: addon.name,
             size: 'One Size',
             quantity: addon.quantity,
             gender: 'Unisex',
             price: addon.price,
+            designId: designId
           });
         }
       });
@@ -721,7 +778,7 @@ export default function OrderConfig({
       // Navigate to the checkout page with a slight delay to allow state updates
       setTimeout(() => {
         navigate('/checkout');
-      }, 300);
+      }, 500); // Increased timeout to ensure state updates are complete
     } catch (error) {
       console.error('Error navigating to checkout:', error);
       toast({
