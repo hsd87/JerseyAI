@@ -21,6 +21,38 @@ export function registerPaymentRoutes(app: Express) {
   // Initialize Stripe
   const stripe = getStripe();
   
+  // Test endpoint for diagnostic page
+  app.post('/api/payment/test', async (req: Request, res: Response) => {
+    try {
+      // Test if Stripe is properly initialized
+      const stripeStatus = await checkStripeApiKey();
+      
+      if (!stripeStatus.valid) {
+        return res.status(503).json({
+          success: false,
+          error: 'Stripe API key is invalid or missing',
+          details: stripeStatus
+        });
+      }
+      
+      // Return success with environment info (without exposing sensitive data)
+      res.json({
+        success: true,
+        message: 'Stripe API connection successful',
+        environment: process.env.NODE_ENV,
+        stripeApiVersion: (stripe as any)?.version || 'unknown',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('Error testing payment API:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'An unexpected error occurred during payment API test',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+  
   // Create a checkout session for an order
   app.post('/api/payment/create-checkout-session', async (req: Request, res: Response) => {
     try {
@@ -406,32 +438,51 @@ export function registerPaymentRoutes(app: Express) {
         });
       }
       
-      const { amount, items } = req.body;
+      const { amount, amountInCents, items, requestId, componentId } = req.body;
+      
+      // Log the request details for debugging
+      console.log(`Payment Intent Request [${requestId || 'no-id'}]:`, {
+        componentId: componentId || 'unknown',
+        hasAmount: Boolean(amount),
+        amount,
+        hasAmountInCents: Boolean(amountInCents),
+        amountInCents,
+        hasItems: Boolean(items),
+        itemsCount: items?.length || 0,
+        userId: req.user?.id || 'not-authenticated',
+        requestId
+      });
       
       if (!amount || amount < 0.5) {
         return res.status(400).json({
           error: 'Invalid amount provided. Amount must be at least $0.50',
-          success: false
+          success: false,
+          requestId
         });
       }
 
       if (!items || !Array.isArray(items) || items.length === 0) {
         return res.status(400).json({
           error: 'No items provided for payment',
-          success: false
+          success: false,
+          requestId
         });
       }
 
-      // Log transaction details for debugging
-      console.log('Payment Intent Request:', {
-        hasItems: Boolean(items),
-        itemsCount: items.length,
-        amount,
-        userId: req.user?.id || 'not-authenticated'
-      });
-
-      // Convert dollar amount to cents for Stripe
-      const amountInCents = Math.round(amount * 100);
+      // Determine the amount in cents
+      // If the client already provided amountInCents, use that (new behavior)
+      // Otherwise calculate it from amount (backward compatibility)
+      let finalAmountInCents: number;
+      
+      if (amountInCents && typeof amountInCents === 'number') {
+        // Use pre-calculated amount from client
+        finalAmountInCents = Math.round(amountInCents);
+        console.log(`Using client-provided amount in cents: ${finalAmountInCents}`);
+      } else {
+        // Convert dollar amount to cents for Stripe
+        finalAmountInCents = Math.round(amount * 100);
+        console.log(`Calculated amount in cents from dollars: ${amount} * 100 = ${finalAmountInCents}`);
+      }
 
       // Determine the customer ID
       let customerId = null;
@@ -444,19 +495,22 @@ export function registerPaymentRoutes(app: Express) {
       }
 
       // Create the payment intent
-      const clientSecret = await createPaymentIntent(amountInCents, customerId || '');
+      const clientSecret = await createPaymentIntent(finalAmountInCents, customerId || '');
 
+      // Include request ID in the response for better client-side tracking
       res.json({
         clientSecret,
-        amount: Math.round(amountInCents),
-        success: true
+        amount: finalAmountInCents,
+        success: true,
+        requestId: requestId || undefined
       });
     } catch (error: any) {
-      console.error('Error creating payment intent:', error);
+      console.error(`Error creating payment intent [${requestId || 'no-id'}]:`, error);
       
       res.status(500).json({
         error: error.message || 'Failed to create payment intent',
-        success: false
+        success: false,
+        requestId: requestId || undefined
       });
     }
   });
