@@ -351,7 +351,7 @@ export default function AdminDashboard() {
       </h1>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid grid-cols-4 mb-4">
+        <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger value="overview" className="flex items-center">
             <BarChart2 className="mr-2 h-4 w-4" /> Overview
           </TabsTrigger>
@@ -363,6 +363,9 @@ export default function AdminDashboard() {
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center">
             <Users className="mr-2 h-4 w-4" /> Users
+          </TabsTrigger>
+          <TabsTrigger value="tools" className="flex items-center">
+            <Settings className="mr-2 h-4 w-4" /> Tools
           </TabsTrigger>
         </TabsList>
 

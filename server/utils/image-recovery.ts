@@ -110,15 +110,19 @@ export async function verifyImagePaths() {
     
     // Check each image URL to ensure the file exists
     for (const design of designsWithImages) {
-      const frontImagePath = design.frontImageUrl.replace(/^\/output\//, '');
-      const fullPath = path.join(OUTPUT_DIR, frontImagePath);
-      
-      if (!fs.existsSync(fullPath)) {
-        missingFiles.push({
-          designId: design.id,
-          imagePath: design.frontImageUrl,
-          fullPath
-        });
+      // We've already filtered out null/empty strings above, but TypeScript doesn't know that
+      // so we add an extra check here to satisfy the compiler
+      if (design.frontImageUrl) {
+        const frontImagePath = design.frontImageUrl.replace(/^\/output\//, '');
+        const fullPath = path.join(OUTPUT_DIR, frontImagePath);
+        
+        if (!fs.existsSync(fullPath)) {
+          missingFiles.push({
+            designId: design.id,
+            imagePath: design.frontImageUrl,
+            fullPath
+          });
+        }
       }
     }
     
