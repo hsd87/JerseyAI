@@ -6,6 +6,7 @@ import { db } from './db';
 import path from 'path';
 import fs from 'fs';
 import { generateOrderPDF } from './utils/pdf-generator';
+import { generateInvoice } from './utils/invoice-generator';
 import Stripe from 'stripe';
 
 export function registerPaymentRoutes(app: Express) {
@@ -140,6 +141,19 @@ export function registerPaymentRoutes(app: Express) {
         return res.status(404).json({ message: 'User not found' });
       }
       
+      // Generate invoice for the completed order
+      try {
+        console.log(`Generating invoice for order ${order.id}`);
+        const invoiceData = await generateInvoice(updatedOrder);
+        console.log(`Invoice generated: ${invoiceData.invoiceNumber}`);
+        
+        // Store invoice data with the order
+        await storage.updateOrderInvoice(order.id, invoiceData);
+      } catch (invoiceError) {
+        console.error('Error generating invoice:', invoiceError);
+        // Continue even if invoice generation fails
+      }
+      
       // Send confirmation email with PDF
       if (user.email) {
         try {
@@ -257,12 +271,48 @@ export function registerPaymentRoutes(app: Express) {
             return res.status(200).json({ message: 'Order is already paid' });
           }
           
+          // Get receipt URL if possible
+          let receiptUrl = null;
+          try {
+            if (session.payment_intent) {
+              receiptUrl = await getReceiptUrl(session.id);
+            }
+          } catch (error) {
+            console.error('Error getting receipt URL:', error);
+          }
+          
+          // Update order metadata with payment info
+          const orderMetadata = order.metadata && typeof order.metadata === 'string' 
+            ? JSON.parse(order.metadata) 
+            : {};
+            
+          orderMetadata.stripeSessionId = session.id;
+          if (receiptUrl) {
+            orderMetadata.stripeReceiptUrl = receiptUrl;
+          }
+          orderMetadata.paymentCompleted = new Date().toISOString();
+          
           // Update order status to paid
           const updatedOrder = await storage.updateOrder(order.id, {
             status: 'paid',
+            // @ts-ignore
+            metadata: JSON.stringify(orderMetadata)
           });
           
           console.log(`Order ${order.id} marked as paid via webhook`);
+          
+          // Generate invoice for the completed order
+          try {
+            console.log(`Generating invoice for order ${order.id} via webhook`);
+            const invoiceData = await generateInvoice(updatedOrder);
+            console.log(`Invoice generated via webhook: ${invoiceData.invoiceNumber}`);
+            
+            // Store invoice data with the order
+            await storage.updateOrderInvoice(order.id, invoiceData);
+          } catch (invoiceError) {
+            console.error('Error generating invoice via webhook:', invoiceError);
+            // Continue even if invoice generation fails
+          }
         } catch (error: any) {
           console.error(`Error processing checkout.session.completed webhook: ${error.message}`);
         }
@@ -318,6 +368,11 @@ export function registerPaymentRoutes(app: Express) {
           if (metadata.paymentCompleted) {
             paymentInfo.paymentDate = metadata.paymentCompleted;
           }
+          
+          // Include invoice information if available
+          if (metadata.invoice) {
+            paymentInfo.invoice = metadata.invoice;
+          }
         } catch (e) {
           console.error("Error parsing order metadata:", e);
         }
@@ -328,6 +383,75 @@ export function registerPaymentRoutes(app: Express) {
     } catch (error: any) {
       console.error('Error getting payment status:', error);
       res.status(500).json({ message: `Failed to get payment status: ${error.message}` });
+    }
+  });
+  
+  // Get invoice for an order
+  app.get('/api/payment/invoice/:orderId', async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
+      const orderId = Number(req.params.orderId);
+      
+      // Fetch the order
+      const order = await storage.getOrderById(orderId);
+      
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      
+      // Verify the user owns this order or is an admin
+      if (order.userId !== req.user?.id && req.user?.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      // If order is not paid, no invoice exists
+      if (order.status !== 'paid') {
+        return res.status(400).json({ message: 'Order is not paid, no invoice available' });
+      }
+      
+      // Check order metadata for invoice information
+      let invoiceData = null;
+      
+      if (order.metadata && typeof order.metadata === 'string') {
+        try {
+          const metadata = JSON.parse(order.metadata);
+          
+          if (metadata.invoice) {
+            invoiceData = metadata.invoice;
+          }
+        } catch (e) {
+          console.error("Error parsing order metadata:", e);
+        }
+      }
+      
+      // If no invoice exists, generate one
+      if (!invoiceData) {
+        try {
+          console.log(`Generating invoice on-demand for order ${order.id}`);
+          invoiceData = await generateInvoice(order);
+          console.log(`Invoice generated on-demand: ${invoiceData.invoiceNumber}`);
+          
+          // Store invoice data with the order
+          await storage.updateOrderInvoice(order.id, invoiceData);
+        } catch (invoiceError) {
+          console.error('Error generating invoice on-demand:', invoiceError);
+          return res.status(500).json({ message: 'Failed to generate invoice' });
+        }
+      }
+      
+      // Return the invoice data or redirect to the invoice URL
+      if (req.query.format === 'json') {
+        res.status(200).json(invoiceData);
+      } else {
+        // Redirect to the invoice URL (for direct viewing in browser)
+        res.redirect(invoiceData.invoiceUrl);
+      }
+    } catch (error: any) {
+      console.error('Error fetching invoice:', error);
+      res.status(500).json({ message: `Failed to fetch invoice: ${error.message}` });
     }
   });
 }
