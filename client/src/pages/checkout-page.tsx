@@ -342,7 +342,7 @@ const CheckoutPage: React.FC = () => {
     );
   };
 
-  // Render order summary
+  // Render order summary with simplified pricing (no discounts, taxes, or shipping)
   const renderOrderSummary = () => {
     if (!priceBreakdown) return null;
     
@@ -351,36 +351,6 @@ const CheckoutPage: React.FC = () => {
         <div className="flex justify-between">
           <span>Subtotal</span>
           <span>${priceBreakdown.subtotal.toFixed(2)}</span>
-        </div>
-        
-        {priceBreakdown.subscriptionDiscountApplied && (
-          <div className="flex justify-between text-green-600">
-            <span>Subscription Discount</span>
-            <span>-${priceBreakdown.subscriptionDiscountAmount.toFixed(2)}</span>
-          </div>
-        )}
-        
-        {priceBreakdown.tierDiscountApplied && (
-          <div className="flex justify-between text-green-600">
-            <span>Quantity Discount</span>
-            <span>-${priceBreakdown.tierDiscountAmount.toFixed(2)}</span>
-          </div>
-        )}
-        
-        <div className="flex justify-between">
-          <span>Shipping</span>
-          <span>
-            {priceBreakdown.shippingFreeThresholdApplied ? (
-              <span className="text-green-600">Free</span>
-            ) : (
-              `$${priceBreakdown.shipping.toFixed(2)}`
-            )}
-          </span>
-        </div>
-        
-        <div className="flex justify-between">
-          <span>Tax</span>
-          <span>${priceBreakdown.tax.toFixed(2)}</span>
         </div>
         
         <Separator />
