@@ -734,19 +734,19 @@ export default function OrderConfig({
       // Success toast
       toast({
         title: "Cart updated",
-        description: "Proceeding to checkout...",
+        description: "Proceeding to shipping information...",
         variant: "default",
       });
       
-      // Navigate to the checkout page with a slight delay to allow state updates
+      // Navigate to the shipping info page with a slight delay to allow state updates
       setTimeout(() => {
-        navigate('/checkout');
+        navigate('/shipping-info');
       }, 500); // Increased timeout to ensure state updates are complete
     } catch (error) {
-      console.error('Error navigating to checkout:', error);
+      console.error('Error navigating to shipping:', error);
       toast({
         title: "Error",
-        description: "Failed to proceed to checkout. Please try again.",
+        description: "Failed to proceed to shipping. Please try again.",
         variant: "destructive",
       });
     }
