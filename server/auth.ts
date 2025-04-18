@@ -49,11 +49,14 @@ export function setupAuth(app: Express) {
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
+    name: 'voro.sid', // Custom name to avoid fingerprinting
+    rolling: true, // Reset cookie expiration on each request
     cookie: {
       secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
       sameSite: 'lax', // Helps with CSRF protection while allowing redirects
       httpOnly: true, // Cookie cannot be accessed via JavaScript
+      path: '/' // Ensure cookie is sent for all paths
     }
   };
 
@@ -147,9 +150,32 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/logout", (req, res, next) => {
+    console.log('Logout requested, session ID:', req.sessionID);
+    
+    if (!req.isAuthenticated()) {
+      console.log('Logout requested for unauthenticated session');
+      return res.status(200).json({ message: "Not logged in" });
+    }
+    
+    const userId = req.user?.id;
+    const username = req.user?.username;
+    
     req.logout((err) => {
-      if (err) return next(err);
-      res.sendStatus(200);
+      if (err) {
+        console.error('Logout error:', err);
+        return next(err);
+      }
+      
+      // Regenerate the session ID to prevent session fixation
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error('Session regeneration error:', err);
+          return next(err);
+        }
+        
+        console.log(`User ${username} (ID: ${userId}) logged out successfully`);
+        res.status(200).json({ message: "Logged out successfully" });
+      });
     });
   });
 

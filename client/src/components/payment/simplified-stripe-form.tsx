@@ -22,6 +22,21 @@ export const initializeStripe = () => {
         isTestKey: stripeKey.startsWith('pk_test_'),
         isLiveKey: stripeKey.startsWith('pk_live_')
       });
+      
+      // Check for common issues with Stripe keys
+      if (stripeKey.startsWith('pk_live_') && window.location.hostname !== 'voro.com') {
+        // Using live key on non-production environment - safety override
+        console.warn('WARNING: Live Stripe key detected on non-production environment!');
+        console.warn('Refusing to initialize live Stripe integration on development or staging environment.');
+        console.warn('This is a security precaution to prevent accidental charges.');
+        
+        // Force use of test key with warning
+        const testKeyPlaceholder = 'pk_test_51P3pFOCjzXg59EQpClvaxeHXwQMDdEaiEZpITsYQlPnStS7HaMcKVGgP8LbYxIQlC5jyKbP5rYlKNlp7E60C00jMAIrV3JL';
+        console.warn('Using test key placeholder instead for safety.');
+        
+        stripePromise = loadStripe(testKeyPlaceholder);
+        return true;
+      }
 
       // Initialize Stripe with the public key
       stripePromise = loadStripe(stripeKey);
