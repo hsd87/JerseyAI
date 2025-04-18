@@ -60,7 +60,7 @@ class OrderService {
       
       // Set a reasonable timeout for payment API
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Payment request timeout', 'TimeoutError')), 15000); // 15 seconds timeout
       
       try {
         // Make API request with timeout using updated API that accepts AbortSignal
@@ -152,7 +152,7 @@ class OrderService {
     try {
       // Set a reasonable timeout for subscription creation
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Subscription request timeout', 'TimeoutError')), 15000); // 15 seconds timeout
       
       try {
         // Make API request with timeout using updated API that accepts AbortSignal
@@ -252,7 +252,7 @@ class OrderService {
     try {
       // Set a reasonable timeout for subscription cancellation
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Subscription cancellation timeout', 'TimeoutError')), 15000); // 15 seconds timeout
       
       try {
         // Make API request with timeout
@@ -327,7 +327,7 @@ class OrderService {
     try {
       // Set a reasonable timeout for order creation
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 seconds timeout for order creation
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Order creation timeout', 'TimeoutError')), 20000); // 20 seconds timeout for order creation
       
       try {
         // Make API request with timeout
@@ -407,7 +407,7 @@ class OrderService {
     try {
       // Set a reasonable timeout for fetching orders
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Order fetch timeout', 'TimeoutError')), 15000); // 15 seconds timeout
       
       try {
         // Make API request with timeout
@@ -466,7 +466,7 @@ class OrderService {
     try {
       // Set a reasonable timeout for fetching order details
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Order details fetch timeout', 'TimeoutError')), 15000); // 15 seconds timeout
       
       try {
         // Make API request with timeout
@@ -527,7 +527,7 @@ class OrderService {
     try {
       // Set a reasonable timeout for fetching payment status
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Payment status fetch timeout', 'TimeoutError')), 15000); // 15 seconds timeout
       
       try {
         // Make API request with timeout
@@ -598,7 +598,7 @@ class OrderService {
       
       // Set a reasonable timeout for fetching invoice
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Invoice fetch timeout', 'TimeoutError')), 15000); // 15 seconds timeout
       
       try {
         // Make API request with timeout
