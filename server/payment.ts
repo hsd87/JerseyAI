@@ -1,6 +1,13 @@
 import { Express, Request, Response } from 'express';
 import { storage } from './storage';
-import { getStripe, createCheckoutSession, verifyCheckoutSession, getReceiptUrl } from './services/stripe-service';
+import { 
+  getStripe, 
+  createCheckoutSession, 
+  verifyCheckoutSession, 
+  getReceiptUrl,
+  createPaymentLink,
+  checkStripeApiKey
+} from './services/stripe-service';
 import { sendOrderConfirmationEmail } from './services/email-service';
 import { db } from './db';
 import path from 'path';
@@ -383,6 +390,91 @@ export function registerPaymentRoutes(app: Express) {
     } catch (error: any) {
       console.error('Error getting payment status:', error);
       res.status(500).json({ message: `Failed to get payment status: ${error.message}` });
+    }
+  });
+  
+  // Create a payment link for an order
+  app.post('/api/payment/create-payment-link', async (req: Request, res: Response) => {
+    try {
+      // Verify Stripe configuration
+      const stripeStatus = await checkStripeApiKey();
+      if (!stripeStatus.valid) {
+        return res.status(503).json({
+          message: 'Payment service is currently unavailable',
+          error: 'stripe_unavailable'
+        });
+      }
+      
+      const { order } = req.body;
+      
+      if (!order || !order.items || !Array.isArray(order.items) || order.items.length === 0) {
+        return res.status(400).json({
+          message: 'Invalid order data. Order must include items array.',
+          error: 'invalid_order'
+        });
+      }
+      
+      // Check if user is authenticated
+      let userId = null;
+      if (req.isAuthenticated() && req.user) {
+        userId = req.user.id;
+        
+        // Add user information to the order if not already present
+        if (!order.email && req.user.email) {
+          order.email = req.user.email;
+        }
+        
+        if (!order.customerName && req.user.username) {
+          order.customerName = req.user.username;
+        }
+      }
+      
+      console.log(`Creating payment link for order with ${order.items.length} items`);
+      
+      try {
+        // Create a payment link
+        const paymentLinkUrl = await createPaymentLink(order);
+        
+        // If this is an existing order with ID, update it
+        if (order.id) {
+          const existingOrder = await storage.getOrderById(Number(order.id));
+          
+          if (existingOrder) {
+            // Only update if the user is the order owner or not authenticated
+            if (!userId || existingOrder.userId === userId) {
+              const orderMetadata = existingOrder.metadata && typeof existingOrder.metadata === 'string'
+                ? JSON.parse(existingOrder.metadata)
+                : {};
+                
+              orderMetadata.stripePaymentLinkUrl = paymentLinkUrl;
+              orderMetadata.paymentLinkCreatedAt = new Date().toISOString();
+              
+              await storage.updateOrder(existingOrder.id, {
+                // @ts-ignore
+                metadata: JSON.stringify(orderMetadata)
+              });
+            }
+          }
+        }
+        
+        // Return the payment link URL
+        res.status(200).json({
+          success: true,
+          paymentLinkUrl
+        });
+      } catch (error: any) {
+        console.error('Error creating payment link:', error);
+        res.status(500).json({
+          message: `Failed to create payment link: ${error.message}`,
+          error: 'payment_link_creation_failed'
+        });
+      }
+    } catch (error: any) {
+      console.error('Unexpected error creating payment link:', error);
+      res.status(500).json({
+        message: 'An unexpected error occurred',
+        error: 'server_error'
+      });
     }
   });
   
