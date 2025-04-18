@@ -350,6 +350,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
   } catch (error) {
     console.error('Error registering admin routes:', error);
   }
+  
+  // Image recovery utilities for admin users
+  app.post("/api/admin/recover-images", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Ensure user is an admin
+      if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: "Forbidden - Admin access required" });
+      }
+      
+      const { reconcileImageFiles } = await import('./utils/image-recovery');
+      const result = await reconcileImageFiles();
+      
+      res.json({
+        success: true,
+        message: `Image recovery complete. Recovered ${result.recovered} of ${result.missing} missing images.`,
+        ...result
+      });
+    } catch (error) {
+      console.error('Error during image recovery:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Error during image recovery", 
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+  
+  app.get("/api/admin/verify-images", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Ensure user is an admin
+      if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: "Forbidden - Admin access required" });
+      }
+      
+      const { verifyImagePaths } = await import('./utils/image-recovery');
+      const result = await verifyImagePaths();
+      
+      res.json({
+        success: true,
+        message: `Image verification complete. Found ${result.missing} missing files out of ${result.total} designs.`,
+        ...result
+      });
+    } catch (error) {
+      console.error('Error during image verification:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Error during image verification", 
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
 
   // Subscription endpoints
   app.post("/api/subscribe", async (req, res, next) => {
