@@ -53,22 +53,11 @@ export interface TeamMember {
 }
 
 export interface PriceBreakdown {
+  // Removed all discounts, shipping costs, and taxes per user request
   subtotal: number;
-  discount: number;
-  discountPercentage: number;
-  shipping: number;
-  tax: number;
   grandTotal: number;
   itemCount: number;
   baseTotal: number;
-  tierDiscountApplied: boolean;
-  tierDiscountAmount: number;
-  subscriptionDiscountApplied: boolean;
-  subscriptionDiscountAmount: number;
-  shippingFreeThresholdApplied: boolean;
-  priceBeforeTax: number;
-  bundleSavings?: number;
-  bundleApplied?: boolean;
 }
 
 export interface OrderDetails {

@@ -10,9 +10,7 @@ interface PriceEstimateResponse {
 }
 
 interface PricingRules {
-  tierDiscounts: { threshold: number; discount: string }[];
-  subscriptionDiscount: string;
-  shipping: { threshold: number; cost: number }[];
+  // Removed all discounts, shipping costs, and taxes per user request
 }
 
 /**
