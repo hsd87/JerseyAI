@@ -56,7 +56,7 @@ function initializeStripe(): Stripe | null {
     
     // Create Stripe instance with the key from environment
     const stripe = new Stripe(stripeKey, {
-      apiVersion: '2025-03-31' as any // Using Basil API version with type assertion
+      apiVersion: '2025-03-31.basil' as any // Using the Basil API version with type assertion
     });
     
     // Verify key is working with a simple API call
