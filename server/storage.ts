@@ -6,7 +6,7 @@ import {
   type B2BLead, type InsertB2BLead
 } from "@shared/schema";
 import session from "express-session";
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, or, isNotNull } from 'drizzle-orm';
 import connectPg from "connect-pg-simple";
 import { db, pool } from './db';
 
@@ -25,6 +25,7 @@ export interface IStorage {
   getDesignById(id: number): Promise<Design | undefined>;
   getUserDesigns(userId: number): Promise<Design[]>;
   getAllDesigns(): Promise<Design[]>;
+  getPublicDesigns(): Promise<Design[]>;
   updateDesign(id: number, data: Partial<Design>): Promise<Design>;
   deleteDesign(id: number): Promise<void>;
   
@@ -152,6 +153,68 @@ export class DatabaseStorage implements IStorage {
   
   async getAllDesigns(): Promise<Design[]> {
     return db.select().from(designs).orderBy(desc(designs.createdAt));
+  }
+  
+  async getPublicDesigns(): Promise<Design[]> {
+    try {
+      // Get designs with image data - prioritize those with both image URLs and data
+      const designsWithImages = await db
+        .select()
+        .from(designs)
+        .where(
+          and(
+            or(
+              and(
+                isNotNull(designs.frontImageUrl),
+                isNotNull(designs.frontImageData)
+              ),
+              and(
+                isNotNull(designs.backImageUrl),
+                isNotNull(designs.backImageData)
+              )
+            )
+          )
+        )
+        .orderBy(desc(designs.createdAt))
+        .limit(5);
+      
+      if (designsWithImages.length > 0) {
+        return designsWithImages;
+      }
+      
+      // Fall back to any designs with at least an image URL
+      const designsWithUrls = await db
+        .select()
+        .from(designs)
+        .where(
+          or(
+            isNotNull(designs.frontImageUrl),
+            isNotNull(designs.backImageUrl)
+          )
+        )
+        .orderBy(desc(designs.createdAt))
+        .limit(5);
+        
+      if (designsWithUrls.length > 0) {
+        return designsWithUrls;
+      }
+      
+      // Last resort - any designs with image data
+      return await db
+        .select()
+        .from(designs)
+        .where(
+          or(
+            isNotNull(designs.frontImageData),
+            isNotNull(designs.backImageData)
+          )
+        )
+        .orderBy(desc(designs.createdAt))
+        .limit(5);
+    } catch (error) {
+      console.error("Error fetching public designs:", error);
+      return [];
+    }
   }
 
   async updateDesign(id: number, data: Partial<Design>): Promise<Design> {

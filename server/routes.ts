@@ -174,27 +174,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get recent designs (most recent first, limited to 10)
   app.get("/api/designs/recent", async (req, res, next) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Unauthorized" });
+      // Check if user is authenticated
+      if (req.isAuthenticated() && req.user?.id) {
+        console.log("Fetching recent designs for authenticated user:", req.user.id);
+        
+        // Get recent designs for the current user, ensure we only return valid designs
+        const allDesigns = await storage.getUserDesigns(req.user.id);
+        
+        // Sort by creation date (most recent first)
+        const sortedDesigns = allDesigns
+          .filter(design => design && design.id)  // Filter out any invalid designs
+          .sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+          })
+          .slice(0, 10);  // Limit to 10 designs
+        
+        // Convert database design format to the format expected by the client
+        const formattedDesigns = sortedDesigns.map(design => {
+          // For designs with base64 image data, use that directly as the URL
+          // This ensures images are always available even if the file system path is missing
+          return {
+            id: design.id.toString(),
+            urls: {
+              front: design.frontImageUrl || (design.frontImageData ? `data:image/png;base64,${design.frontImageData}` : null),
+              back: design.backImageUrl || (design.backImageData ? `data:image/png;base64,${design.backImageData}` : null)
+            },
+            createdAt: design.createdAt ? new Date(design.createdAt).toISOString() : undefined
+          };
+        });
+        
+        return res.json(formattedDesigns);
+      } else {
+        console.log("User not authenticated, serving public designs");
+        
+        // Get most recent public designs or featured designs if available
+        // As a fallback, we'll return an empty array and let the client handle the display
+        const publicDesigns = await storage.getPublicDesigns();
+        
+        if (publicDesigns && publicDesigns.length > 0) {
+          // Format designs for the client
+          const formattedDesigns = publicDesigns.map(design => ({
+            id: design.id.toString(),
+            urls: {
+              front: design.frontImageUrl || (design.frontImageData ? `data:image/png;base64,${design.frontImageData}` : null),
+              back: design.backImageUrl || (design.backImageData ? `data:image/png;base64,${design.backImageData}` : null)
+            },
+            createdAt: design.createdAt ? new Date(design.createdAt).toISOString() : undefined
+          }));
+          
+          return res.json(formattedDesigns);
+        }
+        
+        // Return empty array if no designs are available
+        return res.json([]);
       }
-      
-      // Get recent designs for the current user, ensure we only return valid designs
-      const allDesigns = await storage.getUserDesigns(req.user.id);
-      
-      // Sort by creation date (most recent first)
-      const sortedDesigns = allDesigns
-        .filter(design => design && design.id)  // Filter out any invalid designs
-        .sort((a, b) => {
-          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return dateB - dateA;
-        })
-        .slice(0, 10);  // Limit to 10 designs
-      
-      res.json(sortedDesigns);
     } catch (error) {
       console.error("Error fetching recent designs:", error);
-      next(error);
+      // Send a more graceful error response
+      res.status(500).json({ 
+        message: "Failed to fetch recent designs", 
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

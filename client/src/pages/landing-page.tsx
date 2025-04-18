@@ -98,24 +98,27 @@ export default function LandingPage() {
     const fetchDesigns = async () => {
       try {
         setIsLoading(true);
+        console.log("Making GET request to:", "/api/designs/recent");
         const res = await apiRequest('GET', '/api/designs/recent');
         const data = await res.json();
         
         if (Array.isArray(data) && data.length > 0) {
+          console.log("Received designs from API:", data.length);
           setDesigns(data as Design[]);
         } else {
-          // Fallback to sample data if no designs are available
+          console.log("No designs returned from API, using fallbacks");
+          // Use fallback designs from assets if no designs are available
           const sampleDesigns: Design[] = [
             {
               id: "sample-1",
               urls: {
-                front: "https://via.placeholder.com/300x400/f8f9fa/e6e6e6?text=Jersey+Preview"
+                front: "/assets/sample-jersey-1.jpg"
               }
             },
             {
               id: "sample-2",
               urls: {
-                front: "https://via.placeholder.com/300x400/f8f9fa/e6e6e6?text=Jersey+Preview+2"
+                front: "/assets/sample-jersey-2.jpg"
               }
             }
           ];
