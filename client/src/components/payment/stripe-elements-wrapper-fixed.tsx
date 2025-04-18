@@ -1,225 +1,230 @@
 import React, { useState, useEffect } from 'react';
+import { loadStripe, Stripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import StripeElementsForm from './stripe-elements-form';
-import { apiRequest } from '@/lib/queryClient';
+import { orderService } from '@/lib/order-service';
+import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
-import stripePromise from '@/lib/stripe-client';
-import { logStripeKeyInfo, getStripeKey } from '@/lib/stripe-key-validator';
+import { StripeElementsForm } from './stripe-elements-form';
+
+// Initialize Stripe outside component to avoid re-initialization on re-renders
+let stripePromise: Promise<Stripe | null> | null = null;
+
+// Utility function to initialize Stripe safely
+const initStripe = () => {
+  if (!stripePromise) {
+    const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+    
+    if (!stripeKey) {
+      console.error('Missing Stripe public key');
+      return false;
+    }
+    
+    console.log('Initializing Stripe with key info:', {
+      keyPrefix: stripeKey.substring(0, 7),
+      keyLength: stripeKey.length,
+      isTestKey: stripeKey.startsWith('pk_test_'),
+      isLiveKey: stripeKey.startsWith('pk_live_')
+    });
+    
+    stripePromise = loadStripe(stripeKey);
+    return true;
+  }
+  return true;
+};
 
 interface StripeElementsWrapperProps {
-  amount: number | undefined;
+  amount: number;
   items: any[];
-  onSuccess?: (result: any) => void;
+  onSuccess?: (paymentIntent: any) => void;
   onCancel?: () => void;
 }
 
-export default function StripeElementsWrapper({
-  amount,
-  items,
-  onSuccess,
-  onCancel
+export default function StripeElementsWrapper({ 
+  amount, 
+  items, 
+  onSuccess, 
+  onCancel 
 }: StripeElementsWrapperProps) {
+  const { toast } = useToast();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [stripeLoaded, setStripeLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Track if the component is mounted to prevent state updates after unmounting
-  const isMounted = React.useRef(true);
   
-  // Use a ref to track if we're already fetching to prevent duplicate requests
-  const isRequestInProgress = React.useRef(false);
-  
-  // Store the last amount and items to avoid duplicate requests
-  const lastRequestData = React.useRef({ amount: 0, itemCount: 0, itemIds: [] as string[] });
-  
-  // Store the last client secret to avoid duplicates
-  const lastClientSecret = React.useRef<string | null>(null);
+  // Generate a unique component ID for debugging
+  const componentId = React.useMemo(() => 
+    `stripe-wrapper-${Math.random().toString(36).substring(2, 10)}`, 
+    []
+  );
 
-  // Create component instance ID to track renders
-  const componentId = React.useRef(`stripe_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`);
-  console.log(`[${componentId.current}] Stripe Elements Wrapper initialized`);
-
+  // Initialize Stripe on component mount
   useEffect(() => {
-    console.log(`[${componentId.current}] Component mounted`);
+    const initialized = initStripe();
+    setStripeLoaded(initialized);
     
-    // Log Stripe key info for debugging
-    logStripeKeyInfo();
-    
-    // Validate Stripe is properly initialized
-    if (!stripePromise) {
-      console.error(`[${componentId.current}] Stripe not initialized - payments will fail`);
-      setError('Payment system unavailable - please try again later');
-      setIsLoading(false);
-    } else {
-      console.log(`[${componentId.current}] Stripe initialized successfully`);
+    if (!initialized) {
+      setError('Unable to initialize payment system');
+      setLoading(false);
     }
-    
-    return () => {
-      console.log(`[${componentId.current}] Component unmounting`);
-      isMounted.current = false; // Set to false when component unmounts
-    };
   }, []);
 
+  // Create payment intent when component mounts
   useEffect(() => {
-    // Create a PaymentIntent, but with additional safeguards against duplicates
-    const fetchPaymentIntent = async () => {
-      // Validate we have the required data
-      if (!amount || !items || items.length === 0) {
-        console.log(`[${componentId.current}] No amount or items provided, skipping payment intent creation`);
-        return;
-      }
+    if (!stripeLoaded || !amount) {
+      return;
+    }
+    
+    const createPaymentIntent = async () => {
+      setLoading(true);
       
-      // Check if we already have a request in progress
-      if (isRequestInProgress.current) {
-        console.log(`[${componentId.current}] Request already in progress, skipping duplicate call`);
-        return;
-      }
-      
-      // Check if the data is identical to the last request
-      const currentItemIds = items.map(item => item.id).sort().join(',');
-      const lastItemIds = lastRequestData.current.itemIds.sort().join(',');
-      
-      if (
-        lastRequestData.current.amount === amount && 
-        lastRequestData.current.itemCount === items.length &&
-        currentItemIds === lastItemIds &&
-        lastClientSecret.current
-      ) {
-        console.log(`[${componentId.current}] Data unchanged from previous request, reusing existing client secret`);
-        return;
-      }
-      
-      // Update the last request data
-      lastRequestData.current = {
-        amount: amount,
-        itemCount: items.length,
-        itemIds: items.map(item => item.id)
-      };
-      
-      // Set the request in progress flag
-      isRequestInProgress.current = true;
-      setIsLoading(true);
-      setError(null);
-
-      // Generate a request ID that is truly unique
-      const requestId = `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      console.log(`[${componentId.current}] [${requestId}] Creating payment intent for amount: $${amount} with ${items.length} items`);
+      // Add a request ID for tracking purposes
+      const requestId = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
       
       try {
-        console.log(`[${componentId.current}] [${requestId}] Starting payment intent creation with timeout of 30 seconds`);
-        
-        // Create an AbortController with a 30 second timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          console.log(`[${componentId.current}] [${requestId}] Request timed out after 30 seconds`);
-          controller.abort();
-        }, 30000);
-        
-        // Add a unique componentId to track this specific component instance
-        // Important: The server expects the amount in cents, but we're storing it in dollars
-        // We'll send both the formatted amount and the raw amount for verification purposes
-        const response = await apiRequest('POST', '/api/create-payment-intent', {
+        console.log('Creating payment intent with:', {
           amount,
-          amountInCents: Math.round(amount * 100), // Server expects cents
-          items,
+          itemsCount: items?.length,
           requestId,
-          componentId: componentId.current
-        }, controller.signal);
-        
-        // Clear the timeout
-        clearTimeout(timeoutId);
-        
-        // Parse the response data
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.message || 'Could not create payment intent');
-        }
-        
-        console.log(`[${componentId.current}] [${requestId}] Payment intent created successfully:`, {
-          hasClientSecret: !!data.clientSecret,
-          clientSecretLength: data.clientSecret?.length,
-          amount: data.amount,
-          transactionId: data.transactionId || 'none'
+          componentId
         });
         
-        if (!data.clientSecret) {
+        const response = await orderService.createPaymentIntent({
+          amount,
+          items,
+          requestId,
+          componentId
+        });
+        
+        if (!response.clientSecret) {
           throw new Error('No client secret returned from payment service');
         }
         
-        // Store the client secret for deduplication
-        lastClientSecret.current = data.clientSecret;
+        console.log('Payment intent created successfully:', {
+          hasClientSecret: !!response.clientSecret,
+          clientSecretLength: response.clientSecret.length,
+          amount: response.amount
+        });
         
-        // Only update state if component is still mounted
-        if (isMounted.current) {
-          setClientSecret(data.clientSecret);
-        } else {
-          console.log(`[${componentId.current}] [${requestId}] Component unmounted, not setting client secret`);
-        }
+        setClientSecret(response.clientSecret);
+        setError(null);
       } catch (err: any) {
-        console.error(`[${componentId.current}] [${requestId}] Error creating payment intent:`, err);
+        console.error('Payment intent creation failed:', err);
+        setError(err.message || 'Failed to initialize payment');
         
-        // Only update state if component is still mounted
-        if (isMounted.current) {
-          setError(err.message || 'An unexpected error occurred');
-        } else {
-          console.log(`[${componentId.current}] [${requestId}] Component unmounted, not setting error`);
-        }
+        toast({
+          title: 'Payment Initialization Error',
+          description: err.message || 'Failed to initialize payment. Please try again.',
+          variant: 'destructive',
+        });
       } finally {
-        // Always reset the request in progress flag
-        isRequestInProgress.current = false;
-        
-        // Only update state if component is still mounted
-        if (isMounted.current) {
-          setIsLoading(false);
-        } else {
-          console.log(`[${componentId.current}] [${requestId}] Component unmounted, not updating loading state`);
-        }
+        setLoading(false);
       }
     };
+    
+    createPaymentIntent();
+  }, [amount, items, stripeLoaded, componentId, toast]);
 
-    // Execute the fetch function
-    fetchPaymentIntent();
-  }, [amount, items]);
+  // Handle successful payment
+  const handlePaymentSuccess = (paymentIntent: any) => {
+    if (onSuccess) {
+      onSuccess(paymentIntent);
+    }
+  };
 
-  return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Secure Payment</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  // User wants to cancel payment process
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    }
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Preparing Your Payment</CardTitle>
+          <CardDescription>
+            Please wait while we set up your secure payment...
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center py-6">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">
+              Connecting to payment service...
+            </p>
           </div>
-        ) : error ? (
-          <Alert variant="destructive">
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show error state
+  if (error || !stripeLoaded) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment System Unavailable</CardTitle>
+          <CardDescription>
+            We're having trouble connecting to our payment processor.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              <div className="font-semibold">Payment Error</div>
-              <div className="mt-1">{error}</div>
-              <div className="mt-2 text-xs text-muted-foreground">
-                If you're seeing this error repeatedly, please try refreshing the page or using a different payment method. You can also contact our support team for assistance.
-              </div>
+              {error || 'Payment system is currently unavailable. Please try again later.'}
             </AlertDescription>
           </Alert>
-        ) : clientSecret ? (
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <StripeElementsForm 
-              amount={typeof amount === 'number' ? amount : 0} 
-              onSuccess={onSuccess}
-              onCancel={onCancel}
-            />
-          </Elements>
-        ) : (
-          <Alert variant="destructive">
-            <AlertDescription>
-              Could not initialize payment form. Please try again later.
-            </AlertDescription>
-          </Alert>
-        )}
-      </CardContent>
-    </Card>
+          
+          <Button variant="outline" onClick={handleCancel} className="w-full">
+            Go Back
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // No client secret yet
+  if (!clientSecret) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Preparing Payment</CardTitle>
+          <CardDescription>
+            Initializing payment form...
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center py-6">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Configuration for Stripe Elements
+  const options: StripeElementsOptions = {
+    clientSecret,
+    appearance: {
+      theme: 'stripe',
+      variables: {
+        colorPrimary: '#E34234', // VORO brand color
+      },
+    },
+  };
+
+  // Render Stripe Elements with client secret
+  return (
+    <Elements stripe={stripePromise} options={options}>
+      <StripeElementsForm 
+        onSuccess={handlePaymentSuccess}
+        onCancel={handleCancel}
+        amount={amount}
+      />
+    </Elements>
   );
 }

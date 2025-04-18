@@ -23,6 +23,7 @@ import OrderConfigurationPage from "@/pages/order-configuration-page";
 
 // Lazy-loaded components
 const CheckoutPage = React.lazy(() => import('./pages/checkout-page'));
+const CheckoutFixedPage = React.lazy(() => import('./pages/checkout-fixed')); // New fixed version
 const CheckoutElementsPage = React.lazy(() => import('./pages/checkout-elements-page'));
 const OrderConfirmationPage = React.lazy(() => import('./pages/order-confirmation'));
 const SubscribePage = React.lazy(() => import('./pages/subscribe-page'));
@@ -117,6 +118,9 @@ function AppContent() {
           </Route>
           <Route path="/checkout">
             <ProtectedRoute path="/checkout" component={CheckoutPage} />
+          </Route>
+          <Route path="/checkout-fixed">
+            <ProtectedRoute path="/checkout-fixed" component={CheckoutFixedPage} />
           </Route>
           <Route path="/checkout-elements">
             <CheckoutElementsPage />
