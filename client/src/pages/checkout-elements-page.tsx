@@ -121,7 +121,7 @@ export default function CheckoutElementsPage() {
 
               <div className="flex justify-between font-medium">
                 <span>Total</span>
-                <span>${totalAmount.toFixed(2)}</span>
+                <span>${(totalAmount || 0).toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>

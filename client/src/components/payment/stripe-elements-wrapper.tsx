@@ -12,7 +12,7 @@ import { Loader2 } from 'lucide-react';
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 interface StripeElementsWrapperProps {
-  amount: number;
+  amount: number | undefined;
   items: any[];
   onSuccess?: (result: any) => void;
   onCancel?: () => void;
@@ -82,7 +82,7 @@ export default function StripeElementsWrapper({
         ) : clientSecret ? (
           <Elements stripe={stripePromise} options={{ clientSecret }}>
             <StripeElementsForm 
-              amount={Math.round(amount * 100)} 
+              amount={Math.round((amount || 0) * 100)} 
               onSuccess={onSuccess}
               onCancel={onCancel}
             />

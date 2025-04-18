@@ -61,7 +61,7 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
         // Payment succeeded
         toast({
           title: 'Payment successful',
-          description: `Your payment for $${(amount / 100).toFixed(2)} was successful.`,
+          description: `Your payment for $${((amount || 0) / 100).toFixed(2)} was successful.`,
         });
         
         if (onSuccess) {
@@ -115,7 +115,7 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
               Processing...
             </>
           ) : (
-            `Pay $${(amount / 100).toFixed(2)}`
+            `Pay $${((amount || 0) / 100).toFixed(2)}`
           )}
         </Button>
       </div>
