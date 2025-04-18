@@ -363,14 +363,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden - Admin access required" });
       }
       
-      const { reconcileImageFiles } = await import('./utils/image-recovery');
-      const result = await reconcileImageFiles();
+      const result = await import('./utils/image-recovery').then(module => module.reconcileImageFiles());
       
-      res.json({
-        success: true,
-        message: `Image recovery complete. Recovered ${result.recovered} of ${result.missing} missing images.`,
-        ...result
-      });
+      res.json(result);
     } catch (error) {
       console.error('Error during image recovery:', error);
       res.status(500).json({ 
@@ -392,14 +387,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden - Admin access required" });
       }
       
-      const { verifyImagePaths } = await import('./utils/image-recovery');
-      const result = await verifyImagePaths();
+      const result = await import('./utils/image-recovery').then(module => module.verifyImagePaths());
       
-      res.json({
-        success: true,
-        message: `Image verification complete. Found ${result.missing} missing files out of ${result.total} designs.`,
-        ...result
-      });
+      res.json(result);
     } catch (error) {
       console.error('Error during image verification:', error);
       res.status(500).json({ 
