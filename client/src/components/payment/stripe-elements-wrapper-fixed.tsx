@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import StripeElementsForm from './stripe-elements-form';
 import { apiRequest } from '@/lib/queryClient';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
-
-// Load Stripe outside of a component's render to avoid recreating the Stripe object
-// on every render.
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+import stripePromise from '@/lib/stripe-client';
 
 interface StripeElementsWrapperProps {
   amount: number | undefined;
