@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShoppingCart } from "lucide-react";
 import { useOrderStore } from "../hooks/use-order-store";
 import { usePriceCalculator } from "../hooks/use-price-calculator";
 import { useAuth } from "../hooks/use-auth";
@@ -80,18 +80,27 @@ export default function OrderSummary({
     updatePriceBreakdown();
   }, [items, addOns, getCartItems, calculatePrice, setPriceBreakdown]);
   
-  // Don't render if no items
+  // Show empty cart state
   if (items.length === 0) {
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>Order Summary</CardTitle>
-          <CardDescription>No items in your order</CardDescription>
+          <CardTitle>Your Cart</CardTitle>
+          <CardDescription>No items in your cart</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
-            Add items to your order to see a summary.
-          </p>
+          <div className="flex flex-col items-center justify-center py-4 space-y-4">
+            <ShoppingCart className="h-12 w-12 text-muted-foreground" />
+            <p className="text-muted-foreground text-center">
+              Start by designing a custom jersey and adding it to your cart.
+            </p>
+            <Button
+              onClick={() => setLocation("/designer")}
+              className="mt-2"
+            >
+              Design Your Jersey
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
@@ -177,10 +186,20 @@ export default function OrderSummary({
       <CardFooter className="flex-col space-y-2">
         <Button 
           className="w-full" 
-          onClick={onCheckout ? onCheckout : () => setLocation("/checkout")}
-          disabled={items.length === 0}
+          onClick={
+            items.length === 0 
+              ? () => setLocation("/designer") 
+              : (onCheckout ? onCheckout : () => setLocation("/checkout"))
+          }
         >
-          Proceed to Checkout
+          {items.length === 0 ? (
+            "Add Items to Cart"
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <ShoppingCart className="h-4 w-4" />
+              <span>Proceed to Checkout</span>
+            </div>
+          )}
         </Button>
         
         {!user && (
