@@ -185,13 +185,29 @@ export default function OrderSummary({
       <CardFooter className="flex-col space-y-2">
         <Button 
           className="w-full" 
+          disabled={isCalculatingPrice}
           onClick={
             items.length === 0 
               ? () => setLocation("/designer") 
-              : (onCheckout ? onCheckout : () => setLocation("/checkout"))
+              : (onCheckout ? onCheckout : () => {
+                  // Get the cart items before proceeding to checkout
+                  const cartItems = getCartItems();
+                  if (cartItems.length > 0) {
+                    console.log("Proceeding to checkout with", cartItems.length, "items");
+                    setLocation("/checkout");
+                  } else {
+                    console.warn("Empty cart detected despite items being present");
+                    setLocation("/designer");
+                  }
+                })
           }
         >
-          {items.length === 0 ? (
+          {isCalculatingPrice ? (
+            <div className="flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Calculating Price...</span>
+            </div>
+          ) : items.length === 0 ? (
             "Add Items to Cart"
           ) : (
             <div className="flex items-center justify-center gap-2">
@@ -204,6 +220,13 @@ export default function OrderSummary({
         {!user && (
           <p className="text-xs text-muted-foreground text-center">
             You'll need to sign in or create an account during checkout
+          </p>
+        )}
+        
+        {items.length > 0 && (
+          <p className="text-xs text-muted-foreground text-center">
+            {totalItems} {totalItems === 1 ? "item" : "items"} in cart
+            {totalAddOns > 0 && ` + ${totalAddOns} add-on${totalAddOns === 1 ? "" : "s"}`}
           </p>
         )}
       </CardFooter>

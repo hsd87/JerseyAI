@@ -38,7 +38,9 @@ const CheckoutPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const orderStore = useOrderStore();
-  const { cart, priceBreakdown, orderDetails, clearCart, setOrderCompleted } = orderStore;
+  const { getCartItems, priceBreakdown, orderDetails, clearCart, setOrderCompleted } = orderStore;
+  // Get cart items directly using the function
+  const cart = getCartItems();
   
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);

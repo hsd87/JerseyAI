@@ -75,12 +75,12 @@ export function PriceBreakdownCard({ breakdown, className }: PriceBreakdownProps
           </div>
           
           {/* Shipping threshold info */}
-          {breakdown.shippingCost > 0 && (
+          {breakdown.shipping > 0 && (
             <div className="mt-4 text-sm text-muted-foreground">
-              {breakdown.subtotalAfterDiscounts < 20000 ? (
-                <p>Spend ${formatter.format(500 - breakdown.subtotalAfterDiscounts / 100)} more for free shipping</p>
-              ) : breakdown.subtotalAfterDiscounts < 50000 ? (
-                <p>Spend ${formatter.format(500 - breakdown.subtotalAfterDiscounts / 100)} more for free shipping</p>
+              {breakdown.subtotal < 200 ? (
+                <p>Spend ${formatter.format(200 - breakdown.subtotal)} more for reduced shipping</p>
+              ) : breakdown.subtotal < 500 ? (
+                <p>Spend ${formatter.format(500 - breakdown.subtotal)} more for free shipping</p>
               ) : null}
             </div>
           )}
@@ -104,8 +104,7 @@ export function SimplePriceSummary({ breakdown, className }: PriceBreakdownProps
   const formatPrice = (cents: number) => formatter.format(cents / 100);
   
   // Calculate if there's any discount
-  const hasDiscount = breakdown.tierDiscountAmount > 0 || breakdown.subscriptionDiscountAmount > 0;
-  const totalDiscount = breakdown.tierDiscountAmount + breakdown.subscriptionDiscountAmount;
+  const hasDiscount = breakdown.discount > 0;
   
   return (
     <div className={className}>
@@ -114,7 +113,7 @@ export function SimplePriceSummary({ breakdown, className }: PriceBreakdownProps
         <div className="text-right">
           {hasDiscount && (
             <span className="text-sm line-through text-muted-foreground mr-2">
-              {formatPrice(breakdown.baseTotal)}
+              {formatPrice(breakdown.subtotal)}
             </span>
           )}
           <span className="font-bold">
@@ -125,11 +124,11 @@ export function SimplePriceSummary({ breakdown, className }: PriceBreakdownProps
       
       {hasDiscount && (
         <div className="text-sm text-green-600 text-right">
-          You save {formatPrice(totalDiscount)} ({Math.round((totalDiscount / breakdown.baseTotal) * 100)}%)
+          You save {formatPrice(breakdown.discount)} ({Math.round((breakdown.discount / breakdown.subtotal) * 100)}%)
         </div>
       )}
       
-      {breakdown.shippingCost === 0 && (
+      {breakdown.shipping === 0 && (
         <div className="text-sm text-green-600 text-right mt-1">
           Free shipping included
         </div>
