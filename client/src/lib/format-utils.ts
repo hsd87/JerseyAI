@@ -3,11 +3,11 @@
  */
 
 /**
- * Format a price value to a consistent currency string
+ * Format a price value to a consistent currency string with exactly 2 decimal places
  * @param price The price to format (can be number or string)
  * @param currency The currency code (default: USD)
  * @param locale The locale to use for formatting (default: en-US)
- * @returns Formatted price string with currency symbol
+ * @returns Formatted price string with currency symbol and exactly 2 decimal places
  */
 export function formatPrice(
   price: number | string | undefined | null,
@@ -28,6 +28,7 @@ export function formatPrice(
   }
 
   // Format with Intl.NumberFormat for consistency
+  // Always use exactly 2 decimal places for all prices
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
