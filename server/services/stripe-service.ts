@@ -29,8 +29,43 @@ export async function checkStripeApiKey(): Promise<{ valid: boolean, message: st
       };
     }
 
+    // For restricted keys, use a direct API call instead of the Stripe library
+    // This is more reliable with restricted keys that may have limited permissions
+    if (stripeKey.startsWith('rk_')) {
+      try {
+        // Use a fetch or https request to directly check the balance API
+        const response = await fetch('https://api.stripe.com/v1/balance', {
+          headers: {
+            'Authorization': `Bearer ${stripeKey}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+        
+        if (response.ok) {
+          console.log("✅ Stripe API key validated successfully with direct API call");
+          return { 
+            valid: true, 
+            message: "Stripe API key is valid and working." 
+          };
+        } else {
+          const errorData = await response.json();
+          return {
+            valid: false,
+            message: `API validation failed: ${errorData.error?.message || 'Unknown error'}`
+          };
+        }
+      } catch (error) {
+        const directApiError = error as Error;
+        console.error("Error during direct API validation:", directApiError);
+        return {
+          valid: false,
+          message: `Direct API validation failed: ${directApiError.message || 'Unknown error'}`
+        };
+      }
+    }
+    
+    // For standard keys, use the Stripe library (more reliable for non-restricted keys)
     // Create a temporary Stripe instance to verify the key
-    // This ensures we're using the exact environment key and not any cached value
     const tempStripe = new Stripe(stripeKey, { 
       apiVersion: '2022-11-15' as any // Use a compatible API version
     });
@@ -39,7 +74,7 @@ export async function checkStripeApiKey(): Promise<{ valid: boolean, message: st
     const balance = await tempStripe.balance.retrieve();
     
     // If we get here, the key is valid and working
-    console.log("✅ Stripe API key validated successfully with direct check");
+    console.log("✅ Stripe API key validated successfully with Stripe library");
     
     return { 
       valid: true, 
@@ -340,15 +375,21 @@ async function createPaymentIntentWithStripe(
  * @returns The client secret for the payment intent
  */
 export async function createPaymentIntent(amount: number, customerId?: string | null): Promise<string> {
-  // First validate the Stripe instance
+  // First validate that we have a Stripe key
+  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeKey) {
+    throw new Error('Stripe is not configured - missing API key');
+  }
+  
+  // For restricted keys, use direct API approach
+  if (stripeKey.startsWith('rk_')) {
+    console.log('Using direct API call approach for restricted key');
+    return createPaymentIntentWithDirectApi(stripeKey, amount, customerId);
+  }
+  
+  // For standard keys, use the Stripe library
   if (!stripeInstance) {
     console.error('Stripe instance not initialized when creating payment intent');
-    
-    // Check if API key exists
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeKey) {
-      throw new Error('Stripe is not configured - missing API key');
-    }
     
     // Try to create a local Stripe instance
     try {
@@ -367,6 +408,76 @@ export async function createPaymentIntent(amount: number, customerId?: string | 
   
   // Use the main instance
   return createPaymentIntentWithStripe(stripeInstance, amount, customerId);
+}
+
+/**
+ * Create a payment intent using direct API calls instead of the Stripe library
+ * This is more reliable with restricted keys
+ */
+async function createPaymentIntentWithDirectApi(
+  apiKey: string,
+  amount: number,
+  customerId?: string | null
+): Promise<string> {
+  console.log(`Creating payment intent for ${amount} cents with direct API`);
+  
+  // Validate the amount (minimum 50 cents)
+  if (!amount || amount < 50) {
+    console.warn(`Invalid amount provided: ${amount}. Setting to minimum 50 cents.`);
+    amount = 50; // Set to minimum rather than throwing error
+  }
+  
+  // Ensure amount is an integer
+  const intAmount = Math.round(amount);
+  
+  try {
+    // Prepare request body
+    const params = new URLSearchParams();
+    params.append('amount', intAmount.toString());
+    params.append('currency', 'usd');
+    
+    // Only add customer if provided
+    if (customerId) {
+      params.append('customer', customerId);
+    }
+    
+    // Enable automatic payment methods
+    params.append('automatic_payment_methods[enabled]', 'true');
+    
+    // Make the API call
+    const startTime = Date.now();
+    const response = await fetch('https://api.stripe.com/v1/payment_intents', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: params
+    });
+    
+    // Handle errors
+    if (!response.ok) {
+      const errorData = await response.json() as any;
+      console.error('Stripe API error:', errorData);
+      throw new Error(errorData.error?.message || 'Unknown Stripe API error');
+    }
+    
+    // Parse the response
+    const paymentIntent = await response.json() as any;
+    
+    const duration = Date.now() - startTime;
+    console.log(`Payment intent created in ${duration}ms with ID: ${paymentIntent.id}`);
+    
+    if (!paymentIntent.client_secret) {
+      throw new Error('No client secret returned from Stripe');
+    }
+    
+    return paymentIntent.client_secret;
+  } catch (error) {
+    const apiError = error as Error;
+    console.error('Error creating payment intent with direct API:', apiError);
+    throw apiError;
+  }
 }
 
 /**
