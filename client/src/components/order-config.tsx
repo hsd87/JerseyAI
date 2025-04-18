@@ -272,47 +272,22 @@ export default function OrderConfig({
         });
       }
       
-      // Apply quantity-based discounts
+      // No quantity-based discounts per simplified pricing model
       const totalQuantity = watchedIsTeamOrder 
         ? Math.max(1, teamMembers.length)
         : Math.max(1, watchedQuantity || 1);
       
-      let discount = 0;
-      if (totalQuantity >= 50) {
-        discount = 0.15; // 15% off
-      } else if (totalQuantity >= 20) {
-        discount = 0.10; // 10% off
-      } else if (totalQuantity >= 10) {
-        discount = 0.05; // 5% off
-      }
+      // No discounts with simplified pricing model
+      setTotalPrice(price);
       
-      const discountedPrice = discount > 0 ? price * (1 - discount) : price;
-      
-      setTotalPrice(discountedPrice);
-      
-      // Update price breakdown in store
+      // Update price breakdown in store with simplified pricing
       if (setPriceBreakdown) {
         try {
-          const baseTotal = discount > 0 ? price : discountedPrice;
-          const discountAmount = discount > 0 ? discount * price : 0;
-          const shipping = 9.99;
-          const tax = discountedPrice * 0.07; // Assuming 7% tax rate
-          
           setPriceBreakdown({
-            subtotal: discountedPrice,
-            discount: discountAmount,
-            discountPercentage: discount * 100,
-            shipping: shipping,
-            tax: tax,
-            grandTotal: discountedPrice * 1.07 + shipping, // Tax + shipping
+            subtotal: price,
+            grandTotal: price,
             itemCount: totalQuantity,
-            baseTotal: baseTotal,
-            tierDiscountApplied: discount > 0,
-            tierDiscountAmount: discountAmount,
-            subscriptionDiscountApplied: false,
-            subscriptionDiscountAmount: 0,
-            shippingFreeThresholdApplied: false,
-            priceBeforeTax: discountedPrice
+            baseTotal: price
           });
         } catch (err) {
           console.error("Error setting price breakdown:", err);
@@ -547,9 +522,7 @@ export default function OrderConfig({
     const priceDetails = {
       basePrice: packageUnitPrice,
       subtotal: totalPrice,
-      tax: totalPrice * 0.07,
-      shipping: 9.99,
-      totalAmount: totalPrice * 1.07 + 9.99,
+      totalAmount: totalPrice,
     };
     
     // Create default items array from packageItems
@@ -573,19 +546,9 @@ export default function OrderConfig({
       teamMembers: watchedIsTeamOrder ? teamMembers : [],
       priceBreakdown: {
         subtotal: totalPrice,
-        discount: 0,
-        discountPercentage: 0,
-        shipping: 9.99,
-        tax: totalPrice * 0.07,
-        grandTotal: totalPrice * 1.07 + 9.99,
+        grandTotal: totalPrice,
         itemCount: watchedQuantity,
-        baseTotal: totalPrice,
-        tierDiscountApplied: false,
-        tierDiscountAmount: 0,
-        subscriptionDiscountApplied: false,
-        subscriptionDiscountAmount: 0,
-        shippingFreeThresholdApplied: false,
-        priceBeforeTax: totalPrice
+        baseTotal: totalPrice
       }
     };
     
@@ -2100,34 +2063,9 @@ export default function OrderConfig({
                       </div>
                     )}
                     
-                    {(watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 10 && (
-                      <div className="flex justify-between border-b border-gray-200 pb-3 text-green-600">
-                        <span className="font-medium">Quantity Discount:</span>
-                        <span className="font-medium">
-                          {(watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 50 ? '15% off' : 
-                           (watchedIsTeamOrder ? teamMembers.length : watchedQuantity) >= 20 ? '10% off' : '5% off'}
-                        </span>
-                      </div>
-                    )}
-                    
-                    <div className="flex justify-between border-b border-gray-200 pb-3">
-                      <span className="font-medium text-voro-black">Subtotal:</span>
-                      <span className="font-medium text-voro-black">${totalPrice.toFixed(2)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between border-b border-gray-200 pb-3 text-gray-600">
-                      <span>Estimated Tax:</span>
-                      <span>${(totalPrice * 0.07).toFixed(2)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between border-b border-gray-200 pb-3 text-gray-600">
-                      <span>Shipping:</span>
-                      <span>$9.99</span>
-                    </div>
-                    
                     <div className="flex justify-between pt-3 text-xl font-bold">
                       <span className="text-voro-black">Total:</span>
-                      <span className="text-voro-red">${(totalPrice * 1.07 + 9.99).toFixed(2)}</span>
+                      <span className="text-voro-red">${totalPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
