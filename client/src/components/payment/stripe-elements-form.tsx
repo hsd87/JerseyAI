@@ -25,6 +25,9 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
   useEffect(() => {
     if (elements) {
       setErrorMessage(undefined);
+      console.log('Stripe Elements loaded successfully');
+    } else {
+      console.log('Waiting for Stripe Elements to load...');
     }
   }, [elements]);
 
@@ -40,6 +43,8 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
     setErrorMessage(undefined);
 
     try {
+      console.log('Confirming payment with amount:', amount);
+      
       // Confirm the payment
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
@@ -49,7 +54,14 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
         redirect: 'if_required',
       });
 
+      console.log('Payment confirmation response:', {
+        hasError: !!error,
+        hasPaymentIntent: !!paymentIntent,
+        paymentIntentStatus: paymentIntent?.status
+      });
+
       if (error) {
+        console.error('Payment confirmation error:', error);
         // Show error to your customer
         setErrorMessage(error.message);
         toast({
@@ -58,6 +70,7 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
           variant: 'destructive',
         });
       } else if (paymentIntent) {
+        console.log('Payment successful:', paymentIntent.id);
         // Payment succeeded
         toast({
           title: 'Payment successful',
@@ -67,6 +80,14 @@ export default function StripeElementsForm({ onSuccess, onCancel, amount }: Stri
         if (onSuccess) {
           onSuccess(paymentIntent);
         }
+      } else {
+        console.warn('No payment intent or error returned - this is unusual');
+        // This is an edge case but we should handle it
+        toast({
+          title: 'Payment status unclear',
+          description: 'We couldn\'t confirm if your payment was processed. Please check your email for payment confirmation.',
+          variant: 'default',
+        });
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'An unexpected error occurred');

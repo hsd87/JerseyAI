@@ -41,18 +41,14 @@ router.post('/create-payment-intent', async (req, res) => {
     let customerId = null;
     
     if (req.isAuthenticated && req.isAuthenticated() && req.user) {
-      const user = await storage.getUserById(req.user.id);
+      // Get user from storage
+      const user = await storage.getUser(req.user.id);
       if (user && user.stripeCustomerId) {
         customerId = user.stripeCustomerId;
-      } else if (user) {
-        // Create customer in Stripe if needed
-        try {
-          customerId = await storage.createStripeCustomer(user);
-        } catch (err) {
-          console.error('Error creating Stripe customer:', err);
-          // Continue without customer ID if creation fails
-        }
+        console.log(`Using existing Stripe customer ID: ${customerId} for user ${user.id}`);
       }
+      // Note: We're not attempting to create a Stripe customer here
+      // as the method doesn't exist in the storage interface
     }
 
     // Create the payment intent

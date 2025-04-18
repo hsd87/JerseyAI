@@ -49,9 +49,14 @@ export default function StripeElementsWrapper({
         }
         
         console.log('Payment intent created successfully:', {
-          clientSecret: data.clientSecret ? 'present' : 'missing',
+          hasClientSecret: !!data.clientSecret,
+          clientSecretLength: data.clientSecret?.length,
           amount: data.amount
         });
+        
+        if (!data.clientSecret) {
+          throw new Error('No client secret returned from payment service');
+        }
         
         setClientSecret(data.clientSecret);
       } catch (err: any) {

@@ -28,7 +28,13 @@ export default function CheckoutElementsPage() {
 
   // Handle successful payment
   const handlePaymentSuccess = (paymentResult: any) => {
-    console.log('Payment successful:', paymentResult);
+    console.log('Payment successful details:', {
+      id: paymentResult.id,
+      status: paymentResult.status,
+      amount: paymentResult.amount,
+      created: new Date(paymentResult.created * 1000).toISOString()
+    });
+    
     setPaymentCompleted(true);
     
     // Clear the cart
@@ -42,6 +48,7 @@ export default function CheckoutElementsPage() {
     
     // Redirect to success page after a short delay
     setTimeout(() => {
+      console.log('Redirecting to payment success page');
       setLocation('/payment-success');
     }, 2000);
   };
