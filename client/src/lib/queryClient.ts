@@ -11,6 +11,7 @@ export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
+  customSignal?: AbortSignal,
 ): Promise<Response> {
   // Add logging to debug request details
   console.log(`Making ${method} request to:`, url);
@@ -38,12 +39,15 @@ export async function apiRequest(
     try {
       console.log(`Request timeout set to ${timeout/1000} seconds`);
       
+      // Use custom signal if provided, otherwise use default timeout
+      const signal = customSignal || AbortSignal.timeout(timeout);
+      
       const res = await fetch(normalizedUrl, {
         method,
         headers: data ? { "Content-Type": "application/json" } : {},
         body: data ? JSON.stringify(data) : undefined,
         credentials: "include",
-        signal: AbortSignal.timeout(timeout)
+        signal
       });
   
       // Check for non-ok responses and handle them appropriately

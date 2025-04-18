@@ -42,7 +42,7 @@ class OrderService {
           }];
       
       // Validate amount
-      const amount = request.amount;
+      const amount = request.amount || 0;
       if (isNaN(amount) || amount <= 0) {
         console.error(`Invalid amount provided: ${amount}`);
         throw new Error('Invalid payment amount. Please try again.');
@@ -50,50 +50,85 @@ class OrderService {
       
       console.log(`Creating payment intent for amount: $${amount} with ${items.length} items`);
       
-      // Make API request
-      const response = await apiRequest('POST', '/api/create-payment-intent', {
-        amount,
-        items,
-      });
+      // Set a reasonable timeout for payment API
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
       
-      // Handle error responses
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Payment intent error response:', errorData);
+      try {
+        // Make API request with timeout using updated API that accepts AbortSignal
+        const response = await apiRequest('POST', '/api/create-payment-intent', {
+          amount,
+          items,
+        }, controller.signal);
         
-        // Handle specific error types
-        if (errorData.error === 'stripe_not_configured') {
-          throw new Error('Payment system is not properly configured. Please contact support.');
-        } else if (errorData.error === 'authentication_required' || response.status === 401) {
-          throw new Error('Authentication required. Please log in and try again.');
-        } else if (errorData.error === 'stripe_auth_error') {
-          throw new Error('Payment system configuration error. Please contact support.');
-        } else if (errorData.error === 'stripe_connection_error') {
-          throw new Error('Unable to connect to payment service. Please try again later.');
-        } else {
-          throw new Error(errorData.message || 'Failed to create payment intent');
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        // Handle error responses
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Payment intent error response:', errorData);
+          
+          // Handle specific error types
+          if (errorData.error === 'stripe_not_configured' || errorData.error === 'stripe_unavailable') {
+            throw new Error('Payment system is temporarily unavailable. Your order has been saved and you can complete payment later.');
+          } else if (errorData.error === 'authentication_required' || response.status === 401) {
+            throw new Error('Authentication required. Please log in and try again.');
+          } else if (errorData.error === 'stripe_auth_error') {
+            throw new Error('Payment system configuration error. Our team has been notified and is working to fix the issue.');
+          } else if (errorData.error === 'stripe_connection_error') {
+            throw new Error('Unable to connect to payment service. Your order has been saved and you can complete payment later.');
+          } else {
+            throw new Error(errorData.message || 'Failed to create payment intent');
+          }
         }
+        
+        // Process successful response
+        const responseData = await response.json();
+        console.log('Payment intent created successfully:', responseData);
+        
+        // Ensure the response contains the required clientSecret
+        if (!responseData.clientSecret) {
+          console.error('Missing client secret in payment intent response:', responseData);
+          throw new Error('Invalid response from payment service. Please try again.');
+        }
+        
+        return responseData;
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error('Payment request timed out after 15 seconds');
+          throw new Error('Payment system is taking too long to respond. Your order has been saved for later processing.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
       }
-      
-      // Process successful response
-      const responseData = await response.json();
-      console.log('Payment intent created successfully:', responseData);
-      
-      // Ensure the response contains the required clientSecret
-      if (!responseData.clientSecret) {
-        console.error('Missing client secret in payment intent response:', responseData);
-        throw new Error('Invalid response from payment service. Please try again.');
-      }
-      
-      return responseData;
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
       
+      // Log detailed error info for debugging
+      console.log('Error details:', { 
+        message: error.message, 
+        name: error.name, 
+        stack: error.stack,
+        stripeError: error.type || 'none'
+      });
+      
       // Provide user-friendly error messages
-      if (error.message.includes('Network Error') || error.message.includes('Failed to fetch')) {
-        throw new Error('Network error. Please check your internet connection and try again.');
-      } else if (error.message.includes('Stripe') || error.message.includes('payment')) {
-        // Pass through payment-specific errors
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('The payment system is responding slowly. Your order details have been saved and you can try again later.');
+      } else if (error.message.includes('Stripe') || 
+                error.message.includes('payment') || 
+                error.message.includes('unavailable')) {
+        // Pass through payment-specific errors - these are already user-friendly
         throw error;
       }
       
@@ -107,17 +142,79 @@ class OrderService {
    */
   async createSubscription(): Promise<CreateSubscriptionResponse> {
     try {
-      const response = await apiRequest('POST', '/api/get-or-create-subscription');
+      // Set a reasonable timeout for subscription creation
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create subscription');
+      try {
+        // Make API request with timeout using updated API that accepts AbortSignal
+        const response = await apiRequest('POST', '/api/get-or-create-subscription', undefined, 
+          controller.signal);
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Subscription creation error response:', errorData);
+          
+          // Handle specific error types
+          if (errorData.error === 'stripe_not_configured' || errorData.error === 'stripe_unavailable') {
+            throw new Error('Subscription service is temporarily unavailable. Please try again later.');
+          } else if (errorData.error === 'authentication_required' || response.status === 401) {
+            throw new Error('Authentication required. Please log in and try again.');
+          } else if (errorData.error === 'stripe_auth_error') {
+            throw new Error('Subscription system configuration error. Our team has been notified.');
+          } else if (errorData.error === 'stripe_connection_error') {
+            throw new Error('Unable to connect to subscription service. Please try again later.');
+          } else if (errorData.error === 'subscription_exists') {
+            throw new Error('You already have an active subscription.');
+          } else {
+            throw new Error(errorData.message || 'Failed to create subscription');
+          }
+        }
+        
+        return await response.json();
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error('Subscription request timed out after 15 seconds');
+          throw new Error('Subscription service is taking too long to respond. Please try again later.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
       }
-      
-      return await response.json();
     } catch (error: any) {
       console.error('Subscription creation error:', error);
-      throw new Error(error.message || 'Subscription initialization failed');
+      
+      // Log detailed error info for debugging
+      console.log('Subscription error details:', { 
+        message: error.message, 
+        name: error.name, 
+        stack: error.stack,
+        stripeError: error.type || 'none'
+      });
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('The subscription service is responding slowly. Please try again later.');
+      } else if (error.message.includes('Stripe') || 
+                error.message.includes('subscription') || 
+                error.message.includes('unavailable')) {
+        // Pass through subscription-specific errors - these are already user-friendly
+        throw error;
+      }
+      
+      // Generic fallback error
+      throw new Error(error.message || 'Subscription initialization failed. Please try again later.');
     }
   }
 
@@ -126,17 +223,73 @@ class OrderService {
    */
   async cancelSubscription(): Promise<{ success: boolean }> {
     try {
-      const response = await apiRequest('POST', '/api/cancel-subscription');
+      // Set a reasonable timeout for subscription cancellation
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to cancel subscription');
+      try {
+        // Make API request with timeout
+        const response = await apiRequest('POST', '/api/cancel-subscription', undefined, controller.signal);
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Subscription cancellation error response:', errorData);
+          
+          // Handle specific error types
+          if (errorData.error === 'stripe_not_configured' || errorData.error === 'stripe_unavailable') {
+            throw new Error('Subscription service is temporarily unavailable. Please try again later.');
+          } else if (errorData.error === 'authentication_required' || response.status === 401) {
+            throw new Error('Authentication required. Please log in and try again.');
+          } else if (errorData.error === 'stripe_auth_error') {
+            throw new Error('Subscription system configuration error. Our team has been notified.');
+          } else if (errorData.error === 'stripe_connection_error') {
+            throw new Error('Unable to connect to subscription service. Please try again later.');
+          } else if (errorData.error === 'no_subscription') {
+            throw new Error('You do not have an active subscription to cancel.');
+          } else {
+            throw new Error(errorData.message || 'Failed to cancel subscription');
+          }
+        }
+        
+        return await response.json();
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error('Subscription cancellation request timed out after 15 seconds');
+          throw new Error('Subscription service is taking too long to respond. Please try again later.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
       }
-      
-      return await response.json();
     } catch (error: any) {
       console.error('Subscription cancellation error:', error);
-      throw new Error(error.message || 'Failed to cancel subscription');
+      
+      // Log detailed error info for debugging
+      console.log('Cancellation error details:', { 
+        message: error.message, 
+        name: error.name, 
+        stack: error.stack,
+        stripeError: error.type || 'none'
+      });
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('The subscription service is responding slowly. Please try again later.');
+      }
+      
+      // Pass through subscription-specific errors or use generic message
+      throw new Error(error.message || 'Failed to cancel your subscription. Please try again later.');
     }
   }
 
