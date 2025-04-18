@@ -1,4 +1,4 @@
-import { ShippingAddress } from '@/types/shipping';
+import { ShippingAddress } from '../types/shipping';
 
 export interface ShippingOption {
   id: string;
