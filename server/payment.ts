@@ -498,19 +498,22 @@ export function registerPaymentRoutes(app: Express) {
       const clientSecret = await createPaymentIntent(finalAmountInCents, customerId || '');
 
       // Include request ID in the response for better client-side tracking
+      const reqId = req.body?.requestId || undefined;
       res.json({
         clientSecret,
         amount: finalAmountInCents,
         success: true,
-        requestId: requestId || undefined
+        requestId: reqId
       });
     } catch (error: any) {
-      console.error(`Error creating payment intent [${requestId || 'no-id'}]:`, error);
+      // Get the requestId from the original request body if available
+      const reqId = req.body?.requestId || 'no-id';
+      console.error(`Error creating payment intent [${reqId}]:`, error);
       
       res.status(500).json({
         error: error.message || 'Failed to create payment intent',
         success: false,
-        requestId: requestId || undefined
+        requestId: reqId
       });
     }
   });

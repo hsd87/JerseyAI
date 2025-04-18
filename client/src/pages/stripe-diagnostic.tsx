@@ -8,7 +8,6 @@ import { Loader2, Check, AlertCircle, CheckCircle, XCircle } from "lucide-react"
 import { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { validateStripeKey, logStripeKeyInfo } from "@/lib/stripe-key-validator";
-import { getStripeKey } from "@/lib/stripe-client";
 import StripeElementsWrapper from "@/components/payment/stripe-elements-wrapper-fixed";
 
 interface TestResult {
@@ -48,10 +47,10 @@ export default function StripeDiagnostic() {
     
     try {
       // First check if we have the required environment variables
-      const stripeKey = getStripeKey();
-      const keyValidation = validateStripeKey(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+      const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+      const keyValidation = validateStripeKey(stripePublicKey);
       
-      if (keyValidation.isEmpty) {
+      if (!stripePublicKey) {
         setResults([
           {
             test: 'Environment Check',
@@ -64,13 +63,13 @@ export default function StripeDiagnostic() {
         return;
       }
       
-      if (!keyValidation.valid) {
+      if (!keyValidation.isValid) {
         setResults([
           {
             test: 'Environment Check',
             status: 'error',
             message: 'Invalid Stripe public key format',
-            details: keyValidation.info
+            details: keyValidation.warning
           }
         ]);
         setIsRunning(false);
@@ -87,9 +86,9 @@ export default function StripeDiagnostic() {
           status: 'success',
           message: 'Stripe public key is properly configured',
           details: {
-            keyType: keyValidation.type,
-            mode: keyValidation.mode,
-            prefix: keyValidation.prefix
+            keyType: keyValidation.keyType,
+            environment: keyValidation.environment,
+            warning: keyValidation.warning || 'None'
           }
         }
       ]);
@@ -102,7 +101,7 @@ export default function StripeDiagnostic() {
       }]);
       
       try {
-        const stripe = await loadStripe(stripeKey || '');
+        const stripe = await loadStripe(stripePublicKey);
         
         if (!stripe) {
           setResults(prev => [

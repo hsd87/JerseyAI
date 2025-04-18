@@ -32,6 +32,7 @@ const ProductsPage = React.lazy(() => import('./pages/products-page'));
 const TestPage = React.lazy(() => import('./pages/test-page'));
 const OrderDemoPage = React.lazy(() => import('./pages/order-demo-page'));
 const PaymentTestPage = React.lazy(() => import('./pages/payment-test'));
+const StripeDiagnosticPage = React.lazy(() => import('./pages/stripe-diagnostic'));
 
 // Main application component that handles routing and subscription updates
 function AppContent() {
@@ -138,6 +139,10 @@ function AppContent() {
           
           <Route path="/payment-test">
             <PaymentTestPage />
+          </Route>
+          
+          <Route path="/stripe-diagnostic">
+            <StripeDiagnosticPage />
           </Route>
           
           {/* 404 route */}
