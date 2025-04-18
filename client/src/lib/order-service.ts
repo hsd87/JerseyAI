@@ -27,8 +27,79 @@ class OrderService {
   /**
    * Create a payment intent with Stripe
    */
+  // Class-level cache to store the last successful payment intent
+  private static paymentIntentCache: {
+    amount: number;
+    timestamp: number;
+    response: CreatePaymentIntentResponse;
+  } | null = null;
+  
+  // Static variable to track if a request is in progress
+  private static requestInProgress = false;
+  
+  // Reference to the auth service
+  private authService: any;
+  
+  constructor() {
+    // Initialize authService - it will be set by the component that uses this service
+    this.authService = { userId: null };
+    
+    // Try to get auth info from the page if available
+    try {
+      const userElement = document.getElementById('user-data');
+      if (userElement && userElement.dataset.userId) {
+        this.authService = { 
+          userId: parseInt(userElement.dataset.userId),
+          username: userElement.dataset.username || 'guest'
+        };
+      }
+    } catch (e) {
+      console.warn('Failed to get user data from page:', e);
+    }
+  }
+  
   async createPaymentIntent(request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> {
     try {
+      // Validate amount
+      const amount = request.amount || 0;
+      if (isNaN(amount) || amount <= 0) {
+        console.error(`Invalid amount provided: ${amount}`);
+        throw new Error('Invalid payment amount. Please try again.');
+      }
+      
+      // Check class-level cache first (valid for 10 minutes)
+      const now = Date.now();
+      if (OrderService.paymentIntentCache && 
+          OrderService.paymentIntentCache.amount === amount &&
+          now - OrderService.paymentIntentCache.timestamp < 10 * 60 * 1000) { // 10 minutes
+        console.log(`Cached payment intent for amount: $${amount}`, {
+          hasClientSecret: !!OrderService.paymentIntentCache.response.clientSecret,
+          clientSecretLength: OrderService.paymentIntentCache.response.clientSecret?.length || 0,
+          amount: OrderService.paymentIntentCache.response.amount
+        });
+        return OrderService.paymentIntentCache.response;
+      }
+      
+      // Check if a request is already in progress
+      if (OrderService.requestInProgress) {
+        console.log('Payment intent request already in progress, waiting...');
+        // Wait for up to 5 seconds for the ongoing request to complete
+        for (let i = 0; i < 10; i++) {
+          await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+          if (!OrderService.requestInProgress) {
+            // If the cache was populated while waiting, check it again
+            if (OrderService.paymentIntentCache?.amount === amount) {
+              console.log('Payment intent became available while waiting');
+              return OrderService.paymentIntentCache.response;
+            }
+            break;
+          }
+        }
+      }
+      
+      // Mark that a request is in progress
+      OrderService.requestInProgress = true;
+      
       // Ensure we have valid items to send
       const items = request.orderItems && request.orderItems.length > 0 
         ? request.orderItems.map(item => ({
@@ -49,33 +120,11 @@ class OrderService {
             gender: 'unisex' 
           }];
       
-      // Validate amount
-      const amount = request.amount || 0;
-      if (isNaN(amount) || amount <= 0) {
-        console.error(`Invalid amount provided: ${amount}`);
-        throw new Error('Invalid payment amount. Please try again.');
-      }
-      
-      console.log(`Creating payment intent for amount: $${amount} with ${items.length} items`);
-      
-      // Track unique requests to prevent duplicates
-      const requestId = `${amount}-${Date.now()}`;
-      const recentRequestKey = `recent-payment-request-${requestId}`;
-      
-      // Check if this exact request has been processed in the last 5 seconds
-      if (sessionStorage.getItem(recentRequestKey)) {
-        console.log('Preventing duplicate payment intent creation for request:', requestId);
-        try {
-          const cachedResponse = JSON.parse(sessionStorage.getItem(recentRequestKey) || '{}');
-          if (cachedResponse.clientSecret) {
-            return cachedResponse;
-          }
-          // If cached response is invalid, continue with the request
-          console.log('Cached payment intent response was invalid, creating a new one');
-        } catch (e) {
-          console.warn('Error parsing cached payment intent, will create a new one:', e);
-        }
-      }
+      console.log(`Creating payment intent for checkout with:`, {
+        amount, 
+        cartItems: items.length,
+        userId: this.authService?.userId
+      });
       
       // Set a reasonable timeout for payment API
       const controller = new AbortController();
@@ -129,17 +178,25 @@ class OrderService {
             throw new Error('Invalid response from payment service. Please try again.');
           }
           
-          // Cache the successful response to prevent duplicate requests
-          try {
-            sessionStorage.setItem(recentRequestKey, JSON.stringify(responseData));
-            console.log('Cached payment intent for request:', requestId);
-            // Set an expiration for this cached item (5 seconds)
-            setTimeout(() => {
-              sessionStorage.removeItem(recentRequestKey);
-            }, 5000);
-          } catch (storageError) {
-            console.warn('Failed to cache payment intent:', storageError);
-          }
+          // Store in class-level cache
+          OrderService.paymentIntentCache = {
+            amount,
+            timestamp: Date.now(),
+            response: responseData
+          };
+          
+          // Log successful cache
+          console.log('Cached payment intent for request:', {
+            amount,
+            hasClientSecret: !!responseData.clientSecret,
+            clientSecretLength: responseData.clientSecret?.length || 0
+          });
+          
+          // Add a small delay before releasing the lock to prevent rapid repeat requests
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Reset the in-progress flag
+          OrderService.requestInProgress = false;
           
           return responseData;
         } catch (jsonError) {
@@ -149,6 +206,9 @@ class OrderService {
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
+        
+        // Reset the in-progress flag
+        OrderService.requestInProgress = false;
         
         // Handle fetch-specific errors (timeout, network issues)
         if (fetchError.name === 'AbortError') {
@@ -160,6 +220,8 @@ class OrderService {
         throw fetchError;
       }
     } catch (error: any) {
+      // Always make sure to reset the in-progress flag on any error
+      OrderService.requestInProgress = false;
       console.error('Payment intent creation error:', error);
       
       // Log detailed error info for debugging
