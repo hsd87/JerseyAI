@@ -342,9 +342,28 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     output_format: "jpg",
     disable_safety_checker: false,
     lora_scale: 0.8,
-    extra_lora: "",  // String type
-    extra_lora_scale: 0.69  // Number type
+    extra_lora: "",  // Ensure this is always a string
+    extra_lora_scale: 0.69  // Ensure this is always a number
   };
+  
+  // Type validation to fix 422 errors
+  // Ensure extra_lora is always a string
+  if (typeof input.extra_lora !== 'string') {
+    console.log(`Type correction: Converting extra_lora from ${typeof input.extra_lora} to string`);
+    input.extra_lora = String(input.extra_lora);
+  }
+  
+  // Ensure extra_lora_scale is always a number
+  if (typeof input.extra_lora_scale !== 'number') {
+    console.log(`Type correction: Converting extra_lora_scale from ${typeof input.extra_lora_scale} to number`);
+    input.extra_lora_scale = Number(input.extra_lora_scale) || 0.69; // Use default if conversion fails
+  }
+  
+  // Log corrected parameters
+  console.log("Validated input types:", {
+    extra_lora_type: typeof input.extra_lora,
+    extra_lora_scale_type: typeof input.extra_lora_scale
+  });
   
   // Remove retry logic - we want to handle retries in the frontend
   // This prevents duplicate API calls and gives more control to the user

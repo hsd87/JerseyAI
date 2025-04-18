@@ -76,11 +76,24 @@ export function useReplicate() {
         
         // Add accent colors if they exist in the form data
         if ('accentColor1' in formData && formData['accentColor1']) {
-          cleanedFormData.accentColor1 = formData['accentColor1'] as string;
+          cleanedFormData.accentColor1 = String(formData['accentColor1']);
         }
         
         if ('accentColor2' in formData && formData['accentColor2']) {
-          cleanedFormData.accentColor2 = formData['accentColor2'] as string;
+          cleanedFormData.accentColor2 = String(formData['accentColor2']);
+        }
+        
+        // Ensure Replicate API parameters have correct types
+        // extra_lora must be a string
+        if ('extra_lora' in formData) {
+          cleanedFormData.extra_lora = String(formData['extra_lora']);
+        }
+        
+        // extra_lora_scale must be a number
+        if ('extra_lora_scale' in formData) {
+          cleanedFormData.extra_lora_scale = typeof formData['extra_lora_scale'] === 'number' 
+            ? formData['extra_lora_scale'] 
+            : Number(formData['extra_lora_scale']) || 0.69;
         }
         
         console.log("Sending cleaned form data to generate API:", cleanedFormData);

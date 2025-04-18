@@ -77,21 +77,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { generateKitPrompt, generateJerseyImageWithReplicate } = await import("./openai");
         
         // Check if there's form data in the request that should override DB values
-        const formData = req.body.formData;
+        const formData = req.body.formData || {};
         console.log("Received form data:", formData);
+        
+        // Ensure we handle types correctly to prevent 422 errors with Replicate API
+        // Validate and clean formData to ensure proper types
+        if (formData.extra_lora && typeof formData.extra_lora !== 'string') {
+          console.log(`Type correction: Converting extra_lora from ${typeof formData.extra_lora} to string`);
+          formData.extra_lora = String(formData.extra_lora);
+        }
+        
+        if (formData.extra_lora_scale && typeof formData.extra_lora_scale !== 'number') {
+          console.log(`Type correction: Converting extra_lora_scale from ${typeof formData.extra_lora_scale} to number`);
+          formData.extra_lora_scale = Number(formData.extra_lora_scale) || 0.69;
+        }
         
         // Use form data if available, otherwise fallback to database values
         const options = {
-          sport: formData?.sport || design.sport,
-          kitType: formData?.kitType || design.kitType,
-          primaryColor: formData?.primaryColor || design.primaryColor,
-          secondaryColor: formData?.secondaryColor || design.secondaryColor,
-          accentColor1: formData?.accentColor1 || design.accentColor1 || undefined,
-          accentColor2: formData?.accentColor2 || design.accentColor2 || undefined,
-          sleeveStyle: formData?.sleeveStyle || design.sleeveStyle || undefined,
-          collarType: formData?.collarType || design.collarType || undefined,
-          patternStyle: formData?.patternStyle || design.patternStyle || undefined,
-          designNotes: formData?.designNotes || design.designNotes || undefined
+          sport: formData.sport || design.sport,
+          kitType: formData.kitType || design.kitType,
+          primaryColor: formData.primaryColor || design.primaryColor,
+          secondaryColor: formData.secondaryColor || design.secondaryColor,
+          accentColor1: formData.accentColor1 || design.accentColor1 || undefined,
+          accentColor2: formData.accentColor2 || design.accentColor2 || undefined,
+          sleeveStyle: formData.sleeveStyle || design.sleeveStyle || undefined,
+          collarType: formData.collarType || design.collarType || undefined,
+          patternStyle: formData.patternStyle || design.patternStyle || undefined,
+          designNotes: formData.designNotes || design.designNotes || undefined
         };
         
         console.log("Using kit options for prompt generation:", options);
