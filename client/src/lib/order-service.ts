@@ -175,11 +175,14 @@ class OrderService {
         // Clear timeout if request completes
         clearTimeout(timeoutId);
         
+        // Clone the response first since we might need to read it multiple times
+        const responseClone = response.clone();
+        
         if (!response.ok) {
           // Safely get error data even if response format is unexpected
           let errorData: any = {};
           try {
-            errorData = await response.json();
+            errorData = await responseClone.json();
           } catch (jsonError) {
             console.error('Error parsing subscription error response:', jsonError);
             // If we can't parse the JSON, create a basic error object based on status
@@ -214,7 +217,14 @@ class OrderService {
           }
         }
         
-        return await response.json();
+        // Process successful response using the original response object
+        try {
+          const responseData = await response.json();
+          return responseData;
+        } catch (jsonError) {
+          console.error('Error parsing subscription response:', jsonError);
+          throw new Error('Invalid response format from subscription service. Please try again.');
+        }
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
@@ -275,7 +285,22 @@ class OrderService {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          const errorData = await response.json();
+          // Clone the response first since we might need to read it multiple times
+          const responseClone = response.clone();
+          
+          let errorData: any = {};
+          try {
+            errorData = await responseClone.json();
+          } catch (jsonError) {
+            console.error('Error parsing cancellation error response:', jsonError);
+            // If we can't parse the JSON, create a basic error object based on status
+            errorData = { 
+              message: `Cancellation error (${response.status})`, 
+              error: 'parse_error',
+              details: response.statusText 
+            };
+          }
+          
           console.error('Subscription cancellation error response:', errorData);
           
           // Handle specific error types
@@ -294,7 +319,14 @@ class OrderService {
           }
         }
         
-        return await response.json();
+        // Process successful response
+        try {
+          const responseData = await response.json();
+          return responseData;
+        } catch (jsonError) {
+          console.error('Error parsing cancellation response:', jsonError);
+          throw new Error('Invalid response format from cancellation service. Please try again.');
+        }
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
@@ -350,7 +382,22 @@ class OrderService {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          const errorData = await response.json();
+          // Clone the response first since we might need to read it multiple times
+          const responseClone = response.clone();
+          
+          let errorData: any = {};
+          try {
+            errorData = await responseClone.json();
+          } catch (jsonError) {
+            console.error('Error parsing order creation error response:', jsonError);
+            // If we can't parse the JSON, create a basic error object based on status
+            errorData = { 
+              message: `Order creation error (${response.status})`, 
+              error: 'parse_error',
+              details: response.statusText 
+            };
+          }
+          
           console.error('Order creation error response:', errorData);
           
           // Handle specific error types
@@ -365,7 +412,14 @@ class OrderService {
           }
         }
         
-        return await response.json();
+        // Process successful response
+        try {
+          const responseData = await response.json();
+          return responseData;
+        } catch (jsonError) {
+          console.error('Error parsing order creation response:', jsonError);
+          throw new Error('Invalid response format from order service. Please try again.');
+        }
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
