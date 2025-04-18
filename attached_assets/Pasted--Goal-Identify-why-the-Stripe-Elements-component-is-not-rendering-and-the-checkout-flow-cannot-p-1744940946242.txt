@@ -1,0 +1,49 @@
+🎯 Goal: Identify why the Stripe Elements component is not rendering, and the checkout flow cannot proceed after design submission.
+
+---
+
+🔍 START BY CHECKING FRONTEND (`checkout-page.tsx` and `stripe-payment-form.tsx`):
+
+1. **Inspect `clientSecret` handling:**
+   - Confirm if `clientSecret` is being fetched properly from the server.
+   - Log the result of `createStripeIntent()` or similar function. If it’s undefined or null, add a visible error message or toast.
+   - If using React state, make sure the `clientSecret` is initialized, set, and passed to `<Elements>`.
+
+2. **Check Stripe `Elements` Mounting:**
+   - Ensure the `Elements` wrapper is only rendered when `clientSecret` is truthy.
+   - Add fallback UI (e.g., loading spinner or error banner) if Stripe is not mounted.
+
+---
+
+🧾 NEXT, CHECK BACKEND (`server/stripe.ts`, `server/payment.ts`, or `services/stripe-service.ts`):
+
+3. **Review the payment intent or subscription creation logic:**
+   - Ensure `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID` are not placeholders (like `'sk_test_placeholder'` or `'price_test_placeholder'`).
+   - Print logs before and after calling Stripe’s `createPaymentIntent()` or `createSubscription()`.
+
+4. **Return Shape of the Response:**
+   - Confirm the backend endpoint is returning:
+     ```json
+     { clientSecret: "sk_test_..." }
+     ```
+   - Add status code and error logging for any failures.
+   - Handle unexpected errors (e.g., bad price ID, invalid customer ID) and return structured error messages.
+
+---
+
+📦 ADDITIONAL RECOMMENDATIONS:
+
+- Validate `.env` files are loaded correctly — check for `process.env.STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID`
+- Confirm that no live key override (`sk_live` check) is silently preventing real keys from being used.
+- If needed, create fallback keys inside `dev.config.ts` or similar to prevent build crashes.
+
+---
+
+✅ FINAL OUTPUT EXPECTED:
+
+- Stripe Elements must render correctly in the browser
+- `clientSecret` must be present and visible in console log during flow
+- Checkout proceeds without freezing
+- If something fails, user sees a clear error state or fallback screen
+
+Do NOT modify product logic, form schema, or AI generation. Only inspect and repair the Stripe flow.
