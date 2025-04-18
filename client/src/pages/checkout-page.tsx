@@ -197,7 +197,7 @@ const CheckoutPage: React.FC = () => {
         // Add shipping address (required by interface)
         shippingAddress: {
           name: user?.username || 'Customer',
-          address1: '',
+          street: '', // Using correct property name 'street' instead of 'address1'
           city: '',
           state: '',
           postalCode: '',
