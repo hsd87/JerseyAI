@@ -46,9 +46,28 @@ const CheckoutPage: React.FC = () => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [orderProcessing, setOrderProcessing] = useState(false);
 
-  // Redirect if cart is empty
+  // Check for authentication and empty cart
   useEffect(() => {
+    // First check if user is logged in
+    if (!user) {
+      console.log('User not authenticated, redirecting to auth page');
+      toast({
+        title: 'Login Required',
+        description: 'Please login to continue with checkout',
+        variant: 'default',
+      });
+      
+      // Allow animations to complete before redirecting
+      setTimeout(() => {
+        setLocation('/auth');
+      }, 500);
+      
+      return; // Skip the rest of the initialization
+    }
+    
+    // Then check if cart is empty
     if (!cart || cart.length === 0) {
+      console.log('Empty cart detected, redirecting to designer');
       toast({
         title: 'Empty Cart',
         description: 'Your cart is empty. Add items before checkout.',
@@ -77,7 +96,7 @@ const CheckoutPage: React.FC = () => {
         setLocation('/designer');
       }, 500);
     }
-  }, [cart, priceBreakdown]);
+  }, [user, cart, priceBreakdown, setLocation]);
 
   // Create payment intent when page loads
   useEffect(() => {
@@ -150,15 +169,13 @@ const CheckoutPage: React.FC = () => {
     try {
       // Create the order in the backend
       await orderService.createOrder({
-        items: cart?.map(item => ({
-          id: item.id,
-          type: item.type,
-          name: item.name || `${item.type}`,
-          price: item.price,
-          quantity: item.quantity,
-          size: item.size,
-          gender: item.gender,
-        })) || [],
+        // Required fields
+        designId: cart[0]?.designId || 0,
+        sport: orderDetails?.packageType?.includes('soccer') ? 'soccer' : 'basketball', // Default to common sports based on package
+        totalAmount: priceBreakdown?.grandTotal || 0,
+        paymentMethod: 'stripe',
+        
+        // These fields are derived from the order details
         orderDetails: orderDetails ? {
           // Convert client-side OrderDetails to the format expected by the backend API
           items: orderDetails.items || [],
@@ -176,8 +193,16 @@ const CheckoutPage: React.FC = () => {
           isTeamOrder: false,
           packageType: '',
         },
-        totalAmount: priceBreakdown?.grandTotal || 0,
-        paymentMethod: 'stripe',
+        
+        // Add shipping address (required by interface)
+        shippingAddress: {
+          name: user?.username || 'Customer',
+          address1: '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: 'US',
+        },
       });
       
       // Update order status
