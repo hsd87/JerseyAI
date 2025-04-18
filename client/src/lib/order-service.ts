@@ -72,36 +72,49 @@ class OrderService {
         // Clear timeout if request completes
         clearTimeout(timeoutId);
         
+        // Store response for later use
+        let responseData;
+        
         // Handle error responses
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Payment intent error response:', errorData);
-          
-          // Handle specific error types
-          if (errorData.error === 'stripe_not_configured' || errorData.error === 'stripe_unavailable') {
-            throw new Error('Payment system is temporarily unavailable. Your order has been saved and you can complete payment later.');
-          } else if (errorData.error === 'authentication_required' || response.status === 401) {
-            throw new Error('Authentication required. Please log in and try again.');
-          } else if (errorData.error === 'stripe_auth_error') {
-            throw new Error('Payment system configuration error. Our team has been notified and is working to fix the issue.');
-          } else if (errorData.error === 'stripe_connection_error') {
-            throw new Error('Unable to connect to payment service. Your order has been saved and you can complete payment later.');
-          } else {
-            throw new Error(errorData.message || 'Failed to create payment intent');
+          try {
+            const errorData = await response.json();
+            console.error('Payment intent error response:', errorData);
+            
+            // Handle specific error types
+            if (errorData.error === 'stripe_not_configured' || errorData.error === 'stripe_unavailable') {
+              throw new Error('Payment system is temporarily unavailable. Your order has been saved and you can complete payment later.');
+            } else if (errorData.error === 'authentication_required' || response.status === 401) {
+              throw new Error('Authentication required. Please log in and try again.');
+            } else if (errorData.error === 'stripe_auth_error') {
+              throw new Error('Payment system configuration error. Our team has been notified and is working to fix the issue.');
+            } else if (errorData.error === 'stripe_connection_error') {
+              throw new Error('Unable to connect to payment service. Your order has been saved and you can complete payment later.');
+            } else {
+              throw new Error(errorData.message || 'Failed to create payment intent');
+            }
+          } catch (jsonError) {
+            console.error('Error parsing error response:', jsonError);
+            throw new Error(`Payment request failed with status: ${response.status} ${response.statusText}`);
           }
         }
         
         // Process successful response
-        const responseData = await response.json();
-        console.log('Payment intent created successfully:', responseData);
-        
-        // Ensure the response contains the required clientSecret
-        if (!responseData.clientSecret) {
-          console.error('Missing client secret in payment intent response:', responseData);
-          throw new Error('Invalid response from payment service. Please try again.');
+        try {
+          responseData = await response.json();
+          console.log('Payment intent created successfully:', responseData);
+          
+          // Ensure the response contains the required clientSecret
+          if (!responseData.clientSecret) {
+            console.error('Missing client secret in payment intent response:', responseData);
+            throw new Error('Invalid response from payment service. Please try again.');
+          }
+          
+          return responseData;
+        } catch (jsonError) {
+          console.error('Error parsing payment intent response:', jsonError);
+          throw new Error('Invalid response format from payment service. Please try again.');
         }
-        
-        return responseData;
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
