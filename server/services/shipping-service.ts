@@ -1,29 +1,13 @@
-/**
- * Interface for shipping address
- */
-export interface ShippingAddress {
-  name: string;
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}
+import { ShippingAddress } from '@/types/shipping';
 
-/**
- * Interface for shipping options
- */
 export interface ShippingOption {
   id: string;
   name: string;
   description: string;
-  price: number; // Price in dollars
+  price: number;
   estimatedDelivery: string;
 }
 
-/**
- * Interface for shipping calculation request
- */
 export interface ShippingCalculationRequest {
   shippingAddress: ShippingAddress;
   items: Array<{
@@ -34,85 +18,78 @@ export interface ShippingCalculationRequest {
   subtotal: number;
 }
 
-/**
- * Interface for shipping calculation response
- */
 export interface ShippingCalculationResponse {
   shippingOptions: ShippingOption[];
   baseShippingCost: number;
   recommendedOptionId: string;
 }
 
-/**
- * Service for calculating shipping costs
- */
-export class ShippingService {
+class ShippingService {
   /**
-   * Calculate shipping options based on address and order details
+   * Calculate shipping options based on address, items, and order subtotal
    */
-  calculateShippingOptions(request: ShippingCalculationRequest): ShippingCalculationResponse {
+  calculateShipping(request: ShippingCalculationRequest): ShippingCalculationResponse {
     const { shippingAddress, items, subtotal } = request;
     
-    // Calculate total quantity of items
-    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+    // Calculate total item count
+    const totalItems = items.reduce((total, item) => total + (item.quantity || 1), 0);
     
-    // Base shipping cost calculation - simplified version
-    // In a real app, this would use the address for zone-based calculations
-    let baseShippingCost = 0;
+    // Base shipping cost calculation based on number of items and destination
+    let baseShippingCost = 8.99; // Default base shipping cost
     
-    // Calculate base shipping rate based on quantity and subtotal
-    if (totalQuantity <= 2) {
-      baseShippingCost = 8.99;
-    } else if (totalQuantity <= 5) {
-      baseShippingCost = 12.99;
-    } else if (totalQuantity <= 10) {
-      baseShippingCost = 18.99;
-    } else {
-      baseShippingCost = 24.99;
+    // Adjust for international shipping
+    if (shippingAddress.country !== 'US') {
+      baseShippingCost += 10.00; // International shipping surcharge
     }
+    
+    // Add per-item fee
+    if (totalItems > 1) {
+      baseShippingCost += (totalItems - 1) * 2.50; // $2.50 per additional item
+    }
+    
+    // Calculate express shipping option (faster but more expensive)
+    const expressShippingCost = baseShippingCost * 2.5;
     
     // Free shipping threshold
-    if (subtotal >= 150) {
-      baseShippingCost = 0;
+    const freeShippingThreshold = 200;
+    let standardShippingCost = baseShippingCost;
+    
+    // Apply free shipping for orders over threshold
+    if (subtotal >= freeShippingThreshold) {
+      standardShippingCost = 0;
     }
     
-    // Generate shipping options
+    // Create shipping options
     const shippingOptions: ShippingOption[] = [
       {
         id: 'standard',
         name: 'Standard Shipping',
-        description: 'Standard shipping with tracking',
-        price: baseShippingCost,
+        description: standardShippingCost === 0 ? 'Free shipping (5-7 business days)' : 'Regular delivery with tracking',
+        price: standardShippingCost,
         estimatedDelivery: '5-7 business days',
-      }
-    ];
-    
-    // Add express shipping if available
-    if (baseShippingCost > 0) {
-      shippingOptions.push({
+      },
+      {
         id: 'express',
         name: 'Express Shipping',
         description: 'Faster delivery with priority handling',
-        price: baseShippingCost + 12.99,
+        price: expressShippingCost,
         estimatedDelivery: '2-3 business days',
-      });
-    }
+      }
+    ];
     
-    // Add overnight shipping for smaller orders
-    if (totalQuantity <= 5 && subtotal < 500) {
-      shippingOptions.push({
-        id: 'overnight',
-        name: 'Overnight Shipping',
-        description: 'Next day delivery (order by 2pm)',
-        price: baseShippingCost + 29.99,
-        estimatedDelivery: 'Next business day',
-      });
+    // Determine recommended option (default to standard)
+    let recommendedOptionId = 'standard';
+    
+    // For time-sensitive items, recommend express shipping
+    const hasTimeSensitiveItems = items.some(item => item.size === 'custom');
+    if (hasTimeSensitiveItems) {
+      recommendedOptionId = 'express';
     }
     
     return {
       shippingOptions,
       baseShippingCost,
-      recommendedOptionId: baseShippingCost === 0 ? 'standard' : 'express',
+      recommendedOptionId
     };
   }
 }
