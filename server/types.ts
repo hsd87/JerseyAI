@@ -15,18 +15,11 @@ export interface CartItem {
 
 /**
  * PriceBreakdown interface for order cost calculations
- * Provides a detailed breakdown of costs for transparency
+ * Simplified pricing - removed all discounts, shipping costs, and taxes per user request
  */
 export interface PriceBreakdown {
-  baseTotal: number;                      // Total before any discounts
-  tierDiscountRate: number;               // Rate of tier discount (e.g., 0.05, 0.10, 0.15)
-  tierDiscountApplied: string;            // Description of applied tier discount (e.g., "5%")
-  tierDiscountAmount: number;             // Amount of tier discount in cents/dollars
-  subscriptionDiscountRate: number;       // Rate of subscription discount (e.g., 0.10)
-  subscriptionDiscountApplied: string;    // Description of applied subscription discount (e.g., "10%")
-  subscriptionDiscountAmount: number;     // Amount of subscription discount in cents/dollars
-  subtotalAfterDiscounts: number;         // Subtotal after all discounts
-  shippingCost: number;                   // Shipping cost in cents/dollars
-  taxAmount: number;                      // Tax amount in cents/dollars
-  grandTotal: number;                     // Final total in cents/dollars
+  baseTotal: number;     // Total base price of all items
+  subtotal: number;      // Subtotal (same as baseTotal with simplified pricing)
+  grandTotal: number;    // Final total (same as subtotal with simplified pricing)
+  itemCount: number;     // Number of items in the order
 }

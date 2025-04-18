@@ -1,17 +1,13 @@
 /**
  * Pricing calculation utilities
+ * Simplified pricing - removed all discounts, shipping costs, and taxes per user request
  */
 import { CartItem, PriceBreakdown } from '../types';
-import { 
-  BASE_PRICES, 
-  TIER_DISCOUNTS, 
-  SUBSCRIPTION_DISCOUNT, 
-  SHIPPING_RULES,
-  TAX_RATE
-} from '@shared/pricing';
+import { BASE_PRICES } from '@shared/pricing';
 
 /**
- * Calculate the price for a cart of items with applicable discounts
+ * Calculate the price for a cart of items with simplified pricing
+ * No discounts, shipping costs, or taxes are applied
  */
 export function calculatePrice(
   cartItems: CartItem[], 
@@ -23,72 +19,21 @@ export function calculatePrice(
       return total + (item.basePrice * item.quantity);
     }, 0);
     
-    // Calculate total quantity of items (for tier discounts)
+    // Calculate total quantity of items
     const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     
-    // Determine tier discount (if applicable)
-    let tierDiscountRate = 0;
-    let tierDiscountAmount = 0;
+    // Simplified pricing - subtotal equals base total
+    const subtotal = baseTotal;
     
-    // Find applicable tier discount
-    for (const tier of TIER_DISCOUNTS) {
-      if (totalQuantity >= tier.threshold) {
-        tierDiscountRate = tier.discount;
-        break;
-      }
-    }
+    // Grand total equals subtotal (no discounts, shipping, or taxes)
+    const grandTotal = subtotal;
     
-    // Calculate tier discount amount
-    if (tierDiscountRate > 0) {
-      tierDiscountAmount = Math.round(baseTotal * tierDiscountRate);
-    }
-    
-    // Determine subscription discount (if applicable)
-    let subscriptionDiscountAmount = 0;
-    
-    if (isSubscriber) {
-      // Apply subscription discount after tier discount
-      const amountAfterTierDiscount = baseTotal - tierDiscountAmount;
-      subscriptionDiscountAmount = Math.round(amountAfterTierDiscount * SUBSCRIPTION_DISCOUNT);
-    }
-    
-    // Calculate subtotal after all discounts
-    const subtotalAfterDiscounts = baseTotal - tierDiscountAmount - subscriptionDiscountAmount;
-    
-    // Calculate shipping cost based on order amount
-    let shippingCost = 0;
-    
-    // Find the applicable shipping rule based on order subtotal
-    for (const rule of SHIPPING_RULES) {
-      if (subtotalAfterDiscounts >= rule.threshold) {
-        shippingCost = rule.cost;
-        break;
-      }
-    }
-    
-    // Calculate tax
-    const taxAmount = Math.round((subtotalAfterDiscounts + shippingCost) * TAX_RATE);
-    
-    // Calculate grand total
-    const grandTotal = subtotalAfterDiscounts + shippingCost + taxAmount;
-    
-    // Format discount percentages for display
-    const tierDiscountApplied = tierDiscountRate > 0 ? `${tierDiscountRate * 100}%` : '0%';
-    const subscriptionDiscountApplied = isSubscriber ? `${SUBSCRIPTION_DISCOUNT * 100}%` : '0%';
-    
-    // Prepare the full price breakdown
+    // Prepare the simplified price breakdown
     const breakdown: PriceBreakdown = {
       baseTotal,
-      tierDiscountRate,
-      tierDiscountApplied,
-      tierDiscountAmount,
-      subscriptionDiscountRate: isSubscriber ? SUBSCRIPTION_DISCOUNT : 0,
-      subscriptionDiscountApplied,
-      subscriptionDiscountAmount,
-      subtotalAfterDiscounts,
-      shippingCost,
-      taxAmount,
-      grandTotal
+      subtotal,
+      grandTotal,
+      itemCount: totalQuantity
     };
     
     return {
@@ -103,16 +48,9 @@ export function calculatePrice(
       success: false,
       breakdown: {
         baseTotal: 0,
-        tierDiscountRate: 0,
-        tierDiscountApplied: '0%',
-        tierDiscountAmount: 0,
-        subscriptionDiscountRate: 0,
-        subscriptionDiscountApplied: '0%',
-        subscriptionDiscountAmount: 0,
-        subtotalAfterDiscounts: 0,
-        shippingCost: 0,
-        taxAmount: 0,
-        grandTotal: 0
+        subtotal: 0,
+        grandTotal: 0,
+        itemCount: 0
       }
     };
   }
@@ -120,15 +58,10 @@ export function calculatePrice(
 
 /**
  * Get the current pricing rules
+ * Simplified - no discounts, shipping costs, or taxes per user request
  */
 export function getPricingRules() {
   return {
-    tierDiscounts: TIER_DISCOUNTS.map(tier => ({
-      threshold: tier.threshold,
-      discount: `${tier.discount * 100}%`
-    })),
-    subscriptionDiscount: `${SUBSCRIPTION_DISCOUNT * 100}%`,
-    shipping: SHIPPING_RULES,
-    tax: TAX_RATE
+    // No pricing rules since we removed all discounts, shipping costs, and taxes
   };
 }
