@@ -58,6 +58,25 @@ class OrderService {
       
       console.log(`Creating payment intent for amount: $${amount} with ${items.length} items`);
       
+      // Track unique requests to prevent duplicates
+      const requestId = `${amount}-${Date.now()}`;
+      const recentRequestKey = `recent-payment-request-${requestId}`;
+      
+      // Check if this exact request has been processed in the last 5 seconds
+      if (sessionStorage.getItem(recentRequestKey)) {
+        console.log('Preventing duplicate payment intent creation for request:', requestId);
+        try {
+          const cachedResponse = JSON.parse(sessionStorage.getItem(recentRequestKey) || '{}');
+          if (cachedResponse.clientSecret) {
+            return cachedResponse;
+          }
+          // If cached response is invalid, continue with the request
+          console.log('Cached payment intent response was invalid, creating a new one');
+        } catch (e) {
+          console.warn('Error parsing cached payment intent, will create a new one:', e);
+        }
+      }
+      
       // Set a reasonable timeout for payment API
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(new DOMException('Payment request timeout', 'TimeoutError')), 15000); // 15 seconds timeout
@@ -108,6 +127,18 @@ class OrderService {
           if (!responseData.clientSecret) {
             console.error('Missing client secret in payment intent response:', responseData);
             throw new Error('Invalid response from payment service. Please try again.');
+          }
+          
+          // Cache the successful response to prevent duplicate requests
+          try {
+            sessionStorage.setItem(recentRequestKey, JSON.stringify(responseData));
+            console.log('Cached payment intent for request:', requestId);
+            // Set an expiration for this cached item (5 seconds)
+            setTimeout(() => {
+              sessionStorage.removeItem(recentRequestKey);
+            }, 5000);
+          } catch (storageError) {
+            console.warn('Failed to cache payment intent:', storageError);
           }
           
           return responseData;
@@ -484,7 +515,22 @@ class OrderService {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          const errorData = await response.json();
+          // Clone the response first since we might need to read it multiple times
+          const responseClone = response.clone();
+          
+          let errorData: any = {};
+          try {
+            errorData = await responseClone.json();
+          } catch (jsonError) {
+            console.error('Error parsing order fetch error response:', jsonError);
+            // If we can't parse the JSON, create a basic error object based on status
+            errorData = { 
+              message: `Order fetch error (${response.status})`, 
+              error: 'parse_error',
+              details: response.statusText 
+            };
+          }
+          
           console.error('Order fetch error response:', errorData);
           
           // Handle specific error types
@@ -495,7 +541,14 @@ class OrderService {
           }
         }
         
-        return await response.json();
+        // Process successful response
+        try {
+          const responseData = await response.json();
+          return responseData;
+        } catch (jsonError) {
+          console.error('Error parsing orders response:', jsonError);
+          throw new Error('Invalid response format from order service. Please try again.');
+        }
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
@@ -543,7 +596,22 @@ class OrderService {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          const errorData = await response.json();
+          // Clone the response first since we might need to read it multiple times
+          const responseClone = response.clone();
+          
+          let errorData: any = {};
+          try {
+            errorData = await responseClone.json();
+          } catch (jsonError) {
+            console.error('Error parsing order details error response:', jsonError);
+            // If we can't parse the JSON, create a basic error object based on status
+            errorData = { 
+              message: `Order details fetch error (${response.status})`, 
+              error: 'parse_error',
+              details: response.statusText 
+            };
+          }
+          
           console.error(`Order ${orderId} fetch error response:`, errorData);
           
           // Handle specific error types
@@ -556,7 +624,14 @@ class OrderService {
           }
         }
         
-        return await response.json();
+        // Process successful response
+        try {
+          const responseData = await response.json();
+          return responseData;
+        } catch (jsonError) {
+          console.error('Error parsing order details response:', jsonError);
+          throw new Error('Invalid response format from order service. Please try again.');
+        }
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
@@ -604,7 +679,22 @@ class OrderService {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          const errorData = await response.json();
+          // Clone the response first since we might need to read it multiple times
+          const responseClone = response.clone();
+          
+          let errorData: any = {};
+          try {
+            errorData = await responseClone.json();
+          } catch (jsonError) {
+            console.error('Error parsing payment status error response:', jsonError);
+            // If we can't parse the JSON, create a basic error object based on status
+            errorData = { 
+              message: `Payment status fetch error (${response.status})`, 
+              error: 'parse_error',
+              details: response.statusText 
+            };
+          }
+          
           console.error(`Payment status for order ${orderId} fetch error:`, errorData);
           
           // Handle specific error types
@@ -617,7 +707,14 @@ class OrderService {
           }
         }
         
-        return await response.json();
+        // Process successful response
+        try {
+          const responseData = await response.json();
+          return responseData;
+        } catch (jsonError) {
+          console.error('Error parsing payment status response:', jsonError);
+          throw new Error('Invalid response format from payment service. Please try again.');
+        }
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
@@ -675,7 +772,22 @@ class OrderService {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          const errorData = await response.json();
+          // Clone the response first since we might need to read it multiple times
+          const responseClone = response.clone();
+          
+          let errorData: any = {};
+          try {
+            errorData = await responseClone.json();
+          } catch (jsonError) {
+            console.error('Error parsing invoice error response:', jsonError);
+            // If we can't parse the JSON, create a basic error object based on status
+            errorData = { 
+              message: `Invoice fetch error (${response.status})`, 
+              error: 'parse_error',
+              details: response.statusText 
+            };
+          }
+          
           console.error(`Invoice fetch error for order ${orderId}:`, errorData);
           
           // Handle specific error types
@@ -690,7 +802,14 @@ class OrderService {
           }
         }
         
-        return await response.json();
+        // Process successful response
+        try {
+          const responseData = await response.json();
+          return responseData;
+        } catch (jsonError) {
+          console.error('Error parsing invoice response:', jsonError);
+          throw new Error('Invalid response format from invoice service. Please try again.');
+        }
       } catch (fetchError: any) {
         // Clear timeout if fetch fails
         clearTimeout(timeoutId);
