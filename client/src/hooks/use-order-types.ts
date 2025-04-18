@@ -29,6 +29,7 @@ export interface OrderItem {
   price: number;
   name?: string;
   customValue?: string;
+  designId?: number;
 }
 
 export interface AddOn extends OrderItem {

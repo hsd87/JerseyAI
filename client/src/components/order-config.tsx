@@ -9,7 +9,7 @@ import { useFormatPrice } from '@/hooks/use-format-price';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useOrderStore } from '@/hooks/use-order-store';
-import { PackageItem } from '@/hooks/use-order-types'; // Import from the correct location
+import { PackageItem, OrderDetails, TeamMember, AddOn, OrderItem } from '@/hooks/use-order-types'; // Import from the correct location
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -44,7 +44,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { ADDON_OPTIONS, PACKAGE_ITEMS, getProductBySku, calculatePackageBasePrice, PRODUCTS, Product } from '@shared/product-configs';
-import { TeamMember, TeamMemberItem, AddOn, OrderItem } from '@/hooks/use-order-types';
+import { TeamMemberItem } from '@/hooks/use-order-types';
 
 // Form schema
 const orderConfigSchema = z.object({
@@ -544,27 +544,52 @@ export default function OrderConfig({
     clearItems();
     
     // Prepare order details for storage
-    const orderDetailsData = {
+    const priceDetails = {
+      basePrice: packageUnitPrice,
+      subtotal: totalPrice,
+      tax: totalPrice * 0.07,
+      shipping: 9.99,
+      totalAmount: totalPrice * 1.07 + 9.99,
+    };
+    
+    // Create default items array from packageItems
+    const orderItems: OrderItem[] = packageItems.map(item => ({
+      id: item.id,
+      type: item.type,
+      size: item.sizes[0]?.size || 'M',
+      quantity: item.sizes[0]?.quantity || 1,
+      gender: item.gender,
+      price: item.price,
+      name: item.name
+    }));
+    
+    // Create order details object matching the OrderDetails interface
+    const orderDetailsData: OrderDetails = {
       packageType: watchedPackageType,
       isTeamOrder: watchedIsTeamOrder,
-      quantity: watchedQuantity,
-      designId: designId,
-      designUrls: designUrls,
-      sport: sport,
-      // Save price breakdown information
-      priceDetails: {
-        basePrice: packageUnitPrice,
+      items: orderItems,
+      addOns: addOns || [],
+      teamMembers: watchedIsTeamOrder ? teamMembers : [],
+      priceBreakdown: {
         subtotal: totalPrice,
-        tax: totalPrice * 0.07,
+        discount: 0,
+        discountPercentage: 0,
         shipping: 9.99,
-        totalAmount: totalPrice * 1.07 + 9.99,
+        tax: totalPrice * 0.07,
+        grandTotal: totalPrice * 1.07 + 9.99,
+        itemCount: watchedQuantity,
+        baseTotal: totalPrice,
+        tierDiscountApplied: false,
+        tierDiscountAmount: 0,
+        subscriptionDiscountApplied: false,
+        subscriptionDiscountAmount: 0,
+        shippingFreeThresholdApplied: false,
+        priceBeforeTax: totalPrice
       }
     };
     
     // Save order details to store
-    if (setOrderDetails) {
-      setOrderDetails(orderDetailsData);
-    }
+    setOrderDetails(orderDetailsData);
     
     // Process team order
     if (watchedIsTeamOrder) {
