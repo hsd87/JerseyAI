@@ -471,28 +471,30 @@ export function registerPaymentRoutes(app: Express) {
       }
 
       // Determine the amount in cents
-      // If the client already provided amountInCents, use that (new behavior)
+      // Always use client-provided amountInCents when available (preferred approach)
       // Otherwise calculate it from amount (backward compatibility)
       let finalAmountInCents: number;
       
       if (amountInCents && typeof amountInCents === 'number') {
-        // Use pre-calculated amount from client
+        // Use pre-calculated amount from client - this is the preferred way
         finalAmountInCents = Math.round(amountInCents);
-        console.log(`Using client-provided amount in cents: ${finalAmountInCents}`);
+        console.log(`Using client-provided amount in cents: $${amount} = ${finalAmountInCents} cents`);
       } else if (amount) {
-        // Check if amount is likely already in cents (larger than a typical dollar value)
-        // This prevents double conversion for large amounts like 250.00
-        if (amount >= 100) {
-          // Amount is likely already in cents
-          finalAmountInCents = Math.round(amount);
-          console.log(`Amount ${amount} appears to be in cents already, using directly: ${finalAmountInCents}`);
-        } else {
-          // Convert dollar amount to cents for Stripe (e.g., 19.99 -> 1999)
-          finalAmountInCents = Math.round(amount * 100);
-          console.log(`Calculated amount in cents from dollars: ${amount} * 100 = ${finalAmountInCents}`);
-        }
+        // IMPORTANT: Always convert dollar amounts to cents for Stripe
+        // Stripe requires amounts in cents (smallest currency unit)
+        finalAmountInCents = Math.round(amount * 100);
+        console.log(`WARNING: Client did not provide amountInCents. Converting manually: $${amount} * 100 = ${finalAmountInCents} cents`);
       } else {
         throw new Error('Invalid payment amount');
+      }
+      
+      // Safety check - if finalAmountInCents seems too small for the expected dollar amount
+      // (e.g., if it's just 210 cents = $2.10 when it should be $210.00)
+      if (amount > 100 && finalAmountInCents < amount * 10) {
+        console.warn(`Amount validation warning: dollar amount $${amount} resulted in unusually small cent value ${finalAmountInCents}`);
+        // Force conversion to ensure we have the correct amount in cents
+        finalAmountInCents = Math.round(amount * 100);
+        console.log(`Forcing correct conversion to cents: $${amount} * 100 = ${finalAmountInCents} cents`);
       }
 
       // Determine the customer ID
@@ -513,6 +515,8 @@ export function registerPaymentRoutes(app: Express) {
       res.json({
         clientSecret,
         amount: finalAmountInCents,
+        amountInDollars: amount,
+        amountType: 'cents', // Explicit field so client knows this is in cents
         success: true,
         requestId: reqId
       });

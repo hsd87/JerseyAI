@@ -67,6 +67,10 @@ class OrderService {
         throw new Error('Invalid payment amount. Please try again.');
       }
       
+      // Calculate amount in cents for Stripe (e.g., 19.99 -> 1999)
+      const amountInCents = Math.round(amount * 100);
+      console.log(`Converting amount for Stripe: $${amount} -> ${amountInCents} cents`);
+      
       // Check class-level cache first (valid for 10 minutes)
       const now = Date.now();
       if (OrderService.paymentIntentCache && 
@@ -132,9 +136,10 @@ class OrderService {
       
       try {
         // Make API request with timeout using updated API that accepts AbortSignal
-        // Note: We send the amount in dollars (e.g., 250.00) and server will convert to cents
+        // We're sending both the amount in dollars and the pre-calculated amount in cents
         const response = await apiRequest('POST', '/api/create-payment-intent', {
           amount, // Amount in dollars (e.g., 250.00 = $250.00)
+          amountInCents, // Precalculated amount in cents (e.g., 25000)
           items,
           requestId: request.requestId,
           componentId: request.componentId
