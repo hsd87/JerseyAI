@@ -47,7 +47,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { 
-  UserCog, 
+  UserCog,
+  Settings, 
   Package2, 
   BarChart2, 
   Users, 
@@ -55,8 +56,10 @@ import {
   DollarSign, 
   TrendingUp, 
   Clock,
-  Loader2
+  Loader2,
+  RefreshCw
 } from "lucide-react";
+import ImageRecoveryPanel from "@/components/admin/image-recovery-panel";
 
 // Custom type for analytics data
 type AnalyticsData = {
@@ -368,6 +371,41 @@ export default function AdminDashboard() {
             <Settings className="mr-2 h-4 w-4" /> Tools
           </TabsTrigger>
         </TabsList>
+        
+        {/* New Tools Tab */}
+        <TabsContent value="tools" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="col-span-1">
+              <ImageRecoveryPanel />
+            </div>
+            
+            <div className="col-span-1">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <RefreshCw className="h-5 w-5" />
+                    System Tools
+                  </CardTitle>
+                  <CardDescription>
+                    Additional maintenance tools for system administrators
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <h3 className="text-md font-medium">Data Cleanup</h3>
+                    <p className="text-sm text-gray-500">
+                      Run maintenance tasks to optimize database performance and remove temporary files.
+                    </p>
+                    <Button variant="outline" size="sm" className="mt-2" disabled>
+                      <Clock className="mr-2 h-4 w-4" />
+                      Coming Soon
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">

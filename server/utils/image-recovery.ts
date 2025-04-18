@@ -1,140 +1,195 @@
 import fs from 'fs';
 import path from 'path';
-import { storage } from '../storage';
-import { db } from '../db';
+import { db } from '../db'; 
+import { and, eq, isNull, not } from 'drizzle-orm';
 import { designs } from '@shared/schema';
-import { eq } from 'drizzle-orm';
-
-const OUTPUT_DIR = path.resolve('./output');
 
 /**
- * Utility to scan the output directory and reconcile image files with database records
- * This helps recover from situations where database records don't match filesystem state
- */
-export async function reconcileImageFiles() {
-  console.log('Starting image file reconciliation...');
-  
-  try {
-    // 1. Get all designs from the database
-    const allDesigns = await storage.getAllDesigns();
-    console.log(`Found ${allDesigns.length} designs in database`);
-    
-    // 2. Find designs with missing image URLs
-    const designsWithMissingImages = allDesigns.filter(
-      design => !design.frontImageUrl || design.frontImageUrl === '' || 
-                !design.backImageUrl || design.backImageUrl === ''
-    );
-    
-    console.log(`Found ${designsWithMissingImages.length} designs with missing image URLs`);
-    
-    // 3. Scan the output directory for image files
-    const files = fs.readdirSync(OUTPUT_DIR);
-    const jerseyFiles = files.filter(file => file.startsWith('jersey_'));
-    
-    console.log(`Found ${jerseyFiles.length} jersey image files in output directory`);
-    
-    // 4. Extract UUIDs from filenames
-    const fileUuids = jerseyFiles.map(filename => {
-      // Extract UUID from filenames like jersey_766a8a98-1807-4381-9ab9-096dc87d33a0.png
-      const match = filename.match(/jersey_([0-9a-f-]+)\.png$/i);
-      return match ? match[1] : null;
-    }).filter(Boolean);
-    
-    console.log(`Extracted ${fileUuids.length} valid UUIDs from filenames`);
-    
-    // 5. Update designs with missing images where possible
-    let updatedCount = 0;
-    
-    for (const design of designsWithMissingImages) {
-      // Look for filenames that might match this design
-      // For simplicity, we'll use the most recent matching file
-      const potentialMatches = jerseyFiles.filter(file => {
-        // Match by design ID or creation date pattern
-        return file.includes(design.id.toString()) || 
-               (design.createdAt && file.includes(new Date(design.createdAt).toISOString().split('T')[0].replace(/-/g, '')));
-      });
-      
-      if (potentialMatches.length > 0) {
-        // Use the most recently modified file
-        const mostRecentFile = potentialMatches.sort((a, b) => {
-          const statA = fs.statSync(path.join(OUTPUT_DIR, a));
-          const statB = fs.statSync(path.join(OUTPUT_DIR, b));
-          return statB.mtime.getTime() - statA.mtime.getTime();
-        })[0];
-        
-        // Build paths for front and back images (same file for both in this system)
-        const imagePath = `/output/${mostRecentFile}`;
-        
-        // Update the design record
-        await db.update(designs)
-          .set({ 
-            frontImageUrl: imagePath,
-            backImageUrl: imagePath
-          })
-          .where(eq(designs.id, design.id));
-        
-        console.log(`Updated design ${design.id} with image path: ${imagePath}`);
-        updatedCount++;
-      }
-    }
-    
-    console.log(`Reconciliation complete. Updated ${updatedCount} designs with recovered image paths.`);
-    return {
-      total: allDesigns.length,
-      missing: designsWithMissingImages.length,
-      recovered: updatedCount
-    };
-  } catch (error) {
-    console.error('Error during image reconciliation:', error);
-    throw error;
-  }
-}
-
-/**
- * Verifies that all image URLs in the database point to existing files
- * Reports any discrepancies for further investigation
+ * Verify image files for all design records
+ * Checks if image paths in database records actually exist in the filesystem
  */
 export async function verifyImagePaths() {
-  console.log('Verifying image paths in database...');
-  
-  try {
-    // Get all designs with image URLs
-    const allDesigns = await storage.getAllDesigns();
-    const designsWithImages = allDesigns.filter(
-      design => design.frontImageUrl && design.frontImageUrl !== ''
-    );
-    
-    console.log(`Checking ${designsWithImages.length} designs with image URLs`);
-    
-    const missingFiles = [];
-    
-    // Check each image URL to ensure the file exists
-    for (const design of designsWithImages) {
-      // We've already filtered out null/empty strings above, but TypeScript doesn't know that
-      // so we add an extra check here to satisfy the compiler
-      if (design.frontImageUrl) {
-        const frontImagePath = design.frontImageUrl.replace(/^\/output\//, '');
-        const fullPath = path.join(OUTPUT_DIR, frontImagePath);
+    try {
+      // Get all designs with image URLs
+      const allDesigns = await db.select({
+        id: designs.id,
+        urls: designs.imageUrls,
+      })
+      .from(designs)
+      .where(not(isNull(designs.imageUrls)));
+      
+      const missingImages: {
+        designId: number;
+        imagePath: string;
+        fullPath: string;
+      }[] = [];
+      
+      // Check each design's images
+      for (const design of allDesigns) {
+        const designId = Number(design.id);
+        const urls = design.urls as { front: string, back: string };
         
-        if (!fs.existsSync(fullPath)) {
-          missingFiles.push({
-            designId: design.id,
-            imagePath: design.frontImageUrl,
-            fullPath
+        // Check front image
+        if (urls.front) {
+          const frontPath = urls.front.startsWith('/') 
+            ? urls.front.substring(1) 
+            : urls.front;
+            
+          const fullFrontPath = path.join(process.cwd(), frontPath);
+          
+          if (!fs.existsSync(fullFrontPath)) {
+            missingImages.push({
+              designId,
+              imagePath: frontPath,
+              fullPath: fullFrontPath
+            });
+          }
+        }
+        
+        // Check back image
+        if (urls.back) {
+          const backPath = urls.back.startsWith('/') 
+            ? urls.back.substring(1) 
+            : urls.back;
+            
+          const fullBackPath = path.join(process.cwd(), backPath);
+          
+          if (!fs.existsSync(fullBackPath)) {
+            missingImages.push({
+              designId,
+              imagePath: backPath,
+              fullPath: fullBackPath
+            });
+          }
+        }
+      }
+      
+      return {
+        success: true,
+        message: missingImages.length > 0 
+          ? `Found ${missingImages.length} missing image files across ${allDesigns.length} designs` 
+          : "All image files are present",
+        total: allDesigns.length,
+        missing: missingImages.length,
+        details: missingImages
+      };
+    } catch (error) {
+      console.error("Error verifying images:", error);
+      return {
+        success: false,
+        message: `Error verifying images: ${error.message}`,
+        total: 0,
+        missing: 0
+      };
+    }
+  }
+  
+  /**
+   * Attempt to recover missing image files using alternative sources
+   * This searches backup directories and creates necessary folders
+   */
+  async recoverMissingImages() {
+    try {
+      // First verify to get missing images
+      const verificationResult = await this.verifyImageFiles();
+      
+      if (!verificationResult.success) {
+        return {
+          success: false,
+          message: "Verification failed: " + verificationResult.message,
+          total: 0,
+          missing: 0,
+          recovered: 0
+        };
+      }
+      
+      if (verificationResult.missing === 0) {
+        return {
+          success: true,
+          message: "No missing images to recover",
+          total: verificationResult.total,
+          missing: 0,
+          recovered: 0
+        };
+      }
+      
+      // List of potential backup locations to check
+      const backupLocations = [
+        path.join(process.cwd(), 'backups', 'images'),
+        path.join(process.cwd(), 'data', 'jersey-images')
+      ];
+      
+      let recoveredCount = 0;
+      const details = [];
+      
+      // Try to recover each missing image
+      for (const missingImage of verificationResult.details) {
+        const filename = path.basename(missingImage.imagePath);
+        let recovered = false;
+        
+        // Search in backup locations
+        for (const backupLocation of backupLocations) {
+          if (fs.existsSync(backupLocation)) {
+            const potentialFiles = fs.readdirSync(backupLocation);
+            
+            // Look for exact match or similar filename
+            const matchingFile = potentialFiles.find(file => file === filename);
+            
+            if (matchingFile) {
+              // Ensure target directory exists
+              const targetDir = path.dirname(missingImage.fullPath);
+              if (!fs.existsSync(targetDir)) {
+                fs.mkdirSync(targetDir, { recursive: true });
+              }
+              
+              // Copy file from backup to original location
+              fs.copyFileSync(
+                path.join(backupLocation, matchingFile),
+                missingImage.fullPath
+              );
+              
+              recoveredCount++;
+              recovered = true;
+              
+              details.push({
+                designId: missingImage.designId,
+                status: 'recovered',
+                source: path.join(backupLocation, matchingFile),
+                destination: missingImage.fullPath
+              });
+              
+              break; // Found and recovered this image, move to next
+            }
+          }
+        }
+        
+        if (!recovered) {
+          details.push({
+            designId: missingImage.designId,
+            status: 'not-found',
+            path: missingImage.imagePath
           });
         }
       }
+      
+      return {
+        success: true,
+        message: `Recovered ${recoveredCount} of ${verificationResult.missing} missing images`,
+        total: verificationResult.total,
+        missing: verificationResult.missing,
+        recovered: recoveredCount,
+        details
+      };
+      
+    } catch (error) {
+      console.error("Error recovering images:", error);
+      return {
+        success: false,
+        message: `Error recovering images: ${error.message}`,
+        total: 0,
+        missing: 0,
+        recovered: 0
+      };
     }
-    
-    console.log(`Found ${missingFiles.length} designs with missing image files`);
-    
-    return {
-      total: designsWithImages.length,
-      missing: missingFiles.length,
-      details: missingFiles
-    };
-  } catch (error) {
-    console.error('Error during image path verification:', error);
-    throw error;
   }
 }
