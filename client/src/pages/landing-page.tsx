@@ -12,29 +12,29 @@ const processSteps = [
   {
     title: "Choose Your Gear",
     description: "Pick a sport and jersey style from our catalog",
-    icon: <div className="w-12 h-12 rounded-full bg-[#E34234]/10 flex items-center justify-center">
-      <span className="text-xl font-bold text-[#E34234]">1</span>
+    icon: <div className="w-12 h-12 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center">
+      <span className="text-xl font-bold text-gradient">1</span>
     </div>
   },
   {
     title: "AI Generates Designs",
     description: "Get instant designs to choose from",
-    icon: <div className="w-12 h-12 rounded-full bg-[#E34234]/10 flex items-center justify-center">
-      <span className="text-xl font-bold text-[#E34234]">2</span>
+    icon: <div className="w-12 h-12 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center">
+      <span className="text-xl font-bold text-gradient">2</span>
     </div>
   },
   {
     title: "Customize Details",
     description: "Add names, numbers, logos easily",
-    icon: <div className="w-12 h-12 rounded-full bg-[#E34234]/10 flex items-center justify-center">
-      <span className="text-xl font-bold text-[#E34234]">3</span>
+    icon: <div className="w-12 h-12 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center">
+      <span className="text-xl font-bold text-gradient">3</span>
     </div>
   },
   {
     title: "Order & Fulfillment",
     description: "We produce and ship to your door",
-    icon: <div className="w-12 h-12 rounded-full bg-[#E34234]/10 flex items-center justify-center">
-      <span className="text-xl font-bold text-[#E34234]">4</span>
+    icon: <div className="w-12 h-12 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center">
+      <span className="text-xl font-bold text-gradient">4</span>
     </div>
   }
 ];

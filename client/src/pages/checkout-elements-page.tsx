@@ -205,7 +205,7 @@ export default function CheckoutElementsPage() {
             <CardTitle className="text-center">Loading Saved Order</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center space-y-4 py-6">
-            <div className="bg-blue-50 p-4 rounded-[1px]">
+            <div className="bg-gradient bg-opacity-5 p-4 rounded-[1px]">
               <Loader2 className="h-12 w-12 animate-spin text-primary" />
             </div>
             <p className="text-center">Loading your saved order. Please wait...</p>
