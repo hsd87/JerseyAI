@@ -722,7 +722,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
               </p>
             ) : (
               <p className="text-xs text-gray-500 mt-2 text-center">
-                <Link href="/auth" className="text-black hover:text-gradient">
+                <Link href="/auth" className="text-black hover:text-secondary-gradient">
                   Sign in
                 </Link> to use the design generator
               </p>

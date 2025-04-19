@@ -160,33 +160,33 @@ export default function Navbar() {
       >
         <div className="px-6 py-6 space-y-4">
           <Link href="/" className={`block py-2 text-base font-normal ${location === '/' ? 'font-medium' : ''}`}>
-            <span className={location === '/' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Men</span>
+            <span className={location === '/' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Men</span>
           </Link>
           <Link href="/designer" className={`block py-2 text-base font-normal ${location === '/designer' ? 'font-medium' : ''}`}>
-            <span className={location === '/designer' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Design</span>
+            <span className={location === '/designer' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Design</span>
           </Link>
           <Link href="/how-it-works" className={`block py-2 text-base font-normal ${location === '/how-it-works' ? 'font-medium' : ''}`}>
-            <span className={location === '/how-it-works' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>How It Works</span>
+            <span className={location === '/how-it-works' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>How It Works</span>
           </Link>
           <Link href="/about" className={`block py-2 text-base font-normal ${location === '/about' ? 'font-medium' : ''}`}>
-            <span className={location === '/about' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>About Us</span>
+            <span className={location === '/about' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>About Us</span>
           </Link>
           <Link href="/faq" className={`block py-2 text-base font-normal ${location === '/faq' ? 'font-medium' : ''}`}>
-            <span className={location === '/faq' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Help</span>
+            <span className={location === '/faq' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Help</span>
           </Link>
           <Link href="/partner" className={`block py-2 text-base font-normal ${location === '/partner' ? 'font-medium' : ''}`}>
-            <span className={location === '/partner' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Team Orders</span>
+            <span className={location === '/partner' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Team Orders</span>
           </Link>
           
           <div className="border-t border-[rgba(255,255,255,0.1)] pt-4 mt-4">
             {user ? (
               <>
                 <Link href="/dashboard" className="block py-2 font-medium">
-                  <span className="text-gradient">Your Account</span>
+                  <span className="text-secondary-gradient">Your Account</span>
                 </Link>
                 {user.role === 'admin' && (
                   <Link href="/admin" className="block py-2 font-medium">
-                    <span className="text-gradient">Admin Dashboard</span>
+                    <span className="text-secondary-gradient">Admin Dashboard</span>
                   </Link>
                 )}
                 <button 
@@ -198,7 +198,7 @@ export default function Navbar() {
               </>
             ) : (
               <Link href="/auth" className="block py-2 font-medium">
-                <span className="text-gradient">Join Us</span>
+                <span className="text-secondary-gradient">Join Us</span>
               </Link>
             )}
           </div>
