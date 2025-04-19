@@ -44,20 +44,20 @@ const JerseyScrollGallery: React.FC<JerseyScrollGalleryProps> = ({
   ];
 
   return (
-    <div className="w-full max-w-screen py-4">
-      <div className="px-2 md:px-4">
+    <div className="w-full max-w-screen py-2">
+      <div className="px-1">
         <div 
-          className="flex overflow-x-auto whitespace-nowrap snap-x gap-3 md:gap-4 pb-4 no-scrollbar"
+          className="flex overflow-x-auto whitespace-nowrap snap-x gap-1 pb-2 no-scrollbar"
         >
           {highQualityJerseys.map((jersey, index) => (
             <div 
               key={index} 
-              className="snap-start flex-shrink-0 w-[240px] md:w-[300px]"
+              className="snap-start flex-shrink-0 w-[220px] md:w-[260px]"
             >
               <img 
                 src={jersey.src} 
                 alt={jersey.alt}
-                className="w-full h-auto object-contain rounded-sm shadow-sm transition-transform hover:scale-[1.01]"
+                className="w-full h-auto object-contain rounded-none shadow-none"
                 loading="lazy"
               />
             </div>
