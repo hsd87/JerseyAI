@@ -220,6 +220,51 @@ export default function CheckoutFixedPage() {
     }
   }, [checkoutStep]);
   
+  // Attempt to restore checkout data from localStorage when coming back to checkout page
+  useEffect(() => {
+    try {
+      // Check if we're coming back to the checkout page with stored information
+      const storedCustomerInfo = localStorage.getItem('okdio_checkout_customer_info');
+      const storedShippingOption = localStorage.getItem('okdio_checkout_shipping_option');
+      const storedFinalTotal = localStorage.getItem('okdio_checkout_final_total');
+      
+      if (storedCustomerInfo && storedShippingOption) {
+        // If we have stored data and we're on the shipping step, restore it
+        // This helps if the user had to refresh or go back
+        const parsedCustomerInfo = JSON.parse(storedCustomerInfo);
+        const parsedShippingOption = JSON.parse(storedShippingOption);
+        
+        // Set form defaults if not already set
+        if (!customerInfo) {
+          setCustomerInfo(parsedCustomerInfo);
+          
+          // Pre-populate the form with saved values
+          form.setValue('firstName', parsedCustomerInfo.firstName);
+          form.setValue('lastName', parsedCustomerInfo.lastName);
+          form.setValue('email', parsedCustomerInfo.email);
+          form.setValue('phone', parsedCustomerInfo.phone);
+          form.setValue('street', parsedCustomerInfo.street);
+          form.setValue('city', parsedCustomerInfo.city);
+          form.setValue('state', parsedCustomerInfo.state);
+          form.setValue('postalCode', parsedCustomerInfo.postalCode);
+          form.setValue('country', parsedCustomerInfo.country);
+          form.setValue('shippingOption', parsedShippingOption.id);
+          
+          if (parsedCustomerInfo.additionalInfo) {
+            form.setValue('additionalInfo', parsedCustomerInfo.additionalInfo);
+          }
+        }
+        
+        // Also restore the shipping options and price if available
+        if (storedFinalTotal) {
+          setFinalTotal(parseFloat(storedFinalTotal));
+        }
+      }
+    } catch (e) {
+      console.warn('Could not restore checkout data from localStorage', e);
+    }
+  }, []);
+  
   // Calculate shipping options based on address
   const calculateShippingOptions = async () => {
     const { street, city, state, postalCode, country } = form.getValues();
@@ -328,6 +373,7 @@ export default function CheckoutFixedPage() {
   // Handle shipping form submission
   const onShippingSubmit = async (data: z.infer<typeof customerInfoSchema>) => {
     setLoading(true);
+    console.log('Submitting shipping info:', data);
     
     try {
       // Get the selected shipping option
@@ -337,8 +383,8 @@ export default function CheckoutFixedPage() {
         throw new Error('Please select a shipping option');
       }
       
-      // Create customer info object from form data
-      const customerInfo: CustomerInfo = {
+      // Create customer info object from form data and save immediately
+      const customerInfoData: CustomerInfo = {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
@@ -351,6 +397,9 @@ export default function CheckoutFixedPage() {
         additionalInfo: data.additionalInfo
       };
       
+      // Set customer info state immediately
+      setCustomerInfo(customerInfoData);
+      
       // Create shipping address object
       const shippingAddress = {
         name: `${data.firstName} ${data.lastName}`,
@@ -361,9 +410,13 @@ export default function CheckoutFixedPage() {
         country: data.country
       };
       
+      // Calculate final total with shipping
+      const calculatedTotal = subtotal + shippingOption.price;
+      setFinalTotal(calculatedTotal);
+      
       // Update order store with customer information and shipping details
-      updateOrder({
-        customerInfo,
+      await updateOrder({
+        customerInfo: customerInfoData,
         shippingAddress,
         shippingOption: {
           id: shippingOption.id,
@@ -378,16 +431,25 @@ export default function CheckoutFixedPage() {
           shipping: shippingOption.price,
           discount: 0,
           tax: 0,
-          grandTotal: subtotal + shippingOption.price
+          grandTotal: calculatedTotal
         }
       });
       
-      // Save customer info for later
-      setCustomerInfo(customerInfo);
+      // Store the values in localStorage as a backup to prevent data loss
+      try {
+        localStorage.setItem('okdio_checkout_customer_info', JSON.stringify(customerInfoData));
+        localStorage.setItem('okdio_checkout_shipping_option', JSON.stringify(shippingOption));
+        localStorage.setItem('okdio_checkout_final_total', calculatedTotal.toString());
+      } catch (e) {
+        console.warn('Could not save checkout data to localStorage', e);
+      }
+      
+      // Wait briefly to ensure data is saved before proceeding
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Move to payment step
-      setCheckoutStep(CheckoutStep.PAYMENT);
       setCheckoutProgress(66);
+      setCheckoutStep(CheckoutStep.PAYMENT);
       
       toast({
         title: 'Shipping Information Saved',
