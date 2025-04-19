@@ -694,7 +694,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           <div className="mt-6">
             <Button
               type="submit"
-              className="w-full bg-gradient text-white py-3 px-4 rounded-full font-medium hover:opacity-90 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gradient"
+              className="w-full bg-primary text-white py-3 px-4 rounded-full font-medium hover:bg-[var(--nike-primary-light)] transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               disabled={isGenerating || !user || (!subscription.isSubscribed && subscription.remainingDesigns <= 0)}
             >
               {isGenerating ? (
