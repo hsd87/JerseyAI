@@ -465,9 +465,11 @@ export default function LandingPage() {
                   </div>
                 </li>
               </ul>
-              <Button variant="outline" className="w-full border-gradient text-gradient hover:bg-gradient/5 hover:border-gradient/30 rounded-full py-2 font-medium text-sm">
-                Get Bulk Quote
-              </Button>
+              <Link href="/teams">
+                <Button variant="outline" className="w-full border-gradient text-gradient hover:bg-gradient/5 hover:border-gradient/30 rounded-full py-2 font-medium text-sm">
+                  Get Bulk Quote
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
