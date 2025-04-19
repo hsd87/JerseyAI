@@ -5,26 +5,27 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-pill text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#111] focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-black text-white hover:opacity-90",
+        default: "bg-nike-black text-white hover:bg-[#333]",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-nike-red text-white hover:opacity-90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-nike-grayMedium bg-white text-nike-black hover:bg-[rgba(0,0,0,0.04)]",
         secondary:
-          "bg-gray-100 text-black hover:bg-gray-200",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        brand: "bg-[#E34234] text-white hover:opacity-90",
+          "bg-nike-grayLight text-nike-black hover:bg-[#E5E5E5]",
+        ghost: "hover:bg-[rgba(0,0,0,0.04)] text-nike-black",
+        link: "text-nike-black underline-offset-4 hover:underline p-0 h-auto",
+        accent: "bg-nike-accent text-white hover:opacity-90",
       },
       size: {
-        default: "h-10 px-6 py-3",
-        sm: "h-9 px-4 py-2",
-        lg: "h-12 px-8 py-3",
-        icon: "h-10 w-10",
+        default: "h-10 px-6 py-0",
+        sm: "h-8 px-4 py-0 text-xs",
+        lg: "h-12 px-8 py-0 text-base",
+        xl: "h-14 px-10 py-0 text-base",
+        icon: "h-10 w-10 p-0",
       },
     },
     defaultVariants: {

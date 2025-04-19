@@ -1,108 +1,191 @@
 /* Import fonts first */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --nike-black: #111;
+    --nike-gray-dark: #757575;
+    --nike-gray-medium: #8D8D8D;
+    --nike-gray-light: #F5F5F5;
+    --nike-white: #FFF;
+    --nike-red: #F5413D;
+    --nike-orange: #FA5400;
+    --nike-accent: #F5413D;
+    --nike-hover-overlay: rgba(0, 0, 0, 0.04);
+    --nike-transition-standard: all 0.2s ease;
+  }
+  
   * {
     @apply border-border;
   }
 
   body {
-    @apply antialiased bg-white text-[#0A0A0A] leading-relaxed;
-    font-family: 'Inter', 'Noto Sans', system-ui, sans-serif;
+    @apply antialiased bg-white text-[var(--nike-black)] leading-normal;
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight text-[#0A0A0A];
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    @apply font-medium tracking-tight text-[var(--nike-black)];
+    font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: -0.025em;
   }
 
   h1 {
-    @apply text-5xl md:text-6xl leading-tight;
+    @apply text-5xl md:text-7xl leading-none font-bold;
   }
 
   h2 {
-    @apply text-3xl md:text-4xl;
+    @apply text-3xl md:text-5xl font-bold leading-tight;
   }
 
   h3 {
-    @apply text-2xl md:text-3xl;
+    @apply text-2xl md:text-3xl font-bold;
   }
 
   h4 {
-    @apply text-xl md:text-2xl;
+    @apply text-xl font-medium;
   }
 
   p {
-    @apply text-base md:text-lg text-[#4B5563] leading-relaxed;
-    font-family: 'Inter', 'Noto Sans', system-ui, sans-serif;
+    @apply text-base leading-normal text-[var(--nike-gray-dark)];
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  a {
+    @apply transition-all;
   }
 
   section {
-    @apply py-16 md:py-24;
+    @apply py-12 md:py-16;
   }
 }
 
 @layer components {
   /* Layout container with proper max-width */
-  .container-custom {
-    @apply px-6 md:px-10 mx-auto max-w-7xl;
+  .container-nike {
+    @apply px-4 md:px-8 mx-auto max-w-[1440px];
   }
   
   /* Main section spacing */
   .section-spacing {
-    @apply space-y-16;
+    @apply space-y-12 md:space-y-16;
   }
   
   /* Buttons */
-  .btn-primary {
-    @apply py-3 px-6 rounded-full bg-black text-white font-semibold flex items-center justify-center transition-all hover:opacity-90;
+  .btn-nike-primary {
+    @apply h-10 px-6 rounded-full bg-[var(--nike-black)] text-white font-medium flex items-center justify-center transition-all hover:bg-[#333] text-sm;
   }
   
-  .btn-secondary {
-    @apply py-3 px-6 rounded-full bg-gray-100 text-black flex items-center justify-center font-semibold transition-all hover:bg-gray-200;
+  .btn-nike-secondary {
+    @apply h-10 px-6 rounded-full bg-white text-[var(--nike-black)] border border-[var(--nike-gray-medium)] flex items-center justify-center font-medium transition-all hover:bg-[var(--nike-hover-overlay)] text-sm;
+  }
+  
+  .btn-nike-accent {
+    @apply h-10 px-6 rounded-full bg-[var(--nike-accent)] text-white flex items-center justify-center font-medium transition-all hover:opacity-90 text-sm;
   }
   
   /* Navigation */
-  .nav-item {
-    @apply text-sm uppercase tracking-wide transition-colors font-normal;
+  .nav-item-nike {
+    @apply text-base font-normal text-[var(--nike-black)] transition-colors hover:text-[var(--nike-gray-medium)];
+  }
+  
+  .nav-item-nike-active {
+    @apply text-base font-medium text-[var(--nike-black)] border-b-2 border-[var(--nike-black)];
   }
   
   /* Cards */
-  .card-custom {
-    @apply bg-white shadow-sm rounded-3xl p-6 border border-[#E5E7EB] transition-all;
+  .card-nike {
+    @apply bg-white p-0 transition-all overflow-hidden;
+  }
+  
+  .card-nike-hover {
+    @apply hover:opacity-90 transition-all cursor-pointer;
+  }
+  
+  /* Product tiles */
+  .product-tile {
+    @apply overflow-hidden transition-all;
+  }
+  
+  .product-tile-image {
+    @apply w-full h-auto transition-transform duration-500;
+  }
+  
+  .product-tile:hover .product-tile-image {
+    @apply scale-105;
+  }
+  
+  .product-title {
+    @apply text-base font-medium text-[var(--nike-black)] mt-3;
+  }
+  
+  .product-category {
+    @apply text-sm text-[var(--nike-gray-medium)] mb-1;
+  }
+  
+  .product-price {
+    @apply text-base font-medium text-[var(--nike-black)] mt-1;
   }
   
   /* Form inputs */
-  .form-input {
-    @apply bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-black w-full;
+  .form-input-nike {
+    @apply h-10 bg-[var(--nike-gray-light)] px-4 py-3 text-sm focus:outline-none w-full placeholder-[var(--nike-gray-medium)];
   }
   
-  .form-label {
-    @apply text-sm text-gray-600 mb-1 block;
+  .form-label-nike {
+    @apply text-sm text-[var(--nike-gray-dark)] mb-1 block;
   }
   
-  /* Product gallery */
-  .product-preview {
-    @apply rounded-3xl overflow-hidden hover:scale-105 transition-all duration-300;
+  /* Feature blocks */
+  .feature-block {
+    @apply flex flex-col space-y-3;
+  }
+  
+  .feature-title {
+    @apply text-xl font-bold text-[var(--nike-black)];
+  }
+  
+  .feature-description {
+    @apply text-sm text-[var(--nike-gray-dark)];
+  }
+  
+  /* Hero elements */
+  .hero-title {
+    @apply text-5xl md:text-7xl font-bold text-white leading-none mb-4;
+  }
+  
+  .hero-subtitle {
+    @apply text-xl md:text-2xl text-white font-normal mb-8;
   }
   
   /* Footer */
-  .footer {
-    @apply bg-[#F9F9F9] text-[#4B5563] py-12 px-6 md:px-10 border-t border-[#E5E7EB];
+  .footer-nike {
+    @apply bg-[var(--nike-black)] text-white py-16 px-4 md:px-8;
+  }
+  
+  .footer-title {
+    @apply text-sm font-bold uppercase mb-4;
+  }
+  
+  .footer-link {
+    @apply text-sm text-[var(--nike-gray-medium)] hover:text-white mb-2 block transition-colors;
   }
   
   /* Micro elements */
-  .breadcrumb {
-    @apply text-xs uppercase tracking-wide text-gray-400;
+  .tag-nike {
+    @apply text-xs uppercase font-medium py-1 px-2 bg-[var(--nike-black)] text-white inline-block;
   }
   
-  .tooltip {
-    @apply bg-black text-white text-xs px-2 py-1 rounded;
+  .breadcrumb-nike {
+    @apply text-xs text-[var(--nike-gray-medium)] hover:text-[var(--nike-black)];
   }
 }
