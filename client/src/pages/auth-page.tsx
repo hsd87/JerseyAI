@@ -232,7 +232,7 @@ export default function AuthPage() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">AI-Generated Designs</h3>
+                  <h3 className="font-medium mb-1 text-white">AI-Generated Designs</h3>
                   <p className="text-gray-300">Create unique jersey designs with just a few clicks</p>
                 </div>
               </div>
@@ -242,7 +242,7 @@ export default function AuthPage() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">Custom Kit Editor</h3>
+                  <h3 className="font-medium mb-1 text-white">Custom Kit Editor</h3>
                   <p className="text-gray-300">Add names, numbers, and logos to make it your own</p>
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function AuthPage() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">Team Orders</h3>
+                  <h3 className="font-medium mb-1 text-white">Team Orders</h3>
                   <p className="text-gray-300">Easily manage bulk orders for your entire squad</p>
                 </div>
               </div>
