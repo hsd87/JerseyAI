@@ -94,13 +94,13 @@ const AboutPage: React.FC = () => {
                   >
                     <ul className="space-y-3">
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">V</span>
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-sm bg-voro-red/10 text-voro-red font-bold text-xs mr-2 flex-shrink-0">V</span>
                         <div>
                           <strong className="font-medium">Velocity:</strong> We move quickly and efficiently, understanding that time is valuable for our customers.
                         </div>
                       </li>
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">O</span>
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-sm bg-voro-red/10 text-voro-red font-bold text-xs mr-2 flex-shrink-0">O</span>
                         <div>
                           <strong className="font-medium">Originality:</strong> We embrace uniqueness and creativity, helping teams express their distinct identity.
                         </div>

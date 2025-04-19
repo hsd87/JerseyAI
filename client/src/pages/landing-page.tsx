@@ -481,24 +481,24 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-[#E8E8ED]">
-                <div className="mb-4">
+              <div key={index} className="bg-white rounded-sm p-5 shadow-sm border border-[#E8E8ED]">
+                <div className="mb-3">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="inline-block h-4 w-4 text-[#0071E3]" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={star} className="inline-block h-3 w-3 text-[#0071E3]" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.799-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
                 </div>
-                <blockquote className="text-[#494949] mb-4">"{testimonial.quote}"</blockquote>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#F5F5F7] flex items-center justify-center text-[#86868B]">
+                <blockquote className="text-[#494949] mb-3 text-sm">"{testimonial.quote}"</blockquote>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-sm bg-[#F5F5F7] flex items-center justify-center text-[#86868B] text-sm">
                     {testimonial.author.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-medium text-[#1D1D1F]">{testimonial.author}</p>
-                    <p className="text-sm text-[#86868B]">{testimonial.title}</p>
+                    <p className="font-medium text-[#1D1D1F] text-sm">{testimonial.author}</p>
+                    <p className="text-xs text-[#86868B]">{testimonial.title}</p>
                   </div>
                 </div>
               </div>
@@ -508,10 +508,10 @@ export default function LandingPage() {
           <div className="mt-16">
             <div className="text-center">
               <h3 className="text-[#86868B] uppercase text-sm font-medium tracking-wide mb-4">Trusted by teams and organizations</h3>
-              <div className="flex flex-wrap justify-center gap-8 grayscale opacity-60">
+              <div className="flex flex-wrap justify-center gap-6 grayscale opacity-60">
                 {/* This would contain actual client logos */}
                 {[1, 2, 3, 4, 5].map((logo) => (
-                  <div key={logo} className="h-12 w-24 bg-[#F5F5F7] rounded-lg flex items-center justify-center shadow-sm border border-[#E8E8ED]">
+                  <div key={logo} className="h-10 w-20 bg-[#F5F5F7] rounded-sm flex items-center justify-center shadow-sm border border-[#E8E8ED]">
                     <span className="text-[#86868B] text-xs">Logo {logo}</span>
                   </div>
                 ))}

@@ -66,7 +66,7 @@ export function InfoPill({
   return (
     <section
       className={cn(
-        "rounded-sm px-5 py-4 md:px-8 md:py-5",
+        "rounded-sm px-4 py-3 md:px-5 md:py-4",
         bgColor,
         "shadow-sm border border-gray-200",
         "max-w-2xl mx-auto",
@@ -74,13 +74,13 @@ export function InfoPill({
       )}
       {...props}
     >
-      <div className="flex items-center gap-2 mb-3">
-        {icon && <span className="text-base">{icon}</span>}
-        <h3 className={cn("font-medium text-base", headerColor, titleClassName)}>
+      <div className="flex items-center gap-2 mb-2">
+        {icon && <span className="text-sm">{icon}</span>}
+        <h3 className={cn("font-medium text-sm", headerColor, titleClassName)}>
           {title}
         </h3>
       </div>
-      <div className={cn("text-sm md:text-sm", textColor, contentClassName)}>
+      <div className={cn("text-xs md:text-sm", textColor, contentClassName)}>
         {children}
       </div>
     </section>
