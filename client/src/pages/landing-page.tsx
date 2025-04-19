@@ -170,14 +170,14 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 flex flex-col md:flex-row items-center justify-between">
           <div className="w-full md:w-3/5 space-y-8 mb-12 md:mb-0">
             <h1 className="font-sora text-4xl md:text-6xl font-bold leading-tight text-[#0F0F0F]">
-              Design Custom Teamwear <span className="text-[#E34234]">in Seconds</span>
+              Design Custom Teamwear <span className="text-gradient">in Seconds</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-600 max-w-md">
               AI-powered kit builder. No design skills needed.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link href="/designer">
-                <Button size="lg" className="bg-[#E34234] hover:bg-opacity-80 text-white px-8 py-3 rounded-full text-lg font-semibold transition-all flex items-center gap-2 h-auto">
+                <Button size="lg" className="bg-gradient hover:opacity-90 text-white px-8 py-3 rounded-full text-lg font-semibold transition-all flex items-center gap-2 h-auto">
                   Start Designing <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
@@ -192,7 +192,7 @@ export default function LandingPage() {
             <div className="text-sm text-gray-500 uppercase mb-2">Your Kit Preview</div>
             <div className="rounded-xl shadow-sm border border-gray-300 bg-white p-6">
               <div className="text-center mb-4">
-                <span className="font-heading font-bold text-xl"><span className="text-[#E34234]">VORO</span> Designer</span>
+                <span className="font-heading font-bold text-xl"><span className="text-gradient">VORO</span> Designer</span>
               </div>
               <div className="relative bg-gray-50 h-64 rounded-lg mb-6 flex items-center justify-center overflow-hidden border border-gray-200">
                 {designs.length > 0 ? (
@@ -264,7 +264,7 @@ export default function LandingPage() {
                 
                 <div className="flex justify-center">
                   <Link href="/designer">
-                    <Button className="bg-[#E34234] text-white hover:bg-opacity-90 px-5 py-1.5 flex items-center gap-2 rounded-full text-sm">
+                    <Button className="bg-gradient text-white hover:opacity-90 px-5 py-1.5 flex items-center gap-2 rounded-full text-sm">
                       Try It Now <ArrowRight className="h-3.5 w-3.5" />
                     </Button>
                   </Link>
@@ -275,7 +275,7 @@ export default function LandingPage() {
             <div className="order-1 lg:order-2 relative">
               <div className="aspect-video bg-white rounded-[1px] shadow-sm border border-[#E8E8ED] relative overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <PlayCircle className="h-16 w-16 text-[#E34234] cursor-pointer hover:scale-110 transition-transform" />
+                  <PlayCircle className="h-16 w-16 text-gradient cursor-pointer hover:scale-110 transition-transform" />
                 </div>
                 {/* This would be a video or interactive element in reality */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#F5F5F7]/20 to-[#E8E8ED]/20"></div>
@@ -314,7 +314,7 @@ export default function LandingPage() {
               <ul className="space-y-3">
                 {keyFeatures.map((feature, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="h-4 w-4 text-[#E34234] flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="h-4 w-4 text-gradient flex-shrink-0 mt-0.5" />
                     <span className="text-[#494949] text-sm">{feature}</span>
                   </li>
                 ))}
@@ -349,7 +349,7 @@ export default function LandingPage() {
 
           <div className="mt-16 text-center">
             <Link href="/designer">
-              <Button size="lg" className="bg-[#E34234] hover:bg-opacity-90 text-white px-6 py-4 rounded-full text-base font-medium transition-all flex items-center gap-2 h-auto mx-auto">
+              <Button size="lg" className="bg-gradient hover:opacity-90 text-white px-6 py-4 rounded-full text-base font-medium transition-all flex items-center gap-2 h-auto mx-auto">
                 Design Your Jersey Now <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -408,7 +408,7 @@ export default function LandingPage() {
                 </li>
               </ul>
               <Link href="/designer">
-                <Button className="w-full bg-[#E34234] hover:bg-opacity-90 text-white rounded-full py-2 font-medium text-sm">
+                <Button className="w-full bg-gradient hover:opacity-90 text-white rounded-full py-2 font-medium text-sm">
                   Team Order: Start Designing
                 </Button>
               </Link>
@@ -530,7 +530,7 @@ export default function LandingPage() {
             No design skills required!
           </p>
           <Link href="/designer">
-            <Button size="lg" className="bg-[#E34234] hover:bg-opacity-90 text-white px-6 py-3 rounded-full text-base font-medium transition-all shadow-sm">
+            <Button size="lg" className="bg-gradient hover:opacity-90 text-white px-6 py-3 rounded-full text-base font-medium transition-all shadow-sm">
               Start Designing Now
             </Button>
           </Link>
