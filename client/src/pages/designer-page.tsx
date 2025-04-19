@@ -145,7 +145,7 @@ export default function DesignerPage() {
             <DesignEditor />
             
             <div className="mt-6 flex justify-between items-center">
-              <Button variant="outline" onClick={prevStep} className="rounded-full">
+              <Button variant="outline" onClick={prevStep} className="rounded-full border-gray-300 hover:bg-gray-100">
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Design
               </Button>
               {/* Buttons removed as per client request */}
@@ -171,7 +171,7 @@ export default function DesignerPage() {
               </div>
               
               <div className="mt-6 flex justify-start">
-                <Button variant="outline" onClick={prevStep} className="rounded-full">
+                <Button variant="outline" onClick={prevStep} className="rounded-full border-gray-300 hover:bg-gray-100">
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back to Customization
                 </Button>
               </div>
@@ -195,7 +195,7 @@ export default function DesignerPage() {
                 </div>
                 
                 <div className="mt-8 flex justify-between">
-                  <Button variant="outline" onClick={prevStep} className="rounded-full">
+                  <Button variant="outline" onClick={prevStep} className="rounded-full border-gray-300 hover:bg-gray-100">
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Order Details
                   </Button>
                 </div>

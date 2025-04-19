@@ -815,7 +815,7 @@ export default function OrderConfig({
             </div>
             
             <div className="flex justify-end">
-              <Button onClick={goToNextStep}>
+              <Button onClick={goToNextStep} className="bg-[#E34234] hover:bg-opacity-80 rounded-full">
                 Continue to Package Options <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -991,6 +991,7 @@ export default function OrderConfig({
               <Button 
                 onClick={goToNextStep}
                 disabled={!packageItems || packageItems.length === 0}
+                className="bg-[#E34234] hover:bg-opacity-80 rounded-full"
               >
                 Continue to Order Type <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
