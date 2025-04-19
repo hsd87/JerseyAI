@@ -192,7 +192,7 @@ export default function LandingPage() {
             <div className="text-sm text-gray-500 uppercase mb-2">Your Kit Preview</div>
             <div className="rounded-xl shadow-sm border border-gray-300 bg-white p-6">
               <div className="text-center mb-4">
-                <span className="font-heading font-bold text-xl"><span className="text-gradient">VORO</span> Designer</span>
+                <span className="font-heading font-bold text-xl"><span className="text-gradient">OKDIO</span> Designer</span>
               </div>
               <div className="relative bg-gray-50 h-64 rounded-lg mb-6 flex items-center justify-center overflow-hidden border border-gray-200">
                 {designs.length > 0 ? (
@@ -323,13 +323,13 @@ export default function LandingPage() {
 
             {/* Comparison Table */}
             <div className="bg-white rounded-[1px] p-6 shadow-sm border border-[#E8E8ED]">
-              <h3 className="text-xl mb-5 text-[#1D1D1F] font-medium">VORO vs. Traditional Printing</h3>
+              <h3 className="text-xl mb-5 text-[#1D1D1F] font-medium">OKDIO vs. Traditional Printing</h3>
               <div className="overflow-hidden border border-[#E8E8ED] rounded-[1px]">
                 <table className="min-w-full divide-y divide-[#E8E8ED]">
                   <thead className="bg-[#F5F5F7]">
                     <tr>
                       <th className="px-4 py-2 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Metric</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">VORO</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">OKDIO</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Traditional</th>
                     </tr>
                   </thead>
@@ -375,7 +375,7 @@ export default function LandingPage() {
                 <h3 className="text-xl font-medium text-[#1D1D1F]">Built for Teams of All Sizes</h3>
               </div>
               <p className="text-[#494949] text-sm mb-5">
-                Coaches and team managers love VORO – coordinate your entire team's kit in one go.
+                Coaches and team managers love OKDIO – coordinate your entire team's kit in one go.
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-3">
@@ -418,7 +418,7 @@ export default function LandingPage() {
             <div className="bg-[#F5F5F7] rounded-[1px] p-6 border border-[#E8E8ED] shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <Building className="h-6 w-6 text-gradient" />
-                <h3 className="text-xl font-medium text-[#1D1D1F]">Partner with VORO</h3>
+                <h3 className="text-xl font-medium text-[#1D1D1F]">Partner with OKDIO</h3>
               </div>
               <p className="text-[#494949] text-sm mb-5">
                 Need 50+ jerseys or want to resell custom kits? We've got you covered with scalable fulfillment.
@@ -467,7 +467,7 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-semibold text-[#1D1D1F] mb-4">What Our Customers Say</h2>
             <p className="text-xl text-[#494949] max-w-2xl mx-auto">
-              Join thousands of satisfied customers who've transformed their team's look with VORO
+              Join thousands of satisfied customers who've transformed their team's look with OKDIO
             </p>
             <div className="mt-6 flex justify-center items-center gap-3">
               <div className="flex">
