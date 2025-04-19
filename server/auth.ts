@@ -45,11 +45,11 @@ export function setupAuth(app: Express) {
   });
 
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || 'projersey-session-secret',
+    secret: process.env.SESSION_SECRET || 'okdio-session-secret',
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
-    name: 'voro.sid', // Custom name to avoid fingerprinting
+    name: 'okdio.sid', // Custom name to avoid fingerprinting
     rolling: true, // Reset cookie expiration on each request
     cookie: {
       secure: process.env.NODE_ENV === "production",

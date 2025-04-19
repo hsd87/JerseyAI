@@ -23,7 +23,7 @@ export default function Footer() {
               <a href="#" className="text-gray-300 hover:text-gradient transition-colors p-1.5 rounded-md hover:bg-gradient/10">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-300 hover:text-voro-red transition-colors p-1.5 rounded-md hover:bg-voro-grey/80">
+              <a href="#" className="text-gray-300 hover:text-gradient transition-colors p-1.5 rounded-md hover:bg-gradient/10">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -32,12 +32,12 @@ export default function Footer() {
           <div className="col-span-1">
             <h3 className="text-sm font-medium text-gray-100 uppercase tracking-wider">Company</h3>
             <ul className="mt-4 space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">About</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Careers</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Contact</a></li>
-              <li><Link href="/partner" className="text-gray-300 hover:text-voro-red transition-colors">Partner With Us</Link></li>
-              <li><Link href="/products" className="text-gray-300 hover:text-voro-red transition-colors">Shop</Link></li>
-              <li><a href="#" className="text-gray-300 hover:text-voro-red transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-gradient transition-colors">About</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-gradient transition-colors">Careers</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-gradient transition-colors">Contact</a></li>
+              <li><Link href="/partner" className="text-gray-300 hover:text-gradient transition-colors">Partner With Us</Link></li>
+              <li><Link href="/products" className="text-gray-300 hover:text-gradient transition-colors">Shop</Link></li>
+              <li><a href="#" className="text-gray-300 hover:text-gradient transition-colors">Privacy Policy</a></li>
             </ul>
           </div>
         </div>
@@ -47,9 +47,9 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} OKDIO. All rights reserved.
           </p>
           <div className="mt-4 sm:mt-0 flex flex-wrap justify-center gap-6 items-center">
-            <a href="#" className="text-sm text-gray-400 hover:text-voro-red transition-colors">Privacy Policy</a>
-            <a href="#" className="text-sm text-gray-400 hover:text-voro-red transition-colors">Terms of Service</a>
-            <a href="#" className="text-sm text-gray-400 hover:text-voro-red transition-colors">Legal</a>
+            <a href="#" className="text-sm text-gray-400 hover:text-gradient transition-colors">Privacy Policy</a>
+            <a href="#" className="text-sm text-gray-400 hover:text-gradient transition-colors">Terms of Service</a>
+            <a href="#" className="text-sm text-gray-400 hover:text-gradient transition-colors">Legal</a>
           </div>
         </div>
       </div>
