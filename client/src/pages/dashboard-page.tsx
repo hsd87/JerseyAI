@@ -427,7 +427,7 @@ export default function DashboardPage() {
             <TabsContent value="orders" className="space-y-6">
               {isLoadingOrders ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#0071E3]" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#0088cc]" />
                 </div>
               ) : ordersError ? (
                 <div className="text-center py-12">
@@ -586,7 +586,7 @@ export default function DashboardPage() {
             <TabsContent value="favorites" className="space-y-4">
               {isLoadingDesigns ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#0071E3]" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#0088cc]" />
                 </div>
               ) : designsError ? (
                 <div className="text-center py-12">
