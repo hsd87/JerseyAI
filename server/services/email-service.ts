@@ -211,7 +211,7 @@ export const sendOrderConfirmationEmail = async (
         attachments: [
           {
             content: pdfBase64,
-            filename: `ProJersey_Order_${order.id}.pdf`,
+            filename: `OKDIO_Order_${order.id}.pdf`,
             type: 'application/pdf',
             disposition: 'attachment',
           },
@@ -235,7 +235,7 @@ export const sendOrderConfirmationEmail = async (
         html: htmlContent,
         attachments: [
           {
-            filename: `ProJersey_Order_${order.id}.pdf`,
+            filename: `OKDIO_Order_${order.id}.pdf`,
             content: pdfBuffer,
             contentType: 'application/pdf',
           },

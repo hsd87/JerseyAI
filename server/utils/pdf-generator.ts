@@ -37,11 +37,11 @@ export async function generateOrderPDF(order: Order): Promise<string> {
   const stream = fs.createWriteStream(filePath);
   doc.pipe(stream);
   
-  // Add ProJersey branding header
+  // Add OKDIO branding header
   doc
     .fontSize(28)
-    .fillColor('#0071e3')
-    .text("ProJersey", { align: "center" })
+    .fillColor('#FF4081')
+    .text("OKDIO", { align: "center" })
     .fontSize(14)
     .fillColor('#444444')
     .text("Custom Athletic Apparel", { align: "center" })
@@ -78,7 +78,7 @@ export async function generateOrderPDF(order: Order): Promise<string> {
   if (order.shippingAddress) {
     doc
       .fontSize(14)
-      .fillColor('#0071e3')
+      .fillColor('#FF4081')
       .text("Shipping Information", 50, startY, { underline: true })
       .fillColor('#000000')
       .fontSize(11)
@@ -93,7 +93,7 @@ export async function generateOrderPDF(order: Order): Promise<string> {
   if (order.designUrls) {
     doc
       .fontSize(14)
-      .fillColor('#0071e3')
+      .fillColor('#FF4081')
       .text("Design Preview", 300, startY, { underline: true });
       
     try {
@@ -117,7 +117,7 @@ export async function generateOrderPDF(order: Order): Promise<string> {
   // Order items with improved table formatting
   doc
     .fontSize(14)
-    .fillColor('#0071e3')
+    .fillColor('#FF4081')
     .text("Order Items", { underline: true })
     .moveDown();
   
@@ -304,7 +304,7 @@ export async function generateOrderPDF(order: Order): Promise<string> {
     
     doc
       .fontSize(16)
-      .fillColor('#0071e3')
+      .fillColor('#FF4081')
       .text("Team Order Details", { align: "center" })
       .moveDown();
       
@@ -348,8 +348,8 @@ export async function generateOrderPDF(order: Order): Promise<string> {
     .text("Thank you for your order!", { align: "center" })
     .moveDown(0.5)
     .text("If you have any questions, please contact our customer service at:", { align: "center" })
-    .fillColor('#0071e3')
-    .text("support@projersey.com", { align: "center" })
+    .fillColor('#FF4081')
+    .text("support@okdio.com", { align: "center" })
     .moveDown(0.5)
     .fillColor('#666666')
     .text(`Order ID: ${order.id} • Generated on ${new Date().toLocaleString()}`, { align: "center" });
