@@ -322,9 +322,9 @@ export default function LandingPage() {
             </div>
 
             {/* Comparison Table */}
-            <div className="bg-white rounded-sm p-6 shadow-sm border border-[#E8E8ED]">
+            <div className="bg-white rounded-[2px] p-6 shadow-sm border border-[#E8E8ED]">
               <h3 className="text-xl mb-5 text-[#1D1D1F] font-medium">VORO vs. Traditional Printing</h3>
-              <div className="overflow-hidden border border-[#E8E8ED] rounded-sm">
+              <div className="overflow-hidden border border-[#E8E8ED] rounded-[2px]">
                 <table className="min-w-full divide-y divide-[#E8E8ED]">
                   <thead className="bg-[#F5F5F7]">
                     <tr>
@@ -349,7 +349,7 @@ export default function LandingPage() {
 
           <div className="mt-16 text-center">
             <Link href="/designer">
-              <Button size="lg" className="bg-black hover:bg-gray-800 text-white px-6 py-4 rounded-sm text-base font-medium transition-all flex items-center gap-2 h-auto mx-auto">
+              <Button size="lg" className="bg-black hover:bg-gray-800 text-white px-6 py-4 rounded-[2px] text-base font-medium transition-all flex items-center gap-2 h-auto mx-auto">
                 Design Your Jersey Now <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -369,7 +369,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Teams & Organizations Section */}
-            <div className="bg-[#F5F5F7] rounded-sm p-6 border border-[#E8E8ED] shadow-sm">
+            <div className="bg-[#F5F5F7] rounded-[2px] p-6 border border-[#E8E8ED] shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <Users className="h-6 w-6 text-[#0071E3]" />
                 <h3 className="text-xl font-medium text-[#1D1D1F]">Built for Teams of All Sizes</h3>
@@ -408,14 +408,14 @@ export default function LandingPage() {
                 </li>
               </ul>
               <Link href="/designer">
-                <Button className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-sm py-2 font-medium text-sm">
+                <Button className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-[2px] py-2 font-medium text-sm">
                   Team Order: Start Designing
                 </Button>
               </Link>
             </div>
 
             {/* B2B & Resellers Section */}
-            <div className="bg-[#F5F5F7] rounded-sm p-6 border border-[#E8E8ED] shadow-sm">
+            <div className="bg-[#F5F5F7] rounded-[2px] p-6 border border-[#E8E8ED] shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <Building className="h-6 w-6 text-[#0071E3]" />
                 <h3 className="text-xl font-medium text-[#1D1D1F]">Partner with VORO</h3>
@@ -453,7 +453,7 @@ export default function LandingPage() {
                   </div>
                 </li>
               </ul>
-              <Button variant="outline" className="w-full border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30 rounded-sm py-2 font-medium text-sm">
+              <Button variant="outline" className="w-full border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30 rounded-[2px] py-2 font-medium text-sm">
                 Get Bulk Quote
               </Button>
             </div>
@@ -483,7 +483,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-sm p-5 shadow-sm border border-[#E8E8ED]">
+              <div key={index} className="bg-white rounded-[2px] p-5 shadow-sm border border-[#E8E8ED]">
                 <div className="mb-3">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <svg key={star} className="inline-block h-3 w-3 text-[#0071E3]" fill="currentColor" viewBox="0 0 20 20">
@@ -493,7 +493,7 @@ export default function LandingPage() {
                 </div>
                 <blockquote className="text-[#494949] mb-3 text-sm">"{testimonial.quote}"</blockquote>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-sm bg-[#F5F5F7] flex items-center justify-center text-[#86868B] text-sm">
+                  <div className="w-8 h-8 rounded-[2px] bg-[#F5F5F7] flex items-center justify-center text-[#86868B] text-sm">
                     {testimonial.author.charAt(0)}
                   </div>
                   <div>
@@ -511,7 +511,7 @@ export default function LandingPage() {
               <div className="flex flex-wrap justify-center gap-6 grayscale opacity-60">
                 {/* This would contain actual client logos */}
                 {[1, 2, 3, 4, 5].map((logo) => (
-                  <div key={logo} className="h-10 w-20 bg-[#F5F5F7] rounded-sm flex items-center justify-center shadow-sm border border-[#E8E8ED]">
+                  <div key={logo} className="h-10 w-20 bg-[#F5F5F7] rounded-[2px] flex items-center justify-center shadow-sm border border-[#E8E8ED]">
                     <span className="text-[#86868B] text-xs">Logo {logo}</span>
                   </div>
                 ))}
@@ -530,7 +530,7 @@ export default function LandingPage() {
             No design skills required!
           </p>
           <Link href="/designer">
-            <Button size="lg" className="bg-[#0071E3] hover:bg-[#0077ED] text-white px-6 py-3 rounded-sm text-base font-medium transition-all shadow-sm">
+            <Button size="lg" className="bg-[#0071E3] hover:bg-[#0077ED] text-white px-6 py-3 rounded-[2px] text-base font-medium transition-all shadow-sm">
               Start Designing Now
             </Button>
           </Link>
