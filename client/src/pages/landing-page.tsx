@@ -322,23 +322,23 @@ export default function LandingPage() {
             </div>
 
             {/* Comparison Table */}
-            <div className="bg-white rounded-xl p-8 shadow-sm">
-              <h3 className="font-sora font-bold text-2xl mb-6">VORO vs. Traditional Printing</h3>
-              <div className="overflow-hidden border border-gray-200 rounded-lg">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-[#E8E8ED]">
+              <h3 className="text-2xl mb-6 text-[#1D1D1F] font-medium">VORO vs. Traditional Printing</h3>
+              <div className="overflow-hidden border border-[#E8E8ED] rounded-lg">
+                <table className="min-w-full divide-y divide-[#E8E8ED]">
+                  <thead className="bg-[#F5F5F7]">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VORO</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Traditional</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Metric</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">VORO</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Traditional</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-[#E8E8ED]">
                     {comparisonData.map((row, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{row.metric}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.voro}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.traditional}</td>
+                      <tr key={index} className="hover:bg-[#F5F5F7] transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#1D1D1F]">{row.metric}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#494949]">{row.voro}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#494949]">{row.traditional}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -361,99 +361,99 @@ export default function LandingPage() {
       <section className="py-16 md:py-24 bg-white" id="team-solutions">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="font-sora text-3xl md:text-4xl font-bold text-gray-900 mb-4">Solutions for Every Need</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-semibold text-[#1D1D1F] mb-4">Solutions for Every Need</h2>
+            <p className="text-xl text-[#494949] max-w-2xl mx-auto">
               Whether you're an individual, team manager, or business owner, we have the right solution for you
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Teams & Organizations Section */}
-            <div className="bg-gray-50 rounded-xl p-8 border border-gray-200">
+            <div className="bg-[#F5F5F7] rounded-xl p-8 border border-[#E8E8ED] shadow-sm">
               <div className="flex items-center gap-3 mb-4">
-                <Users className="h-8 w-8 text-[#E34234]" />
-                <h3 className="font-sora font-bold text-2xl">Built for Teams of All Sizes</h3>
+                <Users className="h-8 w-8 text-[#0071E3]" />
+                <h3 className="text-2xl font-medium text-[#1D1D1F]">Built for Teams of All Sizes</h3>
               </div>
-              <p className="text-gray-700 mb-6">
+              <p className="text-[#494949] mb-6">
                 Coaches and team managers love VORO – coordinate your entire team's kit in one go.
               </p>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#0071E3] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium">Bulk edit player names/numbers</span>
-                    <p className="text-sm text-gray-600">Upload a spreadsheet or enter names manually</p>
+                    <span className="font-medium text-[#1D1D1F]">Bulk edit player names/numbers</span>
+                    <p className="text-sm text-[#86868B]">Upload a spreadsheet or enter names manually</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#0071E3] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium">Multiple sizes in one order</span>
-                    <p className="text-sm text-gray-600">Youth and adult sizes together</p>
+                    <span className="font-medium text-[#1D1D1F]">Multiple sizes in one order</span>
+                    <p className="text-sm text-[#86868B]">Youth and adult sizes together</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#0071E3] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium">Team Order Discounts</span>
-                    <p className="text-sm text-gray-600">Automatically applied for 10+ jerseys</p>
+                    <span className="font-medium text-[#1D1D1F]">Team Order Discounts</span>
+                    <p className="text-sm text-[#86868B]">Automatically applied for 10+ jerseys</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#0071E3] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium">Reorder Anytime</span>
-                    <p className="text-sm text-gray-600">Save designs for future seasons</p>
+                    <span className="font-medium text-[#1D1D1F]">Reorder Anytime</span>
+                    <p className="text-sm text-[#86868B]">Save designs for future seasons</p>
                   </div>
                 </li>
               </ul>
               <Link href="/designer">
-                <Button className="w-full bg-black hover:bg-gray-800 text-white rounded-lg py-2.5">
+                <Button className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-lg py-2.5 font-medium">
                   Team Order: Start Designing
                 </Button>
               </Link>
             </div>
 
             {/* B2B & Resellers Section */}
-            <div className="bg-gray-50 rounded-xl p-8 border border-gray-200">
+            <div className="bg-[#F5F5F7] rounded-xl p-8 border border-[#E8E8ED] shadow-sm">
               <div className="flex items-center gap-3 mb-4">
-                <Building className="h-8 w-8 text-[#E34234]" />
-                <h3 className="font-sora font-bold text-2xl">Partner with VORO</h3>
+                <Building className="h-8 w-8 text-[#0071E3]" />
+                <h3 className="text-2xl font-medium text-[#1D1D1F]">Partner with VORO</h3>
               </div>
-              <p className="text-gray-700 mb-6">
+              <p className="text-[#494949] mb-6">
                 Need 50+ jerseys or want to resell custom kits? We've got you covered with scalable fulfillment.
               </p>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#0071E3] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium">Wholesale Pricing</span>
-                    <p className="text-sm text-gray-600">Tiered discounts for large volumes</p>
+                    <span className="font-medium text-[#1D1D1F]">Wholesale Pricing</span>
+                    <p className="text-sm text-[#86868B]">Tiered discounts for large volumes</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#0071E3] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium">White-Label Options</span>
-                    <p className="text-sm text-gray-600">Ship with your branding or integrate via API</p>
+                    <span className="font-medium text-[#1D1D1F]">White-Label Options</span>
+                    <p className="text-sm text-[#86868B]">Ship with your branding or integrate via API</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#0071E3] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium">Dedicated Account Manager</span>
-                    <p className="text-sm text-gray-600">Personalized support for large clients</p>
+                    <span className="font-medium text-[#1D1D1F]">Dedicated Account Manager</span>
+                    <p className="text-sm text-[#86868B]">Personalized support for large clients</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-[#0071E3] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium">On-time Global Fulfillment</span>
-                    <p className="text-sm text-gray-600">Reliable delivery for event organizers</p>
+                    <span className="font-medium text-[#1D1D1F]">On-time Global Fulfillment</span>
+                    <p className="text-sm text-[#86868B]">Reliable delivery for event organizers</p>
                   </div>
                 </li>
               </ul>
-              <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-100 rounded-lg py-2.5">
+              <Button variant="outline" className="w-full border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30 rounded-lg py-2.5 font-medium">
                 Get Bulk Quote
               </Button>
             </div>
@@ -462,43 +462,43 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials & Social Proof Section */}
-      <section className="py-16 md:py-24 bg-gray-50" id="testimonials">
+      <section className="py-16 md:py-24 bg-[#F5F5F7]" id="testimonials">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="font-sora text-3xl md:text-4xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-semibold text-[#1D1D1F] mb-4">What Our Customers Say</h2>
+            <p className="text-xl text-[#494949] max-w-2xl mx-auto">
               Join thousands of satisfied customers who've transformed their team's look with VORO
             </p>
             <div className="mt-6 flex justify-center items-center gap-3">
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <svg key={star} className="h-5 w-5 text-[#0071E3]" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.799-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
               </div>
-              <span className="text-gray-700 font-medium">4.8/5 average from 500+ customers</span>
+              <span className="text-[#1D1D1F] font-medium">4.8/5 average from 500+ customers</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
+              <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-[#E8E8ED]">
                 <div className="mb-4">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="inline-block h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={star} className="inline-block h-4 w-4 text-[#0071E3]" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.799-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
                 </div>
-                <blockquote className="text-gray-700 mb-4">"{testimonial.quote}"</blockquote>
+                <blockquote className="text-[#494949] mb-4">"{testimonial.quote}"</blockquote>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                  <div className="w-10 h-10 rounded-full bg-[#F5F5F7] flex items-center justify-center text-[#86868B]">
                     {testimonial.author.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-medium">{testimonial.author}</p>
-                    <p className="text-sm text-gray-600">{testimonial.title}</p>
+                    <p className="font-medium text-[#1D1D1F]">{testimonial.author}</p>
+                    <p className="text-sm text-[#86868B]">{testimonial.title}</p>
                   </div>
                 </div>
               </div>
@@ -507,12 +507,12 @@ export default function LandingPage() {
 
           <div className="mt-16">
             <div className="text-center">
-              <h3 className="text-gray-500 uppercase text-sm font-medium tracking-wide mb-4">Trusted by teams and organizations</h3>
+              <h3 className="text-[#86868B] uppercase text-sm font-medium tracking-wide mb-4">Trusted by teams and organizations</h3>
               <div className="flex flex-wrap justify-center gap-8 grayscale opacity-60">
                 {/* This would contain actual client logos */}
                 {[1, 2, 3, 4, 5].map((logo) => (
-                  <div key={logo} className="h-12 w-24 bg-gray-200 rounded flex items-center justify-center">
-                    <span className="text-gray-400 text-xs">Logo {logo}</span>
+                  <div key={logo} className="h-12 w-24 bg-[#F5F5F7] rounded-lg flex items-center justify-center shadow-sm border border-[#E8E8ED]">
+                    <span className="text-[#86868B] text-xs">Logo {logo}</span>
                   </div>
                 ))}
               </div>
@@ -522,15 +522,15 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+      <section className="py-16 md:py-24 bg-[#1D1D1F] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-sora text-3xl md:text-4xl font-bold mb-6">Ready to Transform Your Team's Look?</h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+          <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-white">Ready to Transform Your Team's Look?</h2>
+          <p className="text-xl text-[#F5F5F7] max-w-2xl mx-auto mb-10">
             Start designing your dream jersey in seconds with our AI-powered platform.
             No design skills required!
           </p>
           <Link href="/designer">
-            <Button size="lg" className="bg-[#E34234] hover:bg-[#E34234]/90 text-white px-8 py-3 rounded-lg text-lg font-medium transition-all">
+            <Button size="lg" className="bg-[#0071E3] hover:bg-[#0077ED] text-white px-8 py-4 rounded-lg text-lg font-medium transition-all shadow-md">
               Start Designing Now
             </Button>
           </Link>
