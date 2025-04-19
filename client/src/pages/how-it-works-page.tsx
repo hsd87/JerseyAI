@@ -2,12 +2,16 @@ import React from 'react';
 import { Link } from 'wouter';
 import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
+import { InfoPill } from '@/components/ui/info-pill';
 import { 
   ArrowRight,
   Shirt,
   Palette,
   PackageCheck,
-  ShoppingBag
+  ShoppingBag,
+  Sparkles,
+  Info,
+  ShieldCheck
 } from 'lucide-react';
 
 const HowItWorksPage: React.FC = () => {
@@ -137,6 +141,50 @@ const HowItWorksPage: React.FC = () => {
           </div>
         </section>
 
+        {/* How the AI Works Section with InfoPill */}
+        <section className="py-16 bg-white border-t border-gray-100">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-heading font-bold text-center mb-8">
+              How the AI Works
+            </h2>
+            
+            <div className="max-w-4xl mx-auto">
+              <InfoPill 
+                title="The VORO AI Design Process" 
+                icon={<Sparkles className="text-voro-red" />}
+              >
+                <ol className="list-decimal pl-5 space-y-3">
+                  <li><strong>Input Collection:</strong> You provide your preferences for sport type, colors, style elements, and optional custom text.</li>
+                  <li><strong>AI Processing:</strong> Our advanced neural networks analyze thousands of professional designs to understand sport-specific styling.</li>
+                  <li><strong>Design Generation:</strong> The AI creates multiple custom jersey designs based on your inputs, each with front and back views.</li>
+                  <li><strong>Refinement:</strong> You can adjust specific elements or regenerate entirely new designs until you're satisfied.</li>
+                  <li><strong>Production:</strong> Once approved, your design is prepared for high-quality manufacturing with premium materials.</li>
+                </ol>
+              </InfoPill>
+              
+              <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InfoPill 
+                  title="Design Technology" 
+                  icon={<Info className="text-blue-500" />}
+                  className="h-full"
+                >
+                  <p className="mb-3">VORO uses a proprietary AI model specifically trained on professional sportswear design principles.</p>
+                  <p>Our technology understands the unique requirements of each sport, ensuring designs are not just beautiful but also practical for actual gameplay.</p>
+                </InfoPill>
+                
+                <InfoPill 
+                  title="Quality Assurance" 
+                  icon={<ShieldCheck className="text-green-500" />}
+                  className="h-full"
+                >
+                  <p className="mb-3">Every generated design is analyzed to ensure it meets our quality standards before being presented.</p>
+                  <p>Our AI performs multiple validation checks to ensure designs are appropriate, properly balanced, and technically feasible to manufacture.</p>
+                </InfoPill>
+              </div>
+            </div>
+          </div>
+        </section>
+        
         {/* Key Benefits Section */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
