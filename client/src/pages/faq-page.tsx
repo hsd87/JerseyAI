@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'wouter';
 import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
-import { InfoPill } from '@/components/ui/info-pill';
+import { InfoRect } from '@/components/ui/info-rect';
 import { ChevronDown, ChevronUp, Mail, HelpCircle, MessageCircle, FileQuestion } from 'lucide-react';
 
 interface FAQItemProps {
@@ -149,39 +149,39 @@ const FAQPage: React.FC = () => {
         <section className="py-16 bg-white">
           <div className="container max-w-3xl mx-auto px-6">
             <div className="space-y-8">
-              <InfoPill 
+              <InfoRect 
                 title="Still Need Help?" 
-                icon={<HelpCircle className="text-voro-red" />}
+                icon={<HelpCircle className="text-[#E34234]" />}
               >
                 <p className="mb-4">
-                  Reach out to our team at <a href="mailto:help@vorosport.ai" className="text-voro-red hover:underline font-medium">help@vorosport.ai</a> for any questions not covered in our FAQs.
+                  Reach out to our team at <a href="mailto:help@vorosport.ai" className="text-[#E34234] hover:underline font-medium">help@vorosport.ai</a> for any questions not covered in our FAQs.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                  <Link href="/contact" className="px-6 py-2 rounded-sm bg-voro-red text-white hover:bg-opacity-90 transition-colors text-sm font-medium flex items-center gap-2">
+                  <Link href="/contact" className="px-6 py-2 rounded-full bg-[#E34234] text-white hover:bg-opacity-90 transition-colors text-sm font-medium flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     Contact Support
                   </Link>
                 </div>
-              </InfoPill>
+              </InfoRect>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoPill 
+                <InfoRect 
                   title="Live Chat Support" 
                   icon={<MessageCircle className="text-blue-500" />}
                   className="h-full"
                 >
                   <p className="mb-3">Our support team is available via live chat Monday through Friday, 9am-5pm EST.</p>
                   <p>Average response time: <span className="font-medium">Under 10 minutes</span></p>
-                </InfoPill>
+                </InfoRect>
                 
-                <InfoPill 
+                <InfoRect 
                   title="Documentation" 
                   icon={<FileQuestion className="text-green-500" />}
                   className="h-full"
                 >
                   <p className="mb-3">Check out our detailed documentation for step-by-step guides on using the VORO platform.</p>
-                  <Link href="/docs" className="text-voro-red hover:underline font-medium">View Documentation →</Link>
-                </InfoPill>
+                  <Link href="/docs" className="text-[#E34234] hover:underline font-medium">View Documentation →</Link>
+                </InfoRect>
               </div>
             </div>
           </div>

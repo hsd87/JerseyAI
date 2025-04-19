@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'wouter';
 import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
-import { InfoPill } from '@/components/ui/info-pill';
+import { InfoRect } from '@/components/ui/info-rect';
 import { ArrowRight, Target, Lightbulb } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
@@ -62,71 +62,71 @@ const AboutPage: React.FC = () => {
             <div className="max-w-4xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {/* Mission InfoPill */}
-                <InfoPill 
+                <InfoRect 
                   title="Our Mission" 
-                  icon={<Target className="text-voro-red" />}
+                  icon={<Target className="text-[#E34234]" />}
                   className="h-full"
                 >
-                  <p className="text-gray-700">
+                  <p className="text-[#4B5563]">
                     To enable anyone — from solo players to entire clubs — to create elite teamwear effortlessly using intelligent systems.
                   </p>
-                </InfoPill>
+                </InfoRect>
 
                 {/* Vision InfoPill */}
-                <InfoPill 
+                <InfoRect 
                   title="Our Vision" 
-                  icon={<Lightbulb className="text-voro-red" />}
+                  icon={<Lightbulb className="text-[#E34234]" />}
                   className="h-full"
                 >
-                  <p className="text-gray-700">
+                  <p className="text-[#4B5563]">
                     To be the world's most accessible and advanced custom kit platform.
                   </p>
-                </InfoPill>
+                </InfoRect>
               </div>
 
               {/* Values Section */}
               <div className="mt-16">
                 <h2 className="text-2xl md:text-3xl font-heading font-bold mb-8 text-center">Our Core Values</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <InfoPill
+                  <InfoRect
                     title="Velocity & Originality"
                     className="h-full"
                   >
                     <ul className="space-y-3">
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-sm bg-voro-red/10 text-voro-red font-bold text-xs mr-2 flex-shrink-0">V</span>
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#E34234]/10 text-[#E34234] font-bold text-xs mr-2 flex-shrink-0">V</span>
                         <div>
                           <strong className="font-medium">Velocity:</strong> We move quickly and efficiently, understanding that time is valuable for our customers.
                         </div>
                       </li>
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-sm bg-voro-red/10 text-voro-red font-bold text-xs mr-2 flex-shrink-0">O</span>
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#E34234]/10 text-[#E34234] font-bold text-xs mr-2 flex-shrink-0">O</span>
                         <div>
                           <strong className="font-medium">Originality:</strong> We embrace uniqueness and creativity, helping teams express their distinct identity.
                         </div>
                       </li>
                     </ul>
-                  </InfoPill>
+                  </InfoRect>
                   
-                  <InfoPill
+                  <InfoRect
                     title="Resilience & Ownership"
                     className="h-full"
                   >
                     <ul className="space-y-3">
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-sm bg-voro-red/10 text-voro-red font-bold text-xs mr-2 flex-shrink-0">R</span>
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#E34234]/10 text-[#E34234] font-bold text-xs mr-2 flex-shrink-0">R</span>
                         <div>
                           <strong className="font-medium">Resilience:</strong> We build durable products and relationships, standing by our work for the long run.
                         </div>
                       </li>
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-sm bg-voro-red/10 text-voro-red font-bold text-xs mr-2 flex-shrink-0">O</span>
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#E34234]/10 text-[#E34234] font-bold text-xs mr-2 flex-shrink-0">O</span>
                         <div>
                           <strong className="font-medium">Ownership:</strong> We take responsibility for our platform, giving users total control over their designs.
                         </div>
                       </li>
                     </ul>
-                  </InfoPill>
+                  </InfoRect>
                 </div>
               </div>
             </div>
