@@ -20,23 +20,23 @@
     --nike-primary: #2C2C2E;
     --nike-primary-light: #3A3A3C;
     
-    /* Secondary color (pink) - for accent highlights */
-    --nike-secondary: #FF4081;
-    --nike-secondary-light: #FF80AB;
+    /* Secondary color (blue-gray gradient) - for accent highlights */
+    --nike-secondary: #0A1F44;
+    --nike-secondary-light: #D9D9D9;
     
     /* Legacy vars (keep for compatibility) */
-    --nike-red: #FF4081;
-    --nike-orange: #FF80AB;
-    --nike-accent: #FF4081;
+    --nike-red: #0A1F44;
+    --nike-orange: #D9D9D9;
+    --nike-accent: #0A1F44;
     
     /* Design system */
     --nike-hover-overlay: rgba(0, 0, 0, 0.04);
     --nike-transition-standard: all 0.2s ease;
     --nike-primary-gradient-bg: linear-gradient(90deg, #2C2C2E, #3A3A3C);
-    --nike-secondary-gradient-bg: linear-gradient(90deg, #FF80AB, #FF4081);
+    --nike-secondary-gradient-bg: linear-gradient(135deg, #D9D9D9, #0A1F44);
     
     /* Compatibility with existing gradient references */
-    --nike-gradient-bg: linear-gradient(90deg, #FF80AB, #FF4081);
+    --nike-gradient-bg: linear-gradient(135deg, #D9D9D9, #0A1F44);
   }
   
   * {
@@ -455,7 +455,24 @@
     @apply border-[var(--nike-primary)];
   }
   
-  /* Pink utility classes (secondary / accent) */
+  /* Blue-Gray utility classes (secondary / accent) */
+  .blue-gray-cta {
+    @apply bg-secondary text-white font-medium hover:bg-[var(--nike-secondary-light)] transition-all;
+  }
+  
+  .blue-gray-gradient {
+    @apply bg-secondary-gradient text-white;
+  }
+  
+  .blue-gray-text {
+    @apply text-[var(--nike-secondary)] font-medium;
+  }
+  
+  .blue-gray-border {
+    @apply border-[var(--nike-secondary)];
+  }
+  
+  /* Legacy pink utility classes (mapped to blue-gray) */
   .pink-cta {
     @apply bg-secondary text-white font-medium hover:bg-[var(--nike-secondary-light)] transition-all;
   }

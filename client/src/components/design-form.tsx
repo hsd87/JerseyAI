@@ -731,7 +731,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           
           {/* Generation Error Message */}
           {generationError && (
-            <div className="bg-gradient bg-opacity-5 border border-gradient text-gradient rounded-md p-4 mt-6 flex items-start">
+            <div className="bg-secondary bg-opacity-5 border border-secondary text-secondary rounded-md p-4 mt-6 flex items-start">
               <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <h4 className="font-medium text-sm">Design Generation Error</h4>
@@ -754,7 +754,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 mt-6">
               <div className="flex flex-col sm:flex-row sm:items-start">
                 <div className="flex-shrink-0 mb-3 sm:mb-0">
-                  <div className="w-8 h-8 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center text-gradient">
+                  <div className="w-8 h-8 rounded-full bg-[var(--nike-primary)] bg-opacity-10 flex items-center justify-center text-[var(--nike-primary)]">
                     <i className="fas fa-crown"></i>
                   </div>
                 </div>
@@ -766,7 +766,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                   <div className="mt-3">
                     <Link 
                       href="/subscribe" 
-                      className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-gradient hover:opacity-90 rounded-full transition-colors"
+                      className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-[var(--nike-primary-light)] rounded-full transition-colors"
                     >
                       $9/month - Subscribe <i className="fas fa-arrow-right ml-2"></i>
                     </Link>
@@ -798,7 +798,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleRetry} className="bg-gradient hover:opacity-90 rounded-full text-white">
+              <AlertDialogAction onClick={handleRetry} className="bg-primary hover:bg-[var(--nike-primary-light)] rounded-full text-white">
                 <RotateCw className="mr-2 h-4 w-4" />
                 Retry Generation
               </AlertDialogAction>
@@ -824,7 +824,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => setShowDiagnosticInfo(false)} className="bg-gradient hover:opacity-90 text-white">Close</Button>
+                <Button onClick={() => setShowDiagnosticInfo(false)} className="bg-primary hover:bg-[var(--nike-primary-light)] text-white">Close</Button>
                 {diagnosticData && (
                   <Button 
                     variant="outline" 
