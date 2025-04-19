@@ -253,12 +253,12 @@ export default function LandingPage() {
             <div className="order-2 lg:order-1">
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <h3 className="font-medium text-lg mb-2">How the AI Works:</h3>
+                  <h3 className="font-medium text-[#1D1D1F] text-lg mb-2">How the AI Works:</h3>
                   <ol className="space-y-4 ml-6 list-decimal">
-                    <li className="text-gray-700">Input your sport type, colors, and preferences</li>
-                    <li className="text-gray-700">Our AI crafts custom designs based on your input</li>
-                    <li className="text-gray-700">View multiple design options in seconds</li>
-                    <li className="text-gray-700">Fine-tune and customize with our editor</li>
+                    <li className="text-[#333333]">Input your sport type, colors, and preferences</li>
+                    <li className="text-[#333333]">Our AI crafts custom designs based on your input</li>
+                    <li className="text-[#333333]">View multiple design options in seconds</li>
+                    <li className="text-[#333333]">Fine-tune and customize with our editor</li>
                   </ol>
                 </div>
                 
