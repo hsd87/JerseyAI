@@ -83,12 +83,12 @@ export default function Navbar() {
               {user ? (
                 <>
                   {subscription.isSubscribed ? (
-                    <Badge className="bg-voro-red/10 text-voro-red border-voro-red rounded-sm flex items-center gap-1">
+                    <Badge className="bg-voro-red/10 text-voro-red border-voro-red rounded-[1px] flex items-center gap-1">
                       <CrownIcon className="h-3 w-3" />
                       <span>Pro</span>
                     </Badge>
                   ) : (
-                    <Link href="/subscribe" className="text-voro-red border border-voro-red/30 bg-voro-red/5 px-3 py-1 rounded-sm text-xs font-medium hover:bg-voro-red/10 transition-colors flex items-center gap-1">
+                    <Link href="/subscribe" className="text-voro-red border border-voro-red/30 bg-voro-red/5 px-3 py-1 rounded-[1px] text-xs font-medium hover:bg-voro-red/10 transition-colors flex items-center gap-1">
                       <CrownIcon className="h-3 w-3" />
                       <span>Upgrade</span>
                     </Link>
@@ -97,7 +97,7 @@ export default function Navbar() {
                     Dashboard
                   </Link>
                   {user.role === 'admin' && (
-                    <Link href="/admin" className="bg-voro-grey text-voro-white px-3 py-1 rounded-sm text-xs font-medium hover:bg-opacity-90 transition-colors">
+                    <Link href="/admin" className="bg-voro-grey text-voro-white px-3 py-1 rounded-[1px] text-xs font-medium hover:bg-opacity-90 transition-colors">
                       Admin
                     </Link>
                   )}
@@ -118,7 +118,7 @@ export default function Navbar() {
             
             <button 
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-1.5 rounded-sm text-voro-white hover:text-voro-red focus:outline-none transition-colors"
+              className="inline-flex items-center justify-center p-1.5 rounded-[1px] text-voro-white hover:text-voro-red focus:outline-none transition-colors"
               aria-expanded={isMenuOpen}
             >
               <span className="sr-only">{isMenuOpen ? 'Close menu' : 'Open menu'}</span>
@@ -131,7 +131,7 @@ export default function Navbar() {
           </div>
           
           <div className="hidden md:flex items-center space-x-4">
-            <button className="p-1.5 rounded-sm text-voro-white hover:text-voro-red focus:outline-none transition-colors">
+            <button className="p-1.5 rounded-[1px] text-voro-white hover:text-voro-red focus:outline-none transition-colors">
               <span className="sr-only">Dark mode</span>
               <Moon className="h-4 w-4" />
             </button>
@@ -160,41 +160,41 @@ export default function Navbar() {
       {/* Basic Mobile menu dropdown */}
       <div className={`md:hidden bg-voro-black border-t border-voro-grey/20 ${isMenuOpen ? 'block' : 'hidden'}`}>
         <div className="px-4 pt-2 pb-3 space-y-1">
-          <Link href="/" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/" className={`block px-3 py-2 rounded-[1px] text-base font-medium ${location === '/' ? 'text-voro-red' : 'text-voro-white'}`}>
             Home
           </Link>
-          <Link href="/designer" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/designer' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/designer" className={`block px-3 py-2 rounded-[1px] text-base font-medium ${location === '/designer' ? 'text-voro-red' : 'text-voro-white'}`}>
             AI Designer
           </Link>
-          <Link href="/how-it-works" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/how-it-works' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/how-it-works" className={`block px-3 py-2 rounded-[1px] text-base font-medium ${location === '/how-it-works' ? 'text-voro-red' : 'text-voro-white'}`}>
             How It Works
           </Link>
-          <Link href="/about" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/about' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/about" className={`block px-3 py-2 rounded-[1px] text-base font-medium ${location === '/about' ? 'text-voro-red' : 'text-voro-white'}`}>
             About VORO
           </Link>
-          <Link href="/faq" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/faq' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/faq" className={`block px-3 py-2 rounded-[1px] text-base font-medium ${location === '/faq' ? 'text-voro-red' : 'text-voro-white'}`}>
             FAQs & Help
           </Link>
-          <Link href="/partner" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/partner' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/partner" className={`block px-3 py-2 rounded-[1px] text-base font-medium ${location === '/partner' ? 'text-voro-red' : 'text-voro-white'}`}>
             Partner With Us
           </Link>
           
           {user ? (
             <>
-              <Link href="/dashboard" className="block px-3 py-2 rounded-sm text-base font-medium text-voro-red">
+              <Link href="/dashboard" className="block px-3 py-2 rounded-[1px] text-base font-medium text-voro-red">
                 Dashboard
               </Link>
               {user.role === 'admin' && (
-                <Link href="/admin" className="block px-3 py-2 rounded-sm text-base font-medium bg-voro-grey text-voro-white">
+                <Link href="/admin" className="block px-3 py-2 rounded-[1px] text-base font-medium bg-voro-grey text-voro-white">
                   Admin Dashboard
                 </Link>
               )}
-              <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-sm text-base font-medium text-voro-white">
+              <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-[1px] text-base font-medium text-voro-white">
                 Sign Out
               </button>
             </>
           ) : (
-            <Link href="/auth" className="block px-3 py-2 rounded-sm text-base font-medium text-voro-red">
+            <Link href="/auth" className="block px-3 py-2 rounded-[1px] text-base font-medium text-voro-red">
               Sign In
             </Link>
           )}

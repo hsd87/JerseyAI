@@ -66,7 +66,7 @@ export function InfoPill({
   return (
     <section
       className={cn(
-        "rounded-sm px-4 py-3 md:px-5 md:py-4",
+        "rounded-[1px] px-4 py-3 md:px-5 md:py-4",
         bgColor,
         "shadow-sm border border-gray-200",
         "max-w-2xl mx-auto",
