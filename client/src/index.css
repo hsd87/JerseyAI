@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,11 +8,11 @@
   }
 
   body {
-    @apply font-sans antialiased bg-[#FAFAFA] text-[#0F0F0F] leading-relaxed;
+    @apply font-sans antialiased bg-[#F5F5F7] text-[#1D1D1F] leading-relaxed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-semibold;
+    @apply font-heading font-semibold tracking-tight;
   }
 
   h1 {
@@ -44,15 +42,15 @@
   }
   
   .btn-primary {
-    @apply py-2 px-6 rounded-xl bg-[#E34234] text-white min-w-[120px] h-[44px] flex items-center justify-center font-medium transition-colors hover:bg-[#d93a2d];
+    @apply py-2 px-6 rounded-lg bg-[#0071E3] text-white min-w-[120px] h-[44px] flex items-center justify-center font-medium transition-colors hover:bg-[#0077ED];
   }
   
   .btn-secondary {
-    @apply py-2 px-6 rounded-xl border border-[#0F0F0F] text-[#0F0F0F] min-w-[120px] h-[44px] flex items-center justify-center font-medium transition-colors hover:bg-[#0F0F0F] hover:text-white;
+    @apply py-2 px-6 rounded-lg border border-[#86868B] text-[#1D1D1F] min-w-[120px] h-[44px] flex items-center justify-center font-medium transition-colors hover:bg-[#E8E8ED];
   }
   
   .nav-item {
-    @apply text-[#FAFAFA] hover:text-[#E34234] transition-colors font-medium;
+    @apply text-[#1D1D1F] hover:text-[#0071E3] transition-colors font-medium;
   }
   
   .section-spacing {
@@ -60,10 +58,10 @@
   }
   
   .footer {
-    @apply bg-[#404040] text-white py-8 px-6 md:px-12;
+    @apply bg-[#F5F5F7] text-[#86868B] py-8 px-6 md:px-12 border-t border-[#E8E8ED];
   }
   
   .card-custom {
-    @apply bg-white shadow-sm rounded-2xl p-6 border border-gray-100;
+    @apply bg-white shadow-sm rounded-lg p-6 border border-[#E8E8ED];
   }
 }

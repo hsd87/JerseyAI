@@ -6,8 +6,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['"Space Grotesk"', 'Satoshi', 'sans-serif'],
+        sans: ['-apple-system', 'SF Pro Text', 'SF Pro', 'system-ui', 'BlinkMacSystemFont', 'Helvetica Neue', 'Helvetica', 'sans-serif'],
+        heading: ['-apple-system', 'SF Pro Display', 'SF Pro', 'system-ui', 'BlinkMacSystemFont', 'Helvetica Neue', 'Helvetica', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -20,10 +20,11 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         voro: {
-          black: "#0F0F0F",
-          white: "#FAFAFA",
-          red: "#E34234",
-          grey: "#404040",
+          black: "#1D1D1F",
+          white: "#FFFFFF",
+          blue: "#0071E3",
+          grey: "#86868B",
+          lightgrey: "#F5F5F7",
         },
         card: {
           DEFAULT: "hsl(var(--card))",

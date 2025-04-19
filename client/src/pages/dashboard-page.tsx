@@ -575,7 +575,7 @@ export default function DashboardPage() {
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
                   <p className="text-gray-500 mb-6">Create a design and place your first order</p>
                   <Link href="/designer">
-                    <Button className="bg-primary hover:bg-primary/90 text-white">
+                    <Button className="bg-[#0071E3] hover:bg-[#0077ED] text-white font-medium rounded-lg transition-colors">
                       <i className="fas fa-tshirt mr-2"></i> Design Your Jersey
                     </Button>
                   </Link>
