@@ -738,7 +738,11 @@ export default function ShippingInfoPage() {
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Back to Cart
                     </Button>
-                    <Button type="submit" disabled={calculatingShipping || loading}>
+                    <Button 
+                      type="submit" 
+                      disabled={calculatingShipping || loading}
+                      className="bg-gradient hover:opacity-90 text-white"
+                    >
                       Proceed to Payment
                       <CreditCard className="ml-2 h-4 w-4" />
                     </Button>
