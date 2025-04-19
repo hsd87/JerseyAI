@@ -556,7 +556,7 @@ export default function CheckoutFixedPage() {
     return (
       <>
         {/* Navigation Bar */}
-        <div className="bg-[var(--nike-primary)] text-white">
+        <div className="bg-[#2C2C2E] text-white">
           <div className="container max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center">
@@ -910,26 +910,65 @@ export default function CheckoutFixedPage() {
           </div>
         </div>
       </div>
+      </>
     );
   }
   
   // Render payment step
   if (checkoutStep === CheckoutStep.PAYMENT) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <div className="flex items-center mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => {
-              setCheckoutStep(CheckoutStep.SHIPPING_INFO);
-              setCheckoutProgress(33);
-            }}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Shipping
-          </Button>
-          <h1 className="text-2xl font-bold ml-auto">Payment</h1>
+      <>
+        {/* Navigation Bar */}
+        <div className="bg-[#2C2C2E] text-white">
+          <div className="container max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <Link href="/" className="flex items-center">
+                <img 
+                  src={okdioLogo} 
+                  alt="OKDIO Logo" 
+                  className="h-5 md:h-6" 
+                />
+              </Link>
+              <div className="hidden md:flex items-center space-x-8 text-sm">
+                <Link href="/designer" className="text-white hover:text-gray-300 transition-colors">
+                  Design
+                </Link>
+                <Link href="/how-it-works" className="text-white hover:text-gray-300 transition-colors">
+                  How It Works
+                </Link>
+                <Link href="/help" className="text-white hover:text-gray-300 transition-colors">
+                  Help
+                </Link>
+              </div>
+              <div className="flex items-center space-x-4">
+                {user ? (
+                  <div className="text-sm text-white/80">
+                    Hi, {user.username}
+                  </div>
+                ) : (
+                  <Link href="/auth" className="text-sm text-white hover:text-gray-300 transition-colors">
+                    Sign In
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+        
+        <div className="container max-w-4xl mx-auto py-8">
+          <div className="flex items-center mb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                setCheckoutStep(CheckoutStep.SHIPPING_INFO);
+                setCheckoutProgress(33);
+              }}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Shipping
+            </Button>
+            <h1 className="text-2xl font-bold ml-auto text-gradient">Payment</h1>
+          </div>
   
         <div className="mb-8">
           <Progress value={checkoutProgress} className="h-2 mb-2" />
@@ -1052,6 +1091,7 @@ export default function CheckoutFixedPage() {
           </div>
         </div>
       </div>
+      </>
     );
   }
   
