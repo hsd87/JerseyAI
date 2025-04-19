@@ -18,15 +18,8 @@ const JerseyScrollGallery: React.FC<JerseyScrollGalleryProps> = ({
     <div className="w-full max-w-screen">
       <div className="px-4 md:px-8">
         <div 
-          className="flex overflow-x-auto whitespace-nowrap scroll-snap-x gap-4 md:gap-6 pb-4" 
-          style={{ 
-            scrollbarWidth: 'none', // Firefox
-            msOverflowStyle: 'none' // IE/Edge
-          }}
-          className="flex overflow-x-auto whitespace-nowrap scroll-snap-x gap-4 md:gap-6 pb-4 no-scrollbar"
+          className="flex overflow-x-auto whitespace-nowrap snap-x gap-4 md:gap-6 pb-4 no-scrollbar"
         >
-          {/* Scrollbar is hidden via style props and custom class */}
-
           {jerseyUrls.map((url, index) => (
             <div 
               key={index} 
@@ -35,7 +28,7 @@ const JerseyScrollGallery: React.FC<JerseyScrollGalleryProps> = ({
               <img 
                 src={url} 
                 alt={`${altText} ${index + 1}`}
-                className="w-full h-full object-cover rounded-xl shadow-sm"
+                className="w-full h-auto object-cover rounded-xl shadow-sm"
                 loading="lazy"
               />
             </div>

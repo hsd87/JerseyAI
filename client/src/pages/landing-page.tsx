@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle, ArrowDown, PlayCircle, Users, Building, Chevro
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { apiRequest } from "@/lib/queryClient";
+import JerseyScrollGallery from "@/components/jersey-scroll-gallery";
 
 // Feature cards for the "How It Works" section
 const processSteps = [
@@ -282,6 +283,17 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Jersey Gallery Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-heading text-center mb-8">Our AI-Generated Jerseys</h2>
+          <JerseyScrollGallery 
+            jerseyUrls={designs.map(design => design.urls.front)}
+            altText="OKDIO jersey design"
+          />
         </div>
       </section>
 
