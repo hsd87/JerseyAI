@@ -177,12 +177,12 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link href="/designer">
-                <Button size="lg" className="bg-[#E34234] hover:bg-opacity-80 text-white px-8 py-3 rounded-2xl text-lg font-semibold transition-all flex items-center gap-2 h-auto">
+                <Button size="lg" className="bg-[#E34234] hover:bg-opacity-80 text-white px-8 py-3 rounded-full text-lg font-semibold transition-all flex items-center gap-2 h-auto">
                   Start Designing <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
               <Link href="#team-solutions">
-                <Button variant="outline" size="lg" className="border-[#0F0F0F] text-[#0F0F0F] hover:bg-gray-50 px-8 py-3 rounded-2xl text-lg font-semibold transition-all h-auto">
+                <Button variant="outline" size="lg" className="border-[#0F0F0F] text-[#0F0F0F] hover:bg-gray-50 px-8 py-3 rounded-full text-lg font-semibold transition-all h-auto">
                   Request Bulk Quote
                 </Button>
               </Link>
@@ -264,7 +264,7 @@ export default function LandingPage() {
                 
                 <div className="flex justify-center">
                   <Link href="/designer">
-                    <Button className="bg-black text-white hover:bg-gray-800 px-5 py-1.5 flex items-center gap-2 rounded-sm text-sm">
+                    <Button className="bg-[#E34234] text-white hover:bg-opacity-90 px-5 py-1.5 flex items-center gap-2 rounded-full text-sm">
                       Try It Now <ArrowRight className="h-3.5 w-3.5" />
                     </Button>
                   </Link>
@@ -349,7 +349,7 @@ export default function LandingPage() {
 
           <div className="mt-16 text-center">
             <Link href="/designer">
-              <Button size="lg" className="bg-black hover:bg-gray-800 text-white px-6 py-4 rounded-[1px] text-base font-medium transition-all flex items-center gap-2 h-auto mx-auto">
+              <Button size="lg" className="bg-[#E34234] hover:bg-opacity-90 text-white px-6 py-4 rounded-full text-base font-medium transition-all flex items-center gap-2 h-auto mx-auto">
                 Design Your Jersey Now <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -408,7 +408,7 @@ export default function LandingPage() {
                 </li>
               </ul>
               <Link href="/designer">
-                <Button className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-[1px] py-2 font-medium text-sm">
+                <Button className="w-full bg-[#E34234] hover:bg-opacity-90 text-white rounded-full py-2 font-medium text-sm">
                   Team Order: Start Designing
                 </Button>
               </Link>
@@ -453,7 +453,7 @@ export default function LandingPage() {
                   </div>
                 </li>
               </ul>
-              <Button variant="outline" className="w-full border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30 rounded-[1px] py-2 font-medium text-sm">
+              <Button variant="outline" className="w-full border-[#E34234] text-[#E34234] hover:bg-[#E34234]/5 hover:border-[#E34234]/30 rounded-full py-2 font-medium text-sm">
                 Get Bulk Quote
               </Button>
             </div>
@@ -530,7 +530,7 @@ export default function LandingPage() {
             No design skills required!
           </p>
           <Link href="/designer">
-            <Button size="lg" className="bg-[#0071E3] hover:bg-[#0077ED] text-white px-6 py-3 rounded-[1px] text-base font-medium transition-all shadow-sm">
+            <Button size="lg" className="bg-[#E34234] hover:bg-opacity-90 text-white px-6 py-3 rounded-full text-base font-medium transition-all shadow-sm">
               Start Designing Now
             </Button>
           </Link>
