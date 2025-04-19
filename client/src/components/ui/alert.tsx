@@ -3,24 +3,33 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+// Nike uses minimal, clean alerts with less rounded corners and subtle borders
 const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
+  "relative w-full border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
   {
     variants: {
       variant: {
-        default: "bg-white text-[#0A0A0A] border-[#E5E7EB]",
+        default: "bg-[var(--nike-gray-light)] text-[var(--nike-black)] border-transparent",
         destructive:
-          "border-red-200 text-red-800 bg-red-50 [&>svg]:text-red-600",
+          "border-transparent bg-[#FEECEB] text-[var(--nike-red)] [&>svg]:text-[var(--nike-red)]",
         success:
-          "border-green-200 text-green-800 bg-green-50 [&>svg]:text-green-600",
+          "border-transparent bg-[#EDFCF2] text-[#006837] [&>svg]:text-[#006837]",
         warning:
-          "border-yellow-200 text-yellow-800 bg-yellow-50 [&>svg]:text-yellow-600",
+          "border-transparent bg-[#FFF8E7] text-[#995C00] [&>svg]:text-[#995C00]",
         info:
-          "border-blue-200 text-blue-800 bg-blue-50 [&>svg]:text-blue-600",
+          "border-transparent bg-[#E6F3FF] text-[#0066E0] [&>svg]:text-[#0066E0]",
+        accent:
+          "border-transparent bg-[#F5413D10] text-[var(--nike-accent)] [&>svg]:text-[var(--nike-accent)]",
+      },
+      shape: {
+        default: "",
+        square: "rounded-none",
+        rounded: "rounded-lg", 
       },
     },
     defaultVariants: {
       variant: "default",
+      shape: "square",
     },
   }
 )
@@ -28,11 +37,11 @@ const alertVariants = cva(
 const Alert = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
+>(({ className, variant, shape, ...props }, ref) => (
   <div
     ref={ref}
     role="alert"
-    className={cn(alertVariants({ variant }), className)}
+    className={cn(alertVariants({ variant, shape }), className)}
     {...props}
   />
 ))
@@ -44,7 +53,7 @@ const AlertTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    className={cn("mb-1.5 font-medium leading-none tracking-nike-tight text-current", className)}
     {...props}
   />
 ))
@@ -56,7 +65,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    className={cn("text-sm [&_p]:leading-normal font-nike", className)}
     {...props}
   />
 ))
