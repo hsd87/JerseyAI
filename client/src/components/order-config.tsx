@@ -1865,10 +1865,10 @@ export default function OrderConfig({
             </div>
             
             <div className="flex justify-between mt-6">
-              <Button variant="outline" onClick={goToPreviousStep}>
-                Back
+              <Button variant="outline" onClick={goToPreviousStep} className="rounded-full border-gray-300 hover:bg-gray-100">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
-              <Button onClick={goToNextStep}>
+              <Button onClick={goToNextStep} className="bg-[#E34234] hover:bg-opacity-80 rounded-full">
                 Continue to Summary <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -1878,8 +1878,8 @@ export default function OrderConfig({
         {/* Step 6: Order Summary */}
         {currentStep === 6 && (
           <div className="space-y-6">
-            <div className="bg-voro-red/5 border-voro-red/10 border rounded-2xl p-5 mb-6 shadow-sm">
-              <h3 className="font-heading font-medium text-voro-black flex items-center gap-2 text-lg">
+            <div className="bg-[#E34234]/5 border-[#E34234]/10 border rounded-3xl p-5 mb-6 shadow-sm">
+              <h3 className="font-heading font-medium text-[#333333] flex items-center gap-2 text-lg">
                 <CheckCircle className="h-5 w-5 text-green-600" />
                 Order Configuration Complete
               </h3>
@@ -2036,8 +2036,8 @@ export default function OrderConfig({
               
               {/* Pricing tab */}
               <TabsContent value="pricing" className="pt-4">
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                  <h4 className="font-heading font-medium text-voro-black text-lg mb-5">Price Breakdown</h4>
+                <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+                  <h4 className="font-heading font-medium text-[#333333] text-lg mb-5">Price Breakdown</h4>
                   
                   <div className="space-y-4">
                     <div className="flex justify-between border-b border-gray-200 pb-3">
@@ -2078,14 +2078,14 @@ export default function OrderConfig({
               <Button 
                 variant="outline" 
                 onClick={goToPreviousStep}
-                className="border-gray-300 hover:bg-gray-100 text-voro-black font-medium px-6 rounded-xl"
+                className="rounded-full border-gray-300 hover:bg-gray-100 text-[#333333] font-medium px-6"
               >
-                <ChevronLeft className="mr-2 h-4 w-4" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
               <Button 
                 onClick={finalizeOrderForCheckout}
-                className="bg-voro-red hover:bg-voro-red/90 text-white font-medium px-6 rounded-xl shadow-sm"
+                className="bg-[#E34234] hover:bg-opacity-80 text-white font-medium px-6 rounded-full shadow-sm"
               >
                 Continue to Shipping
                 <ArrowRight className="ml-2 h-4 w-4" />
