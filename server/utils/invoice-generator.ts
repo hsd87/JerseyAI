@@ -118,7 +118,7 @@ function createInvoiceHtml(order: Order, invoice: {
       font-size: 24px;
       font-weight: bold;
       margin-bottom: 10px;
-      color: #e34234;
+      color: #FF4081;
     }
     .customer-details, .invoice-details {
       margin-bottom: 20px;
@@ -163,15 +163,15 @@ function createInvoiceHtml(order: Order, invoice: {
   <div class="invoice-box">
     <div class="header">
       <div>
-        <img src="/assets/voro-logo.png" alt="VORO" class="logo">
+        <img src="/assets/okdio-logo.png" alt="OKDIO" class="logo">
       </div>
       <div class="company-info">
         <div class="invoice-title">INVOICE</div>
         <p>
-          VORO Design<br>
+          OKDIO<br>
           123 Sports Way<br>
           New York, NY 10001<br>
-          support@vorodesign.com
+          support@okdio.com
         </p>
       </div>
     </div>
@@ -238,8 +238,8 @@ function createInvoiceHtml(order: Order, invoice: {
     </div>
     
     <div class="footer">
-      <p>Thank you for your business with VORO Design!</p>
-      <p>For any questions regarding this invoice, please contact our customer support at support@vorodesign.com</p>
+      <p>Thank you for your business with OKDIO!</p>
+      <p>For any questions regarding this invoice, please contact our customer support at support@okdio.com</p>
     </div>
   </div>
 </body>

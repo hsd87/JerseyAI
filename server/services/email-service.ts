@@ -146,7 +146,7 @@ export const sendOrderConfirmationEmail = async (
               <p>
                 ${order.shippingAddress?.name}<br>
                 ${order.shippingAddress?.street}<br>
-                ${order.shippingAddress?.city}, ${order.shippingAddress?.state} ${order.shippingAddress?.zip}<br>
+                ${order.shippingAddress?.city}, ${order.shippingAddress?.state} ${order.shippingAddress?.postalCode || order.shippingAddress?.zipCode || ''}<br>
                 ${order.shippingAddress?.country}
               </p>
             </div>
@@ -228,7 +228,7 @@ export const sendOrderConfirmationEmail = async (
       const transporter = createNodemailerTransport();
       
       const result = await transporter.sendMail({
-        from: 'orders@projersey.com',
+        from: 'orders@okdio.com',
         to: user.email,
         subject: emailSubject,
         text: textContent,

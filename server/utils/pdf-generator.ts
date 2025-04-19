@@ -84,7 +84,7 @@ export async function generateOrderPDF(order: Order): Promise<string> {
       .fontSize(11)
       .text(`Name: ${order.shippingAddress.name}`, 50, startY + 25)
       .text(`Address: ${order.shippingAddress.street}`, 50, startY + 40)
-      .text(`${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zip}`, 50, startY + 55)
+      .text(`${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postalCode || order.shippingAddress.zipCode || ''}`, 50, startY + 55)
       .text(`Country: ${order.shippingAddress.country}`, 50, startY + 70)
       .text(`Phone: ${order.shippingAddress.phone}`, 50, startY + 85);
   }
