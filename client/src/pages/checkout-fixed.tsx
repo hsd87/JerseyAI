@@ -1098,21 +1098,59 @@ export default function CheckoutFixedPage() {
   // Render confirmation step
   if (checkoutStep === CheckoutStep.CONFIRMATION) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <div className="mb-8">
-          <Progress value={checkoutProgress} className="h-2 mb-2" />
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <div>
-              Shipping Information
-            </div>
-            <div>
-              Payment
-            </div>
-            <div className="text-primary font-medium">
-              Confirmation
+      <>
+        {/* Navigation Bar */}
+        <div className="bg-[#2C2C2E] text-white">
+          <div className="container max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <Link href="/" className="flex items-center">
+                <img 
+                  src={okdioLogo} 
+                  alt="OKDIO Logo" 
+                  className="h-5 md:h-6" 
+                />
+              </Link>
+              <div className="hidden md:flex items-center space-x-8 text-sm">
+                <Link href="/designer" className="text-white hover:text-gray-300 transition-colors">
+                  Design
+                </Link>
+                <Link href="/how-it-works" className="text-white hover:text-gray-300 transition-colors">
+                  How It Works
+                </Link>
+                <Link href="/help" className="text-white hover:text-gray-300 transition-colors">
+                  Help
+                </Link>
+              </div>
+              <div className="flex items-center space-x-4">
+                {user ? (
+                  <div className="text-sm text-white/80">
+                    Hi, {user.username}
+                  </div>
+                ) : (
+                  <Link href="/auth" className="text-sm text-white hover:text-gray-300 transition-colors">
+                    Sign In
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </div>
+        
+        <div className="container max-w-4xl mx-auto py-8">
+          <div className="mb-8">
+            <Progress value={checkoutProgress} className="h-2 mb-2" />
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <div>
+                Shipping Information
+              </div>
+              <div>
+                Payment
+              </div>
+              <div className="text-primary font-medium">
+                Confirmation
+              </div>
+            </div>
+          </div>
   
         <Card className="mx-auto max-w-2xl mb-8">
           <CardHeader className="text-center">
@@ -1200,6 +1238,7 @@ export default function CheckoutFixedPage() {
           </CardFooter>
         </Card>
       </div>
+      </>
     );
   }
   
