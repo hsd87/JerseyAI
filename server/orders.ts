@@ -88,7 +88,7 @@ export function calculateOrderPrice(orderData: InsertOrder, isSubscriber: boolea
  * Register order-related routes
  */
 export function registerOrderRoutes(app: Express) {
-  // Create a new order
+  // Create a new order (regular or draft)
   app.post('/api/orders', async (req: Request, res: Response) => {
     try {
       if (!req.isAuthenticated()) {
@@ -96,6 +96,9 @@ export function registerOrderRoutes(app: Express) {
       }
       
       const orderData: InsertOrder = req.body;
+      
+      // Check if this is a draft order
+      const isDraft = req.query.draft === 'true' || orderData.metadata?.isDraft;
       
       // Ensure the user is ordering their own design
       if (orderData.userId !== req.user?.id) {
@@ -108,9 +111,19 @@ export function registerOrderRoutes(app: Express) {
       // Recalculate the price on the server side to ensure accuracy
       const { totalInCents, breakdown } = calculateOrderPrice(orderData, isSubscriber);
       
-      // Store the price breakdown in the order metadata (if not already present)
-      // Add metadata as a string value (JSON) since Drizzle expects this format
-      const metadataValue = JSON.stringify({ priceBreakdown: breakdown });
+      // Prepare metadata - include price breakdown and draft status
+      const existingMetadata = orderData.metadata ? 
+        (typeof orderData.metadata === 'string' ? JSON.parse(orderData.metadata) : orderData.metadata) : 
+        {};
+        
+      const metadataValue = JSON.stringify({ 
+        ...existingMetadata,
+        priceBreakdown: breakdown,
+        isDraft: isDraft,
+        draftCreatedAt: isDraft ? new Date().toISOString() : undefined,
+        completedAt: !isDraft ? new Date().toISOString() : undefined
+      });
+      
       // @ts-ignore - This is fine since we added the metadata column to the schema
       orderData.metadata = metadataValue;
       
@@ -120,27 +133,38 @@ export function registerOrderRoutes(app: Express) {
         orderData.totalAmount = totalInCents;
       }
       
+      // We'll set the status after creation
+      const initialStatus = isDraft ? 'draft' : 'pending';
+      
+      console.log(`Creating ${isDraft ? 'draft' : 'regular'} order for user ${req.user.id}`);
+      
       // Create the order in the database
       const order = await storage.createOrder(orderData);
       
-      // Generate the PDF for the order
-      const pdfPath = await generateOrderPDF(order);
-      
-      // Update the order with the PDF path
-      const pdfUrl = `/orders/pdfs/order_${order.id}.pdf`;
-      const updatedOrder = await storage.updateOrderPdfUrl(order.id, pdfUrl);
-      
-      // Send confirmation email if the user has an email
-      if (req.user?.email) {
-        try {
-          await sendOrderConfirmationEmail(req.user, updatedOrder, pdfPath);
-        } catch (emailError) {
-          console.error('Error sending confirmation email:', emailError);
-          // Continue without failing the request if email fails
+      // Only generate PDF and send email for non-draft orders
+      if (!isDraft) {
+        // Generate the PDF for the order
+        const pdfPath = await generateOrderPDF(order);
+        
+        // Update the order with the PDF path
+        const pdfUrl = `/orders/pdfs/order_${order.id}.pdf`;
+        const updatedOrder = await storage.updateOrderPdfUrl(order.id, pdfUrl);
+        
+        // Send confirmation email if the user has an email
+        if (req.user?.email) {
+          try {
+            await sendOrderConfirmationEmail(req.user, updatedOrder, pdfPath);
+          } catch (emailError) {
+            console.error('Error sending confirmation email:', emailError);
+            // Continue without failing the request if email fails
+          }
         }
+        
+        res.status(201).json(updatedOrder);
+      } else {
+        // For draft orders, just return the created order
+        res.status(201).json(order);
       }
-      
-      res.status(201).json(updatedOrder);
     } catch (error: any) {
       console.error('Error creating order:', error);
       res.status(500).json({ message: `Failed to create order: ${error.message}` });
@@ -240,6 +264,73 @@ export function registerOrderRoutes(app: Express) {
     } catch (error: any) {
       console.error('Error updating order status:', error);
       res.status(500).json({ message: `Failed to update order status: ${error.message}` });
+    }
+  });
+  
+  // Convert a draft order to a pending order when user proceeds to checkout
+  app.post('/api/orders/:id/convert-draft', async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      
+      // Get the order
+      const order = await storage.getOrderById(orderId);
+      
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      
+      // Ensure the user owns this order
+      if (order.userId !== req.user!.id) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      // Ensure this is a draft order
+      if (order.status !== 'draft') {
+        return res.status(400).json({ 
+          message: 'Only draft orders can be converted', 
+          currentStatus: order.status 
+        });
+      }
+      
+      // Update the order metadata
+      let metadata = order.metadata ? 
+        (typeof order.metadata === 'string' ? JSON.parse(order.metadata) : order.metadata) : 
+        {};
+      
+      // Update metadata with conversion details
+      metadata = {
+        ...metadata,
+        isDraft: false,
+        draftConvertedAt: new Date().toISOString(),
+      };
+      
+      // Update the order status to pending
+      const updatedOrder = await storage.updateOrder(orderId, {
+        status: 'pending',
+        // @ts-ignore - Metadata typing is complex
+        metadata: JSON.stringify(metadata)
+      });
+      
+      // Generate PDF if needed (can be done asynchronously later)
+      if (!order.pdfUrl) {
+        try {
+          const pdfPath = await generateOrderPDF(updatedOrder);
+          const pdfUrl = `/orders/pdfs/order_${order.id}.pdf`;
+          await storage.updateOrderPdfUrl(order.id, pdfUrl);
+        } catch (pdfError) {
+          console.error('Error generating PDF for converted draft:', pdfError);
+          // Continue without failing the request
+        }
+      }
+      
+      res.json(updatedOrder);
+    } catch (error: any) {
+      console.error('Error converting draft order:', error);
+      res.status(500).json({ message: `Failed to convert draft order: ${error.message}` });
     }
   });
 }
