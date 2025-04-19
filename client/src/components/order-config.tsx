@@ -753,16 +753,16 @@ export default function OrderConfig({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full rounded-3xl overflow-hidden">
       <CardHeader>
-        <CardTitle>Configure Your Order</CardTitle>
+        <CardTitle className="text-[#333333]">Configure Your Order</CardTitle>
         <CardDescription>
           {stepTitles[currentStep - 1]}
         </CardDescription>
         
         {/* Progress indicator */}
         <div className="mt-4">
-          <Progress value={(currentStep / 6) * 100} className="h-2" />
+          <Progress value={(currentStep / 6) * 100} className="h-2 bg-gray-100 [&>div]:bg-[#E34234]" />
           <div className="flex justify-between mt-2 text-xs text-gray-500">
             <span>Step {currentStep} of 6</span>
             <span>{stepTitles[currentStep - 1]}</span>
@@ -985,8 +985,8 @@ export default function OrderConfig({
             )}
             
             <div className="flex justify-between mt-6">
-              <Button variant="outline" onClick={goToPreviousStep}>
-                Back
+              <Button variant="outline" onClick={goToPreviousStep} className="rounded-full border-gray-300 hover:bg-gray-100">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
               <Button 
                 onClick={goToNextStep}
@@ -1125,7 +1125,7 @@ export default function OrderConfig({
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
                     placeholder="Enter team name"
-                    className="mt-2"
+                    className="mt-2 rounded-full"
                   />
                 </div>
                 
@@ -1156,6 +1156,7 @@ export default function OrderConfig({
                                 value={member.name}
                                 onChange={(e) => updateTeamMember(member.id, 'name', e.target.value)}
                                 placeholder="Player name"
+                                className="rounded-full"
                               />
                             </TableCell>
                             <TableCell>
@@ -1163,7 +1164,7 @@ export default function OrderConfig({
                                 value={member.number}
                                 onChange={(e) => updateTeamMember(member.id, 'number', e.target.value)}
                                 placeholder="#"
-                                className="w-20"
+                                className="w-20 rounded-full"
                               />
                             </TableCell>
                             <TableCell>
