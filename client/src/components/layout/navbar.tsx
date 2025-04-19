@@ -79,12 +79,12 @@ export default function Navbar() {
                 <>
                   {subscription.isSubscribed ? (
                     <Badge className="bg-white rounded-none px-2 py-0.5 text-xs flex items-center gap-1 h-5">
-                      <CrownIcon className="h-3 w-3 text-[var(--nike-accent)]" />
+                      <CrownIcon className="h-3 w-3 text-gradient" />
                       <span className="text-gradient font-bold">PRO</span>
                     </Badge>
                   ) : (
                     <Link href="/subscribe" className="px-3 py-1 text-sm font-medium hover:underline transition-all flex items-center gap-1">
-                      <CrownIcon className="h-3 w-3 text-[var(--nike-accent)]" />
+                      <CrownIcon className="h-3 w-3 text-gradient" />
                       <span className="text-gradient">Upgrade</span>
                     </Link>
                   )}

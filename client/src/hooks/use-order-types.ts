@@ -69,6 +69,9 @@ export interface PriceBreakdown {
   shippingCost?: number; // Added for compatibility
   discount?: number;
   tax?: number;
+  // Additional properties for cart display
+  discountPercentage?: number;
+  shippingFreeThresholdApplied?: boolean;
 }
 
 export interface OrderDetails {

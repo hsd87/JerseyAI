@@ -183,13 +183,13 @@ export default function CheckoutElementsPage() {
             <CardTitle className="text-center">Payment Successful</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center space-y-4">
-            <div className="bg-green-50 p-4 rounded-[1px]">
+            <div className="bg-gradient bg-opacity-5 p-4 rounded-[1px]">
               <CheckCircle className="h-16 w-16 text-gradient" />
             </div>
             <p className="text-center">Your payment has been processed successfully. Thank you for your purchase!</p>
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Button onClick={() => setLocation('/designer')}>Go to Designer</Button>
+            <Button onClick={() => setLocation('/designer')} className="bg-gradient hover:opacity-90 text-white">Go to Designer</Button>
           </CardFooter>
         </Card>
       </div>
@@ -206,7 +206,7 @@ export default function CheckoutElementsPage() {
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center space-y-4 py-6">
             <div className="bg-gradient bg-opacity-5 p-4 rounded-[1px]">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+              <Loader2 className="h-12 w-12 animate-spin text-gradient" />
             </div>
             <p className="text-center">Loading your saved order. Please wait...</p>
           </CardContent>
@@ -224,12 +224,12 @@ export default function CheckoutElementsPage() {
             <CardTitle className="text-center">Your cart is empty</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center">
-            <div className="bg-gray-50 p-4 rounded-[1px]">
-              <ShoppingCart className="h-16 w-16 text-muted-foreground" />
+            <div className="bg-gradient bg-opacity-5 p-4 rounded-[1px]">
+              <ShoppingCart className="h-16 w-16 text-gradient" />
             </div>
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Button onClick={() => setLocation('/designer')}>Go to Designer</Button>
+            <Button onClick={() => setLocation('/designer')} className="bg-gradient hover:opacity-90 text-white">Go to Designer</Button>
           </CardFooter>
         </Card>
       </div>
@@ -264,7 +264,7 @@ export default function CheckoutElementsPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">${(item.price * (item.quantity || 1)).toFixed(2)}</p>
+                      <p className="font-medium text-gradient">${(item.price * (item.quantity || 1)).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
@@ -274,7 +274,7 @@ export default function CheckoutElementsPage() {
 
               <div className="flex justify-between font-medium">
                 <span>Total</span>
-                <span>${(totalAmount || calculatedTotal || 0).toFixed(2)}</span>
+                <span className="text-gradient">${(totalAmount || calculatedTotal || 0).toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>
