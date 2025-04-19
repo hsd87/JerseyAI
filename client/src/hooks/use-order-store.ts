@@ -23,10 +23,16 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   packageItems: [], // Initialize as empty array for packageItems
   packageType: 'jerseyOnly', // Default package type
   
-  // Helper method to get cart items for checkout
+  // Helper method to get cart items for checkout - converting OrderItems to CartItems
   getCartItems: () => {
     const state = get();
-    return [...state.items];
+    // Map OrderItems to CartItems for price calculation
+    return state.items.map(item => ({
+      productId: item.id || 'unknown',
+      productType: item.type || 'jersey',
+      basePrice: item.price || 0,
+      quantity: item.quantity || 1
+    }));
   },
   
   // Get total amount of all items in the cart

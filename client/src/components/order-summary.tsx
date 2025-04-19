@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -8,12 +8,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ShoppingCart } from "lucide-react";
+import { Loader2, ShoppingCart, Save, CornerDownLeft } from "lucide-react";
 import { useOrderStore } from "../hooks/use-order-store";
 import { usePriceCalculator } from "../hooks/use-price-calculator";
 import { useAuth } from "../hooks/use-auth";
 import { useLocation } from "wouter";
 import { PriceBreakdownCard, SimplePriceSummary } from "./price-breakdown";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "../lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface OrderSummaryProps {
   showDetailed?: boolean;
@@ -116,6 +119,119 @@ export default function OrderSummary({
   
   // Use validated price breakdown or null
   const validatedPriceBreakdown = isValidPriceBreakdown(priceBreakdown) ? priceBreakdown : null;
+  
+  // Get more values from order store
+  const { designId, designUrls, setDesign, sport } = useOrderStore();
+  
+  // Toast notifications
+  const { toast } = useToast();
+  
+  // State to track if draft is saving
+  const [savingDraft, setSavingDraft] = useState(false);
+  
+  // Type guard for validating the price breakdown
+  const hasValidShipping = (pb: any): pb is {shipping: number, subtotal: number, grandTotal: number} => {
+    return pb && typeof pb.shipping === 'number' && typeof pb.subtotal === 'number';
+  };
+  
+  // Mutation for creating a draft order
+  const createDraftOrderMutation = useMutation({
+    mutationFn: async (draftData: any) => {
+      // Include draft=true as query parameter
+      const response = await apiRequest(
+        "POST", 
+        "/api/orders?draft=true", 
+        draftData
+      );
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Order saved!",
+        description: "Your draft order has been saved. You can find it in your account dashboard.",
+        variant: "default",
+      });
+      setSavingDraft(false);
+    },
+    onError: (error: Error) => {
+      console.error("Error saving draft order:", error);
+      toast({
+        title: "Save failed",
+        description: error.message || "Unable to save your draft order. Please try again.",
+        variant: "destructive",
+      });
+      setSavingDraft(false);
+    }
+  });
+  
+  // Function to create a draft order
+  const createDraftOrder = async () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in or create an account to save your order for later.",
+        variant: "default",
+      });
+      setLocation('/auth');
+      return;
+    }
+    
+    if (!designId) {
+      toast({
+        title: "Cannot save order",
+        description: "No design selected. Please return to the designer and complete your design.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Start saving indicator
+    setSavingDraft(true);
+    
+    try {
+      // Get cart items correctly typed
+      const cartItems = getCartItems();
+      
+      // Prepare order details
+      const orderDetails = {
+        items: items,
+        addOns: addOns,
+        isTeamOrder: false,
+        packageType: 'jerseyOnly' // Default package type
+      };
+      
+      // Calculate total amount in cents for the order
+      const totalAmount = validatedPriceBreakdown 
+        ? Math.round(validatedPriceBreakdown.grandTotal * 100) 
+        : Math.round(getSimpleTotal() * 100);
+      
+      // Create the draft order object
+      const draftOrderData = {
+        userId: user.id,
+        designId: designId,
+        sport: sport || 'soccer',
+        designUrls: designUrls || { front: '', back: '' },
+        orderDetails: orderDetails,
+        totalAmount: totalAmount,
+        metadata: {
+          isDraft: true,
+          priceBreakdown: validatedPriceBreakdown || null
+        }
+      };
+      
+      // Submit the draft order
+      await createDraftOrderMutation.mutateAsync(draftOrderData);
+      
+    } catch (error) {
+      console.error("Error preparing draft order:", error);
+      toast({
+        title: "Error saving draft",
+        description: "We couldn't save your order. Please try again or continue to checkout.",
+        variant: "destructive",
+      });
+      setSavingDraft(false);
+    }
+  };
 
   return (
     <Card className={className}>
@@ -171,7 +287,7 @@ export default function OrderSummary({
         </div>
         
         {/* Shipping threshold notifications */}
-        {validatedPriceBreakdown && validatedPriceBreakdown.shipping > 0 && (
+        {validatedPriceBreakdown && hasValidShipping(validatedPriceBreakdown) && validatedPriceBreakdown.shipping > 0 && (
           <div className="text-sm bg-muted p-2 rounded-md text-center">
             {validatedPriceBreakdown.subtotal < 200 ? (
               <p>Add more items to qualify for reduced shipping ($20)</p>
@@ -183,9 +299,10 @@ export default function OrderSummary({
       </CardContent>
       
       <CardFooter className="flex-col space-y-2">
+        {/* Checkout button */}
         <Button 
           className="w-full" 
-          disabled={isCalculatingPrice}
+          disabled={isCalculatingPrice || savingDraft}
           onClick={
             items.length === 0 
               ? () => setLocation("/designer") 
@@ -216,6 +333,28 @@ export default function OrderSummary({
             </div>
           )}
         </Button>
+        
+        {/* Save for later button - only show if there are items */}
+        {items.length > 0 && user && (
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={savingDraft || isCalculatingPrice}
+            onClick={createDraftOrder}
+          >
+            {savingDraft ? (
+              <div className="flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Saving Draft...</span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2">
+                <Save className="h-4 w-4" />
+                <span>Save for Later</span>
+              </div>
+            )}
+          </Button>
+        )}
         
         {!user && (
           <p className="text-xs text-muted-foreground text-center">
