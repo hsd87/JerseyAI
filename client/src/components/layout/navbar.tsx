@@ -63,16 +63,16 @@ export default function Navbar() {
           <div className="hidden md:block">
             <div className="ml-8 flex items-center space-x-8">
               <Link href="/" className={`nav-item-nike ${location === '/' ? 'nav-item-nike-active' : ''}`}>
-                <span className={location === '/' ? '' : 'text-white hover:text-gradient'}>Men</span>
+                <span className={location === '/' ? 'text-gradient' : 'text-white hover:text-gradient'}>Men</span>
               </Link>
               <Link href="/designer" className={`nav-item-nike ${location === '/designer' ? 'nav-item-nike-active' : ''}`}>
-                <span className={location === '/designer' ? '' : 'text-white hover:text-gradient'}>Design</span>
+                <span className={location === '/designer' ? 'text-gradient' : 'text-white hover:text-gradient'}>Design</span>
               </Link>
-              <Link href="/how-it-works" className={`nav-item-nike text-white ${location === '/how-it-works' ? 'nav-item-nike-active' : ''}`}>
-                How It Works
+              <Link href="/how-it-works" className={`nav-item-nike ${location === '/how-it-works' ? 'nav-item-nike-active' : ''}`}>
+                <span className={location === '/how-it-works' ? 'text-gradient' : 'text-white hover:text-gradient'}>How It Works</span>
               </Link>
-              <Link href="/partner" className={`nav-item-nike text-white ${location === '/partner' ? 'nav-item-nike-active' : ''}`}>
-                Teams
+              <Link href="/partner" className={`nav-item-nike ${location === '/partner' ? 'nav-item-nike-active' : ''}`}>
+                <span className={location === '/partner' ? 'text-gradient' : 'text-white hover:text-gradient'}>Teams</span>
               </Link>
               
               {user ? (
@@ -159,23 +159,23 @@ export default function Navbar() {
         style={{ height: isMenuOpen ? 'auto' : 0 }}
       >
         <div className="px-6 py-6 space-y-4">
-          <Link href="/" className={`block py-2 text-base font-normal ${location === '/' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
-            Men
+          <Link href="/" className={`block py-2 text-base font-normal ${location === '/' ? 'font-medium' : ''}`}>
+            <span className={location === '/' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Men</span>
           </Link>
-          <Link href="/designer" className={`block py-2 text-base font-normal ${location === '/designer' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
-            Design
+          <Link href="/designer" className={`block py-2 text-base font-normal ${location === '/designer' ? 'font-medium' : ''}`}>
+            <span className={location === '/designer' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Design</span>
           </Link>
-          <Link href="/how-it-works" className={`block py-2 text-base font-normal ${location === '/how-it-works' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
-            How It Works
+          <Link href="/how-it-works" className={`block py-2 text-base font-normal ${location === '/how-it-works' ? 'font-medium' : ''}`}>
+            <span className={location === '/how-it-works' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>How It Works</span>
           </Link>
-          <Link href="/about" className={`block py-2 text-base font-normal ${location === '/about' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
-            About Us
+          <Link href="/about" className={`block py-2 text-base font-normal ${location === '/about' ? 'font-medium' : ''}`}>
+            <span className={location === '/about' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>About Us</span>
           </Link>
-          <Link href="/faq" className={`block py-2 text-base font-normal ${location === '/faq' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
-            Help
+          <Link href="/faq" className={`block py-2 text-base font-normal ${location === '/faq' ? 'font-medium' : ''}`}>
+            <span className={location === '/faq' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Help</span>
           </Link>
-          <Link href="/partner" className={`block py-2 text-base font-normal ${location === '/partner' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
-            Team Orders
+          <Link href="/partner" className={`block py-2 text-base font-normal ${location === '/partner' ? 'font-medium' : ''}`}>
+            <span className={location === '/partner' ? 'text-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Team Orders</span>
           </Link>
           
           <div className="border-t border-[rgba(255,255,255,0.1)] pt-4 mt-4">
