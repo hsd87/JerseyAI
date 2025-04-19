@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export interface InfoPillProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
-   * Title of the info pill
+   * Title of the info box
    */
   title: string;
   
@@ -13,12 +13,12 @@ export interface InfoPillProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
   
   /**
-   * Visual variant of the pill
+   * Visual variant of the box
    */
   variant?: "light" | "dark";
   
   /**
-   * Custom class name for the info pill wrapper
+   * Custom class name for the info box wrapper
    */
   className?: string;
   
@@ -34,7 +34,7 @@ export interface InfoPillProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * InfoPill component - A pill-shaped informational container
+ * InfoPill component - A minimally rounded rectangular information container
  * 
  * @example
  * ```tsx
