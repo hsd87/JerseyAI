@@ -252,13 +252,13 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="order-2 lg:order-1">
               <div className="space-y-6">
-                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <h3 className="font-medium text-[#1D1D1F] text-lg mb-2">How the AI Works:</h3>
-                  <ol className="space-y-4 ml-6 list-decimal">
-                    <li className="text-[#333333]">Input your sport type, colors, and preferences</li>
-                    <li className="text-[#333333]">Our AI crafts custom designs based on your input</li>
-                    <li className="text-[#333333]">View multiple design options in seconds</li>
-                    <li className="text-[#333333]">Fine-tune and customize with our editor</li>
+                <div className="bg-[#F5F5F7] rounded-[1px] p-6 border border-[#E8E8ED] shadow-sm">
+                  <h3 className="text-xl font-medium text-[#1D1D1F] mb-3">How the AI Works:</h3>
+                  <ol className="space-y-3 ml-6 list-decimal">
+                    <li className="text-[#494949] text-sm">Input your sport type, colors, and preferences</li>
+                    <li className="text-[#494949] text-sm">Our AI crafts custom designs based on your input</li>
+                    <li className="text-[#494949] text-sm">View multiple design options in seconds</li>
+                    <li className="text-[#494949] text-sm">Fine-tune and customize with our editor</li>
                   </ol>
                 </div>
                 
@@ -273,12 +273,12 @@ export default function LandingPage() {
             </div>
             
             <div className="order-1 lg:order-2 relative">
-              <div className="aspect-video bg-gray-100 rounded-lg shadow-lg relative overflow-hidden">
+              <div className="aspect-video bg-white rounded-[1px] shadow-sm border border-[#E8E8ED] relative overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <PlayCircle className="h-16 w-16 text-[#E34234] cursor-pointer hover:scale-110 transition-transform" />
                 </div>
                 {/* This would be a video or interactive element in reality */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 to-gray-700/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#F5F5F7]/20 to-[#E8E8ED]/20"></div>
               </div>
             </div>
           </div>
@@ -286,11 +286,11 @@ export default function LandingPage() {
       </section>
 
       {/* Product Configuration & Features Section */}
-      <section className="py-16 md:py-24 bg-gray-50" id="features">
+      <section className="py-16 md:py-24 bg-[#F5F5F7]" id="features">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="font-sora text-3xl md:text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-semibold text-[#1D1D1F] mb-4">How It Works</h2>
+            <p className="text-xl text-[#494949] max-w-2xl mx-auto">
               From design to delivery, we've made the process simple, fast, and hassle-free
             </p>
           </div>
@@ -298,10 +298,10 @@ export default function LandingPage() {
           {/* Process Steps */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {processSteps.map((step, index) => (
-              <div key={index} className="bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div key={index} className="bg-white rounded-[1px] p-6 shadow-sm border border-[#E8E8ED] hover:shadow-md transition-shadow">
                 <div className="mb-4">{step.icon}</div>
-                <h3 className="font-sora font-bold text-xl mb-2">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
+                <h3 className="text-xl font-medium text-[#1D1D1F] mb-2">{step.title}</h3>
+                <p className="text-[#494949] text-sm">{step.description}</p>
               </div>
             ))}
           </div>
@@ -309,13 +309,13 @@ export default function LandingPage() {
           {/* Features and Comparison */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* Features */}
-            <div className="bg-white rounded-sm p-6 shadow-sm">
-              <h3 className="font-sora font-bold text-2xl mb-6">Key Benefits</h3>
-              <ul className="space-y-4">
+            <div className="bg-white rounded-[1px] p-6 shadow-sm border border-[#E8E8ED]">
+              <h3 className="text-xl mb-5 text-[#1D1D1F] font-medium">Key Benefits</h3>
+              <ul className="space-y-3">
                 {keyFeatures.map((feature, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-[#E34234] flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 text-sm">{feature}</span>
+                    <CheckCircle className="h-4 w-4 text-[#E34234] flex-shrink-0 mt-0.5" />
+                    <span className="text-[#494949] text-sm">{feature}</span>
                   </li>
                 ))}
               </ul>
