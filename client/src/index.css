@@ -14,11 +14,12 @@
     --nike-gray-medium: #8D8D8D;
     --nike-gray-light: #F5F5F5;
     --nike-white: #FFF;
-    --nike-red: #F5413D;
-    --nike-orange: #FA5400;
-    --nike-accent: #F5413D;
+    --nike-red: #FF4081; /* Changed from #F5413D to match gradient end color */
+    --nike-orange: #FF80AB; /* Changed from #FA5400 to match gradient start color */
+    --nike-accent: #FF4081; /* Changed from #F5413D to match gradient end color */
     --nike-hover-overlay: rgba(0, 0, 0, 0.04);
     --nike-transition-standard: all 0.2s ease;
+    --nike-gradient-bg: linear-gradient(90deg, #FF80AB, #FF4081);
   }
   
   * {
@@ -79,6 +80,26 @@
     color: transparent;
   }
   
+  /* Gradient Background Style */
+  .bg-gradient {
+    background: var(--nike-gradient-bg);
+  }
+  
+  /* Gradient Border Style */
+  .border-gradient {
+    position: relative;
+  }
+  
+  .border-gradient::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--nike-gradient-bg);
+  }
+  
   /* Layout container with proper max-width */
   .container-nike {
     @apply px-4 md:px-8 mx-auto max-w-[1440px];
@@ -99,16 +120,32 @@
   }
   
   .btn-nike-accent {
-    @apply h-10 px-6 rounded-full bg-[var(--nike-accent)] text-white flex items-center justify-center font-medium transition-all hover:opacity-90 text-sm;
+    @apply h-10 px-6 rounded-full bg-gradient text-white flex items-center justify-center font-medium transition-all hover:opacity-90 text-sm;
   }
   
   /* Navigation */
   .nav-item-nike {
-    @apply text-base font-normal text-white transition-colors hover:text-[var(--nike-gray-medium)];
+    @apply text-base font-normal text-white transition-colors hover:text-[var(--nike-red)];
+  }
+  
+  .nav-item-nike:hover {
+    position: relative;
+  }
+  
+  .nav-item-nike:hover::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--nike-gradient-bg);
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
   }
   
   .nav-item-nike-active {
-    @apply text-base font-medium text-white border-b-2 border-white;
+    @apply text-base font-medium text-white border-b-2 border-[var(--nike-red)];
   }
   
   /* Cards */
@@ -142,7 +179,12 @@
   }
   
   .product-price {
-    @apply text-base font-medium text-[var(--nike-black)] mt-1;
+    @apply text-base font-medium mt-1;
+  }
+  
+  /* Apply gradient to product prices */
+  .product-price .price {
+    @apply text-gradient font-bold;
   }
   
   /* Form inputs */
@@ -194,7 +236,15 @@
     @apply text-xs uppercase font-medium py-1 px-2 bg-[var(--nike-black)] text-white inline-block;
   }
   
+  .tag-nike-accent {
+    @apply text-xs uppercase font-medium py-1 px-2 bg-gradient text-white inline-block;
+  }
+  
   .breadcrumb-nike {
-    @apply text-xs text-[var(--nike-gray-medium)] hover:text-[var(--nike-black)];
+    @apply text-xs text-[var(--nike-gray-medium)];
+  }
+  
+  .breadcrumb-nike:hover {
+    @apply text-[var(--nike-red)];
   }
 }
