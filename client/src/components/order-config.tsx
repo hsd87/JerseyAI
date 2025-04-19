@@ -1015,7 +1015,7 @@ export default function OrderConfig({
                 <p className="text-gray-600 mb-4">
                   Order for yourself or a single person
                 </p>
-                <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/10">
+                <Badge className="bg-[#E34234]/10 text-[#E34234] hover:bg-[#E34234]/20 border-[#E34234]/10 rounded-full px-3">
                   Simplest option
                 </Badge>
               </div>
@@ -1032,7 +1032,7 @@ export default function OrderConfig({
                 <p className="text-gray-600 mb-4">
                   Order for a team with custom names and numbers
                 </p>
-                <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/10">
+                <Badge className="bg-[#E34234]/10 text-[#E34234] hover:bg-[#E34234]/20 border-[#E34234]/10 rounded-full px-3">
                   Quantity discounts available
                 </Badge>
               </div>
@@ -1090,10 +1090,10 @@ export default function OrderConfig({
             </div>
             
             <div className="flex justify-between mt-6">
-              <Button variant="outline" onClick={goToPreviousStep}>
-                Back
+              <Button variant="outline" onClick={goToPreviousStep} className="rounded-full border-gray-300 hover:bg-gray-100">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
-              <Button onClick={goToNextStep}>
+              <Button onClick={goToNextStep} className="bg-[#E34234] hover:bg-opacity-80 rounded-full">
                 Continue to Order Details <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -1111,7 +1111,7 @@ export default function OrderConfig({
                   <Button 
                     size="sm" 
                     onClick={addTeamMember}
-                    className="flex items-center gap-1"
+                    className="flex items-center gap-1 bg-[#E34234] hover:bg-opacity-80 rounded-full text-white"
                   >
                     <Plus className="h-4 w-4" />
                     Add Player
@@ -1234,15 +1234,15 @@ export default function OrderConfig({
                 
                 {teamMembers.length === 0 && (
                   <div className="text-center py-6">
-                    <Button onClick={addTeamMember}>
+                    <Button onClick={addTeamMember} className="bg-[#E34234] hover:bg-opacity-80 rounded-full text-white">
                       <Plus className="h-4 w-4 mr-2" />
                       Add First Player
                     </Button>
                   </div>
                 )}
                 
-                <div className="rounded-2xl border border-gray-200 p-5 bg-white shadow-sm mt-6">
-                  <h4 className="font-heading font-medium text-voro-black mb-3 text-lg">Size Chart</h4>
+                <div className="rounded-3xl border border-gray-200 p-5 bg-white shadow-sm mt-6">
+                  <h4 className="font-heading font-medium text-[#333333] mb-3 text-lg">Size Chart</h4>
                   <div className="overflow-x-auto max-h-72 overflow-y-auto">
                     {/* Men's Size Chart */}
                     <div className="mb-5">
@@ -1408,8 +1408,8 @@ export default function OrderConfig({
             ) : (
               // Individual order details
               <div className="space-y-6">
-                <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4 shadow-sm">
-                  <h3 className="font-heading font-medium text-voro-black mb-2 text-lg">Individual Order Details</h3>
+                <div className="bg-white border border-gray-200 rounded-3xl p-5 mb-4 shadow-sm">
+                  <h3 className="font-heading font-medium text-[#333333] mb-2 text-lg">Individual Order Details</h3>
                   <p className="text-sm text-gray-600">Confirm your sizing and quantity preferences below.</p>
                 </div>
                 
@@ -1562,8 +1562,8 @@ export default function OrderConfig({
                   </Table>
                 </div>
                 
-                <div className="rounded-2xl border border-gray-200 p-5 bg-white shadow-sm">
-                  <h4 className="font-heading font-medium text-voro-black mb-3 text-lg">Size Chart</h4>
+                <div className="rounded-3xl border border-gray-200 p-5 bg-white shadow-sm">
+                  <h4 className="font-heading font-medium text-[#333333] mb-3 text-lg">Size Chart</h4>
                   <div className="overflow-x-auto max-h-72 overflow-y-auto">
                     {/* Men's Size Chart */}
                     <div className="mb-5">
@@ -1729,12 +1729,13 @@ export default function OrderConfig({
             )}
             
             <div className="flex justify-between mt-6">
-              <Button variant="outline" onClick={goToPreviousStep}>
-                Back
+              <Button variant="outline" onClick={goToPreviousStep} className="rounded-full border-gray-300 hover:bg-gray-100">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
               <Button 
                 onClick={goToNextStep}
                 disabled={watchedIsTeamOrder && teamMembers.length === 0}
+                className="bg-[#E34234] hover:bg-opacity-80 rounded-full"
               >
                 Continue to Pricing <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
