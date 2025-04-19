@@ -41,7 +41,7 @@ export default function CheckoutElementsPage() {
   const draftOrderId = urlParams.get('draft');
 
   // Handle successful payment
-  const handlePaymentSuccess = (paymentResult: any) => {
+  const handlePaymentSuccess = async (paymentResult: any) => {
     console.log('Payment successful details:', {
       id: paymentResult.id,
       status: paymentResult.status,
@@ -50,6 +50,24 @@ export default function CheckoutElementsPage() {
     });
     
     setPaymentCompleted(true);
+    
+    // If this was a draft order, convert it to a real order
+    if (draftOrderId) {
+      try {
+        // Call API to convert draft to real order
+        const response = await apiRequest('POST', `/api/orders/${draftOrderId}/convert-draft`, {
+          paymentIntentId: paymentResult.id,
+          paymentStatus: paymentResult.status,
+          amount: paymentResult.amount
+        });
+        
+        console.log('Draft order converted successfully:', await response.json());
+      } catch (error) {
+        console.error('Error converting draft order:', error);
+        // Still continue with checkout flow even if conversion fails
+        // The order was still processed through Stripe
+      }
+    }
     
     // Clear the cart
     clearItems();
@@ -67,15 +85,95 @@ export default function CheckoutElementsPage() {
     }, 2000);
   };
 
+  // Fetch draft order if draftOrderId is present in the URL
+  const { data: draftOrder, isLoading: isDraftLoading } = useQuery({
+    queryKey: ['/api/orders', draftOrderId],
+    queryFn: async () => {
+      if (!draftOrderId) return null;
+      setLoadingDraft(true);
+      try {
+        const response = await apiRequest('GET', `/api/orders/${draftOrderId}`);
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching draft order:', error);
+        toast({
+          title: 'Failed to load draft order',
+          description: 'Could not retrieve your saved order. Please try again.',
+          variant: 'destructive',
+        });
+        return null;
+      } finally {
+        setLoadingDraft(false);
+      }
+    },
+    enabled: !!draftOrderId,
+  });
+
+  // Load draft order data into the store
+  useEffect(() => {
+    if (draftOrder && draftOrder.status === 'draft') {
+      // Clear current cart first
+      clearItems();
+
+      // Parse order details
+      const orderDetails = draftOrder.orderDetails || {};
+      
+      // Add items to cart
+      if (orderDetails.items && orderDetails.items.length > 0) {
+        orderDetails.items.forEach((item: {
+          id?: string;
+          type: string;
+          name?: string;
+          price: number;
+          quantity?: number;
+          size?: string;
+          gender?: string;
+        }) => {
+          addItem({
+            id: item.id || `item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            type: item.type,
+            name: item.name || item.type,
+            price: item.price,
+            quantity: item.quantity || 1,
+            size: item.size || 'M',
+            gender: item.gender || 'unisex',
+          });
+        });
+      }
+      
+      // Set full order details
+      setOrderDetails(orderDetails);
+      
+      // Set price breakdown if available
+      try {
+        const metadata = typeof draftOrder.metadata === 'string' 
+          ? JSON.parse(draftOrder.metadata) 
+          : draftOrder.metadata;
+          
+        if (metadata && metadata.priceBreakdown) {
+          setPriceBreakdown(metadata.priceBreakdown);
+        }
+      } catch (error) {
+        console.error('Error parsing draft order metadata:', error);
+      }
+      
+      toast({
+        title: 'Draft order loaded',
+        description: 'Your saved order has been loaded. Continue with checkout when ready.',
+      });
+    }
+  }, [draftOrder, clearItems, addItem, setOrderDetails, setPriceBreakdown, toast]);
+
   // If there are no items, redirect to the designer page
   useEffect(() => {
-    if (items.length === 0 && !paymentCompleted) {
+    // Only redirect if no items, no draft is loading, and payment is not completed
+    if (items.length === 0 && !isDraftLoading && !loadingDraft && !paymentCompleted) {
       console.log('No items in cart, redirecting to designer page');
       setLocation('/designer');
     } else {
       console.log('Checkout started with', items.length, 'items, total amount:', totalAmount || calculatedTotal);
     }
-  }, [items, paymentCompleted, setLocation, totalAmount, calculatedTotal]);
+  }, [items, paymentCompleted, setLocation, totalAmount, calculatedTotal, isDraftLoading, loadingDraft]);
 
   if (paymentCompleted) {
     return (
@@ -96,6 +194,24 @@ export default function CheckoutElementsPage() {
     );
   }
 
+  // Show loading state while fetching draft order
+  if (isDraftLoading || loadingDraft) {
+    return (
+      <div className="container mx-auto py-12">
+        <Card className="max-w-lg mx-auto">
+          <CardHeader>
+            <CardTitle className="text-center">Loading Saved Order</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center space-y-4 py-6">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-center">Loading your saved order. Please wait...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
+  // Show empty cart message if no items and not loading
   if (items.length === 0) {
     return (
       <div className="container mx-auto py-12">

@@ -573,10 +573,10 @@ export default function DashboardPage() {
                     <i className="fas fa-shopping-bag text-gray-400 text-xl"></i>
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
-                  <p className="text-gray-500 mb-6">After placing an order, you'll be able to track it here</p>
-                  <Link href="/checkout">
-                    <Button className="bg-black hover:bg-gray-800">
-                      <i className="fas fa-shopping-cart mr-2"></i> Place Order
+                  <p className="text-gray-500 mb-6">Create a design and place your first order</p>
+                  <Link href="/designer">
+                    <Button className="bg-primary hover:bg-primary/90 text-white">
+                      <i className="fas fa-tshirt mr-2"></i> Design Your Jersey
                     </Button>
                   </Link>
                 </div>
