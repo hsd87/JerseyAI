@@ -79,14 +79,14 @@ export default function AuthPage() {
         <div className="w-full lg:w-1/2 p-8 flex items-center justify-center">
           <div className="w-full max-w-md">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold font-sora mb-2">Welcome to VORO</h1>
+              <h1 className="text-3xl font-bold mb-2"><span className="text-gradient">Welcome to OKDIO</span></h1>
               <p className="text-gray-600">Sign in or create an account to get started</p>
             </div>
             
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsTrigger value="login" className="data-[state=active]:bg-gradient data-[state=active]:text-white">Login</TabsTrigger>
+                <TabsTrigger value="register" className="data-[state=active]:bg-gradient data-[state=active]:text-white">Register</TabsTrigger>
               </TabsList>
               
               <TabsContent value="login">
@@ -122,7 +122,7 @@ export default function AuthPage() {
                     
                     <Button 
                       type="submit" 
-                      className="w-full bg-black hover:bg-gray-800" 
+                      className="w-full bg-gradient hover:opacity-90 rounded-full" 
                       disabled={loginMutation.isPending}
                     >
                       {loginMutation.isPending ? (
@@ -199,7 +199,7 @@ export default function AuthPage() {
                     
                     <Button 
                       type="submit" 
-                      className="w-full bg-black hover:bg-gray-800" 
+                      className="w-full bg-gradient hover:opacity-90 rounded-full" 
                       disabled={registerMutation.isPending}
                     >
                       {registerMutation.isPending ? (
@@ -219,17 +219,17 @@ export default function AuthPage() {
         </div>
         
         {/* Hero Section */}
-        <div className="hidden lg:block w-1/2 bg-gray-900 text-white p-12 flex items-center">
+        <div className="hidden lg:block w-1/2 bg-black text-white p-12 flex items-center">
           <div>
-            <h2 className="text-4xl font-bold font-sora mb-6">Design Your Dream Sports Kit</h2>
+            <h2 className="text-4xl font-bold mb-6"><span className="text-gradient">Design Your Dream Sports Kit</span></h2>
             <p className="text-lg mb-8">
               Use our AI-powered platform to create custom jerseys for any sport. From concept to delivery, we make it simple.
             </p>
             
             <div className="space-y-4">
               <div className="flex items-start">
-                <div className="mr-4 p-2 bg-[#39FF14] bg-opacity-20 rounded-full">
-                  <i className="fas fa-bolt text-[#39FF14]"></i>
+                <div className="mr-4 p-2 bg-gradient bg-opacity-20 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 </div>
                 <div>
                   <h3 className="font-medium mb-1">AI-Generated Designs</h3>
@@ -238,8 +238,8 @@ export default function AuthPage() {
               </div>
               
               <div className="flex items-start">
-                <div className="mr-4 p-2 bg-[#39FF14] bg-opacity-20 rounded-full">
-                  <i className="fas fa-tshirt text-[#39FF14]"></i>
+                <div className="mr-4 p-2 bg-gradient bg-opacity-20 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
                 </div>
                 <div>
                   <h3 className="font-medium mb-1">Custom Kit Editor</h3>
@@ -248,8 +248,8 @@ export default function AuthPage() {
               </div>
               
               <div className="flex items-start">
-                <div className="mr-4 p-2 bg-[#39FF14] bg-opacity-20 rounded-full">
-                  <i className="fas fa-users text-[#39FF14]"></i>
+                <div className="mr-4 p-2 bg-gradient bg-opacity-20 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 </div>
                 <div>
                   <h3 className="font-medium mb-1">Team Orders</h3>
