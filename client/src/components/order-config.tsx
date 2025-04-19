@@ -1172,7 +1172,7 @@ export default function OrderConfig({
                                 value={member.size}
                                 onValueChange={(value) => updateTeamMember(member.id, 'size', value)}
                               >
-                                <SelectTrigger className="w-20 rounded-full">
+                                <SelectTrigger className="w-20">
                                   <SelectValue placeholder="Size" />
                                 </SelectTrigger>
                                 <SelectContent>
