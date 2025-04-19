@@ -128,12 +128,12 @@ export default function ShippingInfoPage() {
     }
   }, [selectedShippingOption, shippingOptions, subtotal]);
 
+  // Get items and addOns directly from the store
+  const { items, addOns } = useOrderStore();
+  const hasCartItems = (items && items.length > 0) || (addOns && addOns.length > 0);
+  
   // Enhanced authentication check
   useEffect(() => {
-    // Get items and addOns directly from the store
-    const { items, addOns } = useOrderStore();
-    const hasCartItems = (items && items.length > 0) || (addOns && addOns.length > 0);
-    
     if (!user) {
       console.log('User authentication check failed');
       
@@ -170,7 +170,7 @@ export default function ShippingInfoPage() {
       
       setTimeout(() => setLocation('/designer'), 500);
     }
-  }, [user, priceBreakdown, setLocation, toast]);
+  }, [user, priceBreakdown, setLocation, toast, hasCartItems]);
 
   // Calculate shipping options based on address
   const calculateShippingOptions = async () => {
@@ -184,8 +184,7 @@ export default function ShippingInfoPage() {
     setCalculatingShipping(true);
     
     try {
-      // Get items directly from the store
-      const { items, addOns } = useOrderStore();
+      // Use the items and addOns from the component-level variables
       const allItems = [...items, ...addOns];
       
       // Convert cart items to the format expected by the shipping API
@@ -305,6 +304,9 @@ export default function ShippingInfoPage() {
         country: data.country
       };
       
+      // Use the items and addOns from the component-level variables
+      const allItems = [...items, ...addOns];
+      
       // Update order store with customer information and shipping details
       updateOrder({
         customerInfo,
@@ -317,7 +319,7 @@ export default function ShippingInfoPage() {
         priceBreakdown: {
           subtotal: subtotal || 0,
           baseTotal: subtotal || 0,
-          itemCount: cart.length,
+          itemCount: allItems.length,
           shippingCost: shippingOption.price,
           shipping: shippingOption.price,
           discount: 0,
@@ -348,9 +350,7 @@ export default function ShippingInfoPage() {
 
   // Render cart items
   const renderCartItems = () => {
-    // Use items directly from the store instead of getCartItems() which has a different format
-    const { items, addOns } = useOrderStore();
-    
+    // Using items and addOns from component-level variables
     if ((!items || items.length === 0) && (!addOns || addOns.length === 0)) {
       return <p>No items in cart</p>;
     }
