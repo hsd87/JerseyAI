@@ -60,7 +60,7 @@ export default function Navbar() {
           </div>
           
           <div className="hidden md:block">
-            <div className="ml-4 flex items-center space-x-7">
+            <div className="ml-4 flex items-center space-x-6">
               <Link href="/" className={`nav-item ${location === '/' ? 'text-voro-red' : ''}`}>
                 Home
               </Link>
@@ -83,27 +83,27 @@ export default function Navbar() {
               {user ? (
                 <>
                   {subscription.isSubscribed ? (
-                    <Badge className="bg-voro-red/10 text-voro-red border-voro-red flex items-center gap-1">
+                    <Badge className="bg-voro-red/10 text-voro-red border-voro-red rounded-sm flex items-center gap-1">
                       <CrownIcon className="h-3 w-3" />
                       <span>Pro</span>
                     </Badge>
                   ) : (
-                    <Link href="/subscribe" className="text-voro-red border border-voro-red/30 bg-voro-red/5 px-3 py-1 rounded-xl text-sm font-medium hover:bg-voro-red/10 transition-colors flex items-center gap-1">
+                    <Link href="/subscribe" className="text-voro-red border border-voro-red/30 bg-voro-red/5 px-3 py-1 rounded-sm text-xs font-medium hover:bg-voro-red/10 transition-colors flex items-center gap-1">
                       <CrownIcon className="h-3 w-3" />
                       <span>Upgrade</span>
                     </Link>
                   )}
-                  <Link href="/dashboard" className="btn-primary py-1.5 px-4 text-sm">
+                  <Link href="/dashboard" className="btn-primary py-1 px-3 text-xs">
                     Dashboard
                   </Link>
                   {user.role === 'admin' && (
-                    <Link href="/admin" className="bg-voro-grey text-voro-white px-4 py-1.5 rounded-xl text-sm font-medium hover:bg-opacity-90 transition-colors">
+                    <Link href="/admin" className="bg-voro-grey text-voro-white px-3 py-1 rounded-sm text-xs font-medium hover:bg-opacity-90 transition-colors">
                       Admin
                     </Link>
                   )}
                 </>
               ) : (
-                <Link href="/auth" className="btn-primary py-1.5 px-4 text-sm">
+                <Link href="/auth" className="btn-primary py-1 px-3 text-xs">
                   Sign In
                 </Link>
               )}
@@ -118,22 +118,22 @@ export default function Navbar() {
             
             <button 
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-voro-white hover:text-voro-red focus:outline-none transition-colors"
+              className="inline-flex items-center justify-center p-1.5 rounded-sm text-voro-white hover:text-voro-red focus:outline-none transition-colors"
               aria-expanded={isMenuOpen}
             >
               <span className="sr-only">{isMenuOpen ? 'Close menu' : 'Open menu'}</span>
               {isMenuOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
+                <X className="block h-5 w-5" aria-hidden="true" />
               ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
+                <Menu className="block h-5 w-5" aria-hidden="true" />
               )}
             </button>
           </div>
           
           <div className="hidden md:flex items-center space-x-4">
-            <button className="p-2 rounded-md text-voro-white hover:text-voro-red focus:outline-none transition-colors">
+            <button className="p-1.5 rounded-sm text-voro-white hover:text-voro-red focus:outline-none transition-colors">
               <span className="sr-only">Dark mode</span>
-              <Moon className="h-5 w-5" />
+              <Moon className="h-4 w-4" />
             </button>
             
             <div className="relative">
@@ -144,12 +144,12 @@ export default function Navbar() {
               <div className="relative">
                 <button 
                   onClick={handleLogout}
-                  className="p-2 rounded-md text-voro-white hover:text-voro-red focus:outline-none transition-colors relative"
+                  className="p-1.5 rounded-sm text-voro-white hover:text-voro-red focus:outline-none transition-colors relative"
                   aria-label="User account and settings"
                 >
                   <span className="sr-only">Logout</span>
-                  <UserCircle className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-voro-red transform translate-x-1 -translate-y-1"></span>
+                  <UserCircle className="h-4 w-4" />
+                  <span className="absolute top-0 right-0 block h-1.5 w-1.5 rounded-sm bg-voro-red transform translate-x-1 -translate-y-1"></span>
                 </button>
               </div>
             )}
