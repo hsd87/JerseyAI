@@ -3,17 +3,27 @@ import { useLocation, useRoute, Link } from 'wouter';
 import StripeElementsWrapper from '@/components/payment/stripe-elements-wrapper-fixed';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, ArrowLeft, CheckCircle } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
+import { useQuery } from '@tanstack/react-query';
 
 export default function CheckoutElementsPage() {
   const [, setLocation] = useLocation();
   const [match, params] = useRoute('/checkout-elements/:orderId?');
-  const { items, totalAmount, clearItems } = useOrderStore();
+  const { 
+    items, 
+    totalAmount, 
+    clearItems, 
+    addItem, 
+    setOrderDetails, 
+    setPriceBreakdown 
+  } = useOrderStore();
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingDraft, setLoadingDraft] = useState(false);
   const { toast } = useToast();
   
   // Calculate total from items as a fallback if totalAmount is not available
@@ -25,6 +35,10 @@ export default function CheckoutElementsPage() {
 
   // Use the order ID from the route if it exists
   const orderId = match ? params?.orderId : null;
+  
+  // Extract draft param from URL (e.g. /checkout-elements?draft=123)
+  const urlParams = new URLSearchParams(window.location.search);
+  const draftOrderId = urlParams.get('draft');
 
   // Handle successful payment
   const handlePaymentSuccess = (paymentResult: any) => {
