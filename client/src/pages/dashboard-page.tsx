@@ -298,55 +298,55 @@ export default function DashboardPage() {
             <TabsContent value="addons" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-[#1D1D1F]">Available Add-ons</CardTitle>
-                  <CardDescription className="text-[#86868B]">Enhance your jersey design with premium add-ons</CardDescription>
+                  <CardTitle className="text-[#000000]">Available Add-ons</CardTitle>
+                  <CardDescription className="text-[#666666]">Enhance your jersey design with premium add-ons</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="border border-[#E8E8ED] rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="h-40 bg-[#F5F5F7] flex items-center justify-center">
-                        <svg className="w-12 h-12 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div className="border border-[#979797] rounded-md overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-[#eeeeee] flex items-center justify-center">
+                        <svg className="w-12 h-12 text-[#0088cc]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-medium mb-1 text-[#1D1D1F]">Premium Name Badge</h3>
-                        <p className="text-sm text-[#86868B] mb-3">High-quality embroidered name badge</p>
+                        <h3 className="font-medium mb-1 text-[#000000]">Premium Name Badge</h3>
+                        <p className="text-sm text-[#666666] mb-3">High-quality embroidered name badge</p>
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-[#1D1D1F]">$12.99</span>
-                          <Button size="sm" variant="outline" className="rounded-lg border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30">Add to Cart</Button>
+                          <span className="font-medium text-[#000000]">$12.99</span>
+                          <Button size="sm" variant="outline" className="rounded-md border-[#979797] text-[#0088cc] hover:bg-[#0088cc]/5 hover:border-[#0088cc]/30">Add to Cart</Button>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="border border-[#E8E8ED] rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="h-40 bg-[#F5F5F7] flex items-center justify-center">
-                        <svg className="w-12 h-12 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div className="border border-[#979797] rounded-md overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-[#eeeeee] flex items-center justify-center">
+                        <svg className="w-12 h-12 text-[#0088cc]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
                         </svg>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-medium mb-1 text-[#1D1D1F]">Team Logo Patch</h3>
-                        <p className="text-sm text-[#86868B] mb-3">Custom embroidered team logo</p>
+                        <h3 className="font-medium mb-1 text-[#000000]">Team Logo Patch</h3>
+                        <p className="text-sm text-[#666666] mb-3">Custom embroidered team logo</p>
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-[#1D1D1F]">$15.99</span>
-                          <Button size="sm" variant="outline" className="rounded-lg border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30">Add to Cart</Button>
+                          <span className="font-medium text-[#000000]">$15.99</span>
+                          <Button size="sm" variant="outline" className="rounded-md border-[#979797] text-[#0088cc] hover:bg-[#0088cc]/5 hover:border-[#0088cc]/30">Add to Cart</Button>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="border border-[#E8E8ED] rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="h-40 bg-[#F5F5F7] flex items-center justify-center">
-                        <svg className="w-12 h-12 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div className="border border-[#979797] rounded-md overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-[#eeeeee] flex items-center justify-center">
+                        <svg className="w-12 h-12 text-[#0088cc]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                         </svg>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-medium mb-1 text-[#1D1D1F]">Performance Fabric Upgrade</h3>
-                        <p className="text-sm text-[#86868B] mb-3">Premium breathable material</p>
+                        <h3 className="font-medium mb-1 text-[#000000]">Performance Fabric Upgrade</h3>
+                        <p className="text-sm text-[#666666] mb-3">Premium breathable material</p>
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-[#1D1D1F]">$9.99</span>
-                          <Button size="sm" variant="outline" className="rounded-lg border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30">Add to Cart</Button>
+                          <span className="font-medium text-[#000000]">$9.99</span>
+                          <Button size="sm" variant="outline" className="rounded-md border-[#979797] text-[#0088cc] hover:bg-[#0088cc]/5 hover:border-[#0088cc]/30">Add to Cart</Button>
                         </div>
                       </div>
                     </div>
@@ -358,53 +358,53 @@ export default function DashboardPage() {
             <TabsContent value="team" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-[#1D1D1F]">Team Details</CardTitle>
-                  <CardDescription className="text-[#86868B]">Manage your team roster and details</CardDescription>
+                  <CardTitle className="text-[#000000]">Team Details</CardTitle>
+                  <CardDescription className="text-[#666666]">Manage your team roster and details</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <label htmlFor="team-name" className="block text-sm font-medium text-[#1D1D1F] mb-1">Team Name</label>
+                      <label htmlFor="team-name" className="block text-sm font-medium text-[#000000] mb-1">Team Name</label>
                       <input 
                         type="text" 
                         id="team-name" 
-                        className="w-full rounded-lg border border-[#E8E8ED] px-3 py-2 text-[#1D1D1F] placeholder-[#86868B] focus:outline-none focus:ring-2 focus:ring-[#0071E3] focus:border-transparent"
+                        className="w-full rounded-md border border-[#979797] px-3 py-2 text-[#000000] placeholder-[#666666] focus:outline-none focus:ring-2 focus:ring-[#0088cc] focus:border-transparent"
                         placeholder="Enter team name"
                       />
                     </div>
                     
                     <div>
-                      <h3 className="text-sm font-medium text-[#1D1D1F] mb-2">Team Members</h3>
-                      <div className="border border-[#E8E8ED] rounded-lg overflow-hidden">
-                        <table className="min-w-full divide-y divide-[#E8E8ED]">
-                          <thead className="bg-[#F5F5F7]">
+                      <h3 className="text-sm font-medium text-[#000000] mb-2">Team Members</h3>
+                      <div className="border border-[#979797] rounded-md overflow-hidden">
+                        <table className="min-w-full divide-y divide-[#979797]">
+                          <thead className="bg-[#eeeeee]">
                             <tr>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Name</th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Number</th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Size</th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Quantity</th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Actions</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">Name</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">Number</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">Size</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">Quantity</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">Actions</th>
                             </tr>
                           </thead>
-                          <tbody className="bg-white divide-y divide-[#E8E8ED]">
+                          <tbody className="bg-white divide-y divide-[#979797]">
                             <tr>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">John Doe</td>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">10</td>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">M</td>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">1</td>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 rounded-full">
+                              <td className="px-4 py-3 text-sm text-[#000000]">John Doe</td>
+                              <td className="px-4 py-3 text-sm text-[#000000]">10</td>
+                              <td className="px-4 py-3 text-sm text-[#000000]">M</td>
+                              <td className="px-4 py-3 text-sm text-[#000000]">1</td>
+                              <td className="px-4 py-3 text-sm text-[#000000]">
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 rounded-md">
                                   <i className="fas fa-trash"></i>
                                 </Button>
                               </td>
                             </tr>
                             <tr>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">Jane Smith</td>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">7</td>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">S</td>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">1</td>
-                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 rounded-full">
+                              <td className="px-4 py-3 text-sm text-[#000000]">Jane Smith</td>
+                              <td className="px-4 py-3 text-sm text-[#000000]">7</td>
+                              <td className="px-4 py-3 text-sm text-[#000000]">S</td>
+                              <td className="px-4 py-3 text-sm text-[#000000]">1</td>
+                              <td className="px-4 py-3 text-sm text-[#000000]">
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 rounded-md">
                                   <i className="fas fa-trash"></i>
                                 </Button>
                               </td>
@@ -414,7 +414,7 @@ export default function DashboardPage() {
                       </div>
                       
                       <div className="mt-4">
-                        <Button variant="outline" size="sm" className="text-sm rounded-lg border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30">
+                        <Button variant="outline" size="sm" className="text-sm rounded-md border-[#979797] text-[#0088cc] hover:bg-[#0088cc]/5 hover:border-[#0088cc]/30">
                           <i className="fas fa-plus mr-1"></i> Add Team Member
                         </Button>
                       </div>
