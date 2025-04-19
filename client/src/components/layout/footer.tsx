@@ -3,24 +3,24 @@ import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="footer bg-voro-grey text-white mt-8 sm:mt-12">
+    <footer className="footer bg-gradient text-white mt-8 sm:mt-12">
       <div className="container-custom mx-auto py-12 md:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
           <div className="col-span-2">
             <Link href="/" className="flex items-center">
-              <span className="font-heading font-semibold text-xl">Pro<span className="text-voro-red">Jersey</span></span>
+              <span className="font-heading font-semibold text-xl"><span className="text-gradient">OKDIO</span></span>
             </Link>
             <p className="mt-4 text-base text-gray-300 leading-relaxed max-w-md">
               Design your dream sports kit with AI-powered precision. From concept to delivery, we make custom sportswear simple, high-quality, and accessible.
             </p>
             <div className="mt-6 flex space-x-5">
-              <a href="#" className="text-gray-300 hover:text-voro-red transition-colors p-1.5 rounded-md hover:bg-voro-grey/80">
+              <a href="#" className="text-gray-300 hover:text-gradient transition-colors p-1.5 rounded-md hover:bg-gradient/10">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-300 hover:text-voro-red transition-colors p-1.5 rounded-md hover:bg-voro-grey/80">
+              <a href="#" className="text-gray-300 hover:text-gradient transition-colors p-1.5 rounded-md hover:bg-gradient/10">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-300 hover:text-voro-red transition-colors p-1.5 rounded-md hover:bg-voro-grey/80">
+              <a href="#" className="text-gray-300 hover:text-gradient transition-colors p-1.5 rounded-md hover:bg-gradient/10">
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="#" className="text-gray-300 hover:text-voro-red transition-colors p-1.5 rounded-md hover:bg-voro-grey/80">
@@ -44,7 +44,7 @@ export default function Footer() {
         
         <div className="mt-12 sm:mt-16 border-t border-gray-600 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} VORO. All rights reserved.
+            &copy; {new Date().getFullYear()} OKDIO. All rights reserved.
           </p>
           <div className="mt-4 sm:mt-0 flex flex-wrap justify-center gap-6 items-center">
             <a href="#" className="text-sm text-gray-400 hover:text-voro-red transition-colors">Privacy Policy</a>
