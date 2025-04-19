@@ -157,7 +157,7 @@ const FAQPage: React.FC = () => {
                   Reach out to our team at <a href="mailto:help@vorosport.ai" className="text-voro-red hover:underline font-medium">help@vorosport.ai</a> for any questions not covered in our FAQs.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                  <Link href="/contact" className="px-6 py-2 rounded-full bg-voro-red text-white hover:bg-opacity-90 transition-colors text-sm font-medium flex items-center gap-2">
+                  <Link href="/contact" className="px-6 py-2 rounded-lg bg-voro-red text-white hover:bg-opacity-90 transition-colors text-sm font-medium flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     Contact Support
                   </Link>
