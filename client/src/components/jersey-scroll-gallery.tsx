@@ -15,31 +15,43 @@ const JerseyScrollGallery: React.FC<JerseyScrollGalleryProps> = ({
   jerseyUrls,
   altText = "Jersey design"
 }) => {
-  // Use the high-quality jersey images
+  // Use the high-quality jersey images with titles
   const highQualityJerseys = [
     { 
       src: strikerJersey, 
-      alt: "Strikers soccer jersey in green and black stripes" 
+      alt: "Strikers soccer jersey in green and black stripes",
+      title: "STRIKERS FC",
+      type: "SOCCER"
     },
     { 
       src: wildcatsJersey, 
-      alt: "Wildcats #7 blue basketball jersey" 
+      alt: "Wildcats #7 blue basketball jersey",
+      title: "WILDCATS",
+      type: "BASKETBALL"
     },
     { 
       src: hurricanesJersey, 
-      alt: "The Hurricanes orange cricket jersey" 
+      alt: "The Hurricanes orange cricket jersey",
+      title: "HURRICANES",
+      type: "CRICKET" 
     },
     { 
       src: unitedJersey, 
-      alt: "United red soccer jersey" 
+      alt: "United red soccer jersey",
+      title: "UNITED",
+      type: "SOCCER"
     },
     { 
       src: neonRaidersJersey, 
-      alt: "Neon Raiders esports jersey in black and pink" 
+      alt: "Neon Raiders esports jersey in black and pink",
+      title: "NEON RAIDERS",
+      type: "ESPORTS"
     },
     { 
       src: esportJersey, 
-      alt: "Esports jersey with pink number 13" 
+      alt: "Esports jersey with pink number 13",
+      title: "TEAM THIRTEEN",
+      type: "ESPORTS"
     }
   ];
 
@@ -52,7 +64,7 @@ const JerseyScrollGallery: React.FC<JerseyScrollGalleryProps> = ({
           {highQualityJerseys.map((jersey, index) => (
             <div 
               key={index} 
-              className="snap-start flex-shrink-0 w-[220px] md:w-[260px]"
+              className="snap-start flex-shrink-0 w-[220px] md:w-[260px] relative"
             >
               <img 
                 src={jersey.src} 
@@ -60,6 +72,12 @@ const JerseyScrollGallery: React.FC<JerseyScrollGalleryProps> = ({
                 className="w-full h-auto object-contain rounded-none shadow-none"
                 loading="lazy"
               />
+              <div className="absolute bottom-10 left-0 p-3 w-full">
+                <div className="bg-black bg-opacity-60 p-2 text-left">
+                  <h3 className="text-white font-bold text-lg uppercase tracking-wide">{jersey.title}</h3>
+                  <p className="text-white text-xs uppercase tracking-wider">{jersey.type}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
