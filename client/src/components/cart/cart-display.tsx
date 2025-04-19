@@ -118,7 +118,7 @@ export const CartDisplay: React.FC<CartDisplayProps> = ({
               }`}
             >
               <div className="flex gap-3">
-                <div className="bg-muted w-12 h-12 rounded flex items-center justify-center">
+                <div className="bg-muted w-12 h-12 rounded-sm flex items-center justify-center">
                   <Package className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div>

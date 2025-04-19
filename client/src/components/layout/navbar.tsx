@@ -181,20 +181,20 @@ export default function Navbar() {
           
           {user ? (
             <>
-              <Link href="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-voro-red">
+              <Link href="/dashboard" className="block px-3 py-2 rounded-sm text-base font-medium text-voro-red">
                 Dashboard
               </Link>
               {user.role === 'admin' && (
-                <Link href="/admin" className="block px-3 py-2 rounded-md text-base font-medium bg-voro-grey text-voro-white">
+                <Link href="/admin" className="block px-3 py-2 rounded-sm text-base font-medium bg-voro-grey text-voro-white">
                   Admin Dashboard
                 </Link>
               )}
-              <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-voro-white">
+              <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-sm text-base font-medium text-voro-white">
                 Sign Out
               </button>
             </>
           ) : (
-            <Link href="/auth" className="block px-3 py-2 rounded-md text-base font-medium text-voro-red">
+            <Link href="/auth" className="block px-3 py-2 rounded-sm text-base font-medium text-voro-red">
               Sign In
             </Link>
           )}
