@@ -12,7 +12,8 @@ export default function DesignResults() {
     frontImage, 
     backImage,
     toggleEditor,
-    formData
+    formData,
+    designId
   } = useDesignStore();
 
   const handleCustomize = () => {
