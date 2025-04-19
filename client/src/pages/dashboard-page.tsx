@@ -133,8 +133,34 @@ export default function DashboardPage() {
         return "bg-blue-100 text-blue-800";
       case "shipped":
         return "bg-green-100 text-green-800";
+      case "draft":
+        return "bg-purple-100 text-purple-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+  
+  // Function to resume a draft order
+  const handleResumeDraftOrder = async (order: Order) => {
+    try {
+      // Extract order details
+      const metadata = typeof order.metadata === 'string' 
+        ? JSON.parse(order.metadata) 
+        : order.metadata;
+      
+      // Navigate to checkout with the draft order details
+      navigate(`/checkout-elements?draft=${order.id}`);
+      
+      toast({
+        title: "Draft order loaded",
+        description: "You can now complete your purchase.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load draft order. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -398,7 +424,7 @@ export default function DashboardPage() {
               </Card>
             </TabsContent>
             
-            <TabsContent value="orders" className="space-y-4">
+            <TabsContent value="orders" className="space-y-6">
               {isLoadingOrders ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
@@ -408,68 +434,139 @@ export default function DashboardPage() {
                   <p className="text-red-500">Error loading orders. Please try again.</p>
                 </div>
               ) : orders && orders.length > 0 ? (
-                <div className="space-y-6">
-                  {orders.map((order) => (
-                    <Card key={order.id} className="overflow-hidden border border-gray-200">
-                      <CardHeader className="bg-gray-50 border-b border-gray-200 py-4">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <CardTitle className="text-base font-medium">Order #{order.id}</CardTitle>
-                            <CardDescription className="text-xs">
-                              Placed on {formatDate(order.createdAt)}
-                            </CardDescription>
-                          </div>
-                          <div>
-                            <Badge className={getStatusColor(order.status)}>
-                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                            </Badge>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="py-4">
-                        <div className="flex flex-col md:flex-row justify-between gap-4">
-                          <div className="space-y-2">
-                            <h3 className="text-sm font-medium text-gray-700">Order Details</h3>
-                            <div className="text-sm text-gray-600">
-                              <p>Total Amount: {formatCurrency(order.totalAmount)}</p>
-                              <p>Items: {order.quantity} jersey{order.quantity > 1 ? 's' : ''}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <h3 className="text-sm font-medium text-gray-700">Shipping Address</h3>
-                            <div className="text-sm text-gray-600">
-                              <p>{order.shippingAddress}</p>
-                            </div>
-                          </div>
-                          
-                          {order.trackingId && (
-                            <div className="space-y-2">
-                              <h3 className="text-sm font-medium text-gray-700">Tracking</h3>
-                              <div className="text-sm">
-                                <a href={`https://track.shipment.com/${order.trackingId}`} className="text-primary hover:underline">
-                                  {order.trackingId}
-                                </a>
+                <>
+                  {/* Draft Orders Section */}
+                  {orders.filter(order => order.status === 'draft').length > 0 && (
+                    <div className="space-y-4">
+                      <h2 className="text-xl font-semibold">Saved for Later</h2>
+                      <div className="space-y-4">
+                        {orders.filter(order => order.status === 'draft').map((order) => (
+                          <Card key={order.id} className="overflow-hidden border border-gray-200 border-l-4 border-l-purple-400">
+                            <CardHeader className="bg-gray-50 border-b border-gray-200 py-4">
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <CardTitle className="text-base font-medium">Saved Order #{order.id}</CardTitle>
+                                  <CardDescription className="text-xs">
+                                    Saved on {formatDate(order.createdAt)}
+                                  </CardDescription>
+                                </div>
+                                <div>
+                                  <Badge className={getStatusColor(order.status)}>
+                                    Draft
+                                  </Badge>
+                                </div>
                               </div>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="bg-gray-50 border-t border-gray-200 py-3">
-                        <div className="flex justify-end gap-2 w-full">
-                          {order.pdfUrl && (
-                            <Button variant="outline" size="sm" className="text-xs rounded">
-                              <i className="fas fa-download mr-1"></i> Invoice
-                            </Button>
-                          )}
-                          <Button variant="outline" size="sm" className="text-xs rounded">
-                            <i className="fas fa-boxes mr-1"></i> Track Order
-                          </Button>
-                        </div>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
+                            </CardHeader>
+                            <CardContent className="py-4">
+                              <div className="flex flex-col md:flex-row justify-between gap-4">
+                                <div className="space-y-2">
+                                  <h3 className="text-sm font-medium text-gray-700">Order Details</h3>
+                                  <div className="text-sm text-gray-600">
+                                    <p>Total Amount: {formatCurrency(order.totalAmount)}</p>
+                                    <p>Sport: {order.sport}</p>
+                                  </div>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <h3 className="text-sm font-medium text-gray-700">Status</h3>
+                                  <div className="text-sm text-gray-600">
+                                    <p>Complete your purchase to proceed</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                            <CardFooter className="bg-gray-50 border-t border-gray-200 py-3">
+                              <div className="flex justify-end gap-2 w-full">
+                                <Button 
+                                  variant="default" 
+                                  size="sm" 
+                                  className="text-xs rounded"
+                                  onClick={() => handleResumeDraftOrder(order)}
+                                >
+                                  <i className="fas fa-shopping-cart mr-1"></i> Complete Purchase
+                                </Button>
+                              </div>
+                            </CardFooter>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Active Orders Section */}
+                  {orders.filter(order => order.status !== 'draft').length > 0 && (
+                    <div className="space-y-4">
+                      <h2 className="text-xl font-semibold">Active Orders</h2>
+                      <div className="space-y-4">
+                        {orders.filter(order => order.status !== 'draft').map((order) => (
+                          <Card key={order.id} className="overflow-hidden border border-gray-200">
+                            <CardHeader className="bg-gray-50 border-b border-gray-200 py-4">
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <CardTitle className="text-base font-medium">Order #{order.id}</CardTitle>
+                                  <CardDescription className="text-xs">
+                                    Placed on {formatDate(order.createdAt)}
+                                  </CardDescription>
+                                </div>
+                                <div>
+                                  <Badge className={getStatusColor(order.status)}>
+                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="py-4">
+                              <div className="flex flex-col md:flex-row justify-between gap-4">
+                                <div className="space-y-2">
+                                  <h3 className="text-sm font-medium text-gray-700">Order Details</h3>
+                                  <div className="text-sm text-gray-600">
+                                    <p>Total Amount: {formatCurrency(order.totalAmount)}</p>
+                                    <p>Sport: {order.sport || 'Custom'}</p>
+                                    <p>Items: {order.metadata?.itemCount || 1} item(s)</p>
+                                  </div>
+                                </div>
+                                
+                                {order.shippingAddress && (
+                                  <div className="space-y-2">
+                                    <h3 className="text-sm font-medium text-gray-700">Shipping Address</h3>
+                                    <div className="text-sm text-gray-600">
+                                      <p>{typeof order.shippingAddress === 'string' 
+                                        ? order.shippingAddress 
+                                        : JSON.stringify(order.shippingAddress)}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {order.trackingId && (
+                                  <div className="space-y-2">
+                                    <h3 className="text-sm font-medium text-gray-700">Tracking</h3>
+                                    <div className="text-sm">
+                                      <a href={`https://track.shipment.com/${order.trackingId}`} className="text-primary hover:underline">
+                                        {order.trackingId}
+                                      </a>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </CardContent>
+                            <CardFooter className="bg-gray-50 border-t border-gray-200 py-3">
+                              <div className="flex justify-end gap-2 w-full">
+                                {order.pdfUrl && (
+                                  <Button variant="outline" size="sm" className="text-xs rounded">
+                                    <i className="fas fa-download mr-1"></i> Invoice
+                                  </Button>
+                                )}
+                                <Button variant="outline" size="sm" className="text-xs rounded">
+                                  <i className="fas fa-boxes mr-1"></i> Track Order
+                                </Button>
+                              </div>
+                            </CardFooter>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="text-center py-12 bg-white rounded-lg shadow">
                   <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -585,7 +682,7 @@ export default function DashboardPage() {
                         </p>
                         <div className="text-sm">
                           <span className="font-medium">Design Credits Remaining:</span>{" "}
-                          {user?.designCreditsRemaining || 0}
+                          {user?.remainingDesigns || 0}
                         </div>
                       </div>
                       
