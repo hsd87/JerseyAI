@@ -103,7 +103,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               {product.description || `${product.type} for sports and casual wear`}
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="text-sm">
+          <Badge className="text-sm bg-gradient text-white">
             ${product.price.toFixed(2)}
           </Badge>
         </div>

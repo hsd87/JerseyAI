@@ -255,7 +255,7 @@ export default function PricingCalculatorPage() {
                   {/* Grand Total */}
                   <div className="text-center p-6 bg-background rounded-lg shadow-sm">
                     <div className="text-sm font-medium text-muted-foreground">Total Price</div>
-                    <div className="text-4xl font-bold mt-1">{priceResult.formatted.grandTotal}</div>
+                    <div className="text-4xl font-bold mt-1 text-gradient">{priceResult.formatted.grandTotal}</div>
                     <div className="text-sm mt-2">
                       for {quantity} {quantity === 1 ? 'item' : 'items'}
                       {useSubscription && ' with Pro discount'}
@@ -360,8 +360,8 @@ export default function PricingCalculatorPage() {
           <CardContent className="space-y-6">
             <div className="grid sm:grid-cols-3 gap-6">
               {/* Quantity Discounts */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-lg mb-2">Quantity Discounts</h3>
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 className="font-semibold text-lg mb-2 text-gradient">Quantity Discounts</h3>
                 <ul className="space-y-1 text-sm">
                   <li className="flex justify-between">
                     <span>1-9 items:</span>
@@ -380,14 +380,14 @@ export default function PricingCalculatorPage() {
                     <span className="font-medium text-green-600">15% off</span>
                   </li>
                 </ul>
-                <p className="text-xs mt-3 text-blue-600">
+                <p className="text-xs mt-3 text-[var(--nike-red)]">
                   The more jerseys you order, the more you save per jersey.
                 </p>
               </div>
               
               {/* Subscription Benefits */}
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-lg mb-2">Pro Subscription</h3>
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 className="font-semibold text-lg mb-2 text-gradient">Pro Subscription</h3>
                 <div className="mb-4 text-sm">
                   <p className="font-medium">For just $9/month, you get:</p>
                   <ul className="mt-2 space-y-1">
@@ -406,15 +406,15 @@ export default function PricingCalculatorPage() {
                   </ul>
                 </div>
                 {!isSubscriber && (
-                  <Button variant="outline" size="sm" className="w-full bg-white">
+                  <Button size="sm" className="w-full bg-gradient text-white hover:opacity-90">
                     Subscribe Now
                   </Button>
                 )}
               </div>
               
               {/* Shipping Costs */}
-              <div className="bg-amber-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-lg mb-2">Shipping Costs</h3>
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 className="font-semibold text-lg mb-2 text-gradient">Shipping Costs</h3>
                 <ul className="space-y-1 text-sm">
                   <li className="flex justify-between">
                     <span>Orders under $200:</span>
@@ -429,14 +429,14 @@ export default function PricingCalculatorPage() {
                     <span className="font-medium text-green-600">FREE shipping</span>
                   </li>
                 </ul>
-                <p className="text-xs mt-3 text-amber-600">
+                <p className="text-xs mt-3 text-[var(--nike-red)]">
                   Larger orders qualify for reduced or free shipping!
                 </p>
               </div>
             </div>
             
-            <div className="bg-slate-50 p-6 rounded-lg mt-6">
-              <h3 className="font-semibold text-lg mb-2">How We Calculate Your Final Price</h3>
+            <div className="bg-gray-50 p-6 rounded-lg mt-6 border border-gray-200">
+              <h3 className="font-semibold text-lg mb-2 text-gradient">How We Calculate Your Final Price</h3>
               <ol className="space-y-3 text-sm">
                 <li className="flex">
                   <span className="font-semibold text-slate-700 mr-2">1.</span>
