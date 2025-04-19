@@ -160,22 +160,22 @@ export default function Navbar() {
       {/* Basic Mobile menu dropdown */}
       <div className={`md:hidden bg-voro-black border-t border-voro-grey/20 ${isMenuOpen ? 'block' : 'hidden'}`}>
         <div className="px-4 pt-2 pb-3 space-y-1">
-          <Link href="/" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/' ? 'text-voro-red' : 'text-voro-white'}`}>
             Home
           </Link>
-          <Link href="/designer" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/designer' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/designer" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/designer' ? 'text-voro-red' : 'text-voro-white'}`}>
             AI Designer
           </Link>
-          <Link href="/how-it-works" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/how-it-works' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/how-it-works" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/how-it-works' ? 'text-voro-red' : 'text-voro-white'}`}>
             How It Works
           </Link>
-          <Link href="/about" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/about' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/about" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/about' ? 'text-voro-red' : 'text-voro-white'}`}>
             About VORO
           </Link>
-          <Link href="/faq" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/faq' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/faq" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/faq' ? 'text-voro-red' : 'text-voro-white'}`}>
             FAQs & Help
           </Link>
-          <Link href="/partner" className={`block px-3 py-2 rounded-md text-base font-medium ${location === '/partner' ? 'text-voro-red' : 'text-voro-white'}`}>
+          <Link href="/partner" className={`block px-3 py-2 rounded-sm text-base font-medium ${location === '/partner' ? 'text-voro-red' : 'text-voro-white'}`}>
             Partner With Us
           </Link>
           
