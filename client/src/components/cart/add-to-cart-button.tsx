@@ -83,11 +83,11 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
   return (
     <Button
-      variant={variant}
+      variant={variant === 'default' ? 'default' : variant}
       size={size}
       onClick={handleAddToCart}
       disabled={isAdding}
-      className={fullWidth ? 'w-full' : ''}
+      className={`${fullWidth ? 'w-full' : ''} ${variant === 'default' ? 'bg-gradient hover:opacity-90 text-white' : ''}`}
     >
       {isAdding ? (
         <>

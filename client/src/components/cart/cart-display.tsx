@@ -78,9 +78,8 @@ export const CartDisplay: React.FC<CartDisplayProps> = ({
             <ShoppingCart className="h-12 w-12 mb-3 text-muted-foreground/50" />
             <p>Your cart is empty</p>
             <Button 
-              variant="link" 
+              className="mt-2 bg-gradient hover:opacity-90 text-white"
               onClick={() => setLocation('/designer')}
-              className="mt-2"
             >
               Start designing
             </Button>
@@ -99,7 +98,7 @@ export const CartDisplay: React.FC<CartDisplayProps> = ({
               <ShoppingCart className="mr-2 h-5 w-5" />
               Your Cart
             </CardTitle>
-            <Badge variant="secondary">
+            <Badge className="bg-gradient text-white">
               {cart.length} {cart.length === 1 ? 'item' : 'items'}
             </Badge>
           </div>
@@ -160,7 +159,7 @@ export const CartDisplay: React.FC<CartDisplayProps> = ({
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="font-medium text-gradient">${(item.price * item.quantity).toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
                 {compact && (
                   <Button
@@ -212,7 +211,7 @@ export const CartDisplay: React.FC<CartDisplayProps> = ({
             
             <div className="flex justify-between font-medium text-base">
               <span>Total</span>
-              <span>${priceBreakdown.grandTotal.toFixed(2)}</span>
+              <span className="text-gradient font-bold">${priceBreakdown.grandTotal.toFixed(2)}</span>
             </div>
           </div>
         )}
@@ -230,7 +229,7 @@ export const CartDisplay: React.FC<CartDisplayProps> = ({
       {showCheckoutButton && (
         <CardFooter className="pt-2">
           <Button
-            className="w-full"
+            className="w-full bg-gradient hover:opacity-90 text-white"
             onClick={handleCheckout}
           >
             <CreditCard className="mr-2 h-4 w-4" />
