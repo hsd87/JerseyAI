@@ -69,7 +69,7 @@ export default function DesignerPage() {
                 <span className="text-sm text-gray-600">Designs left this month:</span>
                 <div className="flex items-center space-x-1">
                   {Array.from({ length: Math.min(user.remainingDesigns || 0, 6) }).map((_, i) => (
-                    <div key={i} className="w-3 h-6 bg-[#E34234] rounded-full"></div>
+                    <div key={i} className="w-3 h-6 bg-gradient rounded-full"></div>
                   ))}
                   {Array.from({ length: Math.max(0, 6 - (user.remainingDesigns || 0)) }).map((_, i) => (
                     <div key={i} className="w-3 h-6 bg-gray-200 rounded-full"></div>
@@ -89,7 +89,7 @@ export default function DesignerPage() {
               {/* Step 1 */}
               <div className="flex flex-col items-center">
                 <div 
-                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 1 ? 'bg-[#E34234]' : 'bg-gray-200'} rounded-full ${currentStep >= 1 ? 'text-white' : 'text-gray-600'} font-bold cursor-pointer`}
+                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 1 ? 'bg-gradient' : 'bg-gray-200'} rounded-full ${currentStep >= 1 ? 'text-white' : 'text-gray-600'} font-bold cursor-pointer`}
                   onClick={() => hasGenerated && setCurrentStep(1)}
                 >1</div>
                 <p className={`mt-2 text-xs font-medium ${currentStep >= 1 ? 'text-gray-900' : 'text-gray-500'}`}>Design</p>
@@ -97,7 +97,7 @@ export default function DesignerPage() {
               {/* Step 2 */}
               <div className="flex flex-col items-center">
                 <div 
-                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 2 ? 'bg-[#E34234]' : 'bg-gray-200'} rounded-full ${currentStep >= 2 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
+                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 2 ? 'bg-gradient' : 'bg-gray-200'} rounded-full ${currentStep >= 2 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
                   onClick={() => hasGenerated && setCurrentStep(2)}
                 >2</div>
                 <p className={`mt-2 text-xs font-medium ${currentStep >= 2 ? 'text-gray-900' : 'text-gray-500'}`}>Customize</p>
@@ -105,7 +105,7 @@ export default function DesignerPage() {
               {/* Step 3 */}
               <div className="flex flex-col items-center">
                 <div 
-                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 3 ? 'bg-[#E34234]' : 'bg-gray-200'} rounded-full ${currentStep >= 3 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
+                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 3 ? 'bg-gradient' : 'bg-gray-200'} rounded-full ${currentStep >= 3 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
                   onClick={() => hasGenerated && setCurrentStep(3)}
                 >3</div>
                 <p className={`mt-2 text-xs font-medium ${currentStep >= 3 ? 'text-gray-900' : 'text-gray-500'}`}>Order Details</p>
@@ -113,7 +113,7 @@ export default function DesignerPage() {
               {/* Step 4 */}
               <div className="flex flex-col items-center">
                 <div 
-                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 4 ? 'bg-[#E34234]' : 'bg-gray-200'} rounded-full ${currentStep >= 4 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
+                  className={`flex items-center justify-center w-10 h-10 ${currentStep >= 4 ? 'bg-gradient' : 'bg-gray-200'} rounded-full ${currentStep >= 4 ? 'text-white' : 'text-gray-600'} font-medium cursor-pointer`}
                   onClick={() => hasGenerated && setCurrentStep(4)}
                 >4</div>
                 <p className={`mt-2 text-xs font-medium ${currentStep >= 4 ? 'text-gray-900' : 'text-gray-500'}`}>Checkout</p>
