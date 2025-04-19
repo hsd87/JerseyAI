@@ -3,6 +3,8 @@ import strikerJersey from "@assets/a-photograph-of-a-folded-soccer-jersey-r_0AV8
 import wildcatsJersey from "@assets/a-photograph-of-a-pristine-basketball-je_kvEtDjqaTo-9k79mDc78tw_ihZ2S4PmQwaRA-ySNHbtEA.png";
 import hurricanesJersey from "@assets/a-photograph-of-a-pristine-cricket-jerse_pk3z3oeyQPefT1snkaEZvQ_GYFy7kXwRnW2vAWCM8Sh_w.png";
 import unitedJersey from "@assets/a-photograph-of-a-soccer-jersey-artfully_6b4hrCVJT3mUFCzCtClxog_jOnJhKB4QJSgxjghY_ffmw.png";
+import neonRaidersJersey from "@assets/a-photograph-of-a-sleek-esports-jersey-p_nhwFplkoQiOKywaTaeSe_Q_fOurUL7_Reqq5gzDlOUftw.png";
+import esportJersey from "@assets/a-photograph-of-a-sleek-esports-jersey-p_hJOH-iR6QQ6rjqhYFZw0wg_fOurUL7_Reqq5gzDlOUftw.png";
 
 interface JerseyScrollGalleryProps {
   jerseyUrls: string[];
@@ -30,24 +32,32 @@ const JerseyScrollGallery: React.FC<JerseyScrollGalleryProps> = ({
     { 
       src: unitedJersey, 
       alt: "United red soccer jersey" 
+    },
+    { 
+      src: neonRaidersJersey, 
+      alt: "Neon Raiders esports jersey in black and pink" 
+    },
+    { 
+      src: esportJersey, 
+      alt: "Esports jersey with pink number 13" 
     }
   ];
 
   return (
-    <div className="w-full max-w-screen py-8">
-      <div className="px-4 md:px-8">
+    <div className="w-full max-w-screen py-4">
+      <div className="px-2 md:px-4">
         <div 
-          className="flex overflow-x-auto whitespace-nowrap snap-x gap-6 md:gap-8 pb-6 no-scrollbar"
+          className="flex overflow-x-auto whitespace-nowrap snap-x gap-3 md:gap-4 pb-4 no-scrollbar"
         >
           {highQualityJerseys.map((jersey, index) => (
             <div 
               key={index} 
-              className="snap-start flex-shrink-0 w-[280px] md:w-[360px]"
+              className="snap-start flex-shrink-0 w-[240px] md:w-[300px]"
             >
               <img 
                 src={jersey.src} 
                 alt={jersey.alt}
-                className="w-full h-auto object-contain rounded-xl shadow-md transition-transform hover:scale-[1.02]"
+                className="w-full h-auto object-contain rounded-sm shadow-sm transition-transform hover:scale-[1.01]"
                 loading="lazy"
               />
             </div>
