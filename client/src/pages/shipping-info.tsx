@@ -65,7 +65,6 @@ export default function ShippingInfoPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { 
-    getCartItems, 
     priceBreakdown, 
     orderDetails, 
     updateOrder
@@ -78,9 +77,6 @@ export default function ShippingInfoPage() {
   const [shippingPrice, setShippingPrice] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const [finalTotal, setFinalTotal] = useState(0);
-  
-  // Get cart items directly
-  const cart = getCartItems();
   
   // Customer info form
   const form = useForm<z.infer<typeof customerInfoSchema>>({
@@ -134,6 +130,10 @@ export default function ShippingInfoPage() {
 
   // Enhanced authentication check
   useEffect(() => {
+    // Get items and addOns directly from the store
+    const { items, addOns } = useOrderStore();
+    const hasCartItems = (items && items.length > 0) || (addOns && addOns.length > 0);
+    
     if (!user) {
       console.log('User authentication check failed');
       
@@ -147,7 +147,7 @@ export default function ShippingInfoPage() {
     }
     
     // Check for empty cart
-    if (!cart || cart.length === 0) {
+    if (!hasCartItems) {
       console.log('Empty cart detected, redirecting to designer');
       toast({
         title: 'Empty Cart',
@@ -170,7 +170,7 @@ export default function ShippingInfoPage() {
       
       setTimeout(() => setLocation('/designer'), 500);
     }
-  }, [user, cart, priceBreakdown, setLocation, toast]);
+  }, [user, priceBreakdown, setLocation, toast]);
 
   // Calculate shipping options based on address
   const calculateShippingOptions = async () => {
@@ -184,8 +184,12 @@ export default function ShippingInfoPage() {
     setCalculatingShipping(true);
     
     try {
+      // Get items directly from the store
+      const { items, addOns } = useOrderStore();
+      const allItems = [...items, ...addOns];
+      
       // Convert cart items to the format expected by the shipping API
-      const itemsForShipping = cart.map(item => ({
+      const itemsForShipping = allItems.map(item => ({
         quantity: item.quantity || 1,
         size: item.size
       }));
@@ -344,11 +348,18 @@ export default function ShippingInfoPage() {
 
   // Render cart items
   const renderCartItems = () => {
-    if (!cart || cart.length === 0) return <p>No items in cart</p>;
+    // Use items directly from the store instead of getCartItems() which has a different format
+    const { items, addOns } = useOrderStore();
+    
+    if ((!items || items.length === 0) && (!addOns || addOns.length === 0)) {
+      return <p>No items in cart</p>;
+    }
+    
+    const allItems = [...items, ...addOns];
     
     return (
       <div className="space-y-4">
-        {cart.map((item, index) => (
+        {allItems.map((item, index) => (
           <div key={index} className="flex justify-between items-center py-2 border-b">
             <div className="flex items-center gap-3">
               <div className="bg-muted w-12 h-12 rounded-md flex items-center justify-center">
@@ -357,11 +368,11 @@ export default function ShippingInfoPage() {
               <div>
                 <p className="font-medium">{item.name || `${item.type}`}</p>
                 <p className="text-sm text-muted-foreground">
-                  {item.gender} / {item.size} / Qty: {item.quantity}
+                  {item.gender} / {item.size} / Qty: {item.quantity || 1}
                 </p>
               </div>
             </div>
-            <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+            <p className="font-medium">${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
           </div>
         ))}
       </div>
