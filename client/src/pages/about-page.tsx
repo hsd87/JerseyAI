@@ -94,13 +94,13 @@ const AboutPage: React.FC = () => {
                   >
                     <ul className="space-y-3">
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">V</span>
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">V</span>
                         <div>
                           <strong className="font-medium">Velocity:</strong> We move quickly and efficiently, understanding that time is valuable for our customers.
                         </div>
                       </li>
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">O</span>
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">O</span>
                         <div>
                           <strong className="font-medium">Originality:</strong> We embrace uniqueness and creativity, helping teams express their distinct identity.
                         </div>
@@ -114,13 +114,13 @@ const AboutPage: React.FC = () => {
                   >
                     <ul className="space-y-3">
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">R</span>
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">R</span>
                         <div>
                           <strong className="font-medium">Resilience:</strong> We build durable products and relationships, standing by our work for the long run.
                         </div>
                       </li>
                       <li className="flex items-start">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">O</span>
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">O</span>
                         <div>
                           <strong className="font-medium">Ownership:</strong> We take responsibility for our platform, giving users total control over their designs.
                         </div>
@@ -150,7 +150,7 @@ const AboutPage: React.FC = () => {
                 </p>
                 <div className="grid grid-cols-3 gap-4 mt-6">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-voro-red/10 text-voro-red mb-2">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-voro-red/10 text-voro-red mb-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
@@ -159,7 +159,7 @@ const AboutPage: React.FC = () => {
                     <div className="font-medium">Athletes</div>
                   </div>
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-voro-red/10 text-voro-red mb-2">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-voro-red/10 text-voro-red mb-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 20h9"></path>
                         <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
@@ -168,7 +168,7 @@ const AboutPage: React.FC = () => {
                     <div className="font-medium">Designers</div>
                   </div>
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-voro-red/10 text-voro-red mb-2">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-voro-red/10 text-voro-red mb-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                         <line x1="8" y1="21" x2="16" y2="21"></line>
