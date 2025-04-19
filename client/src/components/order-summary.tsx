@@ -68,6 +68,7 @@ export default function OrderSummary({
           // Log cart items to debug
           console.log('Calculate price for cart items:', cartItems);
           
+          // Convert the items to the expected CartItem format if needed
           const breakdown = await calculatePrice(cartItems);
           
           if (breakdown) {
