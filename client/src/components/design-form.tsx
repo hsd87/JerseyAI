@@ -694,7 +694,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           <div className="mt-6">
             <Button
               type="submit"
-              className="w-full bg-primary text-white py-3 px-4 rounded-full font-medium hover:bg-primary/90 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              className="w-full bg-[#E34234] text-white py-3 px-4 rounded-full font-medium hover:bg-opacity-80 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E34234]"
               disabled={isGenerating || !user || (!subscription.isSubscribed && subscription.remainingDesigns <= 0)}
             >
               {isGenerating ? (
@@ -722,7 +722,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
               </p>
             ) : (
               <p className="text-xs text-gray-500 mt-2 text-center">
-                <Link href="/auth" className="text-black hover:text-[#39FF14]">
+                <Link href="/auth" className="text-black hover:text-[#E34234]">
                   Sign in
                 </Link> to use the design generator
               </p>
@@ -739,7 +739,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="mt-2"
+                  className="mt-2 rounded-full"
                   onClick={() => setShowRetryDialog(true)}
                 >
                   <RotateCw className="h-4 w-4 mr-1" />
@@ -754,7 +754,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 mt-6">
               <div className="flex flex-col sm:flex-row sm:items-start">
                 <div className="flex-shrink-0 mb-3 sm:mb-0">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <div className="w-8 h-8 rounded-full bg-[#E34234]/10 flex items-center justify-center text-[#E34234]">
                     <i className="fas fa-crown"></i>
                   </div>
                 </div>
@@ -766,7 +766,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                   <div className="mt-3">
                     <Link 
                       href="/subscribe" 
-                      className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-full transition-colors"
+                      className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-[#E34234] hover:bg-opacity-80 rounded-full transition-colors"
                     >
                       $9/month - Subscribe <i className="fas fa-arrow-right ml-2"></i>
                     </Link>
@@ -797,8 +797,8 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleRetry}>
+              <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleRetry} className="bg-[#E34234] hover:bg-opacity-80 rounded-full">
                 <RotateCw className="mr-2 h-4 w-4" />
                 Retry Generation
               </AlertDialogAction>
@@ -824,10 +824,11 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => setShowDiagnosticInfo(false)}>Close</Button>
+                <Button onClick={() => setShowDiagnosticInfo(false)} className="bg-[#E34234] hover:bg-opacity-80">Close</Button>
                 {diagnosticData && (
                   <Button 
                     variant="outline" 
+                    className="rounded-full"
                     onClick={() => {
                       // Copy to clipboard
                       navigator.clipboard.writeText(JSON.stringify(diagnosticData, null, 2))
