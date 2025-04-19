@@ -67,7 +67,9 @@ export default function ShippingInfoPage() {
   const { 
     priceBreakdown, 
     orderDetails, 
-    updateOrder
+    updateOrder,
+    items,
+    addOns
   } = useOrderStore();
   
   const [loading, setLoading] = useState(false);
@@ -128,8 +130,7 @@ export default function ShippingInfoPage() {
     }
   }, [selectedShippingOption, shippingOptions, subtotal]);
 
-  // Get items and addOns directly from the store
-  const { items, addOns } = useOrderStore();
+  // Check if cart has items
   const hasCartItems = (items && items.length > 0) || (addOns && addOns.length > 0);
   
   // Enhanced authentication check
