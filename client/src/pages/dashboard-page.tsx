@@ -209,20 +209,20 @@ export default function DashboardPage() {
           </div>
 
           <Tabs defaultValue="designs" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-8 bg-[#F5F5F7] p-1 rounded-lg border border-[#E8E8ED]">
-              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#1D1D1F] data-[state=active]:shadow-sm text-[#86868B] data-[state=active]:font-medium" value="designs">My Designs</TabsTrigger>
-              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#1D1D1F] data-[state=active]:shadow-sm text-[#86868B] data-[state=active]:font-medium" value="team">Team Details</TabsTrigger>
-              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#1D1D1F] data-[state=active]:shadow-sm text-[#86868B] data-[state=active]:font-medium" value="orders">Track Orders</TabsTrigger>
-              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#1D1D1F] data-[state=active]:shadow-sm text-[#86868B] data-[state=active]:font-medium" value="addons">Add-ons</TabsTrigger>
-              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#1D1D1F] data-[state=active]:shadow-sm text-[#86868B] data-[state=active]:font-medium" value="favorites">Favorites</TabsTrigger>
-              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#1D1D1F] data-[state=active]:shadow-sm text-[#86868B] data-[state=active]:font-medium" value="subscription">Subscription</TabsTrigger>
+            <TabsList className="mb-8 bg-[#eeeeee] p-1 rounded-md border border-[#979797]">
+              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#000000] data-[state=active]:shadow-sm text-[#666666] data-[state=active]:font-medium" value="designs">My Designs</TabsTrigger>
+              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#000000] data-[state=active]:shadow-sm text-[#666666] data-[state=active]:font-medium" value="team">Team Details</TabsTrigger>
+              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#000000] data-[state=active]:shadow-sm text-[#666666] data-[state=active]:font-medium" value="orders">Track Orders</TabsTrigger>
+              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#000000] data-[state=active]:shadow-sm text-[#666666] data-[state=active]:font-medium" value="addons">Add-ons</TabsTrigger>
+              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#000000] data-[state=active]:shadow-sm text-[#666666] data-[state=active]:font-medium" value="favorites">Favorites</TabsTrigger>
+              <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#000000] data-[state=active]:shadow-sm text-[#666666] data-[state=active]:font-medium" value="subscription">Subscription</TabsTrigger>
             </TabsList>
 
             {/* Designs Tab */}
             <TabsContent value="designs" className="space-y-4">
               {isLoadingDesigns ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#0071E3]" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#0088cc]" />
                 </div>
               ) : designsError ? (
                 <div className="text-center py-12">
@@ -231,8 +231,8 @@ export default function DashboardPage() {
               ) : designs && designs.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {designs.map((design) => (
-                    <Card key={design.id} className="overflow-hidden border border-[#E8E8ED] rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                      <div className="relative h-52 bg-[#F5F5F7]">
+                    <Card key={design.id} className="overflow-hidden border border-[#979797] rounded-md shadow-sm hover:shadow-md transition-shadow">
+                      <div className="relative h-52 bg-[#eeeeee]">
                         {design.frontImageUrl ? (
                           <img
                             src={design.frontImageUrl}
@@ -241,35 +241,35 @@ export default function DashboardPage() {
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">
-                            <p className="text-[#86868B]">No image available</p>
+                            <p className="text-[#666666]">No image available</p>
                           </div>
                         )}
                         <button
                           onClick={() => handleToggleFavorite(design)}
                           className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-colors"
                         >
-                          <i className={`fas fa-heart ${design.isFavorite ? 'text-[#0071E3]' : 'text-[#86868B]'}`}></i>
+                          <i className={`fas fa-heart ${design.isFavorite ? 'text-[#0088cc]' : 'text-[#666666]'}`}></i>
                         </button>
                       </div>
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-lg font-medium text-[#1D1D1F]">
+                        <CardTitle className="text-lg font-medium text-[#000000]">
                           {design.sport.charAt(0).toUpperCase() + design.sport.slice(1)} Kit
                         </CardTitle>
-                        <CardDescription className="text-xs text-[#86868B]">
+                        <CardDescription className="text-xs text-[#666666]">
                           Created on {formatDate(design.createdAt)}
                         </CardDescription>
                       </CardHeader>
                       <CardFooter className="flex justify-between pt-2">
                         <Button
                           variant="outline"
-                          className="text-sm rounded-lg border-[#E8E8ED] text-[#1D1D1F] hover:text-[#0071E3] hover:border-[#0071E3]/30 hover:bg-[#0071E3]/5"
+                          className="text-sm rounded-md border-[#979797] text-[#000000] hover:text-[#0088cc] hover:border-[#0088cc]/30 hover:bg-[#0088cc]/5"
                           onClick={() => handleEditDesign(design)}
                         >
                           <i className="fas fa-pencil-alt mr-1"></i> Edit
                         </Button>
                         <Button
                           variant="ghost"
-                          className="text-sm rounded-lg text-[#86868B] hover:text-red-600 hover:bg-red-50"
+                          className="text-sm rounded-md text-[#666666] hover:text-red-600 hover:bg-red-50"
                           onClick={() => handleDeleteDesign(design.id)}
                         >
                           <i className="fas fa-trash mr-1"></i> Delete
@@ -279,14 +279,14 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-[#E8E8ED]">
-                  <div className="mx-auto w-16 h-16 bg-[#F5F5F7] rounded-full flex items-center justify-center mb-4">
-                    <i className="fas fa-tshirt text-[#86868B] text-xl"></i>
+                <div className="text-center py-12 bg-white rounded-md shadow-sm border border-[#979797]">
+                  <div className="mx-auto w-16 h-16 bg-[#eeeeee] rounded-full flex items-center justify-center mb-4">
+                    <i className="fas fa-tshirt text-[#666666] text-xl"></i>
                   </div>
-                  <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">No designs yet</h3>
-                  <p className="text-[#86868B] mb-6">Create your first custom jersey design</p>
+                  <h3 className="text-lg font-medium text-[#000000] mb-2">No designs yet</h3>
+                  <p className="text-[#666666] mb-6">Create your first custom jersey design</p>
                   <Link href="/designer">
-                    <Button className="bg-[#0071E3] hover:bg-[#0077ED] text-white font-medium rounded-lg transition-colors">
+                    <Button className="bg-[#0088cc] hover:bg-[#0077bb] text-white font-medium rounded-md transition-colors">
                       <i className="fas fa-plus mr-2"></i> Create Design
                     </Button>
                   </Link>
