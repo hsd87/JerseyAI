@@ -222,7 +222,7 @@ export default function DashboardPage() {
             <TabsContent value="designs" className="space-y-4">
               {isLoadingDesigns ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#0071E3]" />
                 </div>
               ) : designsError ? (
                 <div className="text-center py-12">
@@ -298,55 +298,55 @@ export default function DashboardPage() {
             <TabsContent value="addons" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Available Add-ons</CardTitle>
-                  <CardDescription>Enhance your jersey design with premium add-ons</CardDescription>
+                  <CardTitle className="text-[#1D1D1F]">Available Add-ons</CardTitle>
+                  <CardDescription className="text-[#86868B]">Enhance your jersey design with premium add-ons</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="h-40 bg-gray-100 flex items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div className="border border-[#E8E8ED] rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-[#F5F5F7] flex items-center justify-center">
+                        <svg className="w-12 h-12 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-medium mb-1">Premium Name Badge</h3>
-                        <p className="text-sm text-gray-500 mb-3">High-quality embroidered name badge</p>
+                        <h3 className="font-medium mb-1 text-[#1D1D1F]">Premium Name Badge</h3>
+                        <p className="text-sm text-[#86868B] mb-3">High-quality embroidered name badge</p>
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-gray-900">$12.99</span>
-                          <Button size="sm" variant="outline">Add to Cart</Button>
+                          <span className="font-medium text-[#1D1D1F]">$12.99</span>
+                          <Button size="sm" variant="outline" className="rounded-lg border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30">Add to Cart</Button>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="h-40 bg-gray-100 flex items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div className="border border-[#E8E8ED] rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-[#F5F5F7] flex items-center justify-center">
+                        <svg className="w-12 h-12 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
                         </svg>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-medium mb-1">Team Logo Patch</h3>
-                        <p className="text-sm text-gray-500 mb-3">Custom embroidered team logo</p>
+                        <h3 className="font-medium mb-1 text-[#1D1D1F]">Team Logo Patch</h3>
+                        <p className="text-sm text-[#86868B] mb-3">Custom embroidered team logo</p>
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-gray-900">$15.99</span>
-                          <Button size="sm" variant="outline">Add to Cart</Button>
+                          <span className="font-medium text-[#1D1D1F]">$15.99</span>
+                          <Button size="sm" variant="outline" className="rounded-lg border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30">Add to Cart</Button>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="h-40 bg-gray-100 flex items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div className="border border-[#E8E8ED] rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-40 bg-[#F5F5F7] flex items-center justify-center">
+                        <svg className="w-12 h-12 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                         </svg>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-medium mb-1">Performance Fabric Upgrade</h3>
-                        <p className="text-sm text-gray-500 mb-3">Premium breathable material</p>
+                        <h3 className="font-medium mb-1 text-[#1D1D1F]">Performance Fabric Upgrade</h3>
+                        <p className="text-sm text-[#86868B] mb-3">Premium breathable material</p>
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-gray-900">$9.99</span>
-                          <Button size="sm" variant="outline">Add to Cart</Button>
+                          <span className="font-medium text-[#1D1D1F]">$9.99</span>
+                          <Button size="sm" variant="outline" className="rounded-lg border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30">Add to Cart</Button>
                         </div>
                       </div>
                     </div>
@@ -441,17 +441,17 @@ export default function DashboardPage() {
                       <h2 className="text-xl font-semibold">Saved for Later</h2>
                       <div className="space-y-4">
                         {orders.filter(order => order.status === 'draft').map((order) => (
-                          <Card key={order.id} className="overflow-hidden border border-gray-200 border-l-4 border-l-purple-400">
-                            <CardHeader className="bg-gray-50 border-b border-gray-200 py-4">
+                          <Card key={order.id} className="overflow-hidden border border-[#E8E8ED] border-l-4 border-l-[#0071E3]">
+                            <CardHeader className="bg-[#F5F5F7] border-b border-[#E8E8ED] py-4">
                               <div className="flex justify-between items-center">
                                 <div>
-                                  <CardTitle className="text-base font-medium">Saved Order #{order.id}</CardTitle>
-                                  <CardDescription className="text-xs">
+                                  <CardTitle className="text-base font-medium text-[#1D1D1F]">Saved Order #{order.id}</CardTitle>
+                                  <CardDescription className="text-xs text-[#86868B]">
                                     Saved on {formatDate(order.createdAt)}
                                   </CardDescription>
                                 </div>
                                 <div>
-                                  <Badge className={getStatusColor(order.status)}>
+                                  <Badge className="bg-[#0071E3]/10 text-[#0071E3] hover:bg-[#0071E3]/20">
                                     Draft
                                   </Badge>
                                 </div>
@@ -460,27 +460,27 @@ export default function DashboardPage() {
                             <CardContent className="py-4">
                               <div className="flex flex-col md:flex-row justify-between gap-4">
                                 <div className="space-y-2">
-                                  <h3 className="text-sm font-medium text-gray-700">Order Details</h3>
-                                  <div className="text-sm text-gray-600">
+                                  <h3 className="text-sm font-medium text-[#1D1D1F]">Order Details</h3>
+                                  <div className="text-sm text-[#86868B]">
                                     <p>Total Amount: {formatCurrency(order.totalAmount)}</p>
                                     <p>Sport: {order.sport}</p>
                                   </div>
                                 </div>
                                 
                                 <div className="space-y-2">
-                                  <h3 className="text-sm font-medium text-gray-700">Status</h3>
-                                  <div className="text-sm text-gray-600">
+                                  <h3 className="text-sm font-medium text-[#1D1D1F]">Status</h3>
+                                  <div className="text-sm text-[#86868B]">
                                     <p>Complete your purchase to proceed</p>
                                   </div>
                                 </div>
                               </div>
                             </CardContent>
-                            <CardFooter className="bg-gray-50 border-t border-gray-200 py-3">
+                            <CardFooter className="bg-[#F5F5F7] border-t border-[#E8E8ED] py-3">
                               <div className="flex justify-end gap-2 w-full">
                                 <Button 
                                   variant="default" 
                                   size="sm" 
-                                  className="text-xs rounded"
+                                  className="text-xs rounded-lg bg-[#0071E3] hover:bg-[#0077ED] text-white font-medium"
                                   onClick={() => handleResumeDraftOrder(order)}
                                 >
                                   <i className="fas fa-shopping-cart mr-1"></i> Complete Purchase
@@ -499,17 +499,17 @@ export default function DashboardPage() {
                       <h2 className="text-xl font-semibold">Active Orders</h2>
                       <div className="space-y-4">
                         {orders.filter(order => order.status !== 'draft').map((order) => (
-                          <Card key={order.id} className="overflow-hidden border border-gray-200">
-                            <CardHeader className="bg-gray-50 border-b border-gray-200 py-4">
+                          <Card key={order.id} className="overflow-hidden border border-[#E8E8ED]">
+                            <CardHeader className="bg-[#F5F5F7] border-b border-[#E8E8ED] py-4">
                               <div className="flex justify-between items-center">
                                 <div>
-                                  <CardTitle className="text-base font-medium">Order #{order.id}</CardTitle>
-                                  <CardDescription className="text-xs">
+                                  <CardTitle className="text-base font-medium text-[#1D1D1F]">Order #{order.id}</CardTitle>
+                                  <CardDescription className="text-xs text-[#86868B]">
                                     Placed on {formatDate(order.createdAt)}
                                   </CardDescription>
                                 </div>
                                 <div>
-                                  <Badge className={getStatusColor(order.status)}>
+                                  <Badge className="bg-[#0071E3]/10 text-[#0071E3] hover:bg-[#0071E3]/20">
                                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                   </Badge>
                                 </div>
@@ -518,8 +518,8 @@ export default function DashboardPage() {
                             <CardContent className="py-4">
                               <div className="flex flex-col md:flex-row justify-between gap-4">
                                 <div className="space-y-2">
-                                  <h3 className="text-sm font-medium text-gray-700">Order Details</h3>
-                                  <div className="text-sm text-gray-600">
+                                  <h3 className="text-sm font-medium text-[#1D1D1F]">Order Details</h3>
+                                  <div className="text-sm text-[#86868B]">
                                     <p>Total Amount: {formatCurrency(order.totalAmount)}</p>
                                     <p>Sport: {order.sport || 'Custom'}</p>
                                     <p>Items: {order.metadata?.itemCount || 1} item(s)</p>
@@ -528,8 +528,8 @@ export default function DashboardPage() {
                                 
                                 {order.shippingAddress && (
                                   <div className="space-y-2">
-                                    <h3 className="text-sm font-medium text-gray-700">Shipping Address</h3>
-                                    <div className="text-sm text-gray-600">
+                                    <h3 className="text-sm font-medium text-[#1D1D1F]">Shipping Address</h3>
+                                    <div className="text-sm text-[#86868B]">
                                       <p>{typeof order.shippingAddress === 'string' 
                                         ? order.shippingAddress 
                                         : JSON.stringify(order.shippingAddress)}</p>
@@ -539,9 +539,9 @@ export default function DashboardPage() {
                                 
                                 {order.trackingId && (
                                   <div className="space-y-2">
-                                    <h3 className="text-sm font-medium text-gray-700">Tracking</h3>
+                                    <h3 className="text-sm font-medium text-[#1D1D1F]">Tracking</h3>
                                     <div className="text-sm">
-                                      <a href={`https://track.shipment.com/${order.trackingId}`} className="text-primary hover:underline">
+                                      <a href={`https://track.shipment.com/${order.trackingId}`} className="text-[#0071E3] hover:underline">
                                         {order.trackingId}
                                       </a>
                                     </div>
@@ -549,14 +549,14 @@ export default function DashboardPage() {
                                 )}
                               </div>
                             </CardContent>
-                            <CardFooter className="bg-gray-50 border-t border-gray-200 py-3">
+                            <CardFooter className="bg-[#F5F5F7] border-t border-[#E8E8ED] py-3">
                               <div className="flex justify-end gap-2 w-full">
                                 {order.pdfUrl && (
-                                  <Button variant="outline" size="sm" className="text-xs rounded">
+                                  <Button variant="outline" size="sm" className="text-xs rounded-lg border-[#E8E8ED] text-[#1D1D1F] hover:text-[#0071E3] hover:border-[#0071E3]/30 hover:bg-[#0071E3]/5">
                                     <i className="fas fa-download mr-1"></i> Invoice
                                   </Button>
                                 )}
-                                <Button variant="outline" size="sm" className="text-xs rounded">
+                                <Button variant="outline" size="sm" className="text-xs rounded-lg border-[#E8E8ED] text-[#1D1D1F] hover:text-[#0071E3] hover:border-[#0071E3]/30 hover:bg-[#0071E3]/5">
                                   <i className="fas fa-boxes mr-1"></i> Track Order
                                 </Button>
                               </div>
@@ -586,7 +586,7 @@ export default function DashboardPage() {
             <TabsContent value="favorites" className="space-y-4">
               {isLoadingDesigns ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#0071E3]" />
                 </div>
               ) : designsError ? (
                 <div className="text-center py-12">
