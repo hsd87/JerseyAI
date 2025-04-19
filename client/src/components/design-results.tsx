@@ -121,7 +121,7 @@ export default function DesignResults() {
                 <div className="p-4">
                   <div className="flex justify-between items-center">
                     <h3 className="font-sora font-medium">
-                      {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)} Jersey - Design #{Math.floor(Math.random() * 10000)}
+                      {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)} Jersey - Design #{designId || "New"}
                     </h3>
                     <span className="text-xs border-gradient text-gradient px-2 py-1 rounded-full">Front View</span>
                   </div>
