@@ -431,7 +431,7 @@ export default function ShippingInfoPage() {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center">
               <img 
-                src="/voro-white.png" 
+                src={voroLogoWhite} 
                 alt="VORO Logo" 
                 className="h-5 md:h-6" 
               />
@@ -468,13 +468,13 @@ export default function ShippingInfoPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Designer
           </Button>
-          <h1 className="text-2xl font-bold ml-auto">Checkout</h1>
+          <h1 className="text-2xl font-bold ml-auto text-gradient">Checkout</h1>
         </div>
 
         <div className="mb-8">
           <Progress value={50} className="h-2 mb-2" />
           <div className="flex justify-between text-sm text-muted-foreground">
-            <div className="text-primary font-medium">
+            <div className="font-medium text-gradient">
               Shipping Information
             </div>
             <div>
@@ -493,7 +493,7 @@ export default function ShippingInfoPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  Your Order Summary
+                  <span className="text-gradient">Your Order Summary</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -514,7 +514,7 @@ export default function ShippingInfoPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <UserCircle2 className="mr-2 h-5 w-5" />
-                      Customer Information
+                      <span className="text-gradient">Customer Information</span>
                     </CardTitle>
                     <CardDescription>
                       Please provide your contact information for this order
@@ -585,7 +585,7 @@ export default function ShippingInfoPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <MapPin className="mr-2 h-5 w-5" />
-                      Shipping Address
+                      <span className="text-gradient">Shipping Address</span>
                     </CardTitle>
                     <CardDescription>
                       Where should we ship your order?
@@ -687,7 +687,7 @@ export default function ShippingInfoPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Truck className="mr-2 h-5 w-5" />
-                      Shipping Method
+                      <span className="text-gradient">Shipping Method</span>
                     </CardTitle>
                     <CardDescription>
                       Choose your preferred shipping method

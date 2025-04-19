@@ -70,6 +70,15 @@
 }
 
 @layer components {
+  /* Gradient Text Style */
+  .text-gradient {
+    background: linear-gradient(90deg, #FF80AB, #FF4081);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+  
   /* Layout container with proper max-width */
   .container-nike {
     @apply px-4 md:px-8 mx-auto max-w-[1440px];
