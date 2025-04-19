@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'wouter';
 import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
-import { ArrowRight } from 'lucide-react';
+import { InfoPill } from '@/components/ui/info-pill';
+import { ArrowRight, Target, Lightbulb } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
   return (
@@ -60,66 +61,72 @@ const AboutPage: React.FC = () => {
           <div className="container mx-auto px-6">
             <div className="max-w-4xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {/* Mission Card */}
-                <div className="bg-gray-50 p-8 rounded-xl shadow-sm">
-                  <h3 className="text-2xl font-heading font-bold mb-4">Our Mission</h3>
+                {/* Mission InfoPill */}
+                <InfoPill 
+                  title="Our Mission" 
+                  icon={<Target className="text-voro-red" />}
+                  className="h-full"
+                >
                   <p className="text-gray-700">
                     To enable anyone — from solo players to entire clubs — to create elite teamwear effortlessly using intelligent systems.
                   </p>
-                </div>
+                </InfoPill>
 
-                {/* Vision Card */}
-                <div className="bg-gray-50 p-8 rounded-xl shadow-sm">
-                  <h3 className="text-2xl font-heading font-bold mb-4">Our Vision</h3>
+                {/* Vision InfoPill */}
+                <InfoPill 
+                  title="Our Vision" 
+                  icon={<Lightbulb className="text-voro-red" />}
+                  className="h-full"
+                >
                   <p className="text-gray-700">
                     To be the world's most accessible and advanced custom kit platform.
                   </p>
-                </div>
+                </InfoPill>
               </div>
 
               {/* Values Section */}
               <div className="mt-16">
                 <h2 className="text-2xl md:text-3xl font-heading font-bold mb-8 text-center">Our Core Values</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="p-6 bg-gray-50 rounded-xl">
-                    <div className="h-12 w-12 rounded-full bg-voro-red/10 flex items-center justify-center mb-4">
-                      <span className="text-xl font-bold text-voro-red">V</span>
-                    </div>
-                    <h4 className="text-xl font-heading font-bold mb-2">Velocity</h4>
-                    <p className="text-gray-700">
-                      We move quickly and efficiently, understanding that time is valuable for our customers.
-                    </p>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <InfoPill
+                    title="Velocity & Originality"
+                    className="h-full"
+                  >
+                    <ul className="space-y-3">
+                      <li className="flex items-start">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">V</span>
+                        <div>
+                          <strong className="font-medium">Velocity:</strong> We move quickly and efficiently, understanding that time is valuable for our customers.
+                        </div>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">O</span>
+                        <div>
+                          <strong className="font-medium">Originality:</strong> We embrace uniqueness and creativity, helping teams express their distinct identity.
+                        </div>
+                      </li>
+                    </ul>
+                  </InfoPill>
                   
-                  <div className="p-6 bg-gray-50 rounded-xl">
-                    <div className="h-12 w-12 rounded-full bg-voro-red/10 flex items-center justify-center mb-4">
-                      <span className="text-xl font-bold text-voro-red">O</span>
-                    </div>
-                    <h4 className="text-xl font-heading font-bold mb-2">Originality</h4>
-                    <p className="text-gray-700">
-                      We embrace uniqueness and creativity, helping teams express their distinct identity.
-                    </p>
-                  </div>
-                  
-                  <div className="p-6 bg-gray-50 rounded-xl">
-                    <div className="h-12 w-12 rounded-full bg-voro-red/10 flex items-center justify-center mb-4">
-                      <span className="text-xl font-bold text-voro-red">R</span>
-                    </div>
-                    <h4 className="text-xl font-heading font-bold mb-2">Resilience</h4>
-                    <p className="text-gray-700">
-                      We build durable products and relationships, standing by our work for the long run.
-                    </p>
-                  </div>
-                  
-                  <div className="p-6 bg-gray-50 rounded-xl">
-                    <div className="h-12 w-12 rounded-full bg-voro-red/10 flex items-center justify-center mb-4">
-                      <span className="text-xl font-bold text-voro-red">O</span>
-                    </div>
-                    <h4 className="text-xl font-heading font-bold mb-2">Ownership</h4>
-                    <p className="text-gray-700">
-                      We take responsibility for our platform, giving users total control over their designs.
-                    </p>
-                  </div>
+                  <InfoPill
+                    title="Resilience & Ownership"
+                    className="h-full"
+                  >
+                    <ul className="space-y-3">
+                      <li className="flex items-start">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">R</span>
+                        <div>
+                          <strong className="font-medium">Resilience:</strong> We build durable products and relationships, standing by our work for the long run.
+                        </div>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-voro-red/10 text-voro-red font-bold text-sm mr-2 flex-shrink-0">O</span>
+                        <div>
+                          <strong className="font-medium">Ownership:</strong> We take responsibility for our platform, giving users total control over their designs.
+                        </div>
+                      </li>
+                    </ul>
+                  </InfoPill>
                 </div>
               </div>
             </div>
@@ -128,13 +135,51 @@ const AboutPage: React.FC = () => {
 
         {/* Team Section (Optional) */}
         <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-6 text-center">
-            <h2 className="text-2xl md:text-3xl font-heading font-bold mb-12">Who We Are</h2>
-            <p className="max-w-3xl mx-auto text-lg text-gray-600 mb-12">
-              VORO brings together experts in AI technology, sports apparel manufacturing, and digital design. 
-              We're a small but passionate team of athletes, designers, and technologists committed to revolutionizing 
-              how sports teams present themselves to the world.
-            </p>
+          <div className="container mx-auto px-6">
+            <h2 className="text-2xl md:text-3xl font-heading font-bold mb-8 text-center">Who We Are</h2>
+            
+            <div className="max-w-3xl mx-auto">
+              <InfoPill
+                title="Our Team"
+                className="text-center"
+              >
+                <p className="text-lg text-gray-600 mb-4">
+                  VORO brings together experts in AI technology, sports apparel manufacturing, and digital design. 
+                  We're a small but passionate team of athletes, designers, and technologists committed to revolutionizing 
+                  how sports teams present themselves to the world.
+                </p>
+                <div className="grid grid-cols-3 gap-4 mt-6">
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-voro-red/10 text-voro-red mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                    </div>
+                    <div className="font-medium">Athletes</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-voro-red/10 text-voro-red mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                    </div>
+                    <div className="font-medium">Designers</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-voro-red/10 text-voro-red mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                      </svg>
+                    </div>
+                    <div className="font-medium">Tech Experts</div>
+                  </div>
+                </div>
+              </InfoPill>
+            </div>
           </div>
         </section>
 
