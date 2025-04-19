@@ -6,9 +6,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        heading: ['Archivo', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        display: ['Oswald', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        heading: ['Space Grotesk', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['Space Grotesk', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        nike: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       borderRadius: {
         none: "0",

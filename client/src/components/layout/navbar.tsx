@@ -7,7 +7,7 @@ import { useSubscription } from "@/hooks/use-subscription-store";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import voroLogoWhite from "../../assets/voro-logo-clean.png";
 
-// Simple navbar with basic mobile menu
+// Nike-inspired navbar with clean design
 export default function Navbar() {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -47,78 +47,73 @@ export default function Navbar() {
     logoutMutation.mutate();
   };
 
+  // Nike-inspired styling - clean, minimal, and focused
   return (
-    <nav className={`bg-black sticky top-0 z-50 ${scrolled ? 'shadow-sm' : ''} transition-shadow duration-300`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-10">
-        <div className="flex justify-between items-center h-[70px]">
+    <nav className={`bg-[var(--nike-black)] sticky top-0 z-50 ${scrolled ? 'shadow-nike' : ''} transition-all duration-300`}>
+      <div className="max-w-[1440px] mx-auto px-4 md:px-8">
+        <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
-                <img src={voroLogoWhite} alt="VORO Logo" className="h-8 md:h-10" />
+                <img src={voroLogoWhite} alt="VORO Logo" className="h-6 md:h-8" />
               </Link>
             </div>
           </div>
           
           <div className="hidden md:block">
-            <div className="ml-4 flex items-center space-x-6">
-              <Link href="/" className={`nav-item ${location === '/' ? 'text-[#E34234]' : 'text-white'}`}>
-                HOME
+            <div className="ml-8 flex items-center space-x-8">
+              <Link href="/" className={`nav-item-nike ${location === '/' ? 'nav-item-nike-active' : ''}`}>
+                Men
               </Link>
-              <Link href="/designer" className={`nav-item ${location === '/designer' ? 'text-[#E34234]' : 'text-white'}`}>
-                AI DESIGNER
+              <Link href="/designer" className={`nav-item-nike ${location === '/designer' ? 'nav-item-nike-active' : ''}`}>
+                Design
               </Link>
-              <Link href="/how-it-works" className={`nav-item ${location === '/how-it-works' ? 'text-[#E34234]' : 'text-white'}`}>
-                HOW IT WORKS
+              <Link href="/how-it-works" className={`nav-item-nike ${location === '/how-it-works' ? 'nav-item-nike-active' : ''}`}>
+                How It Works
               </Link>
-              <Link href="/about" className={`nav-item ${location === '/about' ? 'text-[#E34234]' : 'text-white'}`}>
-                ABOUT VORO
-              </Link>
-              <Link href="/faq" className={`nav-item ${location === '/faq' ? 'text-[#E34234]' : 'text-white'}`}>
-                FAQS & HELP
-              </Link>
-              <Link href="/partner" className={`nav-item ${location === '/partner' ? 'text-[#E34234]' : 'text-white'}`}>
-                PARTNER WITH US
+              <Link href="/partner" className={`nav-item-nike ${location === '/partner' ? 'nav-item-nike-active' : ''}`}>
+                Teams
               </Link>
               
               {user ? (
                 <>
                   {subscription.isSubscribed ? (
-                    <Badge className="bg-[#E34234]/10 text-[#E34234] border-[#E34234] rounded-full flex items-center gap-1">
+                    <Badge className="bg-[var(--nike-accent)] text-white rounded-none px-2 py-0.5 text-xs flex items-center gap-1 h-5">
                       <CrownIcon className="h-3 w-3" />
                       <span>PRO</span>
                     </Badge>
                   ) : (
-                    <Link href="/subscribe" className="text-[#E34234] border border-[#E34234]/30 bg-[#E34234]/5 px-4 py-1.5 rounded-full text-xs font-medium hover:bg-[#E34234]/10 transition-colors flex items-center gap-1">
+                    <Link href="/subscribe" className="text-[var(--nike-accent)] px-3 py-1 text-sm font-medium hover:underline transition-all flex items-center gap-1">
                       <CrownIcon className="h-3 w-3" />
-                      <span>UPGRADE</span>
+                      <span>Upgrade</span>
                     </Link>
                   )}
-                  <Link href="/dashboard" className="bg-[#E34234] text-white px-4 py-1.5 rounded-full text-xs font-medium hover:bg-[#E34234]/90 transition-colors">
-                    DASHBOARD
+                  <Link href="/dashboard" className="bg-white text-[var(--nike-black)] px-4 py-2 h-9 text-sm font-medium hover:bg-[#E5E5E5] transition-colors flex items-center">
+                    Dashboard
                   </Link>
                   {user.role === 'admin' && (
-                    <Link href="/admin" className="bg-gray-800 text-white px-4 py-1.5 rounded-full text-xs font-medium hover:bg-gray-700 transition-colors">
-                      ADMIN
+                    <Link href="/admin" className="bg-[var(--nike-gray-dark)] text-white px-4 py-2 h-9 text-sm font-medium hover:bg-[#656565] transition-colors flex items-center">
+                      Admin
                     </Link>
                   )}
                 </>
               ) : (
-                <Link href="/auth" className="bg-[#E34234] text-white px-4 py-1.5 rounded-full text-xs font-medium hover:bg-[#E34234]/90 transition-colors">
-                  SIGN IN
+                <Link href="/auth" className="bg-white text-[var(--nike-black)] px-4 py-2 h-9 text-sm font-medium hover:bg-[#E5E5E5] transition-colors flex items-center">
+                  Join Us
                 </Link>
               )}
             </div>
           </div>
           
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-3">
+          <div className="md:hidden flex items-center space-x-4">
             <div className="relative">
               <CartDrawer />
             </div>
             
             <button 
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-1.5 rounded-full text-white hover:text-[#E34234] focus:outline-none transition-colors"
+              className="inline-flex items-center justify-center p-2 text-white hover:text-[var(--nike-gray-medium)] focus:outline-none transition-colors"
               aria-expanded={isMenuOpen}
             >
               <span className="sr-only">{isMenuOpen ? 'Close menu' : 'Open menu'}</span>
@@ -130,74 +125,83 @@ export default function Navbar() {
             </button>
           </div>
           
-          <div className="hidden md:flex items-center space-x-5">
-            <button className="p-1.5 rounded-full text-white hover:text-[#E34234] focus:outline-none transition-colors">
-              <span className="sr-only">Dark mode</span>
-              <Moon className="h-4 w-4" />
-            </button>
-            
+          <div className="hidden md:flex items-center space-x-6">
             <div className="relative">
               <CartDrawer />
             </div>
             
-            {user && (
+            {user ? (
               <div className="relative">
                 <button 
                   onClick={handleLogout}
-                  className="p-1.5 rounded-full text-white hover:text-[#E34234] focus:outline-none transition-colors relative"
+                  className="p-2 text-white hover:text-[var(--nike-gray-medium)] focus:outline-none transition-colors relative"
                   aria-label="User account and settings"
                 >
                   <span className="sr-only">Logout</span>
-                  <UserCircle className="h-4 w-4" />
-                  <span className="absolute top-0 right-0 block h-1.5 w-1.5 rounded-full bg-[#E34234] transform translate-x-1 -translate-y-1"></span>
+                  <User className="h-5 w-5" />
                 </button>
               </div>
+            ) : (
+              <Link 
+                href="/auth"
+                className="p-2 text-white hover:text-[var(--nike-gray-medium)] focus:outline-none transition-colors"
+              >
+                <User className="h-5 w-5" />
+              </Link>
             )}
           </div>
         </div>
       </div>
       
-      {/* Basic Mobile menu dropdown */}
-      <div className={`md:hidden bg-black border-t border-gray-800 ${isMenuOpen ? 'block' : 'hidden'}`}>
-        <div className="px-6 pt-3 pb-4 space-y-2">
-          <Link href="/" className={`block px-4 py-2 rounded-full text-base font-medium ${location === '/' ? 'text-[#E34234]' : 'text-white'}`}>
-            HOME
+      {/* Nike-style mobile menu - clean, minimal */}
+      <div 
+        className={`md:hidden bg-[var(--nike-black)] border-t border-[rgba(255,255,255,0.1)] ${isMenuOpen ? 'animate-slide-up opacity-100' : 'opacity-0 pointer-events-none'} transition-all duration-300`}
+        style={{ height: isMenuOpen ? 'auto' : 0 }}
+      >
+        <div className="px-6 py-6 space-y-4">
+          <Link href="/" className={`block py-2 text-base font-normal ${location === '/' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
+            Men
           </Link>
-          <Link href="/designer" className={`block px-4 py-2 rounded-full text-base font-medium ${location === '/designer' ? 'text-[#E34234]' : 'text-white'}`}>
-            AI DESIGNER
+          <Link href="/designer" className={`block py-2 text-base font-normal ${location === '/designer' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
+            Design
           </Link>
-          <Link href="/how-it-works" className={`block px-4 py-2 rounded-full text-base font-medium ${location === '/how-it-works' ? 'text-[#E34234]' : 'text-white'}`}>
-            HOW IT WORKS
+          <Link href="/how-it-works" className={`block py-2 text-base font-normal ${location === '/how-it-works' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
+            How It Works
           </Link>
-          <Link href="/about" className={`block px-4 py-2 rounded-full text-base font-medium ${location === '/about' ? 'text-[#E34234]' : 'text-white'}`}>
-            ABOUT VORO
+          <Link href="/about" className={`block py-2 text-base font-normal ${location === '/about' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
+            About Us
           </Link>
-          <Link href="/faq" className={`block px-4 py-2 rounded-full text-base font-medium ${location === '/faq' ? 'text-[#E34234]' : 'text-white'}`}>
-            FAQS & HELP
+          <Link href="/faq" className={`block py-2 text-base font-normal ${location === '/faq' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
+            Help
           </Link>
-          <Link href="/partner" className={`block px-4 py-2 rounded-full text-base font-medium ${location === '/partner' ? 'text-[#E34234]' : 'text-white'}`}>
-            PARTNER WITH US
+          <Link href="/partner" className={`block py-2 text-base font-normal ${location === '/partner' ? 'text-white font-medium' : 'text-[var(--nike-gray-medium)]'}`}>
+            Team Orders
           </Link>
           
-          {user ? (
-            <>
-              <Link href="/dashboard" className="block px-4 py-2 rounded-full text-base font-semibold text-white bg-[#E34234] mt-4">
-                DASHBOARD
-              </Link>
-              {user.role === 'admin' && (
-                <Link href="/admin" className="block px-4 py-2 rounded-full text-base font-semibold bg-gray-800 text-white">
-                  ADMIN DASHBOARD
+          <div className="border-t border-[rgba(255,255,255,0.1)] pt-4 mt-4">
+            {user ? (
+              <>
+                <Link href="/dashboard" className="block py-2 text-white font-medium">
+                  Your Account
                 </Link>
-              )}
-              <button onClick={handleLogout} className="block w-full text-left px-4 py-2 rounded-full text-base font-medium text-white hover:text-[#E34234]">
-                SIGN OUT
-              </button>
-            </>
-          ) : (
-            <Link href="/auth" className="block px-4 py-2 rounded-full text-base font-semibold text-white bg-[#E34234] mt-4">
-              SIGN IN
-            </Link>
-          )}
+                {user.role === 'admin' && (
+                  <Link href="/admin" className="block py-2 text-white font-medium">
+                    Admin Dashboard
+                  </Link>
+                )}
+                <button 
+                  onClick={handleLogout} 
+                  className="block w-full text-left py-2 text-[var(--nike-gray-medium)] hover:text-white transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link href="/auth" className="block py-2 text-white font-medium">
+                Join Us
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>
