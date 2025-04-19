@@ -95,7 +95,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
   const defaultValues: Partial<DesignFormValues> = {
     sport: formData.sport || "soccer",
     kitType: formData.kitType || "jersey",
-    primaryColor: formData.primaryColor || "#0071e3",
+    primaryColor: formData.primaryColor || "#FF4081", // Using gradient primary color
     secondaryColor: formData.secondaryColor || "#ffffff",
     accentColor1: formData.accentColor1 || "#dddddd",
     accentColor2: formData.accentColor2 || "#333333",
@@ -694,7 +694,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
           <div className="mt-6">
             <Button
               type="submit"
-              className="w-full bg-[#E34234] text-white py-3 px-4 rounded-full font-medium hover:bg-opacity-80 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E34234]"
+              className="w-full bg-gradient text-white py-3 px-4 rounded-full font-medium hover:opacity-90 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gradient"
               disabled={isGenerating || !user || (!subscription.isSubscribed && subscription.remainingDesigns <= 0)}
             >
               {isGenerating ? (
@@ -722,7 +722,7 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
               </p>
             ) : (
               <p className="text-xs text-gray-500 mt-2 text-center">
-                <Link href="/auth" className="text-black hover:text-[#E34234]">
+                <Link href="/auth" className="text-black hover:text-gradient">
                   Sign in
                 </Link> to use the design generator
               </p>
