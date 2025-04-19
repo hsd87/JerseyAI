@@ -358,53 +358,53 @@ export default function DashboardPage() {
             <TabsContent value="team" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Team Details</CardTitle>
-                  <CardDescription>Manage your team roster and details</CardDescription>
+                  <CardTitle className="text-[#1D1D1F]">Team Details</CardTitle>
+                  <CardDescription className="text-[#86868B]">Manage your team roster and details</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <label htmlFor="team-name" className="block text-sm font-medium text-gray-700 mb-1">Team Name</label>
+                      <label htmlFor="team-name" className="block text-sm font-medium text-[#1D1D1F] mb-1">Team Name</label>
                       <input 
                         type="text" 
                         id="team-name" 
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full rounded-lg border border-[#E8E8ED] px-3 py-2 text-[#1D1D1F] placeholder-[#86868B] focus:outline-none focus:ring-2 focus:ring-[#0071E3] focus:border-transparent"
                         placeholder="Enter team name"
                       />
                     </div>
                     
                     <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-2">Team Members</h3>
-                      <div className="border border-gray-200 rounded-md overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
+                      <h3 className="text-sm font-medium text-[#1D1D1F] mb-2">Team Members</h3>
+                      <div className="border border-[#E8E8ED] rounded-lg overflow-hidden">
+                        <table className="min-w-full divide-y divide-[#E8E8ED]">
+                          <thead className="bg-[#F5F5F7]">
                             <tr>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Name</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Number</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Size</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Quantity</th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[#86868B] uppercase tracking-wider">Actions</th>
                             </tr>
                           </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
+                          <tbody className="bg-white divide-y divide-[#E8E8ED]">
                             <tr>
-                              <td className="px-4 py-3 text-sm text-gray-900">John Doe</td>
-                              <td className="px-4 py-3 text-sm text-gray-900">10</td>
-                              <td className="px-4 py-3 text-sm text-gray-900">M</td>
-                              <td className="px-4 py-3 text-sm text-gray-900">1</td>
-                              <td className="px-4 py-3 text-sm text-gray-900">
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">John Doe</td>
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">10</td>
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">M</td>
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">1</td>
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 rounded-full">
                                   <i className="fas fa-trash"></i>
                                 </Button>
                               </td>
                             </tr>
                             <tr>
-                              <td className="px-4 py-3 text-sm text-gray-900">Jane Smith</td>
-                              <td className="px-4 py-3 text-sm text-gray-900">7</td>
-                              <td className="px-4 py-3 text-sm text-gray-900">S</td>
-                              <td className="px-4 py-3 text-sm text-gray-900">1</td>
-                              <td className="px-4 py-3 text-sm text-gray-900">
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">Jane Smith</td>
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">7</td>
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">S</td>
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">1</td>
+                              <td className="px-4 py-3 text-sm text-[#1D1D1F]">
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 rounded-full">
                                   <i className="fas fa-trash"></i>
                                 </Button>
                               </td>
@@ -414,7 +414,7 @@ export default function DashboardPage() {
                       </div>
                       
                       <div className="mt-4">
-                        <Button variant="outline" size="sm" className="text-sm">
+                        <Button variant="outline" size="sm" className="text-sm rounded-lg border-[#E8E8ED] text-[#0071E3] hover:bg-[#0071E3]/5 hover:border-[#0071E3]/30">
                           <i className="fas fa-plus mr-1"></i> Add Team Member
                         </Button>
                       </div>
