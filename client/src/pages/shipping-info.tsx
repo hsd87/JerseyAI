@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
-import voroLogoWhite from "@/assets/voro-white.png";
+import okdioLogo from "@/assets/okdio-logo.png";
 import { useAuth } from '@/hooks/use-auth';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { useToast } from '@/hooks/use-toast';
@@ -431,8 +431,8 @@ export default function ShippingInfoPage() {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center">
               <img 
-                src={voroLogoWhite} 
-                alt="VORO Logo" 
+                src={okdioLogo} 
+                alt="OKDIO Logo" 
                 className="h-5 md:h-6" 
               />
             </Link>
