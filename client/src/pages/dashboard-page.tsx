@@ -568,12 +568,12 @@ export default function DashboardPage() {
                   )}
                 </>
               ) : (
-                <div className="text-center py-12 bg-white rounded-lg shadow">
-                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <i className="fas fa-shopping-bag text-gray-400 text-xl"></i>
+                <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-[#E8E8ED]">
+                  <div className="mx-auto w-16 h-16 bg-[#F5F5F7] rounded-full flex items-center justify-center mb-4">
+                    <i className="fas fa-shopping-bag text-[#86868B] text-xl"></i>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
-                  <p className="text-gray-500 mb-6">Create a design and place your first order</p>
+                  <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">No orders yet</h3>
+                  <p className="text-[#86868B] mb-6">Create a design and place your first order</p>
                   <Link href="/designer">
                     <Button className="bg-[#0071E3] hover:bg-[#0077ED] text-white font-medium rounded-lg transition-colors">
                       <i className="fas fa-tshirt mr-2"></i> Design Your Jersey
@@ -595,8 +595,8 @@ export default function DashboardPage() {
               ) : designs && designs.filter(d => d.isFavorite).length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {designs.filter(d => d.isFavorite).map((design) => (
-                    <Card key={design.id} className="overflow-hidden border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <div className="relative h-52 bg-gray-50">
+                    <Card key={design.id} className="overflow-hidden border border-[#E8E8ED] rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                      <div className="relative h-52 bg-[#F5F5F7]">
                         {design.frontImageUrl ? (
                           <img
                             src={design.frontImageUrl}
@@ -605,35 +605,35 @@ export default function DashboardPage() {
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">
-                            <p className="text-gray-400">No image available</p>
+                            <p className="text-[#86868B]">No image available</p>
                           </div>
                         )}
                         <button
                           onClick={() => handleToggleFavorite(design)}
                           className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-colors"
                         >
-                          <i className="fas fa-heart text-primary"></i>
+                          <i className="fas fa-heart text-[#0071E3]"></i>
                         </button>
                       </div>
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-lg font-medium">
+                        <CardTitle className="text-lg font-medium text-[#1D1D1F]">
                           {design.sport.charAt(0).toUpperCase() + design.sport.slice(1)} Kit
                         </CardTitle>
-                        <CardDescription className="text-xs text-gray-500">
+                        <CardDescription className="text-xs text-[#86868B]">
                           Created on {formatDate(design.createdAt)}
                         </CardDescription>
                       </CardHeader>
                       <CardFooter className="flex justify-between pt-2">
                         <Button
                           variant="outline"
-                          className="text-sm rounded-full border-gray-200 text-gray-700 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
+                          className="text-sm rounded-lg border-[#E8E8ED] text-[#1D1D1F] hover:text-[#0071E3] hover:border-[#0071E3]/30 hover:bg-[#0071E3]/5"
                           onClick={() => handleEditDesign(design)}
                         >
                           <i className="fas fa-pencil-alt mr-1"></i> Edit
                         </Button>
                         <Button
                           variant="ghost"
-                          className="text-sm rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50"
+                          className="text-sm rounded-lg text-[#86868B] hover:text-red-600 hover:bg-red-50"
                           onClick={() => handleDeleteDesign(design.id)}
                         >
                           <i className="fas fa-trash mr-1"></i> Delete
@@ -643,14 +643,14 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-white rounded-lg shadow">
-                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <i className="fas fa-heart text-gray-400 text-xl"></i>
+                <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-[#E8E8ED]">
+                  <div className="mx-auto w-16 h-16 bg-[#F5F5F7] rounded-full flex items-center justify-center mb-4">
+                    <i className="fas fa-heart text-[#86868B] text-xl"></i>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No favorites yet</h3>
-                  <p className="text-gray-500 mb-6">Save designs to your favorites for quick access</p>
+                  <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">No favorites yet</h3>
+                  <p className="text-[#86868B] mb-6">Save designs to your favorites for quick access</p>
                   <Link href="/designer">
-                    <Button className="bg-black hover:bg-gray-800">
+                    <Button className="bg-[#0071E3] hover:bg-[#0077ED] text-white font-medium rounded-lg transition-colors">
                       <i className="fas fa-plus mr-2"></i> Create Design
                     </Button>
                   </Link>
@@ -666,33 +666,33 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-6 bg-white rounded-lg border border-[#E8E8ED] shadow-sm">
                       <div className="flex-1">
                         <h3 className="font-medium text-lg mb-1">
                           {user?.subscriptionTier === "pro" ? (
-                            <>Pro Plan <Badge className="ml-2 bg-primary/10 text-primary">Active</Badge></>
+                            <>Pro Plan <Badge className="ml-2 bg-[#0071E3]/10 text-[#0071E3]">Active</Badge></>
                           ) : (
                             <>Free Plan</>
                           )}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-sm text-[#86868B] mb-2">
                           {user?.subscriptionTier === "pro"
                             ? "Unlimited design credits, 15% discount on all orders, priority support"
                             : "6 design credits per month, standard pricing, regular support"}
                         </p>
-                        <div className="text-sm">
+                        <div className="text-sm text-[#1D1D1F]">
                           <span className="font-medium">Design Credits Remaining:</span>{" "}
                           {user?.remainingDesigns || 0}
                         </div>
                       </div>
                       
                       {user?.subscriptionTier === "pro" ? (
-                        <Button variant="outline" className="rounded-full">
+                        <Button variant="outline" className="rounded-lg border-[#86868B] text-[#1D1D1F] hover:bg-[#F5F5F7]">
                           Manage Subscription
                         </Button>
                       ) : (
                         <Link href="/pricing">
-                          <Button className="rounded-full bg-primary text-white">
+                          <Button className="rounded-lg bg-[#0071E3] hover:bg-[#0077ED] text-white">
                             Upgrade to Pro
                           </Button>
                         </Link>
@@ -702,40 +702,40 @@ export default function DashboardPage() {
                     <div className="space-y-4">
                       <h3 className="font-medium">Subscription Benefits</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-gray-200">
-                          <div className="bg-primary/10 rounded-full p-2 h-fit">
-                            <i className="fas fa-infinity text-primary"></i>
+                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-[#E8E8ED] shadow-sm">
+                          <div className="bg-[#0071E3]/10 rounded-full p-2 h-fit">
+                            <i className="fas fa-infinity text-[#0071E3]"></i>
                           </div>
                           <div>
-                            <h4 className="font-medium text-sm">Unlimited Designs</h4>
-                            <p className="text-sm text-gray-600">Create as many designs as you want</p>
+                            <h4 className="font-medium text-sm text-[#1D1D1F]">Unlimited Designs</h4>
+                            <p className="text-sm text-[#86868B]">Create as many designs as you want</p>
                           </div>
                         </div>
-                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-gray-200">
-                          <div className="bg-primary/10 rounded-full p-2 h-fit">
-                            <i className="fas fa-tags text-primary"></i>
+                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-[#E8E8ED] shadow-sm">
+                          <div className="bg-[#0071E3]/10 rounded-full p-2 h-fit">
+                            <i className="fas fa-tags text-[#0071E3]"></i>
                           </div>
                           <div>
-                            <h4 className="font-medium text-sm">15% Discount</h4>
-                            <p className="text-sm text-gray-600">On all orders, automatically applied</p>
+                            <h4 className="font-medium text-sm text-[#1D1D1F]">15% Discount</h4>
+                            <p className="text-sm text-[#86868B]">On all orders, automatically applied</p>
                           </div>
                         </div>
-                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-gray-200">
-                          <div className="bg-primary/10 rounded-full p-2 h-fit">
-                            <i className="fas fa-headset text-primary"></i>
+                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-[#E8E8ED] shadow-sm">
+                          <div className="bg-[#0071E3]/10 rounded-full p-2 h-fit">
+                            <i className="fas fa-headset text-[#0071E3]"></i>
                           </div>
                           <div>
-                            <h4 className="font-medium text-sm">Priority Support</h4>
-                            <p className="text-sm text-gray-600">Get help faster when you need it</p>
+                            <h4 className="font-medium text-sm text-[#1D1D1F]">Priority Support</h4>
+                            <p className="text-sm text-[#86868B]">Get help faster when you need it</p>
                           </div>
                         </div>
-                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-gray-200">
-                          <div className="bg-primary/10 rounded-full p-2 h-fit">
-                            <i className="fas fa-file-export text-primary"></i>
+                        <div className="flex gap-3 p-4 bg-white rounded-lg border border-[#E8E8ED] shadow-sm">
+                          <div className="bg-[#0071E3]/10 rounded-full p-2 h-fit">
+                            <i className="fas fa-file-export text-[#0071E3]"></i>
                           </div>
                           <div>
-                            <h4 className="font-medium text-sm">Export Options</h4>
-                            <p className="text-sm text-gray-600">Export your designs in high-resolution</p>
+                            <h4 className="font-medium text-sm text-[#1D1D1F]">Export Options</h4>
+                            <p className="text-sm text-[#86868B]">Export your designs in high-resolution</p>
                           </div>
                         </div>
                       </div>
