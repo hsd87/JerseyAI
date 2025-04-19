@@ -528,7 +528,7 @@ export default function DesignEditor() {
                   <label className="block text-xs text-gray-600 mb-1">Text Content</label>
                   <Input 
                     type="text" 
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-gradient focus:ring-1 focus:ring-gradient" 
                     placeholder="Enter text" 
                     value={currentText}
                     onChange={(e) => setCurrentText(e.target.value)}
@@ -569,7 +569,7 @@ export default function DesignEditor() {
                     <label className="block text-xs text-gray-600 mb-1">Color</label>
                     <Input 
                       type="color" 
-                      className="w-full h-9 px-1 border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
+                      className="w-full h-9 px-1 border border-gray-300 rounded-md focus:border-gradient focus:ring-1 focus:ring-gradient" 
                       value={currentColor}
                       onChange={(e) => setCurrentColor(e.target.value)}
                     />
@@ -621,7 +621,7 @@ export default function DesignEditor() {
                         <label className="block text-xs text-gray-600 mb-1">Outline Color</label>
                         <Input 
                           type="color" 
-                          className="w-full h-9 px-1 border border-gray-300 rounded-md focus:border-primary focus:ring-1 focus:ring-primary" 
+                          className="w-full h-9 px-1 border border-gray-300 rounded-md focus:border-gradient focus:ring-1 focus:ring-gradient" 
                           value={currentOutlineColor}
                           onChange={(e) => setCurrentOutlineColor(e.target.value)}
                         />
@@ -646,7 +646,7 @@ export default function DesignEditor() {
                 
                 <Button 
                   size="sm"
-                  className="w-full bg-primary text-white px-4 py-2 rounded-full text-sm h-9 mt-3"
+                  className="w-full bg-gradient text-white px-4 py-2 rounded-full text-sm h-9 mt-3 hover:opacity-90"
                   onClick={handleAddText}
                 >
                   Add Text to Jersey
@@ -665,7 +665,7 @@ export default function DesignEditor() {
                         <div 
                           key={logo.id}
                           className={`w-16 h-16 border rounded-md flex items-center justify-center overflow-hidden cursor-pointer ${
-                            activeElement === logo.id ? 'border-primary border-2' : 'border-gray-200'
+                            activeElement === logo.id ? 'border-gradient border-2' : 'border-gray-200'
                           }`}
                           onClick={() => setActiveElement(logo.id)}
                         >
@@ -858,7 +858,7 @@ export default function DesignEditor() {
       {/* Editor Footer */}
       <div className="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-4 flex justify-between sm:justify-end">
         <Button 
-          className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-full text-sm font-medium"
+          className="bg-gradient hover:opacity-90 text-white px-4 py-2 rounded-full text-sm font-medium"
           onClick={handleProceedToOrder}
         >
           <ShoppingCart className="mr-2 h-4 w-4" /> Configure Order
