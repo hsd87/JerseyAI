@@ -1172,7 +1172,7 @@ export default function OrderConfig({
                                 value={member.size}
                                 onValueChange={(value) => updateTeamMember(member.id, 'size', value)}
                               >
-                                <SelectTrigger className="w-20">
+                                <SelectTrigger className="w-20 rounded-full">
                                   <SelectValue placeholder="Size" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1190,7 +1190,7 @@ export default function OrderConfig({
                                 value={member.gender}
                                 onValueChange={(value) => updateTeamMember(member.id, 'gender', value)}
                               >
-                                <SelectTrigger className="w-24">
+                                <SelectTrigger className="w-24 rounded-full">
                                   <SelectValue placeholder="Gender" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1452,7 +1452,7 @@ export default function OrderConfig({
                                 }
                               }}
                             >
-                              <SelectTrigger className="w-24">
+                              <SelectTrigger className="w-24 rounded-full">
                                 <SelectValue placeholder="Gender" />
                               </SelectTrigger>
                               <SelectContent>
@@ -1481,7 +1481,7 @@ export default function OrderConfig({
                                   setPackageItems(updatedItems);
                                 }}
                               >
-                                <SelectTrigger className="w-20">
+                                <SelectTrigger className="w-20 rounded-full">
                                   <SelectValue placeholder="Size" />
                                 </SelectTrigger>
                                 <SelectContent>
