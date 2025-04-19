@@ -9,17 +9,31 @@
 
 @layer base {
   :root {
+    /* Base colors */
     --nike-black: #111;
     --nike-gray-dark: #757575;
     --nike-gray-medium: #8D8D8D;
     --nike-gray-light: #F5F5F5;
     --nike-white: #FFF;
-    --nike-red: #FF4081; /* Changed from #F5413D to match gradient end color */
-    --nike-orange: #FF80AB; /* Changed from #FA5400 to match gradient start color */
-    --nike-accent: #FF4081; /* Changed from #F5413D to match gradient end color */
+    
+    /* Primary color (pink) - for CTAs and key highlights only */
+    --nike-primary: #FF4081;
+    --nike-primary-light: #FF80AB;
+    
+    /* Secondary color - Gunmetal Gray */
+    --nike-secondary: #2C2C2E;
+    --nike-secondary-light: #3A3A3C;
+    
+    /* Legacy vars (keep for compatibility) */
+    --nike-red: #FF4081;
+    --nike-orange: #FF80AB;
+    --nike-accent: #FF4081;
+    
+    /* Design system */
     --nike-hover-overlay: rgba(0, 0, 0, 0.04);
     --nike-transition-standard: all 0.2s ease;
     --nike-gradient-bg: linear-gradient(90deg, #FF80AB, #FF4081);
+    --nike-secondary-gradient-bg: linear-gradient(90deg, #2C2C2E, #3A3A3C);
   }
   
   * {
@@ -71,7 +85,7 @@
 }
 
 @layer components {
-  /* Gradient Text Style */
+  /* Primary Color Gradient Text Style */
   .text-gradient {
     background: linear-gradient(90deg, #FF80AB, #FF4081);
     -webkit-background-clip: text;
@@ -80,12 +94,33 @@
     color: transparent;
   }
   
-  /* Gradient Background Style */
+  /* Secondary Color (Gunmetal) Text Style */
+  .text-secondary {
+    color: var(--nike-secondary);
+  }
+  
+  .text-secondary-gradient {
+    background: var(--nike-secondary-gradient-bg);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  /* Gradient Background Styles */
   .bg-gradient {
     background: var(--nike-gradient-bg);
   }
   
-  /* Gradient Border Style */
+  .bg-secondary {
+    background-color: var(--nike-secondary);
+  }
+  
+  .bg-secondary-gradient {
+    background: var(--nike-secondary-gradient-bg);
+  }
+  
+  /* Gradient Border Styles */
   .border-gradient {
     position: relative;
   }
@@ -100,6 +135,24 @@
     background: var(--nike-gradient-bg);
   }
   
+  .border-secondary {
+    border-color: var(--nike-secondary);
+  }
+  
+  .border-secondary-gradient {
+    position: relative;
+  }
+  
+  .border-secondary-gradient::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--nike-secondary-gradient-bg);
+  }
+  
   /* Layout container with proper max-width */
   .container-nike {
     @apply px-4 md:px-8 mx-auto max-w-[1440px];
@@ -110,22 +163,39 @@
     @apply space-y-12 md:space-y-16;
   }
   
-  /* Buttons */
+  /* Buttons - Strategic Color Implementation */
+  /* Primary Button - Pink gradient (use only for main CTAs) */
   .btn-nike-primary {
-    @apply h-10 px-6 rounded-full bg-[var(--nike-black)] text-white font-medium flex items-center justify-center transition-all hover:bg-[#333] text-sm;
+    @apply h-10 px-6 rounded-full bg-gradient text-white font-medium flex items-center justify-center transition-all hover:opacity-90 text-sm;
   }
   
+  /* Secondary Button - Gunmetal Gray (use for secondary actions) */
   .btn-nike-secondary {
+    @apply h-10 px-6 rounded-full bg-[var(--nike-secondary)] text-white font-medium flex items-center justify-center transition-all hover:bg-[var(--nike-secondary-light)] text-sm;
+  }
+  
+  /* Outline Buttons */
+  .btn-nike-outline-primary {
+    @apply h-10 px-6 rounded-full bg-transparent text-[var(--nike-primary)] border border-[var(--nike-primary)] flex items-center justify-center font-medium transition-all hover:bg-[var(--nike-primary)]/5 text-sm;
+  }
+  
+  .btn-nike-outline-secondary {
+    @apply h-10 px-6 rounded-full bg-transparent text-[var(--nike-secondary)] border border-[var(--nike-secondary)] flex items-center justify-center font-medium transition-all hover:bg-[var(--nike-secondary)]/5 text-sm;
+  }
+  
+  /* White Button */
+  .btn-nike-white {
     @apply h-10 px-6 rounded-full bg-white text-[var(--nike-black)] border border-[var(--nike-gray-medium)] flex items-center justify-center font-medium transition-all hover:bg-[var(--nike-hover-overlay)] text-sm;
   }
   
+  /* Legacy for backward compatibility */
   .btn-nike-accent {
     @apply h-10 px-6 rounded-full bg-gradient text-white flex items-center justify-center font-medium transition-all hover:opacity-90 text-sm;
   }
   
-  /* Navigation */
+  /* Navigation - Strategic Color Implementation */
   .nav-item-nike {
-    @apply text-base font-normal text-white transition-colors hover:text-[var(--nike-red)];
+    @apply text-base font-normal text-white transition-colors hover:text-[var(--nike-primary-light)];
   }
   
   .nav-item-nike:hover {
@@ -145,7 +215,32 @@
   }
   
   .nav-item-nike-active {
-    @apply text-base font-medium text-white border-b-2 border-[var(--nike-red)];
+    @apply text-base font-medium text-white border-b-2 border-[var(--nike-primary)];
+  }
+  
+  /* Secondary navigation items */
+  .nav-item-secondary {
+    @apply text-base font-normal text-white transition-colors hover:text-[var(--nike-gray-light)];
+  }
+  
+  .nav-item-secondary:hover {
+    position: relative;
+  }
+  
+  .nav-item-secondary:hover::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--nike-secondary-gradient-bg);
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+  
+  .nav-item-secondary-active {
+    @apply text-base font-medium text-white border-b-2 border-[var(--nike-secondary)];
   }
   
   /* Cards */
@@ -259,5 +354,46 @@
   .no-scrollbar {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+  }
+  
+  /* Strategic Color Utility Classes */
+  
+  /* Pink utility classes (for primary CTAs and key highlights only) */
+  .pink-cta {
+    @apply bg-gradient text-white font-medium hover:opacity-90 transition-all;
+  }
+  
+  .pink-text {
+    @apply text-[var(--nike-primary)] font-medium;
+  }
+  
+  .pink-border {
+    @apply border-[var(--nike-primary)];
+  }
+  
+  .pink-accent {
+    @apply bg-[var(--nike-primary)] text-white;
+  }
+  
+  /* Gunmetal Gray utility classes (for secondary actions and UI elements) */
+  .gunmetal-bg {
+    @apply bg-[var(--nike-secondary)] text-white;
+  }
+  
+  .gunmetal-text {
+    @apply text-[var(--nike-secondary)];
+  }
+  
+  .gunmetal-border {
+    @apply border-[var(--nike-secondary)];
+  }
+  
+  /* AI step highlights (key interaction points with AI) */
+  .ai-step-highlight {
+    @apply text-[var(--nike-primary)] font-medium underline;
+  }
+  
+  .ai-action-button {
+    @apply bg-gradient text-white font-medium px-4 py-2 rounded-full hover:opacity-90 transition-all;
   }
 }
