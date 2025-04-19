@@ -1190,7 +1190,7 @@ export default function OrderConfig({
                                 value={member.gender}
                                 onValueChange={(value) => updateTeamMember(member.id, 'gender', value)}
                               >
-                                <SelectTrigger className="w-24 rounded-full">
+                                <SelectTrigger className="w-24">
                                   <SelectValue placeholder="Gender" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1452,7 +1452,7 @@ export default function OrderConfig({
                                 }
                               }}
                             >
-                              <SelectTrigger className="w-24 rounded-full">
+                              <SelectTrigger className="w-24">
                                 <SelectValue placeholder="Gender" />
                               </SelectTrigger>
                               <SelectContent>
@@ -1481,7 +1481,7 @@ export default function OrderConfig({
                                   setPackageItems(updatedItems);
                                 }}
                               >
-                                <SelectTrigger className="w-20 rounded-full">
+                                <SelectTrigger className="w-20">
                                   <SelectValue placeholder="Size" />
                                 </SelectTrigger>
                                 <SelectContent>
