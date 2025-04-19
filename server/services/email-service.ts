@@ -72,7 +72,7 @@ export const sendOrderConfirmationEmail = async (
     });
     
     // Create email content
-    const emailSubject = `Your ProJersey Order #${order.id} is confirmed!`;
+    const emailSubject = `Your OKDIO Order #${order.id} is confirmed!`;
     
     // HTML email body
     const htmlContent = `
@@ -83,16 +83,16 @@ export const sendOrderConfirmationEmail = async (
           <style>
             body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { text-align: center; margin-bottom: 30px; }
-            .logo { color: #0071e3; font-size: 28px; font-weight: bold; }
+            .logo { background: linear-gradient(90deg, #FF80AB, #FF4081); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 28px; font-weight: bold; }
             .order-number { font-size: 18px; color: #555; margin-top: 15px; }
             .main { background: #f9f9f9; border-radius: 6px; padding: 20px; margin-bottom: 30px; }
             .section { margin-bottom: 25px; }
-            .section-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #0071e3; }
+            .section-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; background: linear-gradient(90deg, #FF80AB, #FF4081); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
             .item { display: flex; justify-content: space-between; margin-bottom: 8px; }
             .total { font-weight: bold; margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; }
-            .delivery-info { background: #e8f4ff; padding: 15px; border-radius: 6px; margin-bottom: 25px; }
+            .delivery-info { background: #fff5f8; padding: 15px; border-radius: 6px; margin-bottom: 25px; }
             .footer { text-align: center; color: #777; font-size: 14px; margin-top: 40px; }
-            .button { display: inline-block; background: #0071e3; color: white; text-decoration: none; padding: 10px 25px; border-radius: 6px; margin-top: 15px; }
+            .button { display: inline-block; background: linear-gradient(90deg, #FF80AB, #FF4081); color: white; text-decoration: none; padding: 10px 25px; border-radius: 24px; margin-top: 15px; }
             .discount { color: #2e8540; }
             @media (max-width: 480px) {
               body { padding: 10px; }
@@ -102,7 +102,7 @@ export const sendOrderConfirmationEmail = async (
         </head>
         <body>
           <div class="header">
-            <div class="logo">ProJersey</div>
+            <div class="logo">OKDIO</div>
             <div class="order-number">Order #${order.id}</div>
           </div>
           
@@ -160,10 +160,10 @@ export const sendOrderConfirmationEmail = async (
           
           <p>We've attached a detailed invoice to this email for your records.</p>
           
-          <p>If you have any questions or need assistance, please don't hesitate to contact our support team at <a href="mailto:support@projersey.com">support@projersey.com</a>.</p>
+          <p>If you have any questions or need assistance, please don't hesitate to contact our support team at <a href="mailto:support@okdio.com">support@okdio.com</a>.</p>
           
           <div class="footer">
-            <p>© ${new Date().getFullYear()} ProJersey. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} OKDIO. All rights reserved.</p>
           </div>
         </body>
       </html>
@@ -171,7 +171,7 @@ export const sendOrderConfirmationEmail = async (
     
     // Plain text version
     const textContent = `
-      ProJersey - Order #${order.id}
+      OKDIO - Order #${order.id}
       
       Hello ${user.username || user.email.split('@')[0]},
       
@@ -189,14 +189,14 @@ export const sendOrderConfirmationEmail = async (
       Shipping Address:
       ${order.shippingAddress?.name}
       ${order.shippingAddress?.street}
-      ${order.shippingAddress?.city}, ${order.shippingAddress?.state} ${order.shippingAddress?.zip}
+      ${order.shippingAddress?.city}, ${order.shippingAddress?.state} ${order.shippingAddress?.postalCode}
       ${order.shippingAddress?.country}
       
       We've attached a detailed invoice to this email for your records.
       
-      If you have any questions or need assistance, please don't hesitate to contact our support team at support@projersey.com.
+      If you have any questions or need assistance, please don't hesitate to contact our support team at support@okdio.com.
       
-      © ${new Date().getFullYear()} ProJersey. All rights reserved.
+      © ${new Date().getFullYear()} OKDIO. All rights reserved.
     `;
     
     // Send the email using the appropriate service
@@ -204,7 +204,7 @@ export const sendOrderConfirmationEmail = async (
       // Use SendGrid
       const msg = {
         to: user.email,
-        from: 'orders@projersey.com',
+        from: 'orders@okdio.com',
         subject: emailSubject,
         text: textContent,
         html: htmlContent,
