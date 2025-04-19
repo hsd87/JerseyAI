@@ -184,7 +184,7 @@ export default function CheckoutElementsPage() {
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center space-y-4">
             <div className="bg-green-50 p-4 rounded-[1px]">
-              <CheckCircle className="h-16 w-16 text-green-500" />
+              <CheckCircle className="h-16 w-16 text-gradient" />
             </div>
             <p className="text-center">Your payment has been processed successfully. Thank you for your purchase!</p>
           </CardContent>

@@ -184,10 +184,10 @@ export const CartDisplay: React.FC<CartDisplayProps> = ({
               <span>${priceBreakdown.subtotal.toFixed(2)}</span>
             </div>
             
-            {priceBreakdown.discountPercentage > 0 && (
-              <div className="flex justify-between text-green-600">
+            {priceBreakdown.discountPercentage && priceBreakdown.discountPercentage > 0 && (
+              <div className="flex justify-between text-gradient">
                 <span>Discount ({priceBreakdown.discountPercentage}%)</span>
-                <span>-${priceBreakdown.discount.toFixed(2)}</span>
+                <span>-${priceBreakdown.discount?.toFixed(2) || '0.00'}</span>
               </div>
             )}
             
@@ -195,16 +195,16 @@ export const CartDisplay: React.FC<CartDisplayProps> = ({
               <span>Shipping</span>
               <span>
                 {priceBreakdown.shippingFreeThresholdApplied ? (
-                  <span className="text-green-600">Free</span>
+                  <span className="text-gradient">Free</span>
                 ) : (
-                  `$${priceBreakdown.shipping.toFixed(2)}`
+                  `$${priceBreakdown.shipping?.toFixed(2) || '0.00'}`
                 )}
               </span>
             </div>
             
             <div className="flex justify-between">
               <span>Tax</span>
-              <span>${priceBreakdown.tax.toFixed(2)}</span>
+              <span>${priceBreakdown.tax?.toFixed(2) || '0.00'}</span>
             </div>
             
             <Separator className="my-2" />

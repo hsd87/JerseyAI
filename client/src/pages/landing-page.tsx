@@ -446,14 +446,14 @@ export default function LandingPage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-4 w-4 text-[#0071E3] flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-gradient flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium text-[#1D1D1F] text-sm">On-time Global Fulfillment</span>
                     <p className="text-xs text-[#86868B]">Reliable delivery for event organizers</p>
                   </div>
                 </li>
               </ul>
-              <Button variant="outline" className="w-full border-[#E34234] text-[#E34234] hover:bg-[#E34234]/5 hover:border-[#E34234]/30 rounded-full py-2 font-medium text-sm">
+              <Button variant="outline" className="w-full border-gradient text-gradient hover:bg-gradient/5 hover:border-gradient/30 rounded-full py-2 font-medium text-sm">
                 Get Bulk Quote
               </Button>
             </div>
@@ -472,7 +472,7 @@ export default function LandingPage() {
             <div className="mt-6 flex justify-center items-center gap-3">
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className="h-5 w-5 text-[#0071E3]" fill="currentColor" viewBox="0 0 20 20">
+                  <svg key={star} className="h-5 w-5 text-gradient" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.799-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
@@ -486,7 +486,7 @@ export default function LandingPage() {
               <div key={index} className="bg-white rounded-[1px] p-5 shadow-sm border border-[#E8E8ED]">
                 <div className="mb-3">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="inline-block h-3 w-3 text-[#0071E3]" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={star} className="inline-block h-3 w-3 text-gradient" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.799-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
