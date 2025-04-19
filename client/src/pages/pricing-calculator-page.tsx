@@ -216,7 +216,7 @@ export default function PricingCalculatorPage() {
                 </div>
                 
                 {!isSubscriber && (
-                  <div className="text-sm p-3 bg-blue-50 rounded text-blue-700">
+                  <div className="text-sm p-3 rounded bg-opacity-10 bg-gradient text-gradient">
                     <p className="font-medium">Pro Tip:</p>
                     <p>Subscribe to Pro for just $9/month to unlock a 10% discount on all orders!</p>
                   </div>
@@ -225,7 +225,7 @@ export default function PricingCalculatorPage() {
                 {/* Calculate Button */}
                 <Button 
                   onClick={calculatePrice} 
-                  className="w-full" 
+                  className="w-full bg-gradient hover:opacity-90 text-white" 
                   disabled={isCalculating}
                 >
                   {isCalculating ? (
@@ -380,7 +380,7 @@ export default function PricingCalculatorPage() {
                     <span className="font-medium text-green-600">15% off</span>
                   </li>
                 </ul>
-                <p className="text-xs mt-3 text-[var(--nike-red)]">
+                <p className="text-xs mt-3 text-gradient">
                   The more jerseys you order, the more you save per jersey.
                 </p>
               </div>
@@ -429,7 +429,7 @@ export default function PricingCalculatorPage() {
                     <span className="font-medium text-green-600">FREE shipping</span>
                   </li>
                 </ul>
-                <p className="text-xs mt-3 text-[var(--nike-red)]">
+                <p className="text-xs mt-3 text-gradient">
                   Larger orders qualify for reduced or free shipping!
                 </p>
               </div>
