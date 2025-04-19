@@ -38,9 +38,9 @@ export default function DesignResults() {
             
             <div className="flex justify-center">
               <div className="inline-flex space-x-1">
-                <span className="w-3 h-3 bg-[#39FF14] rounded-full animate-bounce" style={{ animationDelay: "-0.32s" }}></span>
-                <span className="w-3 h-3 bg-[#39FF14] rounded-full animate-bounce" style={{ animationDelay: "-0.16s" }}></span>
-                <span className="w-3 h-3 bg-[#39FF14] rounded-full animate-bounce"></span>
+                <span className="w-3 h-3 bg-[#E34234] rounded-full animate-bounce" style={{ animationDelay: "-0.32s" }}></span>
+                <span className="w-3 h-3 bg-[#E34234] rounded-full animate-bounce" style={{ animationDelay: "-0.16s" }}></span>
+                <span className="w-3 h-3 bg-[#E34234] rounded-full animate-bounce"></span>
               </div>
             </div>
             
@@ -122,7 +122,7 @@ export default function DesignResults() {
                     <h3 className="font-sora font-medium">
                       {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)} Jersey - Design #{Math.floor(Math.random() * 10000)}
                     </h3>
-                    <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">Front View</span>
+                    <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">Front View</span>
                   </div>
                 </div>
               </div>
@@ -136,13 +136,13 @@ export default function DesignResults() {
                 <Button
                   onClick={handleGenerateNew}
                   variant="outline" 
-                  className="flex-1 inline-flex justify-center items-center py-3 px-4"
+                  className="flex-1 inline-flex justify-center items-center py-3 px-4 rounded-full"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" /> Generate New Design
                 </Button>
                 <Button
                   onClick={handleCustomize}
-                  className="flex-1 bg-primary hover:bg-primary/90 inline-flex justify-center items-center py-3 px-4"
+                  className="flex-1 bg-[#E34234] hover:bg-opacity-80 inline-flex justify-center items-center py-3 px-4 rounded-full"
                 >
                   Next
                 </Button>
