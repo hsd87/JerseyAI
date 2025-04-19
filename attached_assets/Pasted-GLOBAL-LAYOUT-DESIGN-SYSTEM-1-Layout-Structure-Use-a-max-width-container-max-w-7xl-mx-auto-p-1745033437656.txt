@@ -1,0 +1,130 @@
+GLOBAL LAYOUT & DESIGN SYSTEM
+
+1. Layout & Structure
+
+Use a max-width container: max-w-7xl mx-auto px-6 md:px-10
+
+Apply consistent vertical rhythm: space-y-16 between major sections
+
+Use section padding: py-16 md:py-24
+
+Align everything to a 12-column grid when needed: grid-cols-12
+
+2. Color Scheme
+
+Base: #FFFFFF (pure white)
+
+Muted background: #F9F9F9
+
+Text: #0A0A0A (primary), #4B5563 (secondary)
+
+Accent (brand): #E34234
+
+Border color: #E5E7EB
+
+3. Typography
+
+Headings: font-heading → Space Grotesk or Satoshi
+
+Body: font-body → Inter or Noto Sans
+
+Font weights:
+
+Headings: font-semibold, tracking-tight
+
+Body: font-normal, leading-relaxed
+
+Sizes:
+
+h1: text-5xl md:text-6xl
+
+h2: text-3xl md:text-4xl
+
+p: text-base md:text-lg
+
+4. Navigation Bar
+
+Fixed top, bg-white, no shadow
+
+Layout: Logo left, links center, CTA right
+
+Spacing: px-6 md:px-10, height: h-[70px]
+
+Mobile: hamburger drawer menu
+
+Font: text-sm uppercase tracking-wide
+
+🗋 COMPONENT STYLING
+
+Buttons
+
+Primary: bg-black text-white rounded-full px-6 py-3 font-semibold hover:opacity-90
+
+Secondary: bg-gray-100 text-black rounded-full px-6 py-3 hover:bg-gray-200
+
+Cards / Sections
+
+Rounded corners: rounded-3xl
+
+Shadows: shadow-sm
+
+Section spacing: gap-10
+
+Layout: flex-col (mobile), flex-row (desktop)
+
+Forms
+
+Inputs: bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-black
+
+Labels: text-sm text-gray-600 mb-1 block
+
+Spacing: space-y-6
+
+Product Previews / Gallery
+
+Aspect: aspect-video or aspect-square
+
+Grid: grid-cols-1 md:grid-cols-3 gap-8
+
+Hover: hover:scale-105 transition
+
+💬 MICRO ELEMENTS
+
+Breadcrumbs / Steppers: text-xs uppercase tracking-wide text-gray-400
+
+Tooltips: bg-black text-white text-xs px-2 py-1 rounded
+
+Loading States: shimmer or pulsing dots
+
+Transitions: transition-all duration-300 ease-in-out
+
+🌙 DARK MODE (Optional)
+
+Use Tailwind dark: variants
+
+Background: #0A0A0A, Text: #F9F9F9
+
+Accent: remain unchanged
+
+✅ TONE & MOOD
+
+Minimal, clear, confident
+
+Product-first, structured like a high-end showroom
+
+No visual clutter
+
+⛔ Avoid:
+
+Gradients
+
+Heavy drop shadows
+
+Busy patterns
+
+Excessive color usage
+
+🔹 Design Outcome
+
+A refined, minimal interface that echoes the polish of Apple.com while reinforcing OKDIO’s athletic intelligence and futuristic focus.
+

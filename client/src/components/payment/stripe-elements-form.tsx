@@ -98,7 +98,7 @@ export default function StripeElementsForm({ amount, onSuccess, onCancel }: Stri
   if (isComplete) {
     return (
       <div className="flex flex-col items-center justify-center py-6">
-        <div className="bg-green-100 p-3 rounded-sm mb-4">
+        <div className="bg-green-100 p-3 rounded-[1px] mb-4">
           <CheckCircle2 className="h-12 w-12 text-green-600" />
         </div>
         <h3 className="text-xl font-semibold mb-2">Payment Successful!</h3>
@@ -119,7 +119,7 @@ export default function StripeElementsForm({ amount, onSuccess, onCancel }: Stri
       
       <div className="space-y-2">
         <Label htmlFor="card-element">Card Details</Label>
-        <div className="p-3 border rounded-sm">
+        <div className="p-3 border rounded-[1px]">
           <CardElement id="card-element" options={cardElementOptions} />
         </div>
         <p className="text-sm text-muted-foreground">

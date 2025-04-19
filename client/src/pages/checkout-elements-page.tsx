@@ -183,7 +183,9 @@ export default function CheckoutElementsPage() {
             <CardTitle className="text-center">Payment Successful</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center space-y-4">
-            <CheckCircle className="h-16 w-16 text-green-500" />
+            <div className="bg-green-50 p-4 rounded-[1px]">
+              <CheckCircle className="h-16 w-16 text-green-500" />
+            </div>
             <p className="text-center">Your payment has been processed successfully. Thank you for your purchase!</p>
           </CardContent>
           <CardFooter className="flex justify-center">
@@ -203,7 +205,9 @@ export default function CheckoutElementsPage() {
             <CardTitle className="text-center">Loading Saved Order</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center space-y-4 py-6">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <div className="bg-blue-50 p-4 rounded-[1px]">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
             <p className="text-center">Loading your saved order. Please wait...</p>
           </CardContent>
         </Card>
@@ -220,7 +224,9 @@ export default function CheckoutElementsPage() {
             <CardTitle className="text-center">Your cart is empty</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center">
-            <ShoppingCart className="h-16 w-16 text-muted-foreground" />
+            <div className="bg-gray-50 p-4 rounded-[1px]">
+              <ShoppingCart className="h-16 w-16 text-muted-foreground" />
+            </div>
           </CardContent>
           <CardFooter className="flex justify-center">
             <Button onClick={() => setLocation('/designer')}>Go to Designer</Button>
