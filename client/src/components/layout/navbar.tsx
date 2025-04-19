@@ -62,11 +62,11 @@ export default function Navbar() {
           
           <div className="hidden md:block">
             <div className="ml-8 flex items-center space-x-8">
-              <Link href="/" className={`nav-item-nike text-white ${location === '/' ? 'nav-item-nike-active' : ''}`}>
-                Men
+              <Link href="/" className={`nav-item-nike ${location === '/' ? 'nav-item-nike-active' : ''}`}>
+                <span className={location === '/' ? '' : 'text-white hover:text-gradient'}>Men</span>
               </Link>
-              <Link href="/designer" className={`nav-item-nike text-white ${location === '/designer' ? 'nav-item-nike-active' : ''}`}>
-                Design
+              <Link href="/designer" className={`nav-item-nike ${location === '/designer' ? 'nav-item-nike-active' : ''}`}>
+                <span className={location === '/designer' ? '' : 'text-white hover:text-gradient'}>Design</span>
               </Link>
               <Link href="/how-it-works" className={`nav-item-nike text-white ${location === '/how-it-works' ? 'nav-item-nike-active' : ''}`}>
                 How It Works
@@ -78,28 +78,28 @@ export default function Navbar() {
               {user ? (
                 <>
                   {subscription.isSubscribed ? (
-                    <Badge className="bg-[var(--nike-accent)] text-white rounded-none px-2 py-0.5 text-xs flex items-center gap-1 h-5">
-                      <CrownIcon className="h-3 w-3" />
-                      <span>PRO</span>
+                    <Badge className="bg-white rounded-none px-2 py-0.5 text-xs flex items-center gap-1 h-5">
+                      <CrownIcon className="h-3 w-3 text-[var(--nike-accent)]" />
+                      <span className="text-gradient font-bold">PRO</span>
                     </Badge>
                   ) : (
-                    <Link href="/subscribe" className="text-[var(--nike-accent)] px-3 py-1 text-sm font-medium hover:underline transition-all flex items-center gap-1">
-                      <CrownIcon className="h-3 w-3" />
-                      <span>Upgrade</span>
+                    <Link href="/subscribe" className="px-3 py-1 text-sm font-medium hover:underline transition-all flex items-center gap-1">
+                      <CrownIcon className="h-3 w-3 text-[var(--nike-accent)]" />
+                      <span className="text-gradient">Upgrade</span>
                     </Link>
                   )}
                   <Link href="/dashboard" className="bg-white text-[var(--nike-black)] px-4 py-2 h-9 text-sm font-medium hover:bg-[#E5E5E5] transition-colors flex items-center">
-                    Dashboard
+                    <span className="text-gradient">Dashboard</span>
                   </Link>
                   {user.role === 'admin' && (
                     <Link href="/admin" className="bg-[var(--nike-gray-dark)] text-white px-4 py-2 h-9 text-sm font-medium hover:bg-[#656565] transition-colors flex items-center">
-                      Admin
+                      <span className="text-gradient">Admin</span>
                     </Link>
                   )}
                 </>
               ) : (
                 <Link href="/auth" className="bg-white text-[var(--nike-black)] px-4 py-2 h-9 text-sm font-medium hover:bg-[#E5E5E5] transition-colors flex items-center">
-                  Join Us
+                  <span className="text-gradient">Join Us</span>
                 </Link>
               )}
             </div>
@@ -181,12 +181,12 @@ export default function Navbar() {
           <div className="border-t border-[rgba(255,255,255,0.1)] pt-4 mt-4">
             {user ? (
               <>
-                <Link href="/dashboard" className="block py-2 text-white font-medium">
-                  Your Account
+                <Link href="/dashboard" className="block py-2 font-medium">
+                  <span className="text-gradient">Your Account</span>
                 </Link>
                 {user.role === 'admin' && (
-                  <Link href="/admin" className="block py-2 text-white font-medium">
-                    Admin Dashboard
+                  <Link href="/admin" className="block py-2 font-medium">
+                    <span className="text-gradient">Admin Dashboard</span>
                   </Link>
                 )}
                 <button 
@@ -197,8 +197,8 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <Link href="/auth" className="block py-2 text-white font-medium">
-                Join Us
+              <Link href="/auth" className="block py-2 font-medium">
+                <span className="text-gradient">Join Us</span>
               </Link>
             )}
           </div>
