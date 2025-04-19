@@ -14,7 +14,7 @@ interface FAQItemProps {
 
 const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, toggleOpen }) => {
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden transition-all duration-200 mb-4 hover:border-voro-red/30">
+    <div className="border border-gray-200 rounded-sm overflow-hidden transition-all duration-200 mb-4 hover:border-voro-red/30">
       <button 
         onClick={toggleOpen}
         className={`w-full p-6 flex justify-between items-center text-left font-heading font-medium text-lg ${isOpen ? 'text-voro-red' : 'text-voro-black'}`}
@@ -126,17 +126,17 @@ const FAQPage: React.FC = () => {
             </h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center">
+              <div className="bg-white p-6 rounded-sm shadow-sm hover:shadow-md transition-shadow text-center">
                 <h3 className="text-xl font-heading font-bold mb-3">Ordering</h3>
                 <p className="text-gray-600 mb-3">Order process, shipping, delivery times</p>
                 <span className="text-voro-red text-sm">5 articles</span>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center">
+              <div className="bg-white p-6 rounded-sm shadow-sm hover:shadow-md transition-shadow text-center">
                 <h3 className="text-xl font-heading font-bold mb-3">Design Help</h3>
                 <p className="text-gray-600 mb-3">AI Designer tips, customization options</p>
                 <span className="text-voro-red text-sm">8 articles</span>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center">
+              <div className="bg-white p-6 rounded-sm shadow-sm hover:shadow-md transition-shadow text-center">
                 <h3 className="text-xl font-heading font-bold mb-3">Team Orders</h3>
                 <p className="text-gray-600 mb-3">Bulk ordering, team management, pricing</p>
                 <span className="text-voro-red text-sm">4 articles</span>
@@ -157,7 +157,7 @@ const FAQPage: React.FC = () => {
                   Reach out to our team at <a href="mailto:help@vorosport.ai" className="text-voro-red hover:underline font-medium">help@vorosport.ai</a> for any questions not covered in our FAQs.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                  <Link href="/contact" className="px-6 py-2 rounded-lg bg-voro-red text-white hover:bg-opacity-90 transition-colors text-sm font-medium flex items-center gap-2">
+                  <Link href="/contact" className="px-6 py-2 rounded-sm bg-voro-red text-white hover:bg-opacity-90 transition-colors text-sm font-medium flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     Contact Support
                   </Link>
