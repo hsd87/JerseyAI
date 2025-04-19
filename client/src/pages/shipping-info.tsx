@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
+import voroLogoWhite from "@/assets/voro-white.png";
 import { useAuth } from '@/hooks/use-auth';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { useToast } from '@/hooks/use-toast';
@@ -21,7 +22,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -424,292 +424,331 @@ export default function ShippingInfoPage() {
 
   // Main shipping info page UI
   return (
-    <div className="container max-w-4xl mx-auto py-8">
-      <div className="flex items-center mb-8">
-        <Button variant="ghost" onClick={() => setLocation('/designer')}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Designer
-        </Button>
-        <h1 className="text-2xl font-bold ml-auto">Checkout</h1>
-      </div>
-
-      <div className="mb-8">
-        <Progress value={50} className="h-2 mb-2" />
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <div className="text-primary font-medium">
-            Shipping Information
-          </div>
-          <div>
-            Payment
-          </div>
-          <div>
-            Confirmation
+    <>
+      {/* Add Nike-style checkout navigation header */}
+      <div className="bg-[var(--nike-black)] text-white">
+        <div className="container max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center">
+              <img 
+                src="/voro-white.png" 
+                alt="VORO Logo" 
+                className="h-5 md:h-6" 
+              />
+            </Link>
+            <div className="hidden md:flex items-center space-x-8 text-sm">
+              <Link href="/designer" className="text-white hover:text-gray-300 transition-colors">
+                Design
+              </Link>
+              <Link href="/how-it-works" className="text-white hover:text-gray-300 transition-colors">
+                How It Works
+              </Link>
+              <Link href="/help" className="text-white hover:text-gray-300 transition-colors">
+                Help
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <div className="text-sm text-white/80">
+                  Hi, {user.username}
+                </div>
+              ) : (
+                <Link href="/auth" className="text-sm text-white hover:text-gray-300 transition-colors">
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Order summary and cart items */}
-        <div className="md:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                Your Order Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {renderCartItems()}
-              
-              <Separator />
-              
-              {renderOrderSummary()}
-            </CardContent>
-          </Card>
+      
+      <div className="container max-w-4xl mx-auto py-8">
+        <div className="flex items-center mb-8">
+          <Button variant="ghost" onClick={() => setLocation('/designer')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Designer
+          </Button>
+          <h1 className="text-2xl font-bold ml-auto">Checkout</h1>
         </div>
 
-        {/* Shipping information form */}
-        <div className="md:col-span-2">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <UserCircle2 className="mr-2 h-5 w-5" />
-                    Customer Information
-                  </CardTitle>
-                  <CardDescription>
-                    Please provide your contact information for this order
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="First name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Last name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+        <div className="mb-8">
+          <Progress value={50} className="h-2 mb-2" />
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <div className="text-primary font-medium">
+              Shipping Information
+            </div>
+            <div>
+              Payment
+            </div>
+            <div>
+              Confirmation
+            </div>
+          </div>
+        </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Email address" type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Phone number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Order summary and cart items */}
+          <div className="md:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  Your Order Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {renderCartItems()}
+                
+                <Separator />
+                
+                {renderOrderSummary()}
+              </CardContent>
+            </Card>
+          </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <MapPin className="mr-2 h-5 w-5" />
-                    Shipping Address
-                  </CardTitle>
-                  <CardDescription>
-                    Where should we ship your order?
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="street"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Street Address</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Street address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <FormControl>
-                            <Input placeholder="City" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="state"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>State/Province</FormLabel>
-                          <FormControl>
-                            <Input placeholder="State" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="postalCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Postal Code</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Postal code" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="country"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Country</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Country" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="additionalInfo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Additional Information (Optional)</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Additional notes, delivery instructions, etc." 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Truck className="mr-2 h-5 w-5" />
-                    Shipping Method
-                  </CardTitle>
-                  <CardDescription>
-                    Choose your preferred shipping method
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {calculatingShipping ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-8 w-8 animate-spin mr-2" />
-                      <p>Calculating shipping options...</p>
+          {/* Shipping information form */}
+          <div className="md:col-span-2">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <UserCircle2 className="mr-2 h-5 w-5" />
+                      Customer Information
+                    </CardTitle>
+                    <CardDescription>
+                      Please provide your contact information for this order
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="First name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Last name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                  ) : (
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Email address" type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Phone number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <MapPin className="mr-2 h-5 w-5" />
+                      Shipping Address
+                    </CardTitle>
+                    <CardDescription>
+                      Where should we ship your order?
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="shippingOption"
+                      name="street"
                       render={({ field }) => (
-                        <FormItem className="space-y-3">
+                        <FormItem>
+                          <FormLabel>Street Address</FormLabel>
                           <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                              className="space-y-3"
-                            >
-                              {shippingOptions.map((option) => (
-                                <div key={option.id} className="flex items-start space-x-2 border p-4 rounded-md">
-                                  <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
-                                  <div className="grid gap-1 grow">
-                                    <Label htmlFor={option.id} className="font-medium cursor-pointer flex justify-between">
-                                      <span>{option.name}</span>
-                                      <span>${option.price.toFixed(2)}</span>
-                                    </Label>
-                                    <div className="text-sm text-muted-foreground">
-                                      {option.description} • {option.estimatedDelivery}
+                            <Input placeholder="Street address" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <FormControl>
+                              <Input placeholder="City" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State/Province</FormLabel>
+                            <FormControl>
+                              <Input placeholder="State" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="postalCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Postal Code</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Postal code" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="country"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Country</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Country" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="additionalInfo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Additional Information (Optional)</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Additional notes, delivery instructions, etc." 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Truck className="mr-2 h-5 w-5" />
+                      Shipping Method
+                    </CardTitle>
+                    <CardDescription>
+                      Choose your preferred shipping method
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {calculatingShipping ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin mr-2" />
+                        <p>Calculating shipping options...</p>
+                      </div>
+                    ) : (
+                      <FormField
+                        control={form.control}
+                        name="shippingOption"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="space-y-3"
+                              >
+                                {shippingOptions.map((option) => (
+                                  <div key={option.id} className="flex items-start space-x-2 border p-4 rounded-md">
+                                    <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                                    <div className="grid gap-1 grow">
+                                      <Label htmlFor={option.id} className="font-medium cursor-pointer flex justify-between">
+                                        <span>{option.name}</span>
+                                        <span>${option.price.toFixed(2)}</span>
+                                      </Label>
+                                      <div className="text-sm text-muted-foreground">
+                                        {option.description} • {option.estimatedDelivery}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button variant="outline" type="button" onClick={() => setLocation('/designer')}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Cart
-                  </Button>
-                  <Button type="submit" disabled={calculatingShipping || loading}>
-                    Proceed to Payment
-                    <CreditCard className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            </form>
-          </Form>
+                                ))}
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <Button variant="outline" type="button" onClick={() => setLocation('/designer')}>
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      Back to Cart
+                    </Button>
+                    <Button type="submit" disabled={calculatingShipping || loading}>
+                      Proceed to Payment
+                      <CreditCard className="ml-2 h-4 w-4" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </form>
+            </Form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
