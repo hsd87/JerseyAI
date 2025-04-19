@@ -2,7 +2,7 @@ import { useDesignStore } from "@/hooks/use-design-store";
 import { Button } from "@/components/ui/button";
 import { useOrderStore } from "@/hooks/use-order-store";
 import { ShoppingCart, PenSquare, RotateCcw } from "lucide-react";
-import dreamJerseyImage from "../assets/a-vibrant-expansive-banner-design-showca_2Er3bKEQTOS85sW6Bmb0oQ_vbmCb9xDThmzV5jO0QV1_Q.png";
+
 
 export default function DesignResults() {
   const { 
@@ -62,9 +62,9 @@ export default function DesignResults() {
             <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
               <div className="text-center">
                 <img 
-                  src={dreamJerseyImage}
-                  alt="Dream Jersey Design" 
-                  className="mx-auto rounded-lg w-full max-w-lg h-auto object-cover mb-6" 
+                  src="/attached_assets/the-edited-text-reads-just-do-it-we-re-l_Xrq4WcXISmSsePVvrsofQA_19881kovRHq2673-gKduAQ (1).png" 
+                  alt="Just Do It" 
+                  className="mx-auto rounded-lg w-full max-w-lg h-auto object-contain mb-6 bg-black" 
                 />
                 
                 <h2 className="text-2xl font-sora font-semibold mb-2">Ready to create your dream kit?</h2>
