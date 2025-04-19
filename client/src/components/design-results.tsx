@@ -38,9 +38,9 @@ export default function DesignResults() {
             
             <div className="flex justify-center">
               <div className="inline-flex space-x-1">
-                <span className="w-3 h-3 bg-[#E34234] rounded-full animate-bounce" style={{ animationDelay: "-0.32s" }}></span>
-                <span className="w-3 h-3 bg-[#E34234] rounded-full animate-bounce" style={{ animationDelay: "-0.16s" }}></span>
-                <span className="w-3 h-3 bg-[#E34234] rounded-full animate-bounce"></span>
+                <span className="w-3 h-3 bg-[var(--nike-red)] rounded-full animate-bounce" style={{ animationDelay: "-0.32s" }}></span>
+                <span className="w-3 h-3 bg-[var(--nike-red)] rounded-full animate-bounce" style={{ animationDelay: "-0.16s" }}></span>
+                <span className="w-3 h-3 bg-[var(--nike-red)] rounded-full animate-bounce"></span>
               </div>
             </div>
             
@@ -76,13 +76,13 @@ export default function DesignResults() {
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-black text-white">
                     <i className="fas fa-tshirt mr-1"></i> 5 Sports
                   </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#E34234] text-white">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient text-white">
                     <i className="fas fa-palette mr-1"></i> Custom Colors
                   </span>
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-black text-white">
                     <i className="fas fa-bolt mr-1"></i> AI-Generated
                   </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#E34234] text-white">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient text-white">
                     <i className="fas fa-users mr-1"></i> Team Orders
                   </span>
                 </div>
@@ -104,10 +104,10 @@ export default function DesignResults() {
                   
                   {/* Preview Overlay */}
                   <div className="absolute top-2 right-2 flex space-x-2">
-                    <button className="bg-[#E34234] bg-opacity-80 hover:bg-opacity-100 text-white p-2 rounded-full transition-colors">
+                    <button className="bg-gradient text-white p-2 rounded-full hover:opacity-90 transition-opacity">
                       <i className="fas fa-expand-alt"></i>
                     </button>
-                    <button className="bg-[#E34234] bg-opacity-80 hover:bg-opacity-100 text-white p-2 rounded-full transition-colors">
+                    <button className="bg-gradient text-white p-2 rounded-full hover:opacity-90 transition-opacity">
                       <i className="fas fa-heart"></i>
                     </button>
                   </div>
@@ -122,7 +122,7 @@ export default function DesignResults() {
                     <h3 className="font-sora font-medium">
                       {formData.sport.charAt(0).toUpperCase() + formData.sport.slice(1)} Jersey - Design #{Math.floor(Math.random() * 10000)}
                     </h3>
-                    <span className="text-xs bg-[#E34234]/10 text-[#E34234] px-2 py-1 rounded-full">Front View</span>
+                    <span className="text-xs border-gradient text-gradient px-2 py-1 rounded-full">Front View</span>
                   </div>
                 </div>
               </div>
@@ -142,7 +142,7 @@ export default function DesignResults() {
                 </Button>
                 <Button
                   onClick={handleCustomize}
-                  className="flex-1 bg-[#E34234] hover:bg-opacity-80 inline-flex justify-center items-center py-3 px-4 rounded-full"
+                  className="flex-1 bg-gradient hover:opacity-90 text-white inline-flex justify-center items-center py-3 px-4 rounded-full"
                 >
                   Next
                 </Button>
