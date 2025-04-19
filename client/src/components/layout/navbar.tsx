@@ -62,16 +62,16 @@ export default function Navbar() {
           
           <div className="hidden md:block">
             <div className="ml-8 flex items-center space-x-8">
-              <Link href="/" className={`nav-item-nike ${location === '/' ? 'nav-item-nike-active' : ''}`}>
+              <Link href="/" className={`nav-item-nike text-white ${location === '/' ? 'nav-item-nike-active' : ''}`}>
                 Men
               </Link>
-              <Link href="/designer" className={`nav-item-nike ${location === '/designer' ? 'nav-item-nike-active' : ''}`}>
+              <Link href="/designer" className={`nav-item-nike text-white ${location === '/designer' ? 'nav-item-nike-active' : ''}`}>
                 Design
               </Link>
-              <Link href="/how-it-works" className={`nav-item-nike ${location === '/how-it-works' ? 'nav-item-nike-active' : ''}`}>
+              <Link href="/how-it-works" className={`nav-item-nike text-white ${location === '/how-it-works' ? 'nav-item-nike-active' : ''}`}>
                 How It Works
               </Link>
-              <Link href="/partner" className={`nav-item-nike ${location === '/partner' ? 'nav-item-nike-active' : ''}`}>
+              <Link href="/partner" className={`nav-item-nike text-white ${location === '/partner' ? 'nav-item-nike-active' : ''}`}>
                 Teams
               </Link>
               

@@ -95,11 +95,11 @@
   
   /* Navigation */
   .nav-item-nike {
-    @apply text-base font-normal text-[var(--nike-black)] transition-colors hover:text-[var(--nike-gray-medium)];
+    @apply text-base font-normal text-white transition-colors hover:text-[var(--nike-gray-medium)];
   }
   
   .nav-item-nike-active {
-    @apply text-base font-medium text-[var(--nike-black)] border-b-2 border-[var(--nike-black)];
+    @apply text-base font-medium text-white border-b-2 border-white;
   }
   
   /* Cards */
