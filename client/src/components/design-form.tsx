@@ -336,10 +336,10 @@ export default function DesignForm({ remainingDesigns = 6 }: DesignFormProps) {
         return;
       }
       
-      // Add pfsportskit token to the designNotes
+      // Add OKDIO token to the designNotes
       const dataWithToken = {
         ...data,
-        designNotes: `${data.designNotes || ""} [pfsportskit]`.trim()
+        designNotes: `${data.designNotes || ""} [okdio]`.trim()
       };
       
       // Track submission data
