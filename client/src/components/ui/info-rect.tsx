@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export interface InfoPillProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface InfoRectProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Title of the info box
    */
@@ -34,21 +34,21 @@ export interface InfoPillProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * InfoPill component - A rounded rectangular information container
+ * InfoRect component - A minimally rounded rectangular information container
  * 
  * @example
  * ```tsx
- * <InfoPill title="How the AI Works">
+ * <InfoRect title="How the AI Works">
  *   <ol className="list-decimal pl-5 space-y-2">
  *     <li>Input your sport type, colors, and preferences</li>
  *     <li>Our AI crafts custom designs based on your input</li>
  *     <li>View multiple design options in seconds</li>
  *     <li>Fine-tune and customize with our editor</li>
  *   </ol>
- * </InfoPill>
+ * </InfoRect>
  * ```
  */
-export function InfoPill({
+export function InfoRect({
   title,
   icon,
   variant = "light",
@@ -57,7 +57,7 @@ export function InfoPill({
   contentClassName,
   children,
   ...props
-}: InfoPillProps) {
+}: InfoRectProps) {
   // Determine background color based on variant
   const bgColor = variant === "light" ? "bg-[#F9F9F9]" : "bg-[#0A0A0A]";
   const textColor = variant === "light" ? "text-[#4B5563]" : "text-[#F9F9F9]";
