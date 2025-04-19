@@ -289,7 +289,7 @@ export default function LandingPage() {
       {/* Jersey Gallery Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-heading text-center mb-8">Our AI-Generated Jerseys</h2>
+          <h2 className="text-3xl font-heading text-center mb-8">Our Premium Sports Jerseys</h2>
           <JerseyScrollGallery 
             jerseyUrls={designs.map(design => design.urls.front)}
             altText="OKDIO jersey design"
