@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { useToast } from '@/hooks/use-toast';
@@ -12,6 +12,7 @@ import { orderService } from '@/lib/order-service';
 import { shippingService, type ShippingOption } from '@/lib/shipping-service';
 import { CustomerInfo } from '@/hooks/use-order-types';
 import StripeElementsForm from '@/components/payment/stripe-elements-form';
+import okdioLogo from "@/assets/okdio-logo.png";
 
 // UI Components
 import {
@@ -553,14 +554,52 @@ export default function CheckoutFixedPage() {
   // Render shipping information step
   if (checkoutStep === CheckoutStep.SHIPPING_INFO) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
-        <div className="flex items-center mb-8">
-          <Button variant="ghost" onClick={() => setLocation('/designer')}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Designer
-          </Button>
-          <h1 className="text-2xl font-bold ml-auto">Checkout</h1>
+      <>
+        {/* Navigation Bar */}
+        <div className="bg-[var(--nike-primary)] text-white">
+          <div className="container max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <Link href="/" className="flex items-center">
+                <img 
+                  src={okdioLogo} 
+                  alt="OKDIO Logo" 
+                  className="h-5 md:h-6" 
+                />
+              </Link>
+              <div className="hidden md:flex items-center space-x-8 text-sm">
+                <Link href="/designer" className="text-white hover:text-gray-300 transition-colors">
+                  Design
+                </Link>
+                <Link href="/how-it-works" className="text-white hover:text-gray-300 transition-colors">
+                  How It Works
+                </Link>
+                <Link href="/help" className="text-white hover:text-gray-300 transition-colors">
+                  Help
+                </Link>
+              </div>
+              <div className="flex items-center space-x-4">
+                {user ? (
+                  <div className="text-sm text-white/80">
+                    Hi, {user.username}
+                  </div>
+                ) : (
+                  <Link href="/auth" className="text-sm text-white hover:text-gray-300 transition-colors">
+                    Sign In
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+      
+        <div className="container max-w-4xl mx-auto py-8">
+          <div className="flex items-center mb-8">
+            <Button variant="ghost" onClick={() => setLocation('/designer')}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Designer
+            </Button>
+            <h1 className="text-2xl font-bold ml-auto text-gradient">Checkout</h1>
+          </div>
   
         <div className="mb-8">
           <Progress value={checkoutProgress} className="h-2 mb-2" />
