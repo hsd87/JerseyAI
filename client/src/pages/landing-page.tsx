@@ -195,7 +195,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
               <Link href="#team-solutions">
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10 px-8 py-3 rounded-full text-lg font-semibold transition-all h-auto">
+                <Button size="lg" className="bg-white text-black hover:bg-white/90 px-8 py-3 rounded-full text-lg font-semibold transition-all h-auto">
                   Request Bulk Quote
                 </Button>
               </Link>
