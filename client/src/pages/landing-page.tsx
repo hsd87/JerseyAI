@@ -321,10 +321,15 @@ export default function LandingPage() {
           </div>
 
           {/* Process Steps */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {processSteps.map((step, index) => (
               <div key={index} className="bg-white rounded-[1px] p-6 shadow-sm border border-[#E8E8ED] hover:shadow-md transition-shadow">
-                <div className="mb-4">{step.icon}</div>
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 rounded-full bg-gradient text-white flex items-center justify-center font-semibold mr-3">
+                    {index + 1}
+                  </div>
+                  {step.icon}
+                </div>
                 <h3 className="text-xl font-medium text-[#1D1D1F] mb-2">{step.title}</h3>
                 <p className="text-[#494949] text-sm">{step.description}</p>
               </div>
