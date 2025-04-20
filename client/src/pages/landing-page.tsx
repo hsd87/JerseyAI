@@ -171,21 +171,21 @@ export default function LandingPage() {
         {/* Galaxy Background Image - Absolute positioned with overlay */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/assets/a-vibrant-expansive-banner-design-showca_2Er3bKEQTOS85sW6Bmb0oQ_vbmCb9xDThmzV5jO0QV1_Q.png" 
+            src="/assets/galaxy-background.png" 
             alt="Galaxy background" 
             className="h-full w-full object-cover" 
           />
           {/* Dark overlay for better text contrast */}
-          <div className="absolute inset-0 bg-black/60"></div>
+          <div className="absolute inset-0 bg-black/70"></div>
         </div>
         
         {/* Content container with higher z-index to appear above background */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-20 flex flex-col md:flex-row items-center justify-between">
           <div className="w-full md:w-3/5 space-y-8 mb-12 md:mb-0">
-            <h1 className="font-sora text-4xl md:text-6xl font-bold leading-tight text-[#0F0F0F]">
+            <h1 className="font-sora text-4xl md:text-6xl font-bold leading-tight text-white">
               Design Custom Teamwear <span className="text-gradient">in Seconds</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-md">
+            <p className="text-lg md:text-xl text-gray-300 max-w-md">
               AI-powered kit builder. No design skills needed.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -195,15 +195,15 @@ export default function LandingPage() {
                 </Button>
               </Link>
               <Link href="#team-solutions">
-                <Button variant="outline" size="lg" className="border-[#0F0F0F] text-[#0F0F0F] hover:bg-gray-50 px-8 py-3 rounded-full text-lg font-semibold transition-all h-auto">
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10 px-8 py-3 rounded-full text-lg font-semibold transition-all h-auto">
                   Request Bulk Quote
                 </Button>
               </Link>
             </div>
           </div>
           <div className="w-full md:w-2/5">
-            <div className="text-sm text-gray-500 uppercase mb-2">Your Kit Preview</div>
-            <div className="rounded-xl shadow-sm border border-gray-300 bg-white p-6">
+            <div className="text-sm text-white uppercase mb-2">Your Kit Preview</div>
+            <div className="rounded-xl shadow-md border border-gray-800/30 bg-white p-6">
               <div className="text-center mb-4">
                 <span className="font-heading font-bold text-xl"><span className="text-gradient">OKDIO</span> Designer</span>
               </div>
@@ -246,7 +246,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <ArrowDown className="h-6 w-6 text-gray-400" />
+            <ArrowDown className="h-6 w-6 text-white" />
           </div>
         </div>
       </section>
