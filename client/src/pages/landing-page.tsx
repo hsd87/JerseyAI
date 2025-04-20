@@ -166,9 +166,21 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="relative bg-[#FAFAFA] overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 flex flex-col md:flex-row items-center justify-between">
+      {/* Hero Section with Galaxy Background */}
+      <section className="relative overflow-hidden bg-black">
+        {/* Galaxy Background Image - Absolute positioned with overlay */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/assets/a-vibrant-expansive-banner-design-showca_2Er3bKEQTOS85sW6Bmb0oQ_vbmCb9xDThmzV5jO0QV1_Q.png" 
+            alt="Galaxy background" 
+            className="h-full w-full object-cover" 
+          />
+          {/* Dark overlay for better text contrast */}
+          <div className="absolute inset-0 bg-black/60"></div>
+        </div>
+        
+        {/* Content container with higher z-index to appear above background */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-20 flex flex-col md:flex-row items-center justify-between">
           <div className="w-full md:w-3/5 space-y-8 mb-12 md:mb-0">
             <h1 className="font-sora text-4xl md:text-6xl font-bold leading-tight text-[#0F0F0F]">
               Design Custom Teamwear <span className="text-gradient">in Seconds</span>
