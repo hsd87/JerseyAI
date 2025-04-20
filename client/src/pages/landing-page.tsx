@@ -166,17 +166,17 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       
-      {/* Hero Section with Galaxy Background */}
+      {/* Hero Section with Cosmic Nebula Background */}
       <section className="relative overflow-hidden bg-black">
-        {/* Galaxy Background Image - Absolute positioned with overlay */}
+        {/* Cosmic Background Image - Absolute positioned with overlay */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/assets/galaxy-background.png" 
-            alt="Galaxy background" 
+            src="/assets/cosmic-background.png" 
+            alt="Cosmic background" 
             className="h-full w-full object-cover" 
           />
           {/* Dark overlay for better text contrast */}
-          <div className="absolute inset-0 bg-black/70"></div>
+          <div className="absolute inset-0 bg-black/50"></div>
         </div>
         
         {/* Content container with higher z-index to appear above background */}

@@ -88,18 +88,18 @@ export default function Navbar() {
                       <span className="text-gradient">Upgrade</span>
                     </Link>
                   )}
-                  <Link href="/dashboard" className="bg-white text-[var(--nike-black)] px-4 py-2 h-9 text-sm font-medium hover:bg-[#E5E5E5] transition-colors flex items-center">
-                    <span className="text-gradient">Dashboard</span>
+                  <Link href="/dashboard" className="bg-white text-black px-4 py-2 h-9 text-sm font-medium hover:bg-white/90 transition-colors flex items-center rounded-full">
+                    Dashboard
                   </Link>
                   {user.role === 'admin' && (
-                    <Link href="/admin" className="bg-[var(--nike-gray-dark)] text-white px-4 py-2 h-9 text-sm font-medium hover:bg-[#656565] transition-colors flex items-center">
-                      <span className="text-gradient">Admin</span>
+                    <Link href="/admin" className="bg-gradient text-white px-4 py-2 h-9 text-sm font-medium hover:opacity-90 transition-colors flex items-center rounded-full">
+                      Admin
                     </Link>
                   )}
                 </>
               ) : (
-                <Link href="/auth" className="bg-white text-[var(--nike-black)] px-4 py-2 h-9 text-sm font-medium hover:bg-[#E5E5E5] transition-colors flex items-center">
-                  <span className="text-gradient">Join Us</span>
+                <Link href="/auth" className="bg-white text-black px-4 py-2 h-9 text-sm font-medium hover:bg-white/90 transition-colors flex items-center rounded-full">
+                  Join Us
                 </Link>
               )}
             </div>
