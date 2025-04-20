@@ -229,7 +229,7 @@ interface SimplifiedStripeFormProps {
 
 export const SimplifiedStripeForm: React.FC<SimplifiedStripeFormProps> = ({
   clientSecret,
-  amount,
+  amount = 0, // Provide default value of 0
   onSuccess,
   onCancel,
 }) => {

@@ -322,22 +322,32 @@ const CheckoutPage: React.FC = () => {
     
     return (
       <div className="space-y-4">
-        {cart.map((item, index) => (
-          <div key={index} className="flex justify-between items-center py-2 border-b">
-            <div className="flex items-center gap-3">
-              <div className="bg-muted w-12 h-12 rounded-md flex items-center justify-center">
-                <Package className="h-6 w-6 text-muted-foreground" />
+        {cart.map((item, index) => {
+          // Safely handle potentially undefined values
+          const price = item.price || 0;
+          const quantity = item.quantity || 1;
+          const gender = item.gender || 'Unisex';
+          const size = item.size || 'One size';
+          const type = item.type || 'Item';
+          const name = item.name || type;
+          
+          return (
+            <div key={index} className="flex justify-between items-center py-2 border-b">
+              <div className="flex items-center gap-3">
+                <div className="bg-muted w-12 h-12 rounded-md flex items-center justify-center">
+                  <Package className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-medium">{name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {gender} / {size} / Qty: {quantity}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium">{item.name || `${item.type}`}</p>
-                <p className="text-sm text-muted-foreground">
-                  {item.gender} / {item.size} / Qty: {item.quantity}
-                </p>
-              </div>
+              <p className="font-medium">${(price * quantity).toFixed(2)}</p>
             </div>
-            <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
@@ -346,18 +356,22 @@ const CheckoutPage: React.FC = () => {
   const renderOrderSummary = () => {
     if (!priceBreakdown) return null;
     
+    // Safely handle potentially undefined values in price breakdown
+    const subtotal = priceBreakdown.subtotal || 0;
+    const grandTotal = priceBreakdown.grandTotal || 0;
+    
     return (
       <div className="space-y-3">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>${priceBreakdown.subtotal.toFixed(2)}</span>
+          <span>${subtotal.toFixed(2)}</span>
         </div>
         
         <Separator />
         
         <div className="flex justify-between font-bold text-lg">
           <span>Total</span>
-          <span>${priceBreakdown.grandTotal.toFixed(2)}</span>
+          <span>${grandTotal.toFixed(2)}</span>
         </div>
       </div>
     );
