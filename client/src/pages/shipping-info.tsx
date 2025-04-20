@@ -335,8 +335,8 @@ export default function ShippingInfoPage() {
         description: 'Proceeding to payment...',
       });
       
-      // Navigate to payment page
-      setLocation('/checkout-fixed');
+      // Navigate to payment page - using standard checkout page
+      setLocation('/checkout');
     } catch (error: any) {
       console.error('Error saving shipping information:', error);
       toast({

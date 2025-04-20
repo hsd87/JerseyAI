@@ -6,13 +6,7 @@ import { PriceBreakdown, OrderDetails } from '@/hooks/use-order-types';
 import { Check, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useSubscription } from '@/hooks/use-subscription-store';
-import { 
-  BASE_PRICES, 
-  TIER_DISCOUNTS, 
-  SUBSCRIPTION_DISCOUNT, 
-  SHIPPING_RULES,
-  TAX_RATE
-} from '@shared/pricing';
+import { BASE_PRICES } from '@shared/pricing';
 
 export default function PriceCalculator() {
   const { 
@@ -35,30 +29,8 @@ export default function PriceCalculator() {
     calculatePriceBreakdown();
   }, [items, addOns, teamMembers, isTeamOrder, sport, subscription.isSubscribed]);
   
-  /**
-   * Helper function to get tiered discount rate based on quantity
-   */
-  function getTieredDiscountRate(quantity: number): number {
-    for (const tier of TIER_DISCOUNTS) {
-      if (quantity >= tier.threshold) {
-        return tier.discount;
-      }
-    }
-    return 0;
-  }
-  
-  /**
-   * Helper function to calculate shipping cost based on subtotal
-   */
-  function calculateShipping(subtotal: number): number {
-    for (const rule of SHIPPING_RULES) {
-      if (subtotal >= rule.threshold) {
-        return rule.cost;
-      }
-    }
-    // Fallback to the last rule's cost (highest shipping cost)
-    return SHIPPING_RULES[SHIPPING_RULES.length - 1].cost;
-  }
+  // Helper functions for tier discounts and shipping have been removed
+  // as part of the pricing simplification
   
   /**
    * Check if a product should use a bundle price instead of individual pricing
@@ -114,8 +86,7 @@ export default function PriceCalculator() {
       addOns, 
       teamMembers, 
       isTeamOrder,
-      sport,
-      isSubscribed: subscription.isSubscribed
+      sport
     });
     
     // Check if we should use bundle pricing
@@ -154,88 +125,25 @@ export default function PriceCalculator() {
     // Count total items
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0) + addOns.length;
     
-    // Calculate tier discount if applicable
-    let tierDiscountRate = 0;
-    let tierDiscountAmount = 0;
-    let tierDiscountApplied = false;
-    let discountPercentage = 0;
+    // According to shared/pricing.ts, pricing has been simplified to remove all discounts,
+    // shipping costs, and taxes. Using the simplified model.
     
-    if (isTeamOrder) {
-      // Use team members count for quantity discount
-      tierDiscountRate = getTieredDiscountRate(teamMembers.length);
-      if (tierDiscountRate > 0) {
-        tierDiscountApplied = true;
-        // Convert to percentage for display
-        discountPercentage = tierDiscountRate * 100;
-        tierDiscountAmount = subtotal * tierDiscountRate;
-        console.log(`Applied tier discount: ${discountPercentage}% on ${teamMembers.length} members = $${tierDiscountAmount.toFixed(2)}`);
-      }
-    } else {
-      // Use item quantity for discount
-      tierDiscountRate = getTieredDiscountRate(itemCount);
-      if (tierDiscountRate > 0) {
-        tierDiscountApplied = true;
-        // Convert to percentage for display
-        discountPercentage = tierDiscountRate * 100;
-        tierDiscountAmount = subtotal * tierDiscountRate;
-        console.log(`Applied tier discount: ${discountPercentage}% on ${itemCount} items = $${tierDiscountAmount.toFixed(2)}`);
-      }
-    }
-    
-    // Apply subscription discount if applicable
-    const isSubscriber = subscription.isSubscribed || user?.subscriptionTier === 'pro';
-    const subscriptionDiscountApplied = isSubscriber;
-    let subscriptionDiscountAmount = 0;
-    
-    if (subscriptionDiscountApplied) {
-      // Apply subscription discount on the amount after tier discount
-      const amountAfterTierDiscount = subtotal - tierDiscountAmount;
-      subscriptionDiscountAmount = amountAfterTierDiscount * SUBSCRIPTION_DISCOUNT;
-      console.log(`Applied subscription discount: ${SUBSCRIPTION_DISCOUNT * 100}% on $${amountAfterTierDiscount.toFixed(2)} = $${subscriptionDiscountAmount.toFixed(2)}`);
-    }
-    
-    // Calculate total discount
-    const discount = tierDiscountAmount + subscriptionDiscountAmount;
-    
-    // Calculate shipping based on subtotal after discounts
-    const subtotalAfterDiscounts = subtotal - discount;
-    const shipping = calculateShipping(subtotalAfterDiscounts);
-    const shippingFreeThresholdApplied = shipping === 0;
-    
-    // Calculate tax
-    const priceBeforeTax = subtotalAfterDiscounts + shipping;
-    const tax = priceBeforeTax * TAX_RATE;
-    
-    // Calculate grand total
-    const grandTotal = priceBeforeTax + tax;
+    // Grand total is the same as subtotal in the simplified model
+    const grandTotal = subtotal;
     
     console.log('Price breakdown:', {
       baseTotal,
-      tierDiscount: tierDiscountAmount,
-      tierDiscountRate,
-      subscriptionDiscount: subscriptionDiscountAmount,
-      subtotalAfterDiscounts,
-      shipping,
-      tax,
-      grandTotal
+      subtotal,
+      grandTotal,
+      itemCount
     });
     
-    // Set the price breakdown
+    // Set the price breakdown using the simplified pricing model
     setPriceBreakdown({
-      subtotal,
-      discount,
-      discountPercentage,
-      shipping,
-      tax,
-      grandTotal,
-      itemCount,
       baseTotal,
-      tierDiscountApplied,
-      tierDiscountAmount,
-      subscriptionDiscountApplied,
-      subscriptionDiscountAmount,
-      shippingFreeThresholdApplied,
-      priceBeforeTax
+      subtotal,
+      grandTotal,
+      itemCount
     });
     
     // Create and set order details
@@ -246,20 +154,10 @@ export default function PriceCalculator() {
       packageType: isTeamOrder ? 'team' : 'individual',
       teamMembers: isTeamOrder ? teamMembers : undefined,
       priceBreakdown: {
-        subtotal,
-        discount,
-        discountPercentage,
-        shipping,
-        tax,
-        grandTotal,
-        itemCount,
         baseTotal,
-        tierDiscountApplied,
-        tierDiscountAmount,
-        subscriptionDiscountApplied,
-        subscriptionDiscountAmount,
-        shippingFreeThresholdApplied,
-        priceBeforeTax
+        subtotal,
+        grandTotal,
+        itemCount
       }
     };
     
@@ -288,41 +186,6 @@ export default function PriceCalculator() {
         <div className="flex justify-between">
           <span>Subtotal</span>
           <span>${priceBreakdown.subtotal.toFixed(2)}</span>
-        </div>
-        
-        {priceBreakdown.discount > 0 && (
-          <div className="flex justify-between text-green-600">
-            <span>Discount</span>
-            <span>-${priceBreakdown.discount.toFixed(2)}</span>
-          </div>
-        )}
-        
-        {priceBreakdown.tierDiscountApplied && (
-          <div className="flex items-center text-sm text-muted-foreground">
-            <Check className="h-3 w-3 mr-1 text-green-600" />
-            <span>Team discount ({priceBreakdown.discountPercentage}%)</span>
-          </div>
-        )}
-        
-        {priceBreakdown.subscriptionDiscountApplied && (
-          <div className="flex items-center text-sm text-muted-foreground">
-            <Check className="h-3 w-3 mr-1 text-green-600" />
-            <span>Pro member discount (10%)</span>
-          </div>
-        )}
-        
-        <div className="flex justify-between">
-          <span>Shipping</span>
-          {priceBreakdown.shippingFreeThresholdApplied ? (
-            <span className="text-green-600">FREE</span>
-          ) : (
-            <span>${priceBreakdown.shipping.toFixed(2)}</span>
-          )}
-        </div>
-        
-        <div className="flex justify-between">
-          <span>Tax</span>
-          <span>${priceBreakdown.tax.toFixed(2)}</span>
         </div>
         
         <div className="border-t pt-2 mt-2">
