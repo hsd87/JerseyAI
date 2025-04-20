@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle, ArrowDown, PlayCircle, Users, Building, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, CheckCircle, ArrowDown, PlayCircle, Users, Building, ChevronLeft, ChevronRight, Shirt, Wand2, Edit, Truck } from "lucide-react";
 import cosmicBackgroundImg from "../assets/cosmic-background.png";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
@@ -14,30 +14,22 @@ const processSteps = [
   {
     title: "Choose Your Gear",
     description: "Pick a sport and jersey style from our catalog",
-    icon: <div className="w-12 h-12 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center">
-      <span className="text-xl font-bold text-gradient">1</span>
-    </div>
+    icon: <Shirt className="w-6 h-6 text-gradient" />
   },
   {
     title: "AI Generates Designs",
     description: "Get instant designs to choose from",
-    icon: <div className="w-12 h-12 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center">
-      <span className="text-xl font-bold text-gradient">2</span>
-    </div>
+    icon: <Wand2 className="w-6 h-6 text-gradient" />
   },
   {
     title: "Customize Details",
     description: "Add names, numbers, logos easily",
-    icon: <div className="w-12 h-12 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center">
-      <span className="text-xl font-bold text-gradient">3</span>
-    </div>
+    icon: <Edit className="w-6 h-6 text-gradient" />
   },
   {
     title: "Order & Fulfillment",
     description: "We produce and ship to your door",
-    icon: <div className="w-12 h-12 rounded-full bg-gradient bg-opacity-10 flex items-center justify-center">
-      <span className="text-xl font-bold text-gradient">4</span>
-    </div>
+    icon: <Truck className="w-6 h-6 text-gradient" />
   }
 ];
 
