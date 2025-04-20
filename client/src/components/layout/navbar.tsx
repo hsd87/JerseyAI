@@ -1,7 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
-import { CrownIcon, Menu, Moon, ShoppingCart, User, UserCircle, X } from "lucide-react";
+import { 
+  CrownIcon, 
+  Menu, 
+  Moon, 
+  ShoppingCart, 
+  User, 
+  UserCircle, 
+  X,
+  LogOut,
+  LayoutDashboard
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useSubscription } from "@/hooks/use-subscription-store";
 import { CartDrawer } from "@/components/cart/cart-drawer";
@@ -14,6 +24,22 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { user, logoutMutation } = useAuth();
   const subscription = useSubscription();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Add scroll detection for navbar shadow
   useEffect(() => {
@@ -63,22 +89,22 @@ export default function Navbar() {
           <div className="hidden md:block">
             <div className="ml-8 flex items-center space-x-8">
               <Link href="/" className={`nav-item-nike ${location === '/' ? 'nav-item-nike-active' : ''}`}>
-                <span className={location === '/' ? 'text-gradient' : 'text-white hover:text-gradient'}>Men</span>
+                <span className={location === '/' ? 'text-gradient' : 'text-white hover:text-gradient'}>Home</span>
               </Link>
               <Link href="/designer" className={`nav-item-nike ${location === '/designer' ? 'nav-item-nike-active' : ''}`}>
-                <span className={location === '/designer' ? 'text-gradient' : 'text-white hover:text-gradient'}>Design</span>
+                <span className={location === '/designer' ? 'text-gradient' : 'text-white hover:text-gradient'}>AI Designer</span>
               </Link>
               <Link href="/how-it-works" className={`nav-item-nike ${location === '/how-it-works' ? 'nav-item-nike-active' : ''}`}>
                 <span className={location === '/how-it-works' ? 'text-gradient' : 'text-white hover:text-gradient'}>How It Works</span>
               </Link>
               <Link href="/partner" className={`nav-item-nike ${location === '/partner' ? 'nav-item-nike-active' : ''}`}>
-                <span className={location === '/partner' ? 'text-gradient' : 'text-white hover:text-gradient'}>Teams</span>
+                <span className={location === '/partner' ? 'text-gradient' : 'text-white hover:text-gradient'}>Become a Partner</span>
               </Link>
               
               {user ? (
                 <>
                   {subscription.isSubscribed ? (
-                    <Badge className="bg-white rounded-none px-2 py-0.5 text-xs flex items-center gap-1 h-5">
+                    <Badge className="bg-white text-black rounded-full px-3 py-0.5 text-xs flex items-center gap-1 h-5">
                       <CrownIcon className="h-3 w-3 text-gradient" />
                       <span className="text-gradient font-bold">PRO</span>
                     </Badge>
@@ -131,15 +157,42 @@ export default function Navbar() {
             </div>
             
             {user ? (
-              <div className="relative">
+              <div className="relative" ref={userMenuRef}>
                 <button 
-                  onClick={handleLogout}
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="p-2 text-white hover:text-[var(--nike-gray-medium)] focus:outline-none transition-colors relative"
                   aria-label="User account and settings"
+                  aria-expanded={userMenuOpen}
                 >
-                  <span className="sr-only">Logout</span>
+                  <span className="sr-only">User Menu</span>
                   <User className="h-5 w-5" />
                 </button>
+                
+                {/* User dropdown menu */}
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-[var(--nike-black)] border border-[rgba(255,255,255,0.1)] rounded-sm shadow-lg z-50">
+                    <div className="py-1">
+                      <Link 
+                        href="/dashboard" 
+                        className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.05)] hover:text-gradient"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <LayoutDashboard className="h-4 w-4 mr-2" />
+                        Dashboard
+                      </Link>
+                      <button 
+                        onClick={() => {
+                          handleLogout();
+                          setUserMenuOpen(false);
+                        }}
+                        className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.05)] hover:text-gradient"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <Link 
@@ -160,10 +213,10 @@ export default function Navbar() {
       >
         <div className="px-6 py-6 space-y-4">
           <Link href="/" className={`block py-2 text-base font-normal ${location === '/' ? 'font-medium' : ''}`}>
-            <span className={location === '/' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Men</span>
+            <span className={location === '/' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Home</span>
           </Link>
           <Link href="/designer" className={`block py-2 text-base font-normal ${location === '/designer' ? 'font-medium' : ''}`}>
-            <span className={location === '/designer' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Design</span>
+            <span className={location === '/designer' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>AI Designer</span>
           </Link>
           <Link href="/how-it-works" className={`block py-2 text-base font-normal ${location === '/how-it-works' ? 'font-medium' : ''}`}>
             <span className={location === '/how-it-works' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>How It Works</span>
@@ -175,7 +228,7 @@ export default function Navbar() {
             <span className={location === '/faq' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Help</span>
           </Link>
           <Link href="/partner" className={`block py-2 text-base font-normal ${location === '/partner' ? 'font-medium' : ''}`}>
-            <span className={location === '/partner' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Team Orders</span>
+            <span className={location === '/partner' ? 'text-secondary-gradient' : 'text-[var(--nike-gray-medium)] hover:text-white'}>Become a Partner</span>
           </Link>
           
           <div className="border-t border-[rgba(255,255,255,0.1)] pt-4 mt-4">

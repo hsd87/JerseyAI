@@ -4,7 +4,7 @@ import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 export default function Footer() {
   return (
     <footer className="footer bg-black text-white mt-8 sm:mt-12">
-      <div className="container-custom mx-auto py-12 md:py-16">
+      <div className="container-custom mx-auto py-12 md:py-16 px-5 md:px-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
           <div className="col-span-2">
             <Link href="/" className="flex items-center">
@@ -32,17 +32,16 @@ export default function Footer() {
           <div className="col-span-1">
             <h3 className="text-sm font-medium text-gray-100 uppercase tracking-wider">Company</h3>
             <ul className="mt-4 space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-gradient transition-colors">About</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-gradient transition-colors">Careers</a></li>
+              <li><Link href="/about" className="text-gray-300 hover:text-gradient transition-colors">About Us</Link></li>
+              <li><Link href="/partner" className="text-gray-300 hover:text-gradient transition-colors">Careers</Link></li>
               <li><a href="#" className="text-gray-300 hover:text-gradient transition-colors">Contact</a></li>
               <li><Link href="/partner" className="text-gray-300 hover:text-gradient transition-colors">Partner With Us</Link></li>
-              <li><Link href="/products" className="text-gray-300 hover:text-gradient transition-colors">Shop</Link></li>
               <li><a href="#" className="text-gray-300 hover:text-gradient transition-colors">Privacy Policy</a></li>
             </ul>
           </div>
         </div>
         
-        <div className="mt-12 sm:mt-16 border-t border-gray-600 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center">
+        <div className="mt-12 sm:mt-16 border-t border-gray-600 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center px-4">
           <p className="text-sm text-gray-400">
             &copy; {new Date().getFullYear()} OKDIO. All rights reserved.
           </p>
