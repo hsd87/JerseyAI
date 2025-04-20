@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, ArrowDown, PlayCircle, Users, Building, ChevronLeft, ChevronRight } from "lucide-react";
+import cosmicBackgroundImg from "../assets/cosmic-background.png";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { apiRequest } from "@/lib/queryClient";
@@ -171,7 +172,7 @@ export default function LandingPage() {
         {/* Cosmic Background Image - Absolute positioned with overlay */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/assets/cosmic-background.png" 
+            src={cosmicBackgroundImg} 
             alt="Cosmic background" 
             className="h-full w-full object-cover" 
           />
