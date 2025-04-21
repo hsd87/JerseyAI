@@ -653,6 +653,69 @@ class OrderService {
   }
 
   /**
+   * Generate a PDF receipt for an order
+   */
+  async generateReceipt(orderId: string | number): Promise<ArrayBuffer> {
+    try {
+      // Set a reasonable timeout for PDF generation
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(new DOMException('Receipt generation timeout', 'TimeoutError')), 20000); // 20 seconds timeout
+      
+      try {
+        // Make API request with timeout
+        const response = await apiRequest('GET', `/api/orders/${orderId}/receipt`, undefined, controller.signal);
+        
+        // Clear timeout if request completes
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Authentication required to generate receipt');
+          } else if (response.status === 404) {
+            throw new Error('Order not found');
+          }
+          
+          // Try to parse error message if available
+          try {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Receipt generation failed: ${response.statusText}`);
+          } catch (jsonError) {
+            throw new Error(`Receipt generation failed: ${response.statusText}`);
+          }
+        }
+        
+        // Return the PDF as an array buffer
+        return await response.arrayBuffer();
+      } catch (fetchError: any) {
+        // Clear timeout if fetch fails
+        clearTimeout(timeoutId);
+        
+        // Handle fetch-specific errors (timeout, network issues)
+        if (fetchError.name === 'AbortError') {
+          console.error('Receipt generation request timed out after 20 seconds');
+          throw new Error('Receipt generation is taking longer than expected. Please try again later.');
+        }
+        
+        // Rethrow other errors
+        throw fetchError;
+      }
+    } catch (error: any) {
+      console.error(`Error generating receipt for order ${orderId}:`, error);
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Network Error') || 
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('network')) {
+        throw new Error('Network connection issue. Please check your internet connection and try again.');
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        throw new Error('Receipt generation is taking longer than expected. Please try again later.');
+      }
+      
+      throw new Error(error.message || 'Failed to generate receipt');
+    }
+  }
+
+  /**
    * Get a specific order by ID
    */
   async getOrderById(orderId: number): Promise<Order> {
