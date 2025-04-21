@@ -32,7 +32,7 @@ class OrderService {
    */
   // Class-level cache to store the last successful payment intent
   private static paymentIntentCache: {
-    amount: number;
+    amount: number; // amount in cents (following our cents-based pricing model)
     timestamp: number;
     response: CreatePaymentIntentResponse;
   } | null = null;
@@ -95,7 +95,7 @@ class OrderService {
           await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
           if (!OrderService.requestInProgress) {
             // If the cache was populated while waiting, check it again
-            if (OrderService.paymentIntentCache?.amount === amount) {
+            if (OrderService.paymentIntentCache?.amount === amountInCents) {
               console.log('Payment intent became available while waiting');
               return OrderService.paymentIntentCache.response;
             }
@@ -128,7 +128,8 @@ class OrderService {
           }];
       
       console.log(`Creating payment intent for checkout with:`, {
-        amount, 
+        amountInCents, 
+        amountInDollars: amountInDollars.toFixed(2),
         cartItems: items.length,
         userId: this.authService?.userId
       });
@@ -139,10 +140,9 @@ class OrderService {
       
       try {
         // Make API request with timeout using updated API that accepts AbortSignal
-        // We're sending both the amount in dollars and the pre-calculated amount in cents
+        // We're only sending amount in cents now (following our new pricing model)
         const response = await apiRequest('POST', '/api/create-payment-intent', {
-          amount, // Amount in dollars (e.g., 250.00 = $250.00)
-          amountInCents, // Precalculated amount in cents (e.g., 25000)
+          amount: amountInCents, // Amount in cents (e.g., 25000 = $250.00)
           items,
           requestId: request.requestId,
           componentId: request.componentId
@@ -191,14 +191,15 @@ class OrderService {
           
           // Store in class-level cache
           OrderService.paymentIntentCache = {
-            amount,
+            amount: amountInCents,
             timestamp: Date.now(),
             response: responseData
           };
           
           // Log successful cache
           console.log('Cached payment intent for request:', {
-            amount,
+            amountInCents,
+            amountInDollars: amountInDollars.toFixed(2),
             hasClientSecret: !!responseData.clientSecret,
             clientSecretLength: responseData.clientSecret?.length || 0
           });
