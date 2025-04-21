@@ -215,7 +215,6 @@ ${sleeveStyle ? `- Sleeve style: ${sleeveStyle}` : ''}
 ${collarType ? `- Collar type: ${collarType}` : ''}
 ${patternStyle ? `- Pattern style: ${patternStyle}` : ''}
 ${designNotes ? `- Design notes: ${designNotes}` : ''}
-- Sport-specific features (basketball = sleeveless, soccer = short sleeves)
 - If kit includes shorts, ensure both jersey and shorts are visible in the final image
 
 Return ONLY a JSON object: { "prompt": "your detailed jersey description" }
@@ -341,7 +340,7 @@ export async function generateJerseyImageWithReplicate(prompt: string, kitType?:
     guidance_scale: 2.9,
     output_format: "jpg",
     disable_safety_checker: false,
-    lora_scale: 0.8,
+    lora_scale: 1,
     extra_lora: "",  // Ensure this is always a string
     extra_lora_scale: 0.69  // Ensure this is always a number
   };
