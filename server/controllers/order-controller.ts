@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
 import { z } from 'zod';
 import { calculateOrderAmount } from '../stripe';
+import path from 'path';
+import fs from 'fs';
 
 // Import types
 import type { 
@@ -283,6 +285,78 @@ export async function getAllOrders(req: Request, res: Response) {
     res.status(500).json({
       error: 'order_fetch_error',
       message: 'Failed to fetch orders',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+}
+
+/**
+ * Generate and return a PDF receipt for an order
+ */
+export async function generateOrderReceipt(req: Request, res: Response) {
+  try {
+    // Check if user is authenticated
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+      return res.status(401).json({ error: 'Unauthorized', message: 'You must be logged in to generate a receipt' });
+    }
+
+    const orderId = parseInt(req.params.id);
+    if (isNaN(orderId)) {
+      return res.status(400).json({ error: 'invalid_id', message: 'Invalid order ID' });
+    }
+
+    // Get the order from the database
+    const order = await storage.getOrderById(orderId);
+    if (!order) {
+      return res.status(404).json({ error: 'not_found', message: 'Order not found' });
+    }
+
+    // Check if the order belongs to the current user or the user is an admin
+    if (order.userId !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'forbidden', message: 'You do not have permission to access this order' });
+    }
+
+    // Import the PDF generator here to avoid circular dependencies
+    const { generateOrderPDF } = await import('../utils/pdf-generator');
+
+    // Generate the PDF
+    const pdfPath = await generateOrderPDF(order);
+    console.log(`Generated PDF for order ${orderId} at path: ${pdfPath}`);
+
+    // Send the file to the client with proper headers for download
+    const filename = `OKDIO_Order_${orderId}_Receipt.pdf`;
+    
+    // Get the absolute path of the generated PDF
+    const absolutePath = path.join(process.cwd(), pdfPath.startsWith('/') ? pdfPath.substring(1) : pdfPath);
+    
+    if (!fs.existsSync(absolutePath)) {
+      console.error(`PDF file not found at ${absolutePath}`);
+      return res.status(500).json({ error: 'file_not_found', message: 'Receipt file could not be generated' });
+    }
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    
+    // Stream the file to the client
+    const fileStream = fs.createReadStream(absolutePath);
+    fileStream.pipe(res);
+    
+    // Handle errors during streaming
+    fileStream.on('error', (err) => {
+      console.error(`Error streaming PDF file: ${err.message}`);
+      // If the response headers haven't been sent yet, respond with an error
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'stream_error', message: 'Error streaming receipt file' });
+      } else {
+        // Otherwise, end the response
+        res.end();
+      }
+    });
+  } catch (error: any) {
+    console.error('Error generating order receipt:', error);
+    res.status(500).json({
+      error: 'receipt_generation_error',
+      message: 'Failed to generate receipt',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

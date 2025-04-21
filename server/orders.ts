@@ -8,6 +8,7 @@ import { generateOrderPDF } from './utils/pdf-generator';
 import { sendOrderConfirmationEmail } from './utils/email-sender';
 import { calculatePrice } from './utils/pricing';
 import { CartItem, PriceBreakdown } from './types';
+import { generateOrderReceipt } from './controllers/order-controller';
 
 /**
  * Convert OrderDetails to a format suitable for pricing calculations
@@ -241,6 +242,9 @@ export function registerOrderRoutes(app: Express) {
       res.status(500).json({ message: `Failed to download PDF: ${error.message}` });
     }
   });
+  
+  // Generate a PDF receipt for an order
+  app.get('/api/orders/:id/receipt', generateOrderReceipt);
   
   // Update order status (admin only, would need admin middleware in production)
   app.patch('/api/orders/:id/status', async (req: Request, res: Response) => {

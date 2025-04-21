@@ -15,7 +15,8 @@ import {
   getUserOrders,
   getOrderById,
   updateOrderStatus,
-  getAllOrders
+  getAllOrders,
+  generateOrderReceipt
 } from './controllers/order-controller';
 
 export async function registerRoutes(app: Express): Promise<Server> {
