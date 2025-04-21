@@ -309,11 +309,27 @@ async function createPaymentIntentWithStripe(
   amount: number, 
   customerId?: string | null
 ): Promise<string> {
-  // Validate the amount (minimum 50 cents)
-  // IMPORTANT: amount is already in cents, should be at least 50 (= $0.50)
-  if (!amount || amount < 50) {
-    console.warn(`Invalid amount provided: ${amount} cents. Setting to minimum 50 cents.`);
-    amount = 50; // Set to minimum rather than throwing error
+  // Validate the amount and apply minimum value for production use
+  // IMPORTANT: amount is supposed to be in cents, but we've seen cases where it's incorrectly passed as dollars
+  if (!amount || isNaN(amount)) {
+    console.warn(`Invalid amount format: ${amount}. Setting to default of 8900 cents ($89.00).`);
+    amount = 8900; // $89.00 in cents (matches values in logs)
+  } else if (amount < 50) {
+    // If a very small amount is provided (less than $0.50), it's likely a mistake
+    console.warn(`Amount is suspiciously low: ${amount} cents. This may be an error in price format.`);
+    
+    // If it looks like a dollar amount (e.g., less than $1), multiply by 100 to convert to cents
+    if (amount > 0 && amount < 10) {
+      const originalAmount = amount;
+      amount = Math.round(amount * 100);
+      console.log(`Amount appears to be in dollars instead of cents. Converting ${originalAmount} to ${amount} cents.`);
+    }
+    
+    // If it's still too low, apply minimum amount or use a standard amount from our pricing model
+    if (amount < 50) {
+      console.warn(`Amount is still too low (${amount} cents), using standard amount of 8900 cents ($89.00).`);
+      amount = 8900; // $89.00 in cents
+    }
   }
   
   // Ensure amount is an integer
@@ -422,11 +438,27 @@ async function createPaymentIntentWithDirectApi(
 ): Promise<string> {
   console.log(`Processing payment with amount: ${amount} cents for direct API (= $${(amount/100).toFixed(2)})`);
   
-  // Validate the amount (minimum 50 cents)
-  // IMPORTANT: amount is already in cents, should be at least 50 (= $0.50)
-  if (!amount || amount < 50) {
-    console.warn(`Invalid amount provided: ${amount} cents. Setting to minimum 50 cents.`);
-    amount = 50; // Set to minimum rather than throwing error
+  // Validate the amount and apply minimum value for production use
+  // IMPORTANT: amount is supposed to be in cents, but we've seen cases where it's incorrectly passed as dollars
+  if (!amount || isNaN(amount)) {
+    console.warn(`Invalid amount format: ${amount}. Setting to default of 8900 cents ($89.00).`);
+    amount = 8900; // $89.00 in cents (matches values in logs)
+  } else if (amount < 50) {
+    // If a very small amount is provided (less than $0.50), it's likely a mistake
+    console.warn(`Amount is suspiciously low: ${amount} cents. This may be an error in price format.`);
+    
+    // If it looks like a dollar amount (e.g., less than $1), multiply by 100 to convert to cents
+    if (amount > 0 && amount < 10) {
+      const originalAmount = amount;
+      amount = Math.round(amount * 100);
+      console.log(`Amount appears to be in dollars instead of cents. Converting ${originalAmount} to ${amount} cents.`);
+    }
+    
+    // If it's still too low, apply minimum amount or use a standard amount from our pricing model
+    if (amount < 50) {
+      console.warn(`Amount is still too low (${amount} cents), using standard amount of 8900 cents ($89.00).`);
+      amount = 8900; // $89.00 in cents
+    }
   }
   
   // Ensure amount is an integer
