@@ -13,6 +13,7 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   role: text("role").default("user").notNull(), // Possible values: "user", "admin"
+  preferences: json("preferences").$type<Record<string, any>>(), // Store user preferences like dashboard tab selection
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
 

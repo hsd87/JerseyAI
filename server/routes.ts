@@ -1070,6 +1070,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User preferences routes
+  app.post("/api/user/preferences", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      console.log("Saving user preferences:", req.body);
+
+      // Validate preferences data
+      const preferencesSchema = z.object({
+        dashboardTab: z.string().optional(),
+      });
+
+      const result = preferencesSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid preferences data", 
+          errors: result.error.format() 
+        });
+      }
+
+      // Save user preferences
+      const updatedUser = await storage.updateUserPreferences(req.user.id, req.body);
+      
+      res.status(200).json({ 
+        message: "Preferences updated successfully", 
+        preferences: updatedUser.preferences || {}
+      });
+    } catch (error: any) {
+      console.error("Error updating user preferences:", error);
+      next(error);
+    }
+  });
+
+  // API to get user preferences
+  app.get("/api/user/preferences", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      // Get user with preferences
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json({ preferences: user.preferences || {} });
+    } catch (error: any) {
+      console.error("Error fetching user preferences:", error);
+      next(error);
+    }
+  });
+
   // Serve images from the output directory
   app.get('/output/:filename', (req, res, next) => {
     try {

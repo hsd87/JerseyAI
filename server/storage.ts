@@ -18,6 +18,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<User>): Promise<User>;
   updateUserRole(id: number, role: string): Promise<User>;
+  updateUserPreferences(id: number, preferences: any): Promise<User>;
   getAllUsers(): Promise<User[]>;
   
   // Design Methods
@@ -125,6 +126,27 @@ export class DatabaseStorage implements IStorage {
     if (!updatedUser) {
       throw new Error(`User with id ${id} not found`);
     }
+    
+    return updatedUser;
+  }
+  
+  async updateUserPreferences(id: number, preferences: any): Promise<User> {
+    // First get the current user and their preferences
+    const user = await this.getUser(id);
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    
+    // Merge existing preferences with new ones
+    const currentPreferences = user.preferences || {};
+    const updatedPreferences = { ...currentPreferences, ...preferences };
+    
+    // Update the user with the new merged preferences
+    const [updatedUser] = await db
+      .update(users)
+      .set({ preferences: updatedPreferences })
+      .where(eq(users.id, id))
+      .returning();
     
     return updatedUser;
   }
