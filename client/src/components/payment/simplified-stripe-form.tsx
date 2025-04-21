@@ -10,14 +10,21 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 let stripePromise: Promise<Stripe | null> | null = null;
 
 export const initializeStripe = () => {
-  // Use environment variable for Stripe key
-  const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+  // Using the provided live key directly
+  const stripeKey = 'pk_live_51QAbrIHFoCUNb2Ppc7kzDStznKQGD4waxbo6mncC4KLmCUMV71jk1JJGahmEuRqD6RdLHshi5NCOcP9mUmJktMM600pWPqXPDF';
   
   if (!stripePromise && stripeKey) {
     try {
-      // Log key presence but not the full key for security
-      console.log('Initializing Stripe with key that starts with:', stripeKey.substring(0, 7));
+      // Log information about the key for debugging (securely)
+      console.log('Initializing Stripe with live key:', stripeKey.substring(0, 7) + '...' + stripeKey.substring(stripeKey.length - 4));
+      console.log('Key properties:', {
+        keyLength: stripeKey.length,
+        isLiveKey: stripeKey.startsWith('pk_live_')
+      });
       
+      // Using live key as provided in all environments
+      console.log('Using live Stripe key in current environment');
+
       // Initialize Stripe with the public key
       stripePromise = loadStripe(stripeKey);
       

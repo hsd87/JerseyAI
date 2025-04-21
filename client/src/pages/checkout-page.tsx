@@ -138,14 +138,8 @@ const CheckoutPage: React.FC = () => {
     }
   }, [user, cart, priceBreakdown, setLocation]);
 
-  // Create payment intent when page loads - with optimization for better loading
+  // Create payment intent when page loads
   useEffect(() => {
-    // Guard clauses to prevent unnecessary execution
-    if (clientSecret) {
-      // Already have a client secret, don't create another one
-      return;
-    }
-    
     if (!priceBreakdown || !cart || cart.length === 0) {
       console.log('Skipping payment intent creation - missing price/cart data:', {
         hasPriceBreakdown: !!priceBreakdown,
@@ -163,66 +157,59 @@ const CheckoutPage: React.FC = () => {
         stage: 'payment_intent_creation'
       });
       setLoading(false);
+      
+      // No need to show a toast here as the first useEffect will handle the redirect
       return;
     }
     
-    // Create a memoized version of the payment intent creation function
+    // Additional check for Stripe customer ID
+    if (!user.stripeCustomerId) {
+      console.warn('User missing Stripe customer ID - may cause payment creation issues:', {
+        userId: user.id,
+        hasStripeId: !!user.stripeCustomerId
+      });
+      // Continue anyway as the server will create a customer if needed
+    }
+    
     const createPaymentIntent = async () => {
-      // Don't set loading if we already have a secret
-      if (!clientSecret) {
-        setLoading(true);
-      }
+      setLoading(true);
       
-      // Set a slightly longer timeout (15 seconds) to account for potential network latency
+      // Set timeout to prevent hanging on network issues
       const timeoutId = setTimeout(() => {
-        console.log('Payment intent creation timed out after 15 seconds');
+        console.log('Payment intent creation timed out after 10 seconds');
         setLoading(false);
+        // Show timeout toast
         toast({
           title: 'Payment Service Timeout',
           description: 'We\'re experiencing high demand. Your order details have been saved - please try again later.',
           variant: 'destructive',
           duration: 5000,
         });
-      }, 15000);
+      }, 10000); // 10 second timeout
+      
+      // Convert from dollars to cents for Stripe
+      // IMPORTANT: With our pricing model, priceBreakdown.grandTotal should be in CENTS already
+      // This is a safety check to ensure we're passing cents to Stripe
+      let amountInCents = priceBreakdown.grandTotal;
+      
+      // If the amount seems too small (less than $1.00), it could be in dollars and needs conversion
+      if (amountInCents < 100 && amountInCents > 0) {
+        console.warn('Amount appears to be in dollars instead of cents:', amountInCents);
+        amountInCents = Math.round(amountInCents * 100);
+        console.log('Converted to cents:', amountInCents);
+      }
+      
+      console.log('Creating payment intent for checkout with:', {
+        amount: amountInCents,
+        amountInDollars: `$${(amountInCents/100).toFixed(2)}`,
+        cartItems: cart.length,
+        userId: user?.id
+      });
       
       try {
-        // Verify the priceBreakdown is valid
-        if (!priceBreakdown?.grandTotal) {
-          throw new Error('Invalid price calculation - please refresh and try again');
-        }
-        
-        // IMPORTANT: Our pricing model uses cents throughout the system
-        // This is a safety check to ensure we're passing cents to Stripe
-        let amountInCents = Math.round(priceBreakdown.grandTotal);
-        
-        // Safety check - verify we're working with sensible amounts
-        // If amount seems like dollars but we expect cents, convert it
-        if (amountInCents < 100 && cart.some(item => item.price > 1000)) {
-          console.warn('Amount appears to be in dollars instead of cents:', amountInCents);
-          amountInCents = Math.round(amountInCents * 100);
-          console.log('Converted to cents:', amountInCents);
-        }
-        
-        // Create formatted order items with complete data
-        const formattedItems = cart.map(item => ({
-          id: item.id || `item-${Date.now()}`,
-          type: item.type || 'jersey',
-          price: item.price || 0,  // Already in cents
-          quantity: item.quantity || 1,
-          size: item.size || 'M',
-          gender: item.gender || 'unisex'
-        }));
-        
-        console.log('Creating payment intent for checkout with:', {
-          amount: amountInCents,
-          amountInDollars: `$${(amountInCents/100).toFixed(2)}`,
-          cartItems: formattedItems.length,
-          userId: user?.id
-        });
-        
         const response = await orderService.createPaymentIntent({
           amount: amountInCents,
-          orderItems: formattedItems,
+          orderItems: cart || [],
         });
         
         // Clear timeout since request completed
@@ -231,7 +218,7 @@ const CheckoutPage: React.FC = () => {
         console.log('Payment intent created successfully:', { 
           hasClientSecret: !!response.clientSecret,
           clientSecretLength: response.clientSecret?.length,
-          amount: response.amount || amountInCents
+          amount: response.amount
         });
         
         if (!response.clientSecret) {
@@ -270,14 +257,8 @@ const CheckoutPage: React.FC = () => {
       }
     };
     
-    // Add slight delay to avoid too many rapid requests during navigation
-    const timer = setTimeout(() => {
-      createPaymentIntent();
-    }, 300);
-    
-    // Clean up timeout on unmount
-    return () => clearTimeout(timer);
-  }, [priceBreakdown, cart, user, clientSecret, toast]);
+    createPaymentIntent();
+  }, [priceBreakdown, cart, user]);
 
   const handlePaymentSuccess = async () => {
     setOrderProcessing(true);
