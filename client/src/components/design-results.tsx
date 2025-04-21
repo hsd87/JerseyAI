@@ -1,8 +1,11 @@
 import { useDesignStore } from "@/hooks/use-design-store";
 import { Button } from "@/components/ui/button";
 import { useOrderStore } from "@/hooks/use-order-store";
-import { ShoppingCart, PenSquare, RotateCcw } from "lucide-react";
+import { ShoppingCart, PenSquare, RotateCcw, Maximize, Heart, X } from "lucide-react";
 import nikeJustDoItImage from "@assets/the-edited-text-reads-just-do-it-we-re-l_Xrq4WcXISmSsePVvrsofQA_19881kovRHq2673-gKduAQ (1).png";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 
 export default function DesignResults() {
@@ -15,6 +18,11 @@ export default function DesignResults() {
     formData,
     designId
   } = useDesignStore();
+  
+  // Add state for full-screen view and favorites
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const { toast } = useToast();
 
   const handleCustomize = () => {
     toggleEditor(true);
@@ -28,6 +36,22 @@ export default function DesignResults() {
   const handleBuyNow = () => {
     // This will be implemented to proceed to order configuration step
     // We'll handle this from the parent component for now
+  };
+  
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen);
+  };
+  
+  const toggleFavorite = () => {
+    setIsFavorite(!isFavorite);
+    
+    toast({
+      title: isFavorite ? "Removed from favorites" : "Added to favorites",
+      description: isFavorite 
+        ? "This design has been removed from your favorites." 
+        : "This design has been added to your favorites.",
+      duration: 3000,
+    });
   };
 
   return (
@@ -106,11 +130,36 @@ export default function DesignResults() {
                   
                   {/* Preview Overlay */}
                   <div className="absolute top-2 right-2 flex space-x-2">
-                    <button className="bg-gradient text-white p-2 rounded-full hover:opacity-90 transition-opacity">
-                      <i className="fas fa-expand-alt"></i>
-                    </button>
-                    <button className="bg-gradient text-white p-2 rounded-full hover:opacity-90 transition-opacity">
-                      <i className="fas fa-heart"></i>
+                    <Dialog open={isFullScreen} onOpenChange={setIsFullScreen}>
+                      <DialogTrigger asChild>
+                        <button 
+                          onClick={toggleFullScreen} 
+                          className="bg-gradient text-white p-2 rounded-full hover:opacity-90 transition-opacity"
+                        >
+                          <Maximize className="h-4 w-4" />
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[90vw] max-h-[90vh] flex flex-col">
+                        <div className="relative w-full h-full overflow-auto flex items-center justify-center">
+                          <button 
+                            onClick={() => setIsFullScreen(false)} 
+                            className="absolute top-2 right-2 bg-gradient text-white p-2 rounded-full hover:opacity-90 transition-opacity z-50"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                          <img 
+                            src={frontImage} 
+                            alt="Full size jersey view" 
+                            className="max-w-full max-h-[80vh] object-contain" 
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <button 
+                      onClick={toggleFavorite} 
+                      className={`${isFavorite ? 'bg-[var(--nike-red)]' : 'bg-gradient'} text-white p-2 rounded-full hover:opacity-90 transition-opacity`}
+                    >
+                      <Heart className={`h-4 w-4 ${isFavorite ? 'fill-white' : ''}`} />
                     </button>
                   </div>
                   
