@@ -227,7 +227,8 @@ const CheckoutForm: React.FC<{
               Payment Complete
             </>
           ) : (
-            `Pay $${amount.toFixed(2)}`
+            // Convert cents to dollars for display
+            `Pay $${(amount / 100).toFixed(2)}`
           )}
         </Button>
 

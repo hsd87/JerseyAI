@@ -187,15 +187,28 @@ const CheckoutPage: React.FC = () => {
         });
       }, 10000); // 10 second timeout
       
+      // Convert from dollars to cents for Stripe
+      // IMPORTANT: With our pricing model, priceBreakdown.grandTotal should be in CENTS already
+      // This is a safety check to ensure we're passing cents to Stripe
+      let amountInCents = priceBreakdown.grandTotal;
+      
+      // If the amount seems too small (less than $1.00), it could be in dollars and needs conversion
+      if (amountInCents < 100 && amountInCents > 0) {
+        console.warn('Amount appears to be in dollars instead of cents:', amountInCents);
+        amountInCents = Math.round(amountInCents * 100);
+        console.log('Converted to cents:', amountInCents);
+      }
+      
       console.log('Creating payment intent for checkout with:', {
-        amount: priceBreakdown.grandTotal,
+        amount: amountInCents,
+        amountInDollars: `$${(amountInCents/100).toFixed(2)}`,
         cartItems: cart.length,
         userId: user?.id
       });
       
       try {
         const response = await orderService.createPaymentIntent({
-          amount: priceBreakdown.grandTotal,
+          amount: amountInCents,
           orderItems: cart || [],
         });
         
@@ -256,7 +269,7 @@ const CheckoutPage: React.FC = () => {
         // Required fields
         designId: cart[0]?.designId || 0,
         sport: orderDetails?.packageType?.includes('soccer') ? 'soccer' : 'basketball', // Default to common sports based on package
-        totalAmount: priceBreakdown?.grandTotal || 0,
+        totalAmount: priceBreakdown?.grandTotal || 0, // Important: This should already be in CENTS per our pricing model
         paymentMethod: 'stripe',
         
         // These fields are derived from the order details
@@ -383,12 +396,17 @@ const CheckoutPage: React.FC = () => {
       <div className="space-y-4">
         {cart.map((item, index) => {
           // Safely handle potentially undefined values
-          const price = item.price || 0;
+          // Price is in cents per our pricing model
+          const priceInCents = item.price || 0;
           const quantity = item.quantity || 1;
           const gender = item.gender || 'Unisex';
           const size = item.size || 'One size';
           const type = item.type || 'Item';
           const name = item.name || type;
+          
+          // Convert to dollars for display
+          const priceInDollars = priceInCents / 100;
+          const itemTotalInDollars = (priceInCents * quantity) / 100;
           
           return (
             <div key={index} className="flex justify-between items-center py-2 border-b">
@@ -403,7 +421,7 @@ const CheckoutPage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <p className="font-medium">${(price * quantity).toFixed(2)}</p>
+              <p className="font-medium">${itemTotalInDollars.toFixed(2)}</p>
             </div>
           );
         })}
@@ -416,21 +434,25 @@ const CheckoutPage: React.FC = () => {
     if (!priceBreakdown) return null;
     
     // Safely handle potentially undefined values in price breakdown
-    const subtotal = priceBreakdown.subtotal || 0;
-    const grandTotal = priceBreakdown.grandTotal || 0;
+    const subtotalInCents = priceBreakdown.subtotal || 0;
+    const grandTotalInCents = priceBreakdown.grandTotal || 0;
+    
+    // Convert from cents to dollars for display
+    const subtotalInDollars = subtotalInCents / 100;
+    const grandTotalInDollars = grandTotalInCents / 100;
     
     return (
       <div className="space-y-3">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>${subtotalInDollars.toFixed(2)}</span>
         </div>
         
         <Separator />
         
         <div className="flex justify-between font-bold text-lg">
           <span>Total</span>
-          <span>${grandTotal.toFixed(2)}</span>
+          <span>${grandTotalInDollars.toFixed(2)}</span>
         </div>
       </div>
     );
