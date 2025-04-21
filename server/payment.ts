@@ -474,12 +474,10 @@ export function registerPaymentRoutes(app: Express) {
       }
 
       // Determine the amount in cents
-      // Always use client-provided amountInCents when available (preferred approach)
-      // Otherwise calculate it from amount (backward compatibility)
       // IMPORTANT: With our new pricing model, all amounts are already in cents
-      // Amount should already be in cents as passed from the client
       
-      const amountValue = parseInt(req.body?.amount);
+      // Force to integer to prevent Stripe errors with non-integer amounts
+      const amountValue = Math.round(parseInt(req.body?.amount, 10));
       let finalAmountInCents: number;
       
       // Validate that the amount is provided and is a positive number
@@ -491,8 +489,14 @@ export function registerPaymentRoutes(app: Express) {
         });
       }
       
-      // Ensure amount is an integer
-      finalAmountInCents = Math.round(amountValue);
+      // Add additional safety check here to ensure we're truly working with cents
+      // If the value is too small (likely in dollars), convert it
+      if (amountValue > 0 && amountValue < 50) {
+        console.warn(`Amount appears to be in dollars instead of cents (${amountValue}), converting to cents`);
+        finalAmountInCents = Math.round(amountValue * 100);
+      } else {
+        finalAmountInCents = amountValue;
+      }
       
       // Log the amount for debugging
       console.log(`Processing payment intent for ${finalAmountInCents} cents (= $${(finalAmountInCents/100).toFixed(2)})`);

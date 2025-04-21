@@ -304,6 +304,16 @@ export async function checkSubscriptionStatus(subscriptionId: string): Promise<{
  * @param customerId Stripe customer ID
  * @returns The client secret for the payment intent
  */
+// Define the cache structure
+interface PaymentIntentCacheEntry {
+  clientSecret: string;
+  timestamp: number;
+}
+
+// Create a simpler cache implementation we can use with multiple functions
+const paymentIntentCache = new Map<string, PaymentIntentCacheEntry>();
+
+// Regular function without static properties
 async function createPaymentIntentWithStripe(
   stripe: Stripe, 
   amount: number, 
@@ -316,15 +326,28 @@ async function createPaymentIntentWithStripe(
     amount = 50; // Set to minimum rather than throwing error
   }
   
-  // Ensure amount is an integer
+  // Ensure amount is an integer (Stripe requirement)
   const intAmount = Math.round(amount);
+  
+  // Create a memoization key to enable caching
+  const memoKey = `${intAmount}_${customerId || 'no-customer'}`;
+  
+  // Add timing logs to track potential bottlenecks
+  const startTime = Date.now();
+  
+  // Optimization: Use a global cache of recent payment intents to avoid repeated API calls
+  
+  // Check if we have a cached client secret for this amount/customer combo from the last 3 minutes
+  const cachedIntent = paymentIntentCache.get(memoKey);
+  if (cachedIntent && (Date.now() - cachedIntent.timestamp) < 3 * 60 * 1000) { // 3 minutes
+    console.log(`Using cached payment intent for ${intAmount} cents (= $${(intAmount/100).toFixed(2)}) - cache age: ${Math.round((Date.now() - cachedIntent.timestamp)/1000)}s`);
+    return cachedIntent.clientSecret;
+  }
+  
   console.log(`Creating payment intent for ${intAmount} cents (= $${(intAmount/100).toFixed(2)}) for customer ${customerId} with local Stripe instance`);
   
   try {
-    // Add timing logs to track potential bottlenecks
-    const startTime = Date.now();
-    
-    // Prepare payment intent data
+    // Prepare payment intent data with optimized settings
     const paymentIntentData: Stripe.PaymentIntentCreateParams = {
       amount: intAmount,
       currency: 'usd',
@@ -332,6 +355,12 @@ async function createPaymentIntentWithStripe(
       automatic_payment_methods: {
         enabled: true,
       },
+      // Add metadata for easier identification in Stripe dashboard
+      metadata: {
+        source: 'okdio_app',
+        cents_amount: intAmount.toString(),
+        dollars_amount: (intAmount/100).toFixed(2)
+      }
     };
     
     // Only add customer if provided
@@ -347,6 +376,29 @@ async function createPaymentIntentWithStripe(
     
     if (!paymentIntent.client_secret) {
       throw new Error('No client secret returned from Stripe');
+    }
+    
+    // Cache the client secret for future requests
+    paymentIntentCache.set(memoKey, {
+      clientSecret: paymentIntent.client_secret,
+      timestamp: Date.now()
+    });
+    
+    // Prune the cache if it gets too large (keep it under 50 entries)
+    if (paymentIntentCache.size > 50) {
+      // Remove the oldest entries
+      const entries = Array.from(paymentIntentCache.entries());
+      const oldestEntries = entries
+        .sort((a, b) => {
+          // Properly typed sort function
+          const entryA = a[1] as PaymentIntentCacheEntry;
+          const entryB = b[1] as PaymentIntentCacheEntry;
+          return entryA.timestamp - entryB.timestamp;
+        })
+        .slice(0, 10)  // Remove the 10 oldest
+        .map(entry => entry[0] as string);
+        
+      oldestEntries.forEach(key => paymentIntentCache.delete(key));
     }
     
     return paymentIntent.client_secret;
