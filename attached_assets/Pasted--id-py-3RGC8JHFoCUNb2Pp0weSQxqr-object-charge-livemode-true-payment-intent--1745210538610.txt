@@ -1,0 +1,76 @@
+
+  "id": "py_3RGC8JHFoCUNb2Pp0weSQxqr",
+  "object": "charge",
+  "livemode": true,
+  "payment_intent": "pi_3RGC8JHFoCUNb2Pp0T265bfL",
+  "status": "failed",
+  "amount": 220,
+  "amount_captured": 220,
+  "amount_refunded": 0,
+  "application": null,
+  "application_fee": null,
+  "application_fee_amount": null,
+  "balance_transaction": null,
+  "billing_details": {
+    "address": {
+      "city": null,
+      "country": "PK",
+      "line1": null,
+      "line2": null,
+      "postal_code": null,
+      "state": null
+    },
+    "email": null,
+    "name": "usman shahid dosondi",
+    "phone": null,
+    "tax_id": null
+  },
+  "calculated_statement_descriptor": null,
+  "captured": true,
+  "created": 1745210438,
+  "currency": "usd",
+  "customer": null,
+  "description": null,
+  "destination": null,
+  "dispute": null,
+  "disputed": false,
+  "failure_balance_transaction": null,
+  "failure_code": "payment_intent_authentication_failure",
+  "failure_message": "The provided PaymentMethod has failed authentication. You can provide payment_method_data or a new PaymentMethod to attempt to fulfill this PaymentIntent again.",
+  "fraud_details": {
+  },
+  "metadata": {
+  },
+  "on_behalf_of": null,
+  "order": null,
+  "outcome": {
+    "advice_code": null,
+    "network_advice_code": null,
+    "network_decline_code": "generic_decline",
+    "network_status": "declined_by_network",
+    "reason": "generic_decline",
+    "risk_level": "normal",
+    "seller_message": "The bank did not return any further details with this decline.",
+    "type": "issuer_declined"
+  },
+  "paid": false,
+  "payment_method": "pm_1RGC9BHFoCUNb2PpltwNsQof",
+  "payment_method_details": {
+    "link": {
+      "country": null
+    },
+    "type": "link"
+  },
+  "radar_options": {
+  },
+  "receipt_email": null,
+  "receipt_number": null,
+  "receipt_url": null,
+  "refunded": false,
+  "review": null,
+  "shipping": null,
+  "source": null,
+  "source_transfer": null,
+  "statement_descriptor": null,
+  "statement_descriptor_suffix": null,
+  "transfer_data": null,
