@@ -74,13 +74,12 @@ class OrderService {
       const amountInDollars = amountInCents / 100;
       console.log(`Processing payment for ${amountInCents} cents (= $${amountInDollars.toFixed(2)})`);
       
-      
       // Check class-level cache first (valid for 10 minutes)
       const now = Date.now();
       if (OrderService.paymentIntentCache && 
-          OrderService.paymentIntentCache.amount === amount &&
+          OrderService.paymentIntentCache.amount === amountInCents &&
           now - OrderService.paymentIntentCache.timestamp < 10 * 60 * 1000) { // 10 minutes
-        console.log(`Cached payment intent for amount: $${amount}`, {
+        console.log(`Cached payment intent for amount: ${amountInCents} cents (= $${amountInDollars.toFixed(2)})`, {
           hasClientSecret: !!OrderService.paymentIntentCache.response.clientSecret,
           clientSecretLength: OrderService.paymentIntentCache.response.clientSecret?.length || 0,
           amount: OrderService.paymentIntentCache.response.amount

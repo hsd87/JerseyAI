@@ -473,28 +473,34 @@ export function registerPaymentRoutes(app: Express) {
       // Determine the amount in cents
       // Always use client-provided amountInCents when available (preferred approach)
       // Otherwise calculate it from amount (backward compatibility)
+      // IMPORTANT: With our new pricing model, all amounts are already in cents
+      // Amount should already be in cents as passed from the client
+      
+      const amountValue = parseInt(req.body?.amount);
       let finalAmountInCents: number;
       
-      if (amountInCents && typeof amountInCents === 'number') {
-        // Use pre-calculated amount from client - this is the preferred way
-        finalAmountInCents = Math.round(amountInCents);
-        console.log(`Using client-provided amount in cents: $${amount} = ${finalAmountInCents} cents`);
-      } else if (amount) {
-        // IMPORTANT: Always convert dollar amounts to cents for Stripe
-        // Stripe requires amounts in cents (smallest currency unit)
-        finalAmountInCents = Math.round(amount * 100);
-        console.log(`WARNING: Client did not provide amountInCents. Converting manually: $${amount} * 100 = ${finalAmountInCents} cents`);
-      } else {
-        throw new Error('Invalid payment amount');
+      // Validate that the amount is provided and is a positive number
+      if (!amountValue || isNaN(amountValue) || amountValue <= 0) {
+        console.error('Invalid amount provided in payment intent request:', req.body?.amount);
+        return res.status(400).json({ 
+          error: 'amount_required', 
+          message: 'Valid amount in cents is required' 
+        });
       }
       
-      // Safety check - if finalAmountInCents seems too small for the expected dollar amount
-      // (e.g., if it's just 210 cents = $2.10 when it should be $210.00)
-      if (amount > 100 && finalAmountInCents < amount * 10) {
-        console.warn(`Amount validation warning: dollar amount $${amount} resulted in unusually small cent value ${finalAmountInCents}`);
-        // Force conversion to ensure we have the correct amount in cents
-        finalAmountInCents = Math.round(amount * 100);
-        console.log(`Forcing correct conversion to cents: $${amount} * 100 = ${finalAmountInCents} cents`);
+      // Ensure amount is an integer
+      finalAmountInCents = Math.round(amountValue);
+      
+      // Log the amount for debugging
+      console.log(`Processing payment intent for ${finalAmountInCents} cents (= $${(finalAmountInCents/100).toFixed(2)})`);
+      
+      // Validate minimum amount (50 cents = $0.50)
+      if (finalAmountInCents < 50) {
+        console.warn(`Amount too small: ${finalAmountInCents} cents is below minimum threshold of 50 cents`);
+        return res.status(400).json({ 
+          error: 'amount_too_small', 
+          message: 'Amount must be at least $0.50' 
+        });
       }
 
       // Determine the customer ID
@@ -512,10 +518,14 @@ export function registerPaymentRoutes(app: Express) {
 
       // Include request ID in the response for better client-side tracking
       const reqId = req.body?.requestId || undefined;
+      // Provide both cents and dollars for client convenience
+      const amountInDollars = finalAmountInCents / 100;
+      
       res.json({
         clientSecret,
         amount: finalAmountInCents,
-        amountInDollars: amount,
+        amountInDollars: amountInDollars,
+        amountFormatted: `$${amountInDollars.toFixed(2)}`,
         amountType: 'cents', // Explicit field so client knows this is in cents
         success: true,
         requestId: reqId
