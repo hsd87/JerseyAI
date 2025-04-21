@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { useOrderStore } from '@/hooks/use-order-store';
 import { useToast } from '@/hooks/use-toast';
@@ -7,6 +7,7 @@ import { useFormatPrice } from '@/hooks/use-format-price';
 import { loadStripe, Stripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { orderService } from '@/lib/order-service';
 import { SimplifiedStripeForm } from '@/components/payment/simplified-stripe-form';
+import okdioLogo from '@/assets/okdio-logo.png';
 
 // UI Components
 import {
