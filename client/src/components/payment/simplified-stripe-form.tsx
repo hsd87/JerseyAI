@@ -52,6 +52,7 @@ const CheckoutForm: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [cardholderName, setCardholderName] = useState('');
 
   // Clear error when Stripe or Elements changes
   useEffect(() => {
@@ -68,6 +69,12 @@ const CheckoutForm: React.FC<{
     if (!stripe || !elements) {
       console.error('Stripe.js hasn\'t loaded yet');
       setError('Payment system not loaded. Please refresh the page and try again.');
+      return;
+    }
+    
+    // Validate cardholder name
+    if (!cardholderName.trim()) {
+      setError('Please enter the cardholder name');
       return;
     }
 
@@ -97,6 +104,11 @@ const CheckoutForm: React.FC<{
       const result = await stripe.confirmPayment({
         elements,
         confirmParams: {
+          payment_method_data: {
+            billing_details: {
+              name: cardholderName
+            }
+          },
           return_url: window.location.origin + '/order-confirmation',
         },
         redirect: 'if_required',
@@ -173,6 +185,21 @@ const CheckoutForm: React.FC<{
           <span>Payment successful! Processing your order...</span>
         </div>
       )}
+      
+      <div className="mb-4">
+        <label htmlFor="cardholderName" className="block text-sm font-medium mb-1">
+          Cardholder Name
+        </label>
+        <input
+          id="cardholderName"
+          type="text"
+          value={cardholderName}
+          onChange={(e) => setCardholderName(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+          placeholder="Name on card"
+          required
+        />
+      </div>
 
       <PaymentElement />
       

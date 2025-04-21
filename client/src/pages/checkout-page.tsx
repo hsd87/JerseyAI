@@ -30,6 +30,8 @@ import {
   ShieldCheck,
   ArrowLeft,
   Check,
+  Download,
+  FileText,
 } from 'lucide-react';
 
 // We're using the initializeStripe function from the SimplifiedStripeForm component
@@ -46,6 +48,9 @@ const CheckoutPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [orderProcessing, setOrderProcessing] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [downloadingReceipt, setDownloadingReceipt] = useState(false);
 
   // Check for authentication and empty cart
   useEffect(() => {
@@ -247,7 +252,7 @@ const CheckoutPage: React.FC = () => {
     
     try {
       // Create the order in the backend
-      await orderService.createOrder({
+      const orderResponse = await orderService.createOrder({
         // Required fields
         designId: cart[0]?.designId || 0,
         sport: orderDetails?.packageType?.includes('soccer') ? 'soccer' : 'basketball', // Default to common sports based on package
@@ -284,8 +289,17 @@ const CheckoutPage: React.FC = () => {
         },
       });
       
-      // Update order status
+      // Update order status and track order ID
       setOrderCompleted(true);
+      
+      // Store order information for receipt generation
+      if (orderResponse?.id) {
+        setOrderId(String(orderResponse.id));
+        
+        // Generate a user-friendly order number (e.g., OKD-12345)
+        const friendlyOrderNumber = `OKD-${String(orderResponse.id).padStart(5, '0')}`;
+        setOrderNumber(friendlyOrderNumber);
+      }
       
       // Clear the cart
       clearCart();
@@ -296,8 +310,8 @@ const CheckoutPage: React.FC = () => {
         description: 'Your order has been placed and is being processed.',
       });
       
-      // Redirect to confirmation page
-      setLocation('/order-confirmation');
+      // We'll now show the success step with receipt download instead of redirecting immediately
+      // setLocation('/order-confirmation');
     } catch (error: any) {
       console.error('Order creation failed:', error);
       toast({
@@ -307,6 +321,50 @@ const CheckoutPage: React.FC = () => {
       });
     } finally {
       setOrderProcessing(false);
+    }
+  };
+  
+  // Handle PDF receipt download
+  const handleDownloadReceipt = async () => {
+    if (!orderId) {
+      toast({
+        title: 'Unable to generate receipt',
+        description: 'Order information not available',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setDownloadingReceipt(true);
+    
+    try {
+      // Call the backend to generate and return a PDF receipt
+      const response = await orderService.generateReceipt(orderId);
+      
+      // Create a download link for the PDF
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `OKDIO_Receipt_${orderNumber}.pdf`;
+      link.click();
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Receipt Downloaded',
+        description: 'Your receipt has been saved to your device',
+      });
+    } catch (error: any) {
+      console.error('Receipt generation failed:', error);
+      toast({
+        title: 'Receipt Generation Failed',
+        description: error.message || 'Unable to generate your receipt',
+        variant: 'destructive',
+      });
+    } finally {
+      setDownloadingReceipt(false);
     }
   };
 
@@ -497,19 +555,50 @@ const CheckoutPage: React.FC = () => {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto py-8 px-4">
-      <div className="mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => window.history.back()}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <h1 className="text-3xl font-bold">Checkout</h1>
-        <p className="text-muted-foreground">Complete your purchase to get your custom jersey</p>
+    <>
+      {/* OKDIO Navigation Header */}
+      <div className="bg-[#121212] text-white">
+        <div className="container max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center">
+              <img 
+                src={okdioLogo} 
+                alt="OKDIO Logo" 
+                className="h-6 md:h-8" 
+              />
+            </Link>
+            <div className="hidden md:flex items-center space-x-8 text-sm">
+              <Link href="/designer" className="text-white hover:text-gray-300 transition-colors">
+                Design
+              </Link>
+              <Link href="/pricing" className="text-white hover:text-gray-300 transition-colors">
+                Pricing
+              </Link>
+              <Link href="/partner" className="text-white hover:text-gray-300 transition-colors">
+                Partner With Us
+              </Link>
+              <Link href="/faq" className="text-white hover:text-gray-300 transition-colors">
+                FAQ
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
+      
+      {/* Checkout Content */}
+      <div className="container max-w-6xl mx-auto py-8 px-4">
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => window.history.back()}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          <h1 className="text-3xl font-bold">Checkout</h1>
+          <p className="text-muted-foreground">Complete your purchase to get your custom jersey</p>
+        </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Order summary and cart items */}
@@ -553,38 +642,96 @@ const CheckoutPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Payment form */}
+        {/* Payment form or Order Success */}
         <div className="lg:col-span-2 order-1 lg:order-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <CreditCard className="mr-2 h-5 w-5" />
-                Payment Details
-              </CardTitle>
-              <CardDescription>
-                Enter your card information to complete your purchase
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {clientSecret ? (
-                // Using the simplified stripe form component
-                <SimplifiedStripeForm
-                  clientSecret={clientSecret}
-                  amount={priceBreakdown?.grandTotal || 0}
-                  onSuccess={handlePaymentSuccess}
-                  onCancel={handlePaymentCancel}
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center py-6 space-y-2">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="text-muted-foreground">Setting up payment form...</p>
+          {orderNumber ? (
+            <Card>
+              <CardHeader className="bg-green-50 border-b">
+                <CardTitle className="flex items-center text-green-800">
+                  <Check className="mr-2 h-5 w-5" />
+                  Order Confirmed!
+                </CardTitle>
+                <CardDescription className="text-green-700">
+                  Your payment was successful and your order has been placed.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                <div className="bg-muted/30 p-4 rounded-lg border">
+                  <p className="text-sm font-medium mb-1">Order Number:</p>
+                  <p className="text-lg font-bold">{orderNumber}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Please save this number for your records
+                  </p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                
+                <div className="space-y-3">
+                  <p className="text-sm">
+                    We'll email you a confirmation with order details and tracking information once your order ships.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setLocation('/dashboard')}
+                      className="sm:flex-1"
+                    >
+                      View My Orders
+                    </Button>
+                    
+                    <Button
+                      onClick={handleDownloadReceipt}
+                      disabled={downloadingReceipt || !orderId}
+                      className="sm:flex-1"
+                    >
+                      {downloadingReceipt ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Generating Receipt...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Download Receipt
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <CreditCard className="mr-2 h-5 w-5" />
+                  Payment Details
+                </CardTitle>
+                <CardDescription>
+                  Enter your card information to complete your purchase
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {clientSecret ? (
+                  // Using the simplified stripe form component
+                  <SimplifiedStripeForm
+                    clientSecret={clientSecret}
+                    amount={priceBreakdown?.grandTotal || 0}
+                    onSuccess={handlePaymentSuccess}
+                    onCancel={handlePaymentCancel}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 space-y-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-muted-foreground">Setting up payment form...</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
+    </>
   );
 };
 
