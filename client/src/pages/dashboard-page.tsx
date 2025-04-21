@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { Design, Order } from "@shared/schema";
@@ -31,6 +31,22 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("designs");
+  
+  // Function to save active tab to user preferences in database
+  const saveTabPreference = useCallback(async (tabValue: string) => {
+    try {
+      await apiRequest('POST', '/api/user/preferences', { dashboardTab: tabValue });
+      console.log('Tab preference saved:', tabValue);
+    } catch (error) {
+      console.error('Error saving tab preference:', error);
+    }
+  }, []);
+
+  // Update tab and save preference to database
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    saveTabPreference(value);
+  };
   const { updateFormData, setImages, setDesignId, setHasGenerated } = useDesignStore();
   const [_, navigate] = useLocation();
 
@@ -208,7 +224,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <Tabs defaultValue="designs" value={activeTab} onValueChange={setActiveTab}>
+          <Tabs defaultValue="designs" value={activeTab} onValueChange={handleTabChange}>
             <TabsList className="mb-8 bg-[#eeeeee] p-1 rounded-md border border-[#979797]">
               <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#000000] data-[state=active]:shadow-sm text-[#666666] data-[state=active]:font-medium" value="designs">My Designs</TabsTrigger>
               <TabsTrigger className="rounded-md data-[state=active]:bg-white data-[state=active]:text-[#000000] data-[state=active]:shadow-sm text-[#666666] data-[state=active]:font-medium" value="team">Team Details</TabsTrigger>
