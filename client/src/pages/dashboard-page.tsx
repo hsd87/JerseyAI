@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { Design, Order } from "@shared/schema";
@@ -32,6 +32,23 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("designs");
   
+  // Fetch user preferences (including saved tab selection)
+  const { 
+    data: userPreferences,
+    isLoading: isLoadingPreferences 
+  } = useQuery({
+    queryKey: ["/api/user/preferences"],
+    enabled: !!user,
+    onSuccess: (data) => {
+      if (data?.preferences?.dashboardTab) {
+        setActiveTab(data.preferences.dashboardTab);
+      }
+    },
+    onError: (error) => {
+      console.error("Error loading preferences:", error);
+    }
+  });
+  
   // Function to save active tab to user preferences in database
   const saveTabPreference = useCallback(async (tabValue: string) => {
     try {
@@ -47,6 +64,7 @@ export default function DashboardPage() {
     setActiveTab(value);
     saveTabPreference(value);
   };
+  
   const { updateFormData, setImages, setDesignId, setHasGenerated } = useDesignStore();
   const [_, navigate] = useLocation();
 
