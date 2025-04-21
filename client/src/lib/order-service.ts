@@ -63,16 +63,17 @@ class OrderService {
   
   async createPaymentIntent(request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> {
     try {
-      // Validate amount
-      const amount = request.amount || 0;
-      if (isNaN(amount) || amount <= 0) {
-        console.error(`Invalid amount provided: ${amount}`);
+      // IMPORTANT: New implementation - all prices are already in cents
+      const amountInCents = request.amount || 0;
+      if (isNaN(amountInCents) || amountInCents <= 0) {
+        console.error(`Invalid amount provided: ${amountInCents} cents`);
         throw new Error('Invalid payment amount. Please try again.');
       }
       
-      // Calculate amount in cents for Stripe (e.g., 19.99 -> 1999)
-      const amountInCents = Math.round(amount * 100);
-      console.log(`Converting amount for Stripe: $${amount} -> ${amountInCents} cents`);
+      // The amount is already in cents, no conversion needed
+      const amountInDollars = amountInCents / 100;
+      console.log(`Processing payment for ${amountInCents} cents (= $${amountInDollars.toFixed(2)})`);
+      
       
       // Check class-level cache first (valid for 10 minutes)
       const now = Date.now();
