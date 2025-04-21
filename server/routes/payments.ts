@@ -53,27 +53,9 @@ router.post('/create-payment-intent', async (req, res) => {
       userId: req.user?.id || 'not-authenticated'
     });
 
-    // Check if amount is already in cents or dollars
-    let amountInCents = Math.round(amount);
-    
-    // If amount seems suspiciously low, it might be in dollars and need conversion
-    if (amount > 0 && amount < 100) {
-      console.warn(`[${transactionId}] Amount may be in dollars: ${amount}`);
-      
-      // If it's very small (below $1), it's probably dollars and needs conversion
-      if (amount < 10) {
-        console.log(`[${transactionId}] Converting from dollars to cents: ${amount} dollars = ${Math.round(amount * 100)} cents`);
-        amountInCents = Math.round(amount * 100);
-      }
-      
-      // If amount is still too low, use a reasonable default based on our pricing model
-      if (amountInCents < 50) {
-        console.warn(`[${transactionId}] Amount is unreasonably low: ${amountInCents} cents, using default of 8900 cents ($89.00)`);
-        amountInCents = 8900; // $89.00 (standard jersey price)
-      }
-    }
-    
-    console.log(`[${transactionId}] Creating payment intent for amount: ${amountInCents} cents (= $${(amountInCents/100).toFixed(2)})`);
+    // Convert dollar amount to cents for Stripe
+    const amountInCents = Math.round(amount * 100);
+    console.log(`[${transactionId}] Creating payment intent for amount: ${amountInCents} cents`);
 
     // Determine the customer ID
     let customerId = null;
