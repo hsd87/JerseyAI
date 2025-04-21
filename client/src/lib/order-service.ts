@@ -64,7 +64,7 @@ class OrderService {
   async createPaymentIntent(request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> {
     try {
       // IMPORTANT: New implementation - all prices are already in cents
-      const amountInCents = request.amount || 0;
+      const amountInCents = Math.round(request.amount || 0);
       if (isNaN(amountInCents) || amountInCents <= 0) {
         console.error(`Invalid amount provided: ${amountInCents} cents`);
         throw new Error('Invalid payment amount. Please try again.');
@@ -74,11 +74,11 @@ class OrderService {
       const amountInDollars = amountInCents / 100;
       console.log(`Processing payment for ${amountInCents} cents (= $${amountInDollars.toFixed(2)})`);
       
-      // Check class-level cache first (valid for 10 minutes)
+      // Check class-level cache first (valid for 5 minutes to ensure fresher cache)
       const now = Date.now();
       if (OrderService.paymentIntentCache && 
           OrderService.paymentIntentCache.amount === amountInCents &&
-          now - OrderService.paymentIntentCache.timestamp < 10 * 60 * 1000) { // 10 minutes
+          now - OrderService.paymentIntentCache.timestamp < 5 * 60 * 1000) { // 5 minutes cache
         console.log(`Cached payment intent for amount: ${amountInCents} cents (= $${amountInDollars.toFixed(2)})`, {
           hasClientSecret: !!OrderService.paymentIntentCache.response.clientSecret,
           clientSecretLength: OrderService.paymentIntentCache.response.clientSecret?.length || 0,
@@ -90,8 +90,8 @@ class OrderService {
       // Check if a request is already in progress
       if (OrderService.requestInProgress) {
         console.log('Payment intent request already in progress, waiting...');
-        // Wait for up to 5 seconds for the ongoing request to complete
-        for (let i = 0; i < 10; i++) {
+        // Wait for up to 3 seconds for the ongoing request to complete (reduced from 5s for faster response)
+        for (let i = 0; i < 6; i++) {
           await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
           if (!OrderService.requestInProgress) {
             // If the cache was populated while waiting, check it again

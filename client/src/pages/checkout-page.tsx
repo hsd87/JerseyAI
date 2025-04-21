@@ -187,16 +187,26 @@ const CheckoutPage: React.FC = () => {
         });
       }, 10000); // 10 second timeout
       
-      // Convert from dollars to cents for Stripe
-      // IMPORTANT: With our pricing model, priceBreakdown.grandTotal should be in CENTS already
-      // This is a safety check to ensure we're passing cents to Stripe
-      let amountInCents = priceBreakdown.grandTotal;
+      // IMPORTANT: Ensure we're using cents for Stripe payments (our pricing model)
+      // This is a critical step to ensure the Stripe dashboard shows correct amounts
+      let amountInCents = Math.round(priceBreakdown.grandTotal);
       
-      // If the amount seems too small (less than $1.00), it could be in dollars and needs conversion
-      if (amountInCents < 100 && amountInCents > 0) {
-        console.warn('Amount appears to be in dollars instead of cents:', amountInCents);
-        amountInCents = Math.round(amountInCents * 100);
-        console.log('Converted to cents:', amountInCents);
+      // Prevent errors with very small amounts - enforce minimum charge of $0.50
+      if (amountInCents < 50) {
+        console.warn(`Amount too small (${amountInCents} cents), using minimum 50 cents instead`);
+        amountInCents = 50;
+      }
+      
+      // Double check that amount is a positive integer to avoid Stripe errors
+      if (isNaN(amountInCents) || amountInCents <= 0) {
+        console.error('Invalid amount for payment intent:', amountInCents);
+        toast({
+          title: 'Price Calculation Error',
+          description: 'Unable to calculate price. Please try again or contact support.',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
       }
       
       console.log('Creating payment intent for checkout with:', {
