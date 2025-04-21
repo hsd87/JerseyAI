@@ -454,9 +454,12 @@ export function registerPaymentRoutes(app: Express) {
         requestId
       });
       
-      if (!amount || amount < 0.5) {
+      // IMPORTANT: We are now enforcing a cents-based pricing model
+      // amount should be in cents (e.g., 100 = $1.00)
+      // The minimum value is 50 cents
+      if (!amount || amount < 50) {
         return res.status(400).json({
-          error: 'Invalid amount provided. Amount must be at least $0.50',
+          error: 'Invalid amount provided. Amount must be at least 50 cents (= $0.50)',
           success: false,
           requestId
         });

@@ -420,7 +420,7 @@ async function createPaymentIntentWithDirectApi(
   amount: number,
   customerId?: string | null
 ): Promise<string> {
-  console.log(`Processing payment amount conversion: $${amount} into cents for direct API`);
+  console.log(`Processing payment with amount: ${amount} cents for direct API (= $${(amount/100).toFixed(2)})`);
   
   // Validate the amount (minimum 50 cents)
   // IMPORTANT: amount is already in cents, should be at least 50 (= $0.50)
@@ -517,9 +517,13 @@ export async function createPaymentLink(order: any): Promise<string> {
       });
       
       // Create a price for the product
+      // IMPORTANT: item.price might already be in cents or in dollars, let's verify and convert if needed
+      const priceInCents = item.price >= 100 ? item.price : Math.round(item.price * 100);
+      console.log(`Setting price for ${item.name || 'item'}: ${priceInCents} cents (= $${(priceInCents/100).toFixed(2)})`);
+      
       const price = await stripeInstance.prices.create({
         product: product.id,
-        unit_amount: Math.round(item.price * 100), // Convert to cents
+        unit_amount: priceInCents, // Using verified cents amount
         currency: 'usd',
       });
       
@@ -544,9 +548,13 @@ export async function createPaymentLink(order: any): Promise<string> {
           });
           
           // Create a price for the addon
+          // IMPORTANT: addon.price might already be in cents or in dollars, let's verify and convert if needed
+          const addonPriceInCents = addon.price >= 100 ? addon.price : Math.round(addon.price * 100);
+          console.log(`Setting price for add-on ${addon.name || 'addon'}: ${addonPriceInCents} cents (= $${(addonPriceInCents/100).toFixed(2)})`);
+          
           const addonPrice = await stripeInstance.prices.create({
             product: addonProduct.id,
-            unit_amount: Math.round(addon.price * 100), // Convert to cents
+            unit_amount: addonPriceInCents, // Using verified cents amount
             currency: 'usd',
           });
           
