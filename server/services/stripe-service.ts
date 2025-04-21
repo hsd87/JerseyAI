@@ -310,14 +310,15 @@ async function createPaymentIntentWithStripe(
   customerId?: string | null
 ): Promise<string> {
   // Validate the amount (minimum 50 cents)
+  // IMPORTANT: amount is already in cents, should be at least 50 (= $0.50)
   if (!amount || amount < 50) {
-    console.warn(`Invalid amount provided: ${amount}. Setting to minimum 50 cents.`);
+    console.warn(`Invalid amount provided: ${amount} cents. Setting to minimum 50 cents.`);
     amount = 50; // Set to minimum rather than throwing error
   }
   
   // Ensure amount is an integer
   const intAmount = Math.round(amount);
-  console.log(`Creating payment intent for ${intAmount} cents for customer ${customerId} with local Stripe instance`);
+  console.log(`Creating payment intent for ${intAmount} cents (= $${(intAmount/100).toFixed(2)}) for customer ${customerId} with local Stripe instance`);
   
   try {
     // Add timing logs to track potential bottlenecks
@@ -419,16 +420,18 @@ async function createPaymentIntentWithDirectApi(
   amount: number,
   customerId?: string | null
 ): Promise<string> {
-  console.log(`Creating payment intent for ${amount} cents with direct API`);
+  console.log(`Processing payment amount conversion: $${amount} into cents for direct API`);
   
   // Validate the amount (minimum 50 cents)
+  // IMPORTANT: amount is already in cents, should be at least 50 (= $0.50)
   if (!amount || amount < 50) {
-    console.warn(`Invalid amount provided: ${amount}. Setting to minimum 50 cents.`);
+    console.warn(`Invalid amount provided: ${amount} cents. Setting to minimum 50 cents.`);
     amount = 50; // Set to minimum rather than throwing error
   }
   
   // Ensure amount is an integer
   const intAmount = Math.round(amount);
+  console.log(`Creating payment intent for ${intAmount} cents (= $${(intAmount/100).toFixed(2)}) with direct API`);
   
   try {
     // Prepare request body
